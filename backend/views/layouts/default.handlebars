@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+{{> headers/header-main }}
+<body>
+{{> navigation/navigation }}
+{{#if error}}
+    <div class="alert alert-danger">{{error}}</div>
+{{/if}}
+{{{body}}}
+{{> sidebars/comment-sb }}
+{{> sidebars/details-sb }}
+{{> modals/alert }}
+<div id="root">
+</div>
+{{> footers/footer-main }}
+</body>
+{{> jsincludes/js-vendors}}
+{{> jsincludes/js-popovers-tooltips}}
+{{> jsincludes/js-app}}
+{{#if user}}
+<script>
+    let loggedInUserId = {{user.id}};
+</script>
+{{/if}}
+</html>

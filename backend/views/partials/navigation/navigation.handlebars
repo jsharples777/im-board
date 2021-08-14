@@ -1,0 +1,37 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/" data-toggle="tooltip" data-placement="bottom" title="Show All Blog Posts" id="navigationItemShowAll">Tech Blog</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false"
+            aria-controls="navigation" aria-label="Toggle Navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="navigation" class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            {{#if user}}
+                <li class="nav-item pr-2"><a class="nav-link" href="#" data-toggle="tooltip" data-placement="bottom" title="Show your tech blog posts" id="navigationItemDashboard">Show My Entries <i class="fas fa-columns"></i></a></li>
+                <li class="nav-item pr-2"><a class="nav-link" href="#" data-toggle="tooltip" data-placement="bottom" title="Add a new tech blog post" id="navigationItemAddNewEntry">Add New Entry <i class="fas fa-plus-square"></i></a></li>
+            {{else}}
+                <li class="nav-item pr-2"><a class="nav-link" href="/dashboard" data-toggle="tooltip" data-placement="bottom" title="Show your tech blog posts" id="navigationItemDashboard">Show My Entries <i class="fas fa-columns"></i></a></li>
+                <li class="nav-item pr-2"><a class="nav-link" href="/dashboard" data-toggle="tooltip" data-placement="bottom" title="Add a new tech blog post" id="navigationItemAddNewEntry">Add New Entry <i class="fas fa-plus-square"></i></a></li>
+            {{/if}}
+        </ul>
+        <ul class="navbar-nav is-pulled-right">
+            <li class="nav-item dropdown">
+                <a href="#"
+                   class="nav-link dropdown-toggle"
+                   data-toggle="dropdown"
+                   role="button"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    Options <i class="fas fa-cogs"></i> <span class="caret"></span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/register" id="navigationItemRegister">Register <i class="fas fa-user-plus"></i></a>
+                    <a class="dropdown-item {{#if user}}disabled{{/if}}" href="/login" id="navigationItemRegister" >Login <i class="fas fa-sign-in-alt"></i></a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item {{#if user}}{{else}}disabled{{/if}}" href="/logout" id="navigationItemLogout" >Logout <i class="fas fa-sign-out-alt"></i></a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div id="notifications" class="notifications"></div>
