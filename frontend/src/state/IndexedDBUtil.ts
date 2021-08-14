@@ -1,49 +1,52 @@
 import debug from 'debug';
+import {openDB,deleteDB,wrap, unwrap} from "idb";
 
 const idLogger = debug('indexeddb-ts');
 
-// @ts-ignore
-window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB;
-// @ts-ignore
-window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || windows.msIDBTransaction || {READ_WRITE: "readWrite"};
-// @ts-ignore
-window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange ;
 
 
 class IndexedDBUtil {
   private static instance:IndexedDBUtil;
 
   public static getDB():IndexedDBUtil {
-    if (IndexedDBUtil.instance === null) {
+    if (!IndexedDBUtil.instance) {
       IndexedDBUtil.instance = new IndexedDBUtil();
     }
     return IndexedDBUtil.instance;
   }
 
-  private request:IDBOpenDBRequest;
   // @ts-ignore
   private db:IDBDatabase;
 
-  private constructor() {
-    this.request = window.indexedDB.open('imboard-db', 1);
-    if (this.request) { // @ts-ignore
-      this.request.onerror((ev: Event) => {
+  private async initialise() {
+    let request:IDBOpenDBRequest = window.indexedDB.open('imboard-db', 1)
+    idLogger(request);
+    if (request) { // @ts-ignore
+      request.onerror = ((ev: Event) => {
         idLogger('Failed to open database');
       });
     }
 
-    if (this.request) { // @ts-ignore
-      this.request.onsuccess( (ev:Event) => {
+    if (request) { // @ts-ignore
+      request.onsuccess = ((ev: Event) => {
+        // @ts-ignore
+        idLogger('Opened database');
         // @ts-ignore
         this.db = ev.target.result;
+        idLogger(this.db);
         if (this.db) { // @ts-ignore
-          this.db.onerror( (event:Event) => {
-              // @ts-ignore
-              idLogger('Database Error: ' + event.target.errorCode);
+          this.db.onerror = ((event: Event) => {
+            // @ts-ignore
+            idLogger('Database Error: ' + event.target.errorCode);
           })
         }
       });
     }
+
+  }
+
+  private constructor() {
+    idLogger(`Constructor`);
   }
 
   private checkForObjectStore(transaction:IDBTransaction,key:string,keyField:string):IDBObjectStore {
@@ -69,7 +72,7 @@ class IndexedDBUtil {
     idLogger(saveData);
     let transaction:IDBTransaction = this.db.transaction(key,"readwrite");
     // @ts-ignore
-    transaction.oncomplete((event:Event) => {
+    transaction.oncomplete = ((event:Event) => {
       idLogger(`Save for key ${key} - completed.`)
     });
     let objectStore = this.checkForObjectStore(transaction,key,keyField);
@@ -82,7 +85,7 @@ class IndexedDBUtil {
     let transaction:IDBTransaction = this.db.transaction(key);
     let objectStore:IDBObjectStore = this.checkForObjectStore(transaction,key,keyField);
     // @ts-ignore
-    objectStore.openCursor().onsuccess( (event:Event) => {
+    objectStore.openCursor().onsuccess = ( (event:Event) => {
         // @ts-ignore
       let cursor:IDBCursor = event.target.result;
         while (cursor) {
@@ -103,7 +106,7 @@ class IndexedDBUtil {
     }
     let transaction:IDBTransaction = this.db.transaction(key,"readwrite");
     // @ts-ignore
-    transaction.oncomplete((event:Event) => {
+    transaction.oncomplete = ((event:Event) => {
       idLogger(`Add new item to key ${key} - completed.`)
     });
     let objectStore = this.checkForObjectStore(transaction,key,keyField);
@@ -118,7 +121,7 @@ class IndexedDBUtil {
       let objectStore = this.checkForObjectStore(transaction,key,keyField);
       let request = objectStore.delete(item[keyField]);
       // @ts-ignore
-      request.onsuccess((event:Event) => {
+      request.onsuccess = ((event:Event) => {
         idLogger(`Removed item from key ${key} - completed.`)
       });
     }
@@ -132,7 +135,7 @@ class IndexedDBUtil {
        let objectStore = this.checkForObjectStore(transaction,key,keyField);
        let request = objectStore.get(item[keyField]);
        // @ts-ignore
-       request.onsuccess((event:Event) => {
+       request.onsuccess = ((event:Event) => {
          // @ts-ignore
          let previousItem:any = event.target.result;
          if (previousItem) {

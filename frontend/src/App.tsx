@@ -228,7 +228,7 @@ class Root extends React.Component{
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         logger('component Did Mount');
 
         // add the additional views and configure them
@@ -268,8 +268,9 @@ class Root extends React.Component{
         // ok lets try get things done
         controller.initialise();
         // indexedDB access
-        let db:IndexedDBUtil = IndexedDBUtil.getDB();
-        db.addNewItemToCollection("test",{id: 1, data: "Test"});
+        IndexedDBUtil.getDB().then((db:IndexedDBUtil) =>  {
+            if (db) db.addNewItemToCollection("test",{id: 1, data: "Test"});
+        });
 
     }
 

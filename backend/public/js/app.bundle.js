@@ -481,6 +481,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
 /* harmony import */ var _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./component/DetailsSidebarView */ "./src/component/DetailsSidebarView.ts");
 /* harmony import */ var _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./state/IndexedDBUtil */ "./src/state/IndexedDBUtil.ts");
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
@@ -710,48 +714,68 @@ var Root = /*#__PURE__*/function (_React$Component) {
     }
   };
 
-  _proto.componentDidMount = function componentDidMount() {
-    logger('component Did Mount'); // add the additional views and configure them
+  _proto.componentDidMount = /*#__PURE__*/function () {
+    var _componentDidMount = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              logger('component Did Mount'); // add the additional views and configure them
 
-    this.commentView = new _component_CommentSidebarView__WEBPACK_IMPORTED_MODULE_5__["default"](this, document);
-    this.commentView.onDocumentLoaded(); // reset the view state
+              this.commentView = new _component_CommentSidebarView__WEBPACK_IMPORTED_MODULE_5__["default"](this, document);
+              this.commentView.onDocumentLoaded(); // reset the view state
 
-    this.detailsView = new _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_9__["default"](this, document);
-    this.detailsView.onDocumentLoaded(); // navigation item handlers
+              this.detailsView = new _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_9__["default"](this, document);
+              this.detailsView.onDocumentLoaded(); // navigation item handlers
 
-    if (document) {
-      // @ts-ignore
-      document.getElementById(this.state.ui.navigation.addNewEntryId).addEventListener('click', this.handleAddEntry); // @ts-ignore
+              if (document) {
+                // @ts-ignore
+                document.getElementById(this.state.ui.navigation.addNewEntryId).addEventListener('click', this.handleAddEntry); // @ts-ignore
 
-      document.getElementById(this.state.ui.navigation.showMyEntriesId).addEventListener('click', this.handleShowMyEntries);
-    } // alert modal dialog setup
-    // @ts-ignore
+                document.getElementById(this.state.ui.navigation.showMyEntriesId).addEventListener('click', this.handleShowMyEntries);
+              } // alert modal dialog setup
+              // @ts-ignore
 
 
-    this.modalEl = document.getElementById(this.state.ui.alert.modalId); // @ts-ignore
+              this.modalEl = document.getElementById(this.state.ui.alert.modalId); // @ts-ignore
 
-    this.titleEl = document.getElementById(this.state.ui.alert.titleId); // @ts-ignore
+              this.titleEl = document.getElementById(this.state.ui.alert.titleId); // @ts-ignore
 
-    this.contentEl = document.getElementById(this.state.ui.alert.contentId); // @ts-ignore
+              this.contentEl = document.getElementById(this.state.ui.alert.contentId); // @ts-ignore
 
-    this.cancelBtnEl = document.getElementById(this.state.ui.alert.cancelButtonId); // @ts-ignore
+              this.cancelBtnEl = document.getElementById(this.state.ui.alert.cancelButtonId); // @ts-ignore
 
-    this.confirmBtnEl = document.getElementById(this.state.ui.alert.confirmButtonId); // @ts-ignore
+              this.confirmBtnEl = document.getElementById(this.state.ui.alert.confirmButtonId); // @ts-ignore
 
-    this.closeBtnEl = document.getElementById(this.state.ui.alert.closeButtonId); // event listeners for the confirm delete of entry
+              this.closeBtnEl = document.getElementById(this.state.ui.alert.closeButtonId); // event listeners for the confirm delete of entry
 
-    if (this.cancelBtnEl) this.cancelBtnEl.addEventListener('click', this.cancelDelete);
-    if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click', this.confirmDelete);
-    if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete); // ok lets try get things done
+              if (this.cancelBtnEl) this.cancelBtnEl.addEventListener('click', this.cancelDelete);
+              if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click', this.confirmDelete);
+              if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete); // ok lets try get things done
 
-    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].initialise(); // indexedDB access
+              _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].initialise(); // indexedDB access
 
-    var db = _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__["default"].getDB();
-    db.addNewItemToCollection("test", {
-      id: 1,
-      data: "Test"
-    });
-  };
+              _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__["default"].getDB().then(function (db) {
+                if (db) db.addNewItemToCollection("test", {
+                  id: 1,
+                  data: "Test"
+                });
+              });
+
+            case 17:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    function componentDidMount() {
+      return _componentDidMount.apply(this, arguments);
+    }
+
+    return componentDidMount;
+  }();
 
   _proto.hideAllSideBars = function hideAllSideBars() {
     this.commentView.eventHide(null);
@@ -3104,56 +3128,113 @@ var socketManager = new SocketManager();
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
 
-var idLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('indexeddb-ts'); // @ts-ignore
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
 
-window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB; // @ts-ignore
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
 
-window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || windows.msIDBTransaction || {
-  READ_WRITE: "readWrite"
-}; // @ts-ignore
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
 
-window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
+
+var idLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('indexeddb-ts');
 
 var IndexedDBUtil = /*#__PURE__*/function () {
   IndexedDBUtil.getDB = function getDB() {
-    if (IndexedDBUtil.instance === null) {
+    if (!IndexedDBUtil.instance) {
       IndexedDBUtil.instance = new IndexedDBUtil();
     }
 
     return IndexedDBUtil.instance;
-  };
-
-  function IndexedDBUtil() {
-    var _this = this;
-
-    this.request = window.indexedDB.open('imboard-db', 1);
-
-    if (this.request) {
-      // @ts-ignore
-      this.request.onerror(function (ev) {
-        idLogger('Failed to open database');
-      });
-    }
-
-    if (this.request) {
-      // @ts-ignore
-      this.request.onsuccess(function (ev) {
-        // @ts-ignore
-        _this.db = ev.target.result;
-
-        if (_this.db) {
-          // @ts-ignore
-          _this.db.onerror(function (event) {
-            // @ts-ignore
-            idLogger('Database Error: ' + event.target.errorCode);
-          });
-        }
-      });
-    }
-  }
+  } // @ts-ignore
+  ;
 
   var _proto = IndexedDBUtil.prototype;
+
+  _proto.initialise = /*#__PURE__*/function () {
+    var _initialise = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      var _this = this;
+
+      var request;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              request = window.indexedDB.open('imboard-db', 1);
+              idLogger(request);
+
+              if (request) {
+                // @ts-ignore
+                request.onerror = function (ev) {
+                  idLogger('Failed to open database');
+                };
+              }
+
+              if (request) {
+                // @ts-ignore
+                request.onsuccess = function (ev) {
+                  // @ts-ignore
+                  idLogger('Opened database'); // @ts-ignore
+
+                  _this.db = ev.target.result;
+                  idLogger(_this.db);
+
+                  if (_this.db) {
+                    // @ts-ignore
+                    _this.db.onerror = function (event) {
+                      // @ts-ignore
+                      idLogger('Database Error: ' + event.target.errorCode);
+                    };
+                  }
+                };
+              }
+
+            case 4:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    function initialise() {
+      return _initialise.apply(this, arguments);
+    }
+
+    return initialise;
+  }();
+
+  function IndexedDBUtil() {
+    idLogger("Constructor");
+  }
 
   _proto.checkForObjectStore = function checkForObjectStore(transaction, key, keyField) {
     var store;
@@ -3189,9 +3270,10 @@ var IndexedDBUtil = /*#__PURE__*/function () {
     idLogger(saveData);
     var transaction = this.db.transaction(key, "readwrite"); // @ts-ignore
 
-    transaction.oncomplete(function (event) {
+    transaction.oncomplete = function (event) {
       idLogger("Save for key " + key + " - completed.");
-    });
+    };
+
     var objectStore = this.checkForObjectStore(transaction, key, keyField);
     this.saveItemsToCollection(objectStore, saveData, keyField);
   };
@@ -3206,7 +3288,7 @@ var IndexedDBUtil = /*#__PURE__*/function () {
     var transaction = this.db.transaction(key);
     var objectStore = this.checkForObjectStore(transaction, key, keyField); // @ts-ignore
 
-    objectStore.openCursor().onsuccess(function (event) {
+    objectStore.openCursor().onsuccess = function (event) {
       // @ts-ignore
       var cursor = event.target.result;
 
@@ -3215,7 +3297,8 @@ var IndexedDBUtil = /*#__PURE__*/function () {
         savedResults.push(cursor.value);
         cursor.continue();
       }
-    });
+    };
+
     return savedResults;
   }
   /* add a new item to the local storage if not already there */
@@ -3233,9 +3316,10 @@ var IndexedDBUtil = /*#__PURE__*/function () {
 
     var transaction = this.db.transaction(key, "readwrite"); // @ts-ignore
 
-    transaction.oncomplete(function (event) {
+    transaction.oncomplete = function (event) {
       idLogger("Add new item to key " + key + " - completed.");
-    });
+    };
+
     var objectStore = this.checkForObjectStore(transaction, key, keyField);
     this.saveItemsToCollection(objectStore, [item], keyField);
   };
@@ -3252,9 +3336,9 @@ var IndexedDBUtil = /*#__PURE__*/function () {
       var objectStore = this.checkForObjectStore(transaction, key, keyField);
       var request = objectStore.delete(item[keyField]); // @ts-ignore
 
-      request.onsuccess(function (event) {
+      request.onsuccess = function (event) {
         idLogger("Removed item from key " + key + " - completed.");
-      });
+      };
     }
   };
 
@@ -3270,7 +3354,7 @@ var IndexedDBUtil = /*#__PURE__*/function () {
       var objectStore = this.checkForObjectStore(transaction, key, keyField);
       var request = objectStore.get(item[keyField]); // @ts-ignore
 
-      request.onsuccess(function (event) {
+      request.onsuccess = function (event) {
         // @ts-ignore
         var previousItem = event.target.result;
 
@@ -3279,7 +3363,7 @@ var IndexedDBUtil = /*#__PURE__*/function () {
         } else {
           objectStore.add(item, item[keyField]);
         }
-      });
+      };
     }
   };
 
