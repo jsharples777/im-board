@@ -755,14 +755,19 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
               _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].initialise(); // indexedDB access
 
-              _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__["default"].getDB().then(function (db) {
-                if (db) db.addNewItemToCollection("test", {
-                  id: 1,
-                  data: "Test"
-                });
+              _context.next = 18;
+              return _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__["default"].getDB().initialise([{
+                name: "test",
+                keyField: "id"
+              }]);
+
+            case 18:
+              _context.next = 20;
+              return _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__["default"].getDB().addNewItemToCollection("test", {
+                id: 1
               });
 
-            case 17:
+            case 20:
             case "end":
               return _context.stop();
           }
@@ -3128,6 +3133,7 @@ var socketManager = new SocketManager();
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var idb__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! idb */ "./node_modules/idb/build/esm/index.js");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -3165,6 +3171,7 @@ function _asyncToGenerator(fn) {
 }
 
 
+
 var idLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('indexeddb-ts');
 
 var IndexedDBUtil = /*#__PURE__*/function () {
@@ -3174,50 +3181,35 @@ var IndexedDBUtil = /*#__PURE__*/function () {
     }
 
     return IndexedDBUtil.instance;
-  } // @ts-ignore
-  ;
+  };
 
   var _proto = IndexedDBUtil.prototype;
 
   _proto.initialise = /*#__PURE__*/function () {
-    var _initialise = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-      var _this = this;
-
-      var request;
+    var _initialise = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(collections) {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              request = window.indexedDB.open('imboard-db', 1);
-              idLogger(request);
+              _context.next = 2;
+              return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1, {
+                upgrade: function upgrade(db, oldVersion, newVersion, transaction) {
+                  collections.forEach(function (collection) {
+                    db.createObjectStore(collection.name, {
+                      keyPath: collection.keyField,
+                      autoIncrement: false
+                    });
+                  });
+                },
+                blocked: function blocked() {// …
+                },
+                blocking: function blocking() {// …
+                },
+                terminated: function terminated() {// …
+                }
+              });
 
-              if (request) {
-                // @ts-ignore
-                request.onerror = function (ev) {
-                  idLogger('Failed to open database');
-                };
-              }
-
-              if (request) {
-                // @ts-ignore
-                request.onsuccess = function (ev) {
-                  // @ts-ignore
-                  idLogger('Opened database'); // @ts-ignore
-
-                  _this.db = ev.target.result;
-                  idLogger(_this.db);
-
-                  if (_this.db) {
-                    // @ts-ignore
-                    _this.db.onerror = function (event) {
-                      // @ts-ignore
-                      idLogger('Database Error: ' + event.target.errorCode);
-                    };
-                  }
-                };
-              }
-
-            case 4:
+            case 2:
             case "end":
               return _context.stop();
           }
@@ -3225,7 +3217,7 @@ var IndexedDBUtil = /*#__PURE__*/function () {
       }, _callee);
     }));
 
-    function initialise() {
+    function initialise(_x) {
       return _initialise.apply(this, arguments);
     }
 
@@ -3236,136 +3228,358 @@ var IndexedDBUtil = /*#__PURE__*/function () {
     idLogger("Constructor");
   }
 
-  _proto.checkForObjectStore = function checkForObjectStore(transaction, key, keyField) {
-    var store;
+  _proto.checkForObjectStore = /*#__PURE__*/function () {
+    var _checkForObjectStore = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(db, key, keyField) {
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              if (db.objectStoreNames.contains(key)) {
+                _context2.next = 3;
+                break;
+              }
 
-    if (!this.db.objectStoreNames.contains(key)) {
-      store = this.db.createObjectStore(key, {
-        keyPath: keyField,
-        autoIncrement: false
-      });
-    } else {
-      store = transaction.objectStore(key);
+              _context2.next = 3;
+              return db.createObjectStore(key, {
+                keyPath: keyField,
+                autoIncrement: false
+              });
+
+            case 3:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, _callee2);
+    }));
+
+    function checkForObjectStore(_x2, _x3, _x4) {
+      return _checkForObjectStore.apply(this, arguments);
     }
 
-    return store;
-  };
+    return checkForObjectStore;
+  }();
 
-  _proto.saveItemsToCollection = function saveItemsToCollection(objectStore, saveData, keyField) {
-    if (keyField === void 0) {
-      keyField = 'id';
+  _proto.saveItemsToCollection = /*#__PURE__*/function () {
+    var _saveItemsToCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(objectStore, saveData, keyField) {
+      return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              if (keyField === void 0) {
+                keyField = 'id';
+              }
+
+              saveData.forEach(function (data) {
+                // @ts-ignore
+                objectStore.add(data);
+              });
+
+            case 2:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3);
+    }));
+
+    function saveItemsToCollection(_x5, _x6, _x7) {
+      return _saveItemsToCollection.apply(this, arguments);
     }
 
-    saveData.forEach(function (data) {
-      var request = objectStore.add(data, data[keyField]);
-    });
-  };
+    return saveItemsToCollection;
+  }();
 
-  _proto.saveWithCollectionKey = function saveWithCollectionKey(key, saveData, keyField) {
-    if (keyField === void 0) {
-      keyField = 'id';
+  _proto.saveWithCollectionKey = /*#__PURE__*/function () {
+    var _saveWithCollectionKey = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(key, saveData, keyField) {
+      var db, transaction, objectStore;
+      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              if (keyField === void 0) {
+                keyField = 'id';
+              }
+
+              idLogger("Saving with key " + key);
+              idLogger(saveData);
+              _context4.next = 5;
+              return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
+
+            case 5:
+              db = _context4.sent;
+              _context4.next = 8;
+              return this.checkForObjectStore(db, key, keyField);
+
+            case 8:
+              // @ts-ignore
+              transaction = db.transaction(key, "readwrite"); // @ts-ignore
+
+              objectStore = transaction.store; // @ts-ignore
+
+              _context4.next = 12;
+              return this.saveItemsToCollection(objectStore, saveData, keyField);
+
+            case 12:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, _callee4, this);
+    }));
+
+    function saveWithCollectionKey(_x8, _x9, _x10) {
+      return _saveWithCollectionKey.apply(this, arguments);
     }
 
-    idLogger("Saving with key " + key);
-    idLogger(saveData);
-    var transaction = this.db.transaction(key, "readwrite"); // @ts-ignore
+    return saveWithCollectionKey;
+  }();
 
-    transaction.oncomplete = function (event) {
-      idLogger("Save for key " + key + " - completed.");
-    };
+  _proto.getWithCollectionKey = /*#__PURE__*/function () {
+    var _getWithCollectionKey = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(key, keyField) {
+      var savedResults, db, transaction, objectStore, cursor;
+      return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              if (keyField === void 0) {
+                keyField = 'id';
+              }
 
-    var objectStore = this.checkForObjectStore(transaction, key, keyField);
-    this.saveItemsToCollection(objectStore, saveData, keyField);
-  };
+              savedResults = [];
+              idLogger("Loading with key " + key);
+              _context5.next = 5;
+              return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
 
-  _proto.getWithCollectionKey = function getWithCollectionKey(key, keyField) {
-    if (keyField === void 0) {
-      keyField = 'id';
+            case 5:
+              db = _context5.sent;
+              _context5.next = 8;
+              return this.checkForObjectStore(db, key, keyField);
+
+            case 8:
+              ; // @ts-ignore
+
+              transaction = db.transaction(key); // @ts-ignore
+
+              objectStore = transaction.store; // @ts-ignore
+
+              _context5.next = 13;
+              return objectStore.openCursor();
+
+            case 13:
+              cursor = _context5.sent;
+
+            case 14:
+              if (!cursor) {
+                _context5.next = 21;
+                break;
+              } // @ts-ignore
+
+
+              savedResults.push(cursor.value); // @ts-ignore
+
+              _context5.next = 18;
+              return cursor.continue();
+
+            case 18:
+              cursor = _context5.sent;
+              _context5.next = 14;
+              break;
+
+            case 21:
+              return _context5.abrupt("return", savedResults);
+
+            case 22:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, _callee5, this);
+    }));
+
+    function getWithCollectionKey(_x11, _x12) {
+      return _getWithCollectionKey.apply(this, arguments);
     }
 
-    var savedResults = [];
-    idLogger("Loading with key " + key);
-    var transaction = this.db.transaction(key);
-    var objectStore = this.checkForObjectStore(transaction, key, keyField); // @ts-ignore
-
-    objectStore.openCursor().onsuccess = function (event) {
-      // @ts-ignore
-      var cursor = event.target.result;
-
-      while (cursor) {
-        // @ts-ignore
-        savedResults.push(cursor.value);
-        cursor.continue();
-      }
-    };
-
-    return savedResults;
-  }
+    return getWithCollectionKey;
+  }()
   /* add a new item to the local storage if not already there */
   ;
 
-  _proto.addNewItemToCollection = function addNewItemToCollection(key, item, keyField) {
-    if (keyField === void 0) {
-      keyField = 'id';
-    }
+  _proto.addNewItemToCollection = /*#__PURE__*/function () {
+    var _addNewItemToCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(key, item, keyField) {
+      var db, transaction, objectStore;
+      return regeneratorRuntime.wrap(function _callee6$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              if (keyField === void 0) {
+                keyField = 'id';
+              }
 
-    if (item !== null) {
-      idLogger("Adding with key " + key);
-      idLogger(item);
-    }
+              if (item !== null) {
+                idLogger("Adding with key " + key);
+                idLogger(item);
+              }
 
-    var transaction = this.db.transaction(key, "readwrite"); // @ts-ignore
+              _context6.next = 4;
+              return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
 
-    transaction.oncomplete = function (event) {
-      idLogger("Add new item to key " + key + " - completed.");
-    };
+            case 4:
+              db = _context6.sent;
+              _context6.next = 7;
+              return this.checkForObjectStore(db, key, keyField);
 
-    var objectStore = this.checkForObjectStore(transaction, key, keyField);
-    this.saveItemsToCollection(objectStore, [item], keyField);
-  };
+            case 7:
+              ; // @ts-ignore
 
-  _proto.removeItemFromCollection = function removeItemFromCollection(key, item, keyField) {
-    if (keyField === void 0) {
-      keyField = 'id';
-    }
+              transaction = db.transaction(key, "readwrite"); // @ts-ignore
 
-    if (item !== null) {
-      idLogger("Removing with key " + key);
-      idLogger(item);
-      var transaction = this.db.transaction(key, "readwrite");
-      var objectStore = this.checkForObjectStore(transaction, key, keyField);
-      var request = objectStore.delete(item[keyField]); // @ts-ignore
+              objectStore = transaction.store;
+              this.saveItemsToCollection(objectStore, [item], keyField);
 
-      request.onsuccess = function (event) {
-        idLogger("Removed item from key " + key + " - completed.");
-      };
-    }
-  };
-
-  _proto.updateItemInCollection = function updateItemInCollection(key, item, keyField) {
-    if (keyField === void 0) {
-      keyField = 'id';
-    }
-
-    if (item) {
-      idLogger("Updating item in storage " + key);
-      idLogger(item);
-      var transaction = this.db.transaction(key, "readwrite");
-      var objectStore = this.checkForObjectStore(transaction, key, keyField);
-      var request = objectStore.get(item[keyField]); // @ts-ignore
-
-      request.onsuccess = function (event) {
-        // @ts-ignore
-        var previousItem = event.target.result;
-
-        if (previousItem) {
-          objectStore.put(item, item[keyField]);
-        } else {
-          objectStore.add(item, item[keyField]);
+            case 11:
+            case "end":
+              return _context6.stop();
+          }
         }
-      };
+      }, _callee6, this);
+    }));
+
+    function addNewItemToCollection(_x13, _x14, _x15) {
+      return _addNewItemToCollection.apply(this, arguments);
     }
-  };
+
+    return addNewItemToCollection;
+  }();
+
+  _proto.removeItemFromCollection = /*#__PURE__*/function () {
+    var _removeItemFromCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(key, item, keyField) {
+      var db, transaction, objectStore;
+      return regeneratorRuntime.wrap(function _callee7$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              if (keyField === void 0) {
+                keyField = 'id';
+              }
+
+              if (!(item !== null)) {
+                _context7.next = 16;
+                break;
+              }
+
+              idLogger("Removing with key " + key);
+              idLogger(item);
+              _context7.next = 6;
+              return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
+
+            case 6:
+              db = _context7.sent;
+              _context7.next = 9;
+              return this.checkForObjectStore(db, key, keyField);
+
+            case 9:
+              ; // @ts-ignore
+
+              transaction = db.transaction(key, "readwrite"); // @ts-ignore
+
+              objectStore = transaction.store; // @ts-ignore
+
+              _context7.next = 14;
+              return objectStore.delete(item[keyField]);
+
+            case 14:
+              _context7.next = 16;
+              return transaction.done;
+
+            case 16:
+            case "end":
+              return _context7.stop();
+          }
+        }
+      }, _callee7, this);
+    }));
+
+    function removeItemFromCollection(_x16, _x17, _x18) {
+      return _removeItemFromCollection.apply(this, arguments);
+    }
+
+    return removeItemFromCollection;
+  }();
+
+  _proto.updateItemInCollection = /*#__PURE__*/function () {
+    var _updateItemInCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(key, item, keyField) {
+      var db, transaction, objectStore, previousItem;
+      return regeneratorRuntime.wrap(function _callee8$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              if (keyField === void 0) {
+                keyField = 'id';
+              }
+
+              if (!item) {
+                _context8.next = 24;
+                break;
+              }
+
+              idLogger("Updating item in storage " + key);
+              idLogger(item);
+              _context8.next = 6;
+              return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
+
+            case 6:
+              db = _context8.sent;
+              _context8.next = 9;
+              return this.checkForObjectStore(db, key, keyField);
+
+            case 9:
+              ; // @ts-ignore
+
+              transaction = db.transaction(key, "readwrite"); // @ts-ignore
+
+              objectStore = transaction.store;
+              _context8.next = 14;
+              return objectStore.get(item[keyField]);
+
+            case 14:
+              previousItem = _context8.sent;
+
+              if (!previousItem) {
+                _context8.next = 20;
+                break;
+              }
+
+              _context8.next = 18;
+              return objectStore.put(item, item[keyField]);
+
+            case 18:
+              _context8.next = 22;
+              break;
+
+            case 20:
+              _context8.next = 22;
+              return objectStore.add(item, item[keyField]);
+
+            case 22:
+              _context8.next = 24;
+              return transaction.done;
+
+            case 24:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, _callee8, this);
+    }));
+
+    function updateItemInCollection(_x19, _x20, _x21) {
+      return _updateItemInCollection.apply(this, arguments);
+    }
+
+    return updateItemInCollection;
+  }();
 
   return IndexedDBUtil;
 }();

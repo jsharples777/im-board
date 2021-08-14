@@ -268,9 +268,9 @@ class Root extends React.Component{
         // ok lets try get things done
         controller.initialise();
         // indexedDB access
-        IndexedDBUtil.getDB().then((db:IndexedDBUtil) =>  {
-            if (db) db.addNewItemToCollection("test",{id: 1, data: "Test"});
-        });
+        await IndexedDBUtil.getDB().initialise([{name:"test",keyField:"id"}]);
+        await IndexedDBUtil.getDB().addNewItemToCollection("test",{id:1});
+
 
     }
 
