@@ -1,2 +1,3657 @@
-!function(e){function t(t){for(var i,s,o=t[0],c=t[1],l=t[2],u=0,m=[];u<o.length;u++)s=o[u],Object.prototype.hasOwnProperty.call(a,s)&&a[s]&&m.push(a[s][0]),a[s]=0;for(i in c)Object.prototype.hasOwnProperty.call(c,i)&&(e[i]=c[i]);for(d&&d(t);m.length;)m.shift()();return r.push.apply(r,l||[]),n()}function n(){for(var e,t=0;t<r.length;t++){for(var n=r[t],i=!0,o=1;o<n.length;o++){var c=n[o];0!==a[c]&&(i=!1)}i&&(r.splice(t--,1),e=s(s.s=n[0]))}return e}var i={},a={0:0},r=[];function s(t){if(i[t])return i[t].exports;var n=i[t]={i:t,l:!1,exports:{}};return e[t].call(n.exports,n,n.exports,s),n.l=!0,n.exports}s.m=e,s.c=i,s.d=function(e,t,n){s.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:n})},s.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},s.t=function(e,t){if(1&t&&(e=s(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var n=Object.create(null);if(s.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var i in e)s.d(n,i,function(t){return e[t]}.bind(null,i));return n},s.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return s.d(t,"a",t),t},s.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},s.p="";var o=window.webpackJsonp=window.webpackJsonp||[],c=o.push.bind(o);o.push=t,o=o.slice();for(var l=0;l<o.length;l++)t(o[l]);var d=c;r.push([141,1]),n()}({141:function(e,t,n){e.exports=n(153)},150:function(e,t,n){var i={"./af":5,"./af.js":5,"./ar":6,"./ar-dz":7,"./ar-dz.js":7,"./ar-kw":8,"./ar-kw.js":8,"./ar-ly":9,"./ar-ly.js":9,"./ar-ma":10,"./ar-ma.js":10,"./ar-sa":11,"./ar-sa.js":11,"./ar-tn":12,"./ar-tn.js":12,"./ar.js":6,"./az":13,"./az.js":13,"./be":14,"./be.js":14,"./bg":15,"./bg.js":15,"./bm":16,"./bm.js":16,"./bn":17,"./bn-bd":18,"./bn-bd.js":18,"./bn.js":17,"./bo":19,"./bo.js":19,"./br":20,"./br.js":20,"./bs":21,"./bs.js":21,"./ca":22,"./ca.js":22,"./cs":23,"./cs.js":23,"./cv":24,"./cv.js":24,"./cy":25,"./cy.js":25,"./da":26,"./da.js":26,"./de":27,"./de-at":28,"./de-at.js":28,"./de-ch":29,"./de-ch.js":29,"./de.js":27,"./dv":30,"./dv.js":30,"./el":31,"./el.js":31,"./en-au":32,"./en-au.js":32,"./en-ca":33,"./en-ca.js":33,"./en-gb":34,"./en-gb.js":34,"./en-ie":35,"./en-ie.js":35,"./en-il":36,"./en-il.js":36,"./en-in":37,"./en-in.js":37,"./en-nz":38,"./en-nz.js":38,"./en-sg":39,"./en-sg.js":39,"./eo":40,"./eo.js":40,"./es":41,"./es-do":42,"./es-do.js":42,"./es-mx":43,"./es-mx.js":43,"./es-us":44,"./es-us.js":44,"./es.js":41,"./et":45,"./et.js":45,"./eu":46,"./eu.js":46,"./fa":47,"./fa.js":47,"./fi":48,"./fi.js":48,"./fil":49,"./fil.js":49,"./fo":50,"./fo.js":50,"./fr":51,"./fr-ca":52,"./fr-ca.js":52,"./fr-ch":53,"./fr-ch.js":53,"./fr.js":51,"./fy":54,"./fy.js":54,"./ga":55,"./ga.js":55,"./gd":56,"./gd.js":56,"./gl":57,"./gl.js":57,"./gom-deva":58,"./gom-deva.js":58,"./gom-latn":59,"./gom-latn.js":59,"./gu":60,"./gu.js":60,"./he":61,"./he.js":61,"./hi":62,"./hi.js":62,"./hr":63,"./hr.js":63,"./hu":64,"./hu.js":64,"./hy-am":65,"./hy-am.js":65,"./id":66,"./id.js":66,"./is":67,"./is.js":67,"./it":68,"./it-ch":69,"./it-ch.js":69,"./it.js":68,"./ja":70,"./ja.js":70,"./jv":71,"./jv.js":71,"./ka":72,"./ka.js":72,"./kk":73,"./kk.js":73,"./km":74,"./km.js":74,"./kn":75,"./kn.js":75,"./ko":76,"./ko.js":76,"./ku":77,"./ku.js":77,"./ky":78,"./ky.js":78,"./lb":79,"./lb.js":79,"./lo":80,"./lo.js":80,"./lt":81,"./lt.js":81,"./lv":82,"./lv.js":82,"./me":83,"./me.js":83,"./mi":84,"./mi.js":84,"./mk":85,"./mk.js":85,"./ml":86,"./ml.js":86,"./mn":87,"./mn.js":87,"./mr":88,"./mr.js":88,"./ms":89,"./ms-my":90,"./ms-my.js":90,"./ms.js":89,"./mt":91,"./mt.js":91,"./my":92,"./my.js":92,"./nb":93,"./nb.js":93,"./ne":94,"./ne.js":94,"./nl":95,"./nl-be":96,"./nl-be.js":96,"./nl.js":95,"./nn":97,"./nn.js":97,"./oc-lnc":98,"./oc-lnc.js":98,"./pa-in":99,"./pa-in.js":99,"./pl":100,"./pl.js":100,"./pt":101,"./pt-br":102,"./pt-br.js":102,"./pt.js":101,"./ro":103,"./ro.js":103,"./ru":104,"./ru.js":104,"./sd":105,"./sd.js":105,"./se":106,"./se.js":106,"./si":107,"./si.js":107,"./sk":108,"./sk.js":108,"./sl":109,"./sl.js":109,"./sq":110,"./sq.js":110,"./sr":111,"./sr-cyrl":112,"./sr-cyrl.js":112,"./sr.js":111,"./ss":113,"./ss.js":113,"./sv":114,"./sv.js":114,"./sw":115,"./sw.js":115,"./ta":116,"./ta.js":116,"./te":117,"./te.js":117,"./tet":118,"./tet.js":118,"./tg":119,"./tg.js":119,"./th":120,"./th.js":120,"./tk":121,"./tk.js":121,"./tl-ph":122,"./tl-ph.js":122,"./tlh":123,"./tlh.js":123,"./tr":124,"./tr.js":124,"./tzl":125,"./tzl.js":125,"./tzm":126,"./tzm-latn":127,"./tzm-latn.js":127,"./tzm.js":126,"./ug-cn":128,"./ug-cn.js":128,"./uk":129,"./uk.js":129,"./ur":130,"./ur.js":130,"./uz":131,"./uz-latn":132,"./uz-latn.js":132,"./uz.js":131,"./vi":133,"./vi.js":133,"./x-pseudo":134,"./x-pseudo.js":134,"./yo":135,"./yo.js":135,"./zh-cn":136,"./zh-cn.js":136,"./zh-hk":137,"./zh-hk.js":137,"./zh-mo":138,"./zh-mo.js":138,"./zh-tw":139,"./zh-tw.js":139};function a(e){var t=r(e);return n(t)}function r(e){if(!n.o(i,e)){var t=new Error("Cannot find module '"+e+"'");throw t.code="MODULE_NOT_FOUND",t}return i[e]}a.keys=function(){return Object.keys(i)},a.resolve=r,e.exports=a,a.id=150},153:function(e,t,n){"use strict";n.r(t);var i=n(1),a=n.n(i),r=n(140),s=n.n(r),o=n(2),c=n.n(o),l=n(0),d=n.n(l);function u(){return(u=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var i in n)Object.prototype.hasOwnProperty.call(n,i)&&(e[i]=n[i])}return e}).apply(this,arguments)}var m,h,g=c()("api-ts"),f=new(function(){function e(){}var t=e.prototype;return t.fetchJSON=function(e,t,n,i,a){fetch(e,t).then((function(e){if(g("Response code was "+e.status),e.status>=200&&e.status<=299)return e.json()})).then((function(e){g(e),n(e,200,i,a)})).catch((function(e){g(e),n(null,500,i,a)}))},t.apiFetchJSONWithPost=function(e){g("Executing fetch with URL "+e.originalRequest.url+" with body "+e.originalRequest.params);try{JSON.stringify(e.originalRequest.params)}catch(t){g("Unable to convert parameters to JSON"),g(e.originalRequest.params,100),e.callback(null,404,e.queueType,e.requestId)}var t={method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(u({},e.originalRequest.params))};this.fetchJSON(e.originalRequest.url,t,e.callback,e.queueType,e.requestId)},t.apiFetchJSONWithGet=function(e){g("Executing GET fetch with URL "+e.originalRequest.url+" with id "+e.originalRequest.params.id);e.originalRequest.params.id&&(e.originalRequest.url+="/"+e.originalRequest.params.id),this.fetchJSON(e.originalRequest.url,{method:"GET",headers:{"Content-Type":"application/json"}},e.callback,e.queueType,e.requestId)},t.apiFetchJSONWithDelete=function(e){g("Executing DELETE fetch with URL "+e.originalRequest.url+" with id "+e.originalRequest.params.id);e.originalRequest.params.id&&(e.originalRequest.url+="/"+e.originalRequest.params.id),this.fetchJSON(e.originalRequest.url,{method:"DELETE",headers:{"Content-Type":"application/json"}},e.callback,e.queueType,e.requestId)},t.apiFetchJSONWithPut=function(e){g("Executing PUT fetch with URL "+e.originalRequest.url+" with id "+e.originalRequest.params.id);var t={method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(u({},e.originalRequest.params))};e.originalRequest.params.id&&(e.originalRequest.url+="/"+e.originalRequest.params.id),this.fetchJSON(e.originalRequest.url,t,e.callback,e.queueType,e.requestId)},e}()),p=new(function(){function e(){}return e.prototype.getUniqueId=function(){return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,(function(e){var t=16*Math.random()|0;return("x"==e?t:3&t|8).toString(16)}))},e}());function y(e,t,n,i,a,r,s){try{var o=e[r](s),c=o.value}catch(e){return void n(e)}o.done?t(c):Promise.resolve(c).then(i,a)}function v(e){return function(){var t=this,n=arguments;return new Promise((function(i,a){var r=e.apply(t,n);function s(e){y(r,i,a,s,o,"next",e)}function o(e){y(r,i,a,s,o,"throw",e)}s(void 0)}))}}!function(e){e[e.POST=0]="POST",e[e.GET=1]="GET",e[e.PUT=2]="PUT",e[e.DELETE=3]="DELETE"}(m||(m={})),function(e){e[e.PRIORITY=0]="PRIORITY",e[e.BACKGROUND=1]="BACKGROUND"}(h||(h={}));var E=c()("api-ts"),b=new(function(){function e(){this.backgroundQueue=[],this.priorityQueue=[],this.inProgress=[],this.backgroundChangeListener=null,this.priorityChangeListener=null,this.callbackForQueueRequest=this.callbackForQueueRequest.bind(this)}var t=e.prototype;return t.setBackgroundChangeListener=function(e){this.backgroundChangeListener=e},t.setPriorityChangeListener=function(e){this.priorityChangeListener=e},t.getPriorityQueueCount=function(){return this.priorityQueue.length},t.getBackgroundQueueCount=function(){return this.backgroundQueue.length},t.addApiRequest=function(e,t){void 0===t&&(t=!1);var n=p.getUniqueId();if(E("Download Manger: Adding Queue Request "+n),E(e,200),t){var i={originalRequest:e,requestId:n,queueType:h.PRIORITY,callback:this.callbackForQueueRequest};this.priorityQueue.push(i),this.priorityChangeListener&&this.priorityChangeListener.handleEventAddToQueue()}else{var a={originalRequest:e,requestId:n,queueType:h.BACKGROUND,callback:this.callbackForQueueRequest};this.backgroundQueue.push(a),this.backgroundChangeListener&&this.backgroundChangeListener.handleEventAddToQueue()}this.processQueues()},t.processPriorityQueue=function(){var e=v(regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:void 0!==(t=this.priorityQueue.shift())&&this.inProgress.push(t),void 0!==t&&this.initiateFetchForQueueItem(t);case 3:case"end":return e.stop()}}),e,this)})));return function(){return e.apply(this,arguments)}}(),t.processBackgroundQueue=function(){var e=v(regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:void 0!==(t=this.backgroundQueue.shift())&&this.inProgress.push(t),void 0!==t&&this.initiateFetchForQueueItem(t);case 3:case"end":return e.stop()}}),e,this)})));return function(){return e.apply(this,arguments)}}(),t.processQueues=function(){var e=v(regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:t=this.priorityQueue.length+this.backgroundQueue.length;case 1:if(!(t>0)){e.next=14;break}if(E("Download Manager: processing queue, items remaining "+t),!(this.priorityQueue.length>0)){e.next=8;break}return e.next=6,this.processPriorityQueue();case 6:e.next=11;break;case 8:if(!(this.backgroundQueue.length>0)){e.next=11;break}return e.next=11,this.processBackgroundQueue();case 11:t=this.priorityQueue.length+this.backgroundQueue.length,e.next=1;break;case 14:case"end":return e.stop()}}),e,this)})));return function(){return e.apply(this,arguments)}}(),t.callbackForQueueRequest=function(e,t,n,i){n===h.PRIORITY?this.priorityChangeListener&&this.priorityChangeListener.handleEventRemoveFromQueue():this.backgroundChangeListener&&this.backgroundChangeListener.handleEventRemoveFromQueue(),E("Download Manager: received callback for queue "+n+" request "+i+" with status "+t);var a=this.inProgress.findIndex((function(e){return e.requestId===i}));if(a>=0){var r=this.inProgress[a];this.inProgress.splice(a,1),E(r),E("Download Manager: finished for queue item "+r.requestId),r.originalRequest.callback(e,t)}},t.initiateFetchForQueueItem=function(e){if(E("Download Manager: initiating fetch for queue item "+e.requestId),E(e),null!==e.originalRequest.url&&null!=e.originalRequest.params&&null!=e.originalRequest.callback)switch(e.originalRequest.type){case m.POST:f.apiFetchJSONWithPost(e);break;case m.GET:f.apiFetchJSONWithGet(e);break;case m.DELETE:f.apiFetchJSONWithDelete(e);break;case m.PUT:f.apiFetchJSONWithPut(e)}},e}()),I=c()("state-manager-ts"),S=function(){function e(){this.applicationState=[],this.stateChangeListeners=[]}e.create=function(){return null===e._instance&&(e._instance=new e),e._instance};var t=e.prototype;return t.isStatePresent=function(e){var t=this.applicationState.findIndex((function(t){return t.name===e}))>=0;return I("State Manager: Checking state of "+e+" is present = "+t),t},t.informChangeListenersForStateWithName=function(e,t){I("State Manager: Informing state listeners of "+e);var n=this.stateChangeListeners.findIndex((function(t){return t.name===e}));if(n>=0){I("State Manager: Found state listeners of "+e);for(var i=this.stateChangeListeners[n],a=0;a<i.listeners.length;a++){I("State Manager: Found state listener of "+e+" - informing"),i.listeners[a].stateChanged(e,t)}}},t.addChangeListenerForName=function(e,t){I("State Manager: Adding state listener for "+e);var n=this.stateChangeListeners.findIndex((function(t){return t.name===e}));if(n>=0){this.stateChangeListeners[n].listeners.push(t)}else{I("State Manager: Adding state listener for "+e+" - first occurrence");var i={name:e,listeners:[t]};this.stateChangeListeners.push(i)}},t.getStateByName=function(e){I("State Manager: Getting state for "+e);var t={},n=this.applicationState.findIndex((function(t){return t.name===e}));n>=0?(t=this.applicationState[n].value,I("State Manager: Found previous state for "+e),I(t)):t=this.addStateByName(e,[]);return t},t.setStateByName=function(e,t){I("State Manager: Setting state for "+e),I(t);var n=this.applicationState.findIndex((function(t){return t.name===e}));n>=0?this.applicationState[n].value=t:this.addStateByName(e,t);return this.informChangeListenersForStateWithName(e,t),t},t.addStateByName=function(e,t){if(this.isStatePresent(e))this.setStateByName(e,t);else{I("State Manager: Adding state for "+e+" - first occurrence"),I(t,201);var n={name:e,value:t};this.applicationState.push(n)}return t},t.addNewItemToState=function(e,t){I("State Manager: Adding item to state "+e);var n=this.getStateByName(e);n.push(t),I(n),this.informChangeListenersForStateWithName(e,n)},t.findItemInState=function(e,t,n){var i={},a=this.getStateByName(e),r=a.findIndex((function(e){return n(e,t)}));return I("Finding item in state "+e+" - found index "+r),I(t),r>=0&&(i=a[r]),i},t.isItemInState=function(e,t,n){var i=!1;return this.getStateByName(e).findIndex((function(e){return n(e,t)}))>=0&&(i=!0),i},t.removeItemFromState=function(e,t,n){var i=!1,a=this.getStateByName(e),r=a.findIndex((function(e){return n(e,t)}));return r>=0&&(i=!0,I("State Manager: Found item - removing "),a.splice(r,1),I(a),this.setStateByName(e,a)),i},t.updateItemInState=function(e,t,n){var i=!1,a=this.getStateByName(e),r=a.findIndex((function(e){return n(e,t)}));return r>=0?(i=!0,I("State Manager: Found item - replacing "),a.splice(r,1,t),I(a),this.setStateByName(e,a)):this.addNewItemToState(e,t),i},e}();S._instance=null;var C=S.create();function w(e,t){return e.id===t.id}function j(e,t){return(j=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e})(e,t)}var N=function(e){var t,n;function i(t){return e.call(this,t)||this}return n=e,(t=i).prototype=Object.create(n.prototype),t.prototype.constructor=t,j(t,n),i.prototype.show=function(e,t,n,i,a){var r=this;void 0===n&&(n=0),void 0===i&&(i="info"),void 0===a&&(a=3e3);var s=this.notificationManager.getContainerId(),o="";switch(i){case"info":o="bg-info";break;case"warning":o="bg-warning";break;case"message":o="bg-primary";break;case"priority":o="bg-danger";break;default:o="bg-info"}var c=document.createElement("div");c.className="notification toast",c.style.top=n+"px",c.setAttribute("role","alert"),c.setAttribute("data-autohide","false");var l=document.createElement("div");l.className="toast-header text-white "+o;var d=document.createElement("strong");d.className="mr-auto",d.textContent=e;var u=document.createElement("button");u.className="ml-2 mb-1 close",u.textContent="x",u.addEventListener("click",(function(){r.notificationManager.remove(c)}));var m=document.createElement("div");m.className="toast-body",m.textContent=t,l.appendChild(d),l.appendChild(u),c.appendChild(l),c.appendChild(m),c.classList.add("is-"+i);var h=document.getElementById(s);return h&&h.appendChild(c),$(".notification").toast("show"),a<=0&&(a=2e3),setTimeout((function(){r.notificationManager.remove(c)}),a),c},i}((function(e){this.show=this.show.bind(this),this.notificationManager=e,this.containerId=this.notificationManager.getContainerId()})),k=new(function(){function e(){}return e.prototype.createNotification=function(e){return new N(e)},e}()),D=new(function(){function e(){this.notifications=[],this.currentCount=0,this.offsetPerNotification=120,this.containerId="notifications",this.show=this.show.bind(this)}var t=e.prototype;return t.getContainerId=function(){return this.containerId},t.show=function(e,t,n,i){void 0===n&&(n="info"),void 0===i&&(i=5e3);var a=k.createNotification(this).show(e,t,this.currentCount*this.offsetPerNotification,n,i);this.currentCount++,this.notifications.push(a)},t.remove=function(e){var t=this,n=this.notifications.findIndex((function(t){return t===e}));n>=0&&(this.notifications.splice(n,1),this.notifications.map((function(e,n){e.style.top=t.offsetPerNotification*n+"px"})));var i=e.parentElement;null!==i&&i.removeChild(e),this.currentCount--,this.currentCount<0&&(this.currentCount=0)},e}()),B=c()("socket-ts"),L=new(function(){function e(){this.callbackForMessage=this.callbackForMessage.bind(this),this.callbackForData=this.callbackForData.bind(this),this.listener=null,this.socket=null}var t=e.prototype;return t.callbackForMessage=function(e){B("Received message : "+e),this.listener&&this.listener.handleMessage(e)},t.callbackForData=function(e){B("Received data");try{var t=JSON.parse(e);if(B(t),null===this.listener)return;t.user===this.listener.getCurrentUser()?B("change made by this user, ignoring"):(B("change made by another user, passing off to the application"),this.listener.handleDataChangedByAnotherUser(t))}catch(e){B("Not JSON data")}},t.setListener=function(e){B("Setting listener"),this.listener=e,B("Creating socket connection"),this.socket=io(),B("Waiting for messages"),this.socket.on("message",this.callbackForMessage),this.socket.on("data",this.callbackForData)},t.sendMessage=function(e){this.socket.emit("message",e)},e}()),O=c()("controller-ts"),x=new(function(){function e(){}var t=e.prototype;return t.connectToApplication=function(e,t){return this.applicationView=e,this.clientSideStorage=t,this.config=this.applicationView.state,this.callbackForUsers=this.callbackForUsers.bind(this),this.callbackForEntries=this.callbackForEntries.bind(this),this.callbackForCreateEntry=this.callbackForCreateEntry.bind(this),this.callbackForCreateComment=this.callbackForCreateComment.bind(this),this.stateChanged=this.stateChanged.bind(this),C.addChangeListenerForName(this.config.stateNames.entries,this),this},t.stateChanged=function(e,t){O("State changes "+e),O(t),this.applicationView.setState({isLoggedIn:this.isLoggedIn(),loggedInUserId:this.getLoggedInUserId(),selectedEntry:{},entries:t})},t.callbackForUsers=function(e,t){O("callback for all users");var n=[];t>=200&&t<=299&&(O(e),e.forEach((function(e){var t={id:e.id,username:e.username};n.push(t)})));C.setStateByName(this.config.stateNames.users,n)},e.convertJSONCommentToComment=function(e){return{id:e.id,content:e.content,createdBy:e.createdBy,changedOn:e.changedOn,commentOn:e.commentOn}},e.convertJSONUserToUser=function(e){return{id:e.id,username:e.username}},e.convertJSONEntryToBlogEntry=function(t){var n={id:t.id,title:t.title,content:t.content,createdBy:t.createdBy,changedOn:t.changedOn,User:null,Comments:[]},i=t.user;i&&(n.User=e.convertJSONUserToUser(i));var a=t.comments;return a&&a.forEach((function(t){var i=e.convertJSONCommentToComment(t);n.Comments.push(i)})),n},t.callbackForEntries=function(t,n){O("callback for all entries");var i=[];n>=200&&n<=299&&(O(t),t.forEach((function(t){var n=e.convertJSONEntryToBlogEntry(t);i.push(n)}))),C.setStateByName(this.config.stateNames.entries,i)},t.callbackForCreateEntry=function(t,n){O("callback for create entry");if(n>=200&&n<=299){O(t);var i=e.convertJSONEntryToBlogEntry(t);C.addNewItemToState(this.config.stateNames.entries,i)}},t.callbackForCreateComment=function(t,n){O("callback for create comment");if(n>=200&&n<=299){var i=e.convertJSONCommentToComment(t);O(i);var a=C.findItemInState(this.config.stateNames.entries,{id:i.commentOn},w);O(a),a&&(O("callback for create comment - updating entry"),a.Comments.push(i),C.updateItemInState(this.config.stateNames.entries,a,w),C.setStateByName(this.config.stateNames.selectedEntry,a),O(a))}},t.getAllUsers=function(){O("Getting All Users");var e={url:this.getServerAPIURL()+this.config.apis.users,type:m.GET,params:{},callback:this.callbackForUsers};b.addApiRequest(e,!0)},t.getAllEntries=function(){O("Getting All Entries");var e={url:this.getServerAPIURL()+this.config.apis.entries,type:m.GET,params:{},callback:this.callbackForEntries};b.addApiRequest(e,!0)},t.apiDeleteComment=function(e){var t={url:this.getServerAPIURL()+this.config.apis.comment,type:m.DELETE,params:{id:e},callback:function(e,t){O("callback for delete comment"),t>=200&&t<=299&&O(e)}};b.addApiRequest(t)},t.apiDeleteEntry=function(e){if(e){var t={url:this.getServerAPIURL()+this.config.apis.entries,type:m.DELETE,params:{id:e.id},callback:function(e,t){O("callback for delete entry"),t>=200&&t<=299&&O(e)}};b.addApiRequest(t)}},t.apiCreateEntry=function(e){if(e){var t={url:this.getServerAPIURL()+this.config.apis.entries,type:m.POST,params:e,callback:this.callbackForCreateEntry};b.addApiRequest(t,!0)}},t.apiCreateComment=function(e){if(e){var t={url:this.getServerAPIURL()+this.config.apis.comment,type:m.POST,params:e,callback:this.callbackForCreateComment};b.addApiRequest(t,!0)}},t.apiUpdateEntry=function(e){if(e){var t={url:this.getServerAPIURL()+this.config.apis.entries,type:m.PUT,params:e,callback:function(e,t){O("callback for update entry"),t>=200&&t<=299&&O(e)}};b.addApiRequest(t)}},t.getServerAPIURL=function(){var e="/api";return window.ENV&&window.ENV.serverURL&&(e=window.ENV.serverURL),e},t.isLoggedIn=function(){var e=!1;try{loggedInUserId&&(e=!0)}catch(e){}return O("Are logged in: "+e),e},t.getLoggedInUserId=function(){var e=-1;try{loggedInUserId&&(e=loggedInUserId)}catch(e){}return O("Logged in user id: "+e),e},t.initialise=function(){O("Initialising data state"),L.setListener(this),this.getAllUsers(),this.getAllEntries()},t.deleteComment=function(e){var t=C.getStateByName(this.config.stateNames.selectedEntry);if(t){O("Handling delete comment for "+t.id+" and comment "+e);var n=t.Comments,i=n.findIndex((function(t){return t.id===e}));i>=0&&(O("Found comment in entry - removing"),n.splice(i,1),O(t),C.setStateByName(this.config.stateNames.selectedEntry,t),C.updateItemInState(this.config.stateNames.entries,t,w))}this.apiDeleteComment(e)},t.deleteEntry=function(e){e&&(O("Handling delete entry for "+e.id),C.removeItemFromState(this.config.stateNames.entries,e,w),this.apiDeleteEntry(e))},t.updateEntry=function(e){e&&(O(e),e.id?(O("Handling update for entry "+e.id),C.updateItemInState(this.config.stateNames.entries,e,w),this.apiUpdateEntry(e)):(O("Handling create for entry"),this.apiCreateEntry(e)))},t.addComment=function(e){e&&(O(e),O("Handling create for comment"),this.apiCreateComment(e))},t.handleMessage=function(e){O(e)},t.getCurrentUser=function(){return this.getLoggedInUserId()},t.handleDataChangedByAnotherUser=function(t){O("Handling data change "+t.type+" on object type "+t.objectType+" made by user "+t.user);var n=C.findItemInState(this.config.stateNames.users,{id:t.user},w),i=t.data;O(i);try{switch(t.type){case"create":switch(t.objectType){case"Comment":var a=C.findItemInState(this.config.stateNames.entries,{id:i.commentOn},w);if(a){var r=e.convertJSONCommentToComment(i);a.Comments.push(r),C.updateItemInState(this.config.stateNames.entries,a,w);var s=C.getStateByName(this.config.stateNames.selectedEntry);s&&s.id===a.id&&C.setStateByName(this.config.stateNames.selectedEntry,a);var o="unknown";n&&(o=n.username),D.show(a.title,o+" added comment "+i.content)}break;case"BlogEntry":var c=e.convertJSONEntryToBlogEntry(i);O("Converting to BlogEntry type for Create"),O(c),C.addNewItemToState(this.config.stateNames.entries,c);var l="unknown";n&&(l=n.username),D.show(i.title,l+" added new entry");break;case"User":var d=e.convertJSONUserToUser(i);C.addNewItemToState(this.config.stateNames.users,d),D.show(i.username,i.username+" has just registered.","message")}break;case"update":switch(t.objectType){case"BlogEntry":var u=e.convertJSONEntryToBlogEntry(i);O("Converting to BlogEntry type for Update"),O(u),C.updateItemInState(this.config.stateNames.entries,u,w)}break;case"delete":switch(t.objectType){case"Comment":var m=C.findItemInState(this.config.stateNames.entries,{id:i.commentOn},w);if(O(m),m){var h=m.Comments,g=h.findIndex((function(e){return e.id===i.id}));if(g>=0){O("Found comment in entry - removing"),h.splice(g,1),O(m),C.updateItemInState(this.config.stateNames.entries,m,w);var f=C.getStateByName(this.config.stateNames.selectedEntry);f&&f.id===m.id&&C.setStateByName(this.config.stateNames.selectedEntry,m)}}break;case"BlogEntry":O("Deleting Blog Entry with id "+i.id);var p=C.findItemInState(this.config.stateNames.entries,i,w);if(O(p),p){O("Deleting Blog Entry with id "+p.id),C.removeItemFromState(this.config.stateNames.entries,p,w);var y=C.getStateByName(this.config.stateNames.selectedEntry);y&&y.id===p.id&&(O("Deleted entry is selected by user, closing sidebars"),this.applicationView.hideAllSideBars()),D.show(p.title,p.User.username+" has deleted this entry.","danger")}}}}catch(e){O(e)}},e}()),R=new(function(){function e(){}var t=e.prototype;return t.scrollSmoothToId=function(e){var t=document.getElementById(e);null!==t&&t.scrollIntoView({block:"start",behavior:"smooth"})},t.scrollSmoothTo=function(e){e.scrollIntoView({block:"start",behavior:"smooth"})},t.removeAllChildren=function(e){if(e&&e.firstChild)for(;e.firstChild;){var t=e.lastChild;t&&e.removeChild(t)}},t.addRemoveClasses=function(e,t,n){void 0===n&&(n=!0),t.split(" ").forEach((function(t){t.trim().length>0&&(n?e.classList.add(t):e.classList.remove(t))}))},e}()),A=c()("view-ts");function T(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function F(e,t){return(F=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e})(e,t)}var U=function(e){var t,n;function i(t,n,i,a){var r;return(r=e.call(this,t,n,i,a)||this).eventHide=r.eventHide.bind(T(r)),r.eventShow=r.eventShow.bind(T(r)),r}n=e,(t=i).prototype=Object.create(n.prototype),t.prototype.constructor=t,F(t,n);var a=i.prototype;return a.onDocumentLoaded=function(){this.eventHide(null);var e=this.document.getElementById(this.uiConfig.dom.sideBarId);if(null!==e){var t=e.querySelector(".close");t&&t.addEventListener("click",this.eventHide)}},a.showHide=function(e){var t=this.document.getElementById(this.uiConfig.dom.sideBarId);if(null!==t)switch(this.uiPrefs.view.location){case"left":case"right":t.style.width=e;break;case"bottom":case"top":t.style.height=e}},a.eventHide=function(e){e&&e.preventDefault(),this.showHide("0%")},a.eventShow=function(e){this.showHide(this.uiPrefs.view.expandedSize)},i}(function(){function e(e,t,n,i){this.applicationView=e,this.document=document,this.uiConfig=n,this.uiPrefs=i,this.config=e.state,this.stateChanged=this.stateChanged.bind(this),this.eventStartDrag=this.eventStartDrag.bind(this),this.eventClickItem=this.eventClickItem.bind(this)}var t=e.prototype;return t.eventStartDrag=function(e){A("Abstract View : drag start",10);var t=JSON.stringify(this.getDragData(e));A(t,10),e.dataTransfer.setData(this.applicationView.state.ui.draggable.draggableDataKeyId,t)},t.createResultsForState=function(e,t){var n=this;A("Abstract View : creating Results",10),A(t);var i=this.uiConfig.dom,a=document.getElementById(i.resultsId);a&&R.removeAllChildren(a),t.map((function(t,r){var s=n.document.createElement(i.resultsElementType);R.addRemoveClasses(s,i.resultsClasses),s.setAttribute(i.resultDataKeyId,n.getIdForStateItem(e,t)),s.setAttribute(i.resultLegacyDataKeyId,n.getLegacyIdForStateItem(e,t)),s.setAttribute(i.resultDataSourceId,i.resultDataSourceValue);var o=n.getDisplayValueForStateItem(e,t),c=n.getModifierForStateItem(e,t),l=n.getSecondaryModifierForStateItem(e,t);switch(c){case"normal":switch(A("Abstract View: normal item",10),R.addRemoveClasses(s,i.modifierClassNormal),""!==i.iconNormal?s.innerHTML=o+i.iconNormal:s.innerText=o,l){case"warning":R.addRemoveClasses(s,i.modifierClassNormal,!1),R.addRemoveClasses(s,i.modifierClassWarning,!0),""!==i.iconWarning&&(s.innerHTML+=i.iconWarning)}break;case"active":switch(A("Abstract View: active item",10),R.addRemoveClasses(s,i.modifierClassActive),""!==i.iconActive?s.innerHTML=o+i.iconActive:s.innerText=o,l){case"warning":R.addRemoveClasses(s,i.modifierClassNormal,!1),R.addRemoveClasses(s,i.modifierClassWarning,!0),""!==i.iconWarning&&(s.innerHTML+=i.iconWarning)}break;case"inactive":switch(A("Abstract View: inactive item",10),R.addRemoveClasses(s,i.modifierClassInactive),""!==i.iconInactive?s.innerHTML=o+i.iconInactive:s.innerText=o,l){case"warning":""!==i.iconWarning&&(s.innerHTML+=i.iconWarning)}}i.isDraggable&&(s.setAttribute("draggable","true"),s.addEventListener("dragstart",n.eventStartDrag)),i.isClickable&&s.addEventListener("click",n.eventClickItem),A("Abstract View: Adding child "+t.id),a&&a.appendChild(s)}))},t.stateChanged=function(e,t){this.updateView(e,t)},e}());function q(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function M(e,t){return(M=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e})(e,t)}var P=c()("view-ts:comments"),H=function(e){var t,n;function i(t,n){var i;return(i=e.call(this,t,n,t.state.ui.commentSideBar,t.state.uiPrefs.commentSideBar)||this).updateView=i.updateView.bind(q(i)),i.commentHeaderEl=n.getElementById(i.uiConfig.dom.headerId),i.newCommentFormEl=n.getElementById(i.uiConfig.dom.newFormId),i.newCommentFormEl&&i.newCommentFormEl.addEventListener("submit",i.applicationView.handleAddComment),i.newCommentTextEl=n.getElementById(i.uiConfig.dom.commentId),i.newCommentSubmitEl=n.getElementById(i.uiConfig.dom.submitCommentId),C.addChangeListenerForName(i.config.stateNames.selectedEntry,q(i)),i}n=e,(t=i).prototype=Object.create(n.prototype),t.prototype.constructor=t,M(t,n);var a=i.prototype;return a.getIdForStateItem=function(e,t){return t.id},a.getLegacyIdForStateItem=function(e,t){return t.id},a.getDisplayValueForStateItem=function(e,t){P("Getting display value for comment "+t.id+" with content "+t.content);var n=C.findItemInState(this.config.stateNames.users,{id:t.createdBy},w),i=d()(t.changedOn,"YYYYMMDDHHmmss").format("DD/MM/YYYY HH:mm");return t.content+" - "+n.username+" on "+i+"  "},a.getModifierForStateItem=function(e,t){var n="inactive";return t.createdBy===x.getLoggedInUserId()&&(n="normal"),n},a.getSecondaryModifierForStateItem=function(e,t){return"normal"},a.eventClickItem=function(e){e.preventDefault();var t=C.getStateByName(this.config.stateNames.selectedEntry);P(e.target);var n=e.target.getAttribute(this.uiConfig.dom.resultDataKeyId);if(!n){var i=e.target.parentNode;n=i.getAttribute(this.uiConfig.dom.resultDataKeyId)}if(P("Comment "+e.target.innerText+" with id "+n+" clicked",20),n){n=parseInt(n);var a=t.Comments.find((function(e){return e.id===n}));a&&(P("Comment created by "+a.createdBy+" and current user is "+x.getLoggedInUserId()),a.createdBy===x.getLoggedInUserId()&&this.applicationView.handleDeleteComment(parseInt(n)))}},a.updateView=function(e,t){P("Updating view"),P(t),x.isLoggedIn()?(this.newCommentTextEl&&this.newCommentTextEl.removeAttribute("readonly"),this.newCommentSubmitEl&&this.newCommentSubmitEl.removeAttribute("disabled")):(this.newCommentTextEl&&this.newCommentTextEl.setAttribute("readonly","true"),this.newCommentSubmitEl&&this.newCommentSubmitEl.setAttribute("disabled","true")),t&&t.Comments&&(this.commentHeaderEl&&(this.commentHeaderEl.innerHTML=t.title),P(t.Comments),this.createResultsForState(e,t.Comments))},a.getDragData=function(e){},i}(U),V=n(3),Y=n.n(V),Q=c()("view-ts:blogentry");function J(e){var t,n,i=e.entry,r=e.showCommentsHandler,s=e.editEntryHandler,o=e.deleteEntryHandler;return i?(Q("Entry "+i.User.id+" === "+x.getLoggedInUserId()),i.User.id===x.getLoggedInUserId()?(t=a.a.createElement("button",{type:"button",className:"btn-primary btn-sm rounded p-1 mr-2","entry-id":i.id,onClick:s},"  Edit  ",a.a.createElement("i",{className:"fas fa-edit"}),"  "),n=a.a.createElement("button",{type:"button",className:"btn-warning btn-sm rounded p-1 mr-2","entry-id":i.id,onClick:o},"  Delete  ",a.a.createElement("i",{className:"fas fa-trash-alt"}),"  ")):(t=a.a.createElement("button",{type:"button",className:"btn-outline-secondary btn-sm rounded p-1 mr-2 ",disabled:!0},"  Edit  ",a.a.createElement("i",{className:"fas fa-edit"}),"  "),n=a.a.createElement("button",{type:"button",className:"btn-outline-secondary btn-sm rounded p-1 mr-2",disabled:!0},"  Delete  ",a.a.createElement("i",{className:"fas fa-trash-alt"}),"  ")),a.a.createElement("div",{className:"col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2"},a.a.createElement("div",{className:"card",style:{width:"350px"}},a.a.createElement("div",{className:"card-header"},i.title,"    ",a.a.createElement("a",{className:"text-decoration-none"},a.a.createElement("i",{className:"fas fa-comments text-secondary","entry-id":i.id,onClick:r}),"  ",a.a.createElement("span",{className:"badge badge-pill badge-primary text-right","entry-id":i.id,onClick:r}," ",i.Comments.length," "))),a.a.createElement("div",{className:"card-body"},a.a.createElement("p",{className:"card-text"},i.content),t,n),a.a.createElement("div",{className:"card-footer text-right text-muted"},i.User.username," on ",d()(i.changedOn,"YYYYMMDDHHmmss").format("DD/MM/YYYY"))))):a.a.createElement("div",null)}function _(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function z(e,t){return(z=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e})(e,t)}J.propTypes={entry:Y.a.any.isRequired,showCommentsHandler:Y.a.func.isRequired,editEntryHandler:Y.a.func.isRequired,deleteEntryHandler:Y.a.func.isRequired};var W=c()("view-ts:details"),K=function(e){var t,n;function i(t,n){var i;return(i=e.call(this,t,n,t.state.ui.entryDetailsSideBar,t.state.uiPrefs.entryDetailsSideBar)||this).updateView=i.updateView.bind(_(i)),i.eventClickItem=i.eventClickItem.bind(_(i)),i.formEl=document.getElementById(i.uiConfig.dom.formId),i.titleEl=document.getElementById(i.uiConfig.dom.titleId),i.contentEl=document.getElementById(i.uiConfig.dom.contentId),i.changeOnEl=document.getElementById(i.uiConfig.dom.changedOnId),C.addChangeListenerForName(i.config.stateNames.selectedEntry,_(i)),i.formEl&&i.formEl.addEventListener("submit",i.eventClickItem),i}n=e,(t=i).prototype=Object.create(n.prototype),t.prototype.constructor=t,z(t,n);var a=i.prototype;return a.getIdForStateItem=function(e,t){return t.id},a.getLegacyIdForStateItem=function(e,t){return t.id},a.eventClickItem=function(e){e.preventDefault(),W("Handling submit Details Sidebar View"),W(e.target);var t=C.getStateByName(this.config.stateNames.selectedEntry);W(t),t.title=this.titleEl?this.titleEl.value.trim():"",t.content=this.contentEl?this.contentEl.value.trim():"",t.changedOn=parseInt(d()().format("YYYYMMDDHHmmss")),W(t),this.titleEl&&(this.titleEl.value=""),this.contentEl&&(this.contentEl.value=""),this.changeOnEl&&(this.changeOnEl.innerText="Last Changed On:"),this.applicationView.handleUpdateEntry(t)},a.updateView=function(e,t){W("Handling update of Details Sidebar View"),W(t);var n=t;n&&n.title?(this.titleEl&&(this.titleEl.value=n.title),this.contentEl&&(this.contentEl.value=n.content),this.changeOnEl&&(this.changeOnEl.innerText="Last Changed On: "+d()(n.changedOn,"YYYYMMDDHHmmss").format("DD/MM/YYYY"))):(this.titleEl&&(this.titleEl.value=""),this.contentEl&&(this.contentEl.value=""),this.changeOnEl&&(this.changeOnEl.innerText="Last Changed On: "))},a.getDisplayValueForStateItem=function(e,t){return""},a.getDragData=function(e){},a.getModifierForStateItem=function(e,t){return""},a.getSecondaryModifierForStateItem=function(e,t){return""},i}(U);function G(e){if(void 0===e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function X(e,t){return(X=Object.setPrototypeOf||function(e,t){return e.__proto__=t,e})(e,t)}var Z=c()("app"),ee=function(e){var t,n;function i(){var t;return(t=e.call(this)||this).state={isLoggedIn:!1,loggedInUserId:-1,entries:[],selectedEntry:{},applyUserFilter:!1,stateNames:{users:"users",entries:"entries",selectedEntry:"selectedEntry"},apis:{users:"/users",entries:"/blog",entry:"/blog",comment:"/comment",login:"/login"},ui:{alert:{modalId:"alert",titleId:"alert-title",contentId:"alert-content",cancelButtonId:"alert-cancel",confirmButtonId:"alert-confirm",closeButtonId:"alert-close",hideClass:"d-none",showClass:"d-block"},navigation:{showMyEntriesId:"navigationItemDashboard",addNewEntryId:"navigationItemAddNewEntry",showAllEntriesId:"navigationItemShowAll"},blogEntry:{},entryDetailsSideBar:{dom:{sideBarId:"detailsSideBar",formId:"details",titleId:"title",contentId:"content",changedOnId:"changedOn",resultDataKeyId:"id",isDraggable:!1,isClickable:!0}},commentSideBar:{dom:{sideBarId:"commentSideBar",headerId:"commentHeader",resultsId:"comments",resultsElementType:"button",resultsElementAttributes:[["type","button"]],resultsClasses:"list-group-item my-list-item truncate-comment list-group-item-action",resultDataKeyId:"id",resultLegacyDataKeyId:"id",modifierClassNormal:"float-right list-group-item-primary text-right",modifierClassInactive:"float-left list-group-item-dark text-left",modifierClassActive:"list-group-item-primary",modifierClassWarning:"list-group-item-warning",iconNormal:'<i class="fas fa-trash-alt"></i>',iconInactive:"",iconActive:"",iconWarning:"",isDraggable:!1,isClickable:!0,newFormId:"newComment",commentId:"comment",submitCommentId:"submitComment"}}},uiPrefs:{navigation:{},blogEntry:{},commentSideBar:{view:{location:"right",expandedSize:"50%"}},entryDetailsSideBar:{view:{location:"left",expandedSize:"35%"}}},controller:{events:{entry:{eventDataKeyId:"entry-id"}},dataLimit:{}}},t.cancelDelete=t.cancelDelete.bind(G(t)),t.confirmDelete=t.confirmDelete.bind(G(t)),t.handleShowMyEntries=t.handleShowMyEntries.bind(G(t)),t.handleSelectEntryComments=t.handleSelectEntryComments.bind(G(t)),t.handleShowEditEntry=t.handleShowEditEntry.bind(G(t)),t.handleUpdateEntry=t.handleUpdateEntry.bind(G(t)),t.handleAddEntry=t.handleAddEntry.bind(G(t)),t.handleAddComment=t.handleAddComment.bind(G(t)),t.handleDeleteEntry=t.handleDeleteEntry.bind(G(t)),t.handleDeleteComment=t.handleDeleteComment.bind(G(t)),x.connectToApplication(G(t),window.localStorage),t}n=e,(t=i).prototype=Object.create(n.prototype),t.prototype.constructor=t,X(t,n);var r=i.prototype;return r.getCurrentUser=function(){return x.getLoggedInUserId()},r.alert=function(e,t){this.titleEl.textContent=e,this.contentEl.textContent=t,this.modalEl.classList.remove(this.state.ui.alert.hideClass),this.modalEl.classList.add(this.state.ui.alert.showClass)},r.render=function(){var e=this;Z("Rendering App"),Z(this.state.entries),Z(this.state.applyUserFilter);var t=this.state.entries;this.state.applyUserFilter&&x.isLoggedIn()&&x.getLoggedInUserId()>0&&(t=t.filter((function(e){return e.createdBy===x.getLoggedInUserId()})));var n=t.map((function(t,n){return a.a.createElement(J,{key:n,entry:t,showCommentsHandler:e.handleSelectEntryComments,editEntryHandler:e.handleShowEditEntry,deleteEntryHandler:e.handleDeleteEntry})}));return a.a.createElement("div",{className:"Root row ml-1"},n)},r.cancelDelete=function(e){this.modalEl.classList.remove(this.state.ui.alert.showClass),this.modalEl.classList.add(this.state.ui.alert.hideClass),e.preventDefault()},r.confirmDelete=function(e){this.modalEl.classList.remove(this.state.ui.alert.showClass),this.modalEl.classList.add(this.state.ui.alert.hideClass),e.preventDefault();var t=this.modalEl.getAttribute(this.state.controller.events.entry.eventDataKeyId);if(Z("Handling Delete Entry "+t),t){t=parseInt(t);var n=C.findItemInState(this.state.stateNames.entries,{id:t},w);n&&(x.deleteEntry(n),C.removeItemFromState(this.state.stateNames.entries,n,w))}},r.componentDidMount=function(){Z("component Did Mount"),this.commentView=new H(this,document),this.commentView.onDocumentLoaded(),this.detailsView=new K(this,document),this.detailsView.onDocumentLoaded(),document&&(document.getElementById(this.state.ui.navigation.addNewEntryId).addEventListener("click",this.handleAddEntry),document.getElementById(this.state.ui.navigation.showMyEntriesId).addEventListener("click",this.handleShowMyEntries)),this.modalEl=document.getElementById(this.state.ui.alert.modalId),this.titleEl=document.getElementById(this.state.ui.alert.titleId),this.contentEl=document.getElementById(this.state.ui.alert.contentId),this.cancelBtnEl=document.getElementById(this.state.ui.alert.cancelButtonId),this.confirmBtnEl=document.getElementById(this.state.ui.alert.confirmButtonId),this.closeBtnEl=document.getElementById(this.state.ui.alert.closeButtonId),this.cancelBtnEl&&this.cancelBtnEl.addEventListener("click",this.cancelDelete),this.confirmBtnEl&&this.confirmBtnEl.addEventListener("click",this.confirmDelete),this.closeBtnEl&&this.closeBtnEl.addEventListener("click",this.cancelDelete),x.initialise()},r.hideAllSideBars=function(){this.commentView.eventHide(null),this.detailsView.eventHide(null)},r.handleShowMyEntries=function(e){Z("Handling Show My Entries"),this.hideAllSideBars(),x.isLoggedIn()?this.setState({applyUserFilter:!0}):window.location.href=this.state.apis.login},r.handleAllEntries=function(e){Z("Handling Show All Entries"),this.setState({applyUserFilter:!1}),this.hideAllSideBars()},r.handleAddEntry=function(e){if(Z("Handling Add Entry"),e.preventDefault(),this.hideAllSideBars(),x.isLoggedIn()){var t=C.findItemInState(this.state.stateNames.users,{id:x.getLoggedInUserId()},w);Z(t);var n={title:"",content:"",createdBy:t.id,changedOn:parseInt(d()().format("YYYYMMDDHHmmss")),Comments:[],User:{id:t.id,username:t.username}};Z(n),this.setState({selectedEntry:n}),C.setStateByName(this.state.stateNames.selectedEntry,n),this.detailsView.eventShow(e)}else window.location.href=this.state.apis.login},r.handleAddComment=function(e){Z("Handling Add Comment"),e.preventDefault();var t=document.getElementById(this.state.ui.commentSideBar.dom.commentId);if(!t||0!==t.value.trim().length)if(x.isLoggedIn()){var n=C.findItemInState(this.state.stateNames.users,{id:x.getLoggedInUserId()},w);Z(n);var i=C.getStateByName(this.state.stateNames.selectedEntry);if(i&&t){var a={createdBy:n.id,commentOn:i.id,changedOn:parseInt(d()().format("YYYYMMDDHHmmss")),content:t.value.trim()};t.value="",x.addComment(a),Z(a)}}else window.location.href=this.state.apis.login},r.handleSelectEntryComments=function(e){Z("Handling Select Entry Comments"),e.preventDefault(),this.hideAllSideBars();var t=e.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);if(Z("Handling Show Edit Entry "+t),t){t=parseInt(t);var n=C.findItemInState(this.state.stateNames.entries,{id:t},w);Z(n),n&&(this.setState({selectedEntry:n}),C.setStateByName(this.state.stateNames.selectedEntry,n),this.commentView.eventShow(e))}},r.handleShowEditEntry=function(e){e.preventDefault(),this.hideAllSideBars();var t=e.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);if(Z("Handling Show Edit Entry "+t),t){t=parseInt(t);var n=C.findItemInState(this.state.stateNames.entries,{id:t},w);Z(n),n&&(this.setState({selectedEntry:n}),C.setStateByName(this.state.stateNames.selectedEntry,n),this.detailsView.eventShow(e))}},r.handleDeleteEntry=function(e){e.preventDefault(),this.hideAllSideBars();var t=e.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);if(Z("Handling Delete Entry "+t),t){this.modalEl.setAttribute(this.state.controller.events.entry.eventDataKeyId,t),t=parseInt(t);var n=C.findItemInState(this.state.stateNames.entries,{id:t},w);this.alert(n.title,"Are you sure you want to delete this blog entry?")}},r.handleDeleteComment=function(e){x.deleteComment(e)},r.handleUpdateEntry=function(e){this.hideAllSideBars(),x.updateEntry(e)},i}(a.a.Component),te=a.a.createElement(ee,{className:"container-fluid justify-content-around"});s.a.render(te,document.getElementById("root"))}});
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// install a JSONP callback for chunk loading
+/******/ 	function webpackJsonpCallback(data) {
+/******/ 		var chunkIds = data[0];
+/******/ 		var moreModules = data[1];
+/******/ 		var executeModules = data[2];
+/******/
+/******/ 		// add "moreModules" to the modules object,
+/******/ 		// then flag all "chunkIds" as loaded and fire callback
+/******/ 		var moduleId, chunkId, i = 0, resolves = [];
+/******/ 		for(;i < chunkIds.length; i++) {
+/******/ 			chunkId = chunkIds[i];
+/******/ 			if(Object.prototype.hasOwnProperty.call(installedChunks, chunkId) && installedChunks[chunkId]) {
+/******/ 				resolves.push(installedChunks[chunkId][0]);
+/******/ 			}
+/******/ 			installedChunks[chunkId] = 0;
+/******/ 		}
+/******/ 		for(moduleId in moreModules) {
+/******/ 			if(Object.prototype.hasOwnProperty.call(moreModules, moduleId)) {
+/******/ 				modules[moduleId] = moreModules[moduleId];
+/******/ 			}
+/******/ 		}
+/******/ 		if(parentJsonpFunction) parentJsonpFunction(data);
+/******/
+/******/ 		while(resolves.length) {
+/******/ 			resolves.shift()();
+/******/ 		}
+/******/
+/******/ 		// add entry modules from loaded chunk to deferred list
+/******/ 		deferredModules.push.apply(deferredModules, executeModules || []);
+/******/
+/******/ 		// run deferred modules when all chunks ready
+/******/ 		return checkDeferredModules();
+/******/ 	};
+/******/ 	function checkDeferredModules() {
+/******/ 		var result;
+/******/ 		for(var i = 0; i < deferredModules.length; i++) {
+/******/ 			var deferredModule = deferredModules[i];
+/******/ 			var fulfilled = true;
+/******/ 			for(var j = 1; j < deferredModule.length; j++) {
+/******/ 				var depId = deferredModule[j];
+/******/ 				if(installedChunks[depId] !== 0) fulfilled = false;
+/******/ 			}
+/******/ 			if(fulfilled) {
+/******/ 				deferredModules.splice(i--, 1);
+/******/ 				result = __webpack_require__(__webpack_require__.s = deferredModule[0]);
+/******/ 			}
+/******/ 		}
+/******/
+/******/ 		return result;
+/******/ 	}
+/******/
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// object to store loaded and loading chunks
+/******/ 	// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 	// Promise = chunk loading, 0 = chunk loaded
+/******/ 	var installedChunks = {
+/******/ 		"app": 0
+/******/ 	};
+/******/
+/******/ 	var deferredModules = [];
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	var jsonpArray = window["webpackJsonp"] = window["webpackJsonp"] || [];
+/******/ 	var oldJsonpFunction = jsonpArray.push.bind(jsonpArray);
+/******/ 	jsonpArray.push = webpackJsonpCallback;
+/******/ 	jsonpArray = jsonpArray.slice();
+/******/ 	for(var i = 0; i < jsonpArray.length; i++) webpackJsonpCallback(jsonpArray[i]);
+/******/ 	var parentJsonpFunction = oldJsonpFunction;
+/******/
+/******/
+/******/ 	// add entry module to deferred list
+/******/ 	deferredModules.push([0,"vendor"]);
+/******/ 	// run deferred modules when ready
+/******/ 	return checkDeferredModules();
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./node_modules/moment/locale sync recursive ^\\.\\/.*$":
+/*!**************************************************!*\
+  !*** ./node_modules/moment/locale sync ^\.\/.*$ ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var map = {
+	"./af": "./node_modules/moment/locale/af.js",
+	"./af.js": "./node_modules/moment/locale/af.js",
+	"./ar": "./node_modules/moment/locale/ar.js",
+	"./ar-dz": "./node_modules/moment/locale/ar-dz.js",
+	"./ar-dz.js": "./node_modules/moment/locale/ar-dz.js",
+	"./ar-kw": "./node_modules/moment/locale/ar-kw.js",
+	"./ar-kw.js": "./node_modules/moment/locale/ar-kw.js",
+	"./ar-ly": "./node_modules/moment/locale/ar-ly.js",
+	"./ar-ly.js": "./node_modules/moment/locale/ar-ly.js",
+	"./ar-ma": "./node_modules/moment/locale/ar-ma.js",
+	"./ar-ma.js": "./node_modules/moment/locale/ar-ma.js",
+	"./ar-sa": "./node_modules/moment/locale/ar-sa.js",
+	"./ar-sa.js": "./node_modules/moment/locale/ar-sa.js",
+	"./ar-tn": "./node_modules/moment/locale/ar-tn.js",
+	"./ar-tn.js": "./node_modules/moment/locale/ar-tn.js",
+	"./ar.js": "./node_modules/moment/locale/ar.js",
+	"./az": "./node_modules/moment/locale/az.js",
+	"./az.js": "./node_modules/moment/locale/az.js",
+	"./be": "./node_modules/moment/locale/be.js",
+	"./be.js": "./node_modules/moment/locale/be.js",
+	"./bg": "./node_modules/moment/locale/bg.js",
+	"./bg.js": "./node_modules/moment/locale/bg.js",
+	"./bm": "./node_modules/moment/locale/bm.js",
+	"./bm.js": "./node_modules/moment/locale/bm.js",
+	"./bn": "./node_modules/moment/locale/bn.js",
+	"./bn-bd": "./node_modules/moment/locale/bn-bd.js",
+	"./bn-bd.js": "./node_modules/moment/locale/bn-bd.js",
+	"./bn.js": "./node_modules/moment/locale/bn.js",
+	"./bo": "./node_modules/moment/locale/bo.js",
+	"./bo.js": "./node_modules/moment/locale/bo.js",
+	"./br": "./node_modules/moment/locale/br.js",
+	"./br.js": "./node_modules/moment/locale/br.js",
+	"./bs": "./node_modules/moment/locale/bs.js",
+	"./bs.js": "./node_modules/moment/locale/bs.js",
+	"./ca": "./node_modules/moment/locale/ca.js",
+	"./ca.js": "./node_modules/moment/locale/ca.js",
+	"./cs": "./node_modules/moment/locale/cs.js",
+	"./cs.js": "./node_modules/moment/locale/cs.js",
+	"./cv": "./node_modules/moment/locale/cv.js",
+	"./cv.js": "./node_modules/moment/locale/cv.js",
+	"./cy": "./node_modules/moment/locale/cy.js",
+	"./cy.js": "./node_modules/moment/locale/cy.js",
+	"./da": "./node_modules/moment/locale/da.js",
+	"./da.js": "./node_modules/moment/locale/da.js",
+	"./de": "./node_modules/moment/locale/de.js",
+	"./de-at": "./node_modules/moment/locale/de-at.js",
+	"./de-at.js": "./node_modules/moment/locale/de-at.js",
+	"./de-ch": "./node_modules/moment/locale/de-ch.js",
+	"./de-ch.js": "./node_modules/moment/locale/de-ch.js",
+	"./de.js": "./node_modules/moment/locale/de.js",
+	"./dv": "./node_modules/moment/locale/dv.js",
+	"./dv.js": "./node_modules/moment/locale/dv.js",
+	"./el": "./node_modules/moment/locale/el.js",
+	"./el.js": "./node_modules/moment/locale/el.js",
+	"./en-au": "./node_modules/moment/locale/en-au.js",
+	"./en-au.js": "./node_modules/moment/locale/en-au.js",
+	"./en-ca": "./node_modules/moment/locale/en-ca.js",
+	"./en-ca.js": "./node_modules/moment/locale/en-ca.js",
+	"./en-gb": "./node_modules/moment/locale/en-gb.js",
+	"./en-gb.js": "./node_modules/moment/locale/en-gb.js",
+	"./en-ie": "./node_modules/moment/locale/en-ie.js",
+	"./en-ie.js": "./node_modules/moment/locale/en-ie.js",
+	"./en-il": "./node_modules/moment/locale/en-il.js",
+	"./en-il.js": "./node_modules/moment/locale/en-il.js",
+	"./en-in": "./node_modules/moment/locale/en-in.js",
+	"./en-in.js": "./node_modules/moment/locale/en-in.js",
+	"./en-nz": "./node_modules/moment/locale/en-nz.js",
+	"./en-nz.js": "./node_modules/moment/locale/en-nz.js",
+	"./en-sg": "./node_modules/moment/locale/en-sg.js",
+	"./en-sg.js": "./node_modules/moment/locale/en-sg.js",
+	"./eo": "./node_modules/moment/locale/eo.js",
+	"./eo.js": "./node_modules/moment/locale/eo.js",
+	"./es": "./node_modules/moment/locale/es.js",
+	"./es-do": "./node_modules/moment/locale/es-do.js",
+	"./es-do.js": "./node_modules/moment/locale/es-do.js",
+	"./es-mx": "./node_modules/moment/locale/es-mx.js",
+	"./es-mx.js": "./node_modules/moment/locale/es-mx.js",
+	"./es-us": "./node_modules/moment/locale/es-us.js",
+	"./es-us.js": "./node_modules/moment/locale/es-us.js",
+	"./es.js": "./node_modules/moment/locale/es.js",
+	"./et": "./node_modules/moment/locale/et.js",
+	"./et.js": "./node_modules/moment/locale/et.js",
+	"./eu": "./node_modules/moment/locale/eu.js",
+	"./eu.js": "./node_modules/moment/locale/eu.js",
+	"./fa": "./node_modules/moment/locale/fa.js",
+	"./fa.js": "./node_modules/moment/locale/fa.js",
+	"./fi": "./node_modules/moment/locale/fi.js",
+	"./fi.js": "./node_modules/moment/locale/fi.js",
+	"./fil": "./node_modules/moment/locale/fil.js",
+	"./fil.js": "./node_modules/moment/locale/fil.js",
+	"./fo": "./node_modules/moment/locale/fo.js",
+	"./fo.js": "./node_modules/moment/locale/fo.js",
+	"./fr": "./node_modules/moment/locale/fr.js",
+	"./fr-ca": "./node_modules/moment/locale/fr-ca.js",
+	"./fr-ca.js": "./node_modules/moment/locale/fr-ca.js",
+	"./fr-ch": "./node_modules/moment/locale/fr-ch.js",
+	"./fr-ch.js": "./node_modules/moment/locale/fr-ch.js",
+	"./fr.js": "./node_modules/moment/locale/fr.js",
+	"./fy": "./node_modules/moment/locale/fy.js",
+	"./fy.js": "./node_modules/moment/locale/fy.js",
+	"./ga": "./node_modules/moment/locale/ga.js",
+	"./ga.js": "./node_modules/moment/locale/ga.js",
+	"./gd": "./node_modules/moment/locale/gd.js",
+	"./gd.js": "./node_modules/moment/locale/gd.js",
+	"./gl": "./node_modules/moment/locale/gl.js",
+	"./gl.js": "./node_modules/moment/locale/gl.js",
+	"./gom-deva": "./node_modules/moment/locale/gom-deva.js",
+	"./gom-deva.js": "./node_modules/moment/locale/gom-deva.js",
+	"./gom-latn": "./node_modules/moment/locale/gom-latn.js",
+	"./gom-latn.js": "./node_modules/moment/locale/gom-latn.js",
+	"./gu": "./node_modules/moment/locale/gu.js",
+	"./gu.js": "./node_modules/moment/locale/gu.js",
+	"./he": "./node_modules/moment/locale/he.js",
+	"./he.js": "./node_modules/moment/locale/he.js",
+	"./hi": "./node_modules/moment/locale/hi.js",
+	"./hi.js": "./node_modules/moment/locale/hi.js",
+	"./hr": "./node_modules/moment/locale/hr.js",
+	"./hr.js": "./node_modules/moment/locale/hr.js",
+	"./hu": "./node_modules/moment/locale/hu.js",
+	"./hu.js": "./node_modules/moment/locale/hu.js",
+	"./hy-am": "./node_modules/moment/locale/hy-am.js",
+	"./hy-am.js": "./node_modules/moment/locale/hy-am.js",
+	"./id": "./node_modules/moment/locale/id.js",
+	"./id.js": "./node_modules/moment/locale/id.js",
+	"./is": "./node_modules/moment/locale/is.js",
+	"./is.js": "./node_modules/moment/locale/is.js",
+	"./it": "./node_modules/moment/locale/it.js",
+	"./it-ch": "./node_modules/moment/locale/it-ch.js",
+	"./it-ch.js": "./node_modules/moment/locale/it-ch.js",
+	"./it.js": "./node_modules/moment/locale/it.js",
+	"./ja": "./node_modules/moment/locale/ja.js",
+	"./ja.js": "./node_modules/moment/locale/ja.js",
+	"./jv": "./node_modules/moment/locale/jv.js",
+	"./jv.js": "./node_modules/moment/locale/jv.js",
+	"./ka": "./node_modules/moment/locale/ka.js",
+	"./ka.js": "./node_modules/moment/locale/ka.js",
+	"./kk": "./node_modules/moment/locale/kk.js",
+	"./kk.js": "./node_modules/moment/locale/kk.js",
+	"./km": "./node_modules/moment/locale/km.js",
+	"./km.js": "./node_modules/moment/locale/km.js",
+	"./kn": "./node_modules/moment/locale/kn.js",
+	"./kn.js": "./node_modules/moment/locale/kn.js",
+	"./ko": "./node_modules/moment/locale/ko.js",
+	"./ko.js": "./node_modules/moment/locale/ko.js",
+	"./ku": "./node_modules/moment/locale/ku.js",
+	"./ku.js": "./node_modules/moment/locale/ku.js",
+	"./ky": "./node_modules/moment/locale/ky.js",
+	"./ky.js": "./node_modules/moment/locale/ky.js",
+	"./lb": "./node_modules/moment/locale/lb.js",
+	"./lb.js": "./node_modules/moment/locale/lb.js",
+	"./lo": "./node_modules/moment/locale/lo.js",
+	"./lo.js": "./node_modules/moment/locale/lo.js",
+	"./lt": "./node_modules/moment/locale/lt.js",
+	"./lt.js": "./node_modules/moment/locale/lt.js",
+	"./lv": "./node_modules/moment/locale/lv.js",
+	"./lv.js": "./node_modules/moment/locale/lv.js",
+	"./me": "./node_modules/moment/locale/me.js",
+	"./me.js": "./node_modules/moment/locale/me.js",
+	"./mi": "./node_modules/moment/locale/mi.js",
+	"./mi.js": "./node_modules/moment/locale/mi.js",
+	"./mk": "./node_modules/moment/locale/mk.js",
+	"./mk.js": "./node_modules/moment/locale/mk.js",
+	"./ml": "./node_modules/moment/locale/ml.js",
+	"./ml.js": "./node_modules/moment/locale/ml.js",
+	"./mn": "./node_modules/moment/locale/mn.js",
+	"./mn.js": "./node_modules/moment/locale/mn.js",
+	"./mr": "./node_modules/moment/locale/mr.js",
+	"./mr.js": "./node_modules/moment/locale/mr.js",
+	"./ms": "./node_modules/moment/locale/ms.js",
+	"./ms-my": "./node_modules/moment/locale/ms-my.js",
+	"./ms-my.js": "./node_modules/moment/locale/ms-my.js",
+	"./ms.js": "./node_modules/moment/locale/ms.js",
+	"./mt": "./node_modules/moment/locale/mt.js",
+	"./mt.js": "./node_modules/moment/locale/mt.js",
+	"./my": "./node_modules/moment/locale/my.js",
+	"./my.js": "./node_modules/moment/locale/my.js",
+	"./nb": "./node_modules/moment/locale/nb.js",
+	"./nb.js": "./node_modules/moment/locale/nb.js",
+	"./ne": "./node_modules/moment/locale/ne.js",
+	"./ne.js": "./node_modules/moment/locale/ne.js",
+	"./nl": "./node_modules/moment/locale/nl.js",
+	"./nl-be": "./node_modules/moment/locale/nl-be.js",
+	"./nl-be.js": "./node_modules/moment/locale/nl-be.js",
+	"./nl.js": "./node_modules/moment/locale/nl.js",
+	"./nn": "./node_modules/moment/locale/nn.js",
+	"./nn.js": "./node_modules/moment/locale/nn.js",
+	"./oc-lnc": "./node_modules/moment/locale/oc-lnc.js",
+	"./oc-lnc.js": "./node_modules/moment/locale/oc-lnc.js",
+	"./pa-in": "./node_modules/moment/locale/pa-in.js",
+	"./pa-in.js": "./node_modules/moment/locale/pa-in.js",
+	"./pl": "./node_modules/moment/locale/pl.js",
+	"./pl.js": "./node_modules/moment/locale/pl.js",
+	"./pt": "./node_modules/moment/locale/pt.js",
+	"./pt-br": "./node_modules/moment/locale/pt-br.js",
+	"./pt-br.js": "./node_modules/moment/locale/pt-br.js",
+	"./pt.js": "./node_modules/moment/locale/pt.js",
+	"./ro": "./node_modules/moment/locale/ro.js",
+	"./ro.js": "./node_modules/moment/locale/ro.js",
+	"./ru": "./node_modules/moment/locale/ru.js",
+	"./ru.js": "./node_modules/moment/locale/ru.js",
+	"./sd": "./node_modules/moment/locale/sd.js",
+	"./sd.js": "./node_modules/moment/locale/sd.js",
+	"./se": "./node_modules/moment/locale/se.js",
+	"./se.js": "./node_modules/moment/locale/se.js",
+	"./si": "./node_modules/moment/locale/si.js",
+	"./si.js": "./node_modules/moment/locale/si.js",
+	"./sk": "./node_modules/moment/locale/sk.js",
+	"./sk.js": "./node_modules/moment/locale/sk.js",
+	"./sl": "./node_modules/moment/locale/sl.js",
+	"./sl.js": "./node_modules/moment/locale/sl.js",
+	"./sq": "./node_modules/moment/locale/sq.js",
+	"./sq.js": "./node_modules/moment/locale/sq.js",
+	"./sr": "./node_modules/moment/locale/sr.js",
+	"./sr-cyrl": "./node_modules/moment/locale/sr-cyrl.js",
+	"./sr-cyrl.js": "./node_modules/moment/locale/sr-cyrl.js",
+	"./sr.js": "./node_modules/moment/locale/sr.js",
+	"./ss": "./node_modules/moment/locale/ss.js",
+	"./ss.js": "./node_modules/moment/locale/ss.js",
+	"./sv": "./node_modules/moment/locale/sv.js",
+	"./sv.js": "./node_modules/moment/locale/sv.js",
+	"./sw": "./node_modules/moment/locale/sw.js",
+	"./sw.js": "./node_modules/moment/locale/sw.js",
+	"./ta": "./node_modules/moment/locale/ta.js",
+	"./ta.js": "./node_modules/moment/locale/ta.js",
+	"./te": "./node_modules/moment/locale/te.js",
+	"./te.js": "./node_modules/moment/locale/te.js",
+	"./tet": "./node_modules/moment/locale/tet.js",
+	"./tet.js": "./node_modules/moment/locale/tet.js",
+	"./tg": "./node_modules/moment/locale/tg.js",
+	"./tg.js": "./node_modules/moment/locale/tg.js",
+	"./th": "./node_modules/moment/locale/th.js",
+	"./th.js": "./node_modules/moment/locale/th.js",
+	"./tk": "./node_modules/moment/locale/tk.js",
+	"./tk.js": "./node_modules/moment/locale/tk.js",
+	"./tl-ph": "./node_modules/moment/locale/tl-ph.js",
+	"./tl-ph.js": "./node_modules/moment/locale/tl-ph.js",
+	"./tlh": "./node_modules/moment/locale/tlh.js",
+	"./tlh.js": "./node_modules/moment/locale/tlh.js",
+	"./tr": "./node_modules/moment/locale/tr.js",
+	"./tr.js": "./node_modules/moment/locale/tr.js",
+	"./tzl": "./node_modules/moment/locale/tzl.js",
+	"./tzl.js": "./node_modules/moment/locale/tzl.js",
+	"./tzm": "./node_modules/moment/locale/tzm.js",
+	"./tzm-latn": "./node_modules/moment/locale/tzm-latn.js",
+	"./tzm-latn.js": "./node_modules/moment/locale/tzm-latn.js",
+	"./tzm.js": "./node_modules/moment/locale/tzm.js",
+	"./ug-cn": "./node_modules/moment/locale/ug-cn.js",
+	"./ug-cn.js": "./node_modules/moment/locale/ug-cn.js",
+	"./uk": "./node_modules/moment/locale/uk.js",
+	"./uk.js": "./node_modules/moment/locale/uk.js",
+	"./ur": "./node_modules/moment/locale/ur.js",
+	"./ur.js": "./node_modules/moment/locale/ur.js",
+	"./uz": "./node_modules/moment/locale/uz.js",
+	"./uz-latn": "./node_modules/moment/locale/uz-latn.js",
+	"./uz-latn.js": "./node_modules/moment/locale/uz-latn.js",
+	"./uz.js": "./node_modules/moment/locale/uz.js",
+	"./vi": "./node_modules/moment/locale/vi.js",
+	"./vi.js": "./node_modules/moment/locale/vi.js",
+	"./x-pseudo": "./node_modules/moment/locale/x-pseudo.js",
+	"./x-pseudo.js": "./node_modules/moment/locale/x-pseudo.js",
+	"./yo": "./node_modules/moment/locale/yo.js",
+	"./yo.js": "./node_modules/moment/locale/yo.js",
+	"./zh-cn": "./node_modules/moment/locale/zh-cn.js",
+	"./zh-cn.js": "./node_modules/moment/locale/zh-cn.js",
+	"./zh-hk": "./node_modules/moment/locale/zh-hk.js",
+	"./zh-hk.js": "./node_modules/moment/locale/zh-hk.js",
+	"./zh-mo": "./node_modules/moment/locale/zh-mo.js",
+	"./zh-mo.js": "./node_modules/moment/locale/zh-mo.js",
+	"./zh-tw": "./node_modules/moment/locale/zh-tw.js",
+	"./zh-tw.js": "./node_modules/moment/locale/zh-tw.js"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
+
+/***/ }),
+
+/***/ "./src/App.tsx":
+/*!*********************!*\
+  !*** ./src/App.tsx ***!
+  \*********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Controller */ "./src/Controller.ts");
+/* harmony import */ var _component_CommentSidebarView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./component/CommentSidebarView */ "./src/component/CommentSidebarView.ts");
+/* harmony import */ var _component_BlogEntryView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./component/BlogEntryView */ "./src/component/BlogEntryView.tsx");
+/* harmony import */ var _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./state/StateManagementUtil */ "./src/state/StateManagementUtil.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+/* harmony import */ var _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./component/DetailsSidebarView */ "./src/component/DetailsSidebarView.ts");
+/* harmony import */ var _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./state/IndexedDBUtil */ "./src/state/IndexedDBUtil.ts");
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+/* eslint "react/react-in-jsx-scope":"off" */
+
+/* eslint "react/jsx-no-undef":"off" */
+
+
+
+
+
+
+
+
+
+
+
+var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('app');
+
+var Root = /*#__PURE__*/function (_React$Component) {
+  _inheritsLoose(Root, _React$Component);
+
+  // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
+  function Root() {
+    var _this;
+
+    // @ts-ignore
+    _this = _React$Component.call(this) || this;
+    _this.state = {
+      isLoggedIn: false,
+      loggedInUserId: -1,
+      entries: [],
+      selectedEntry: {},
+      applyUserFilter: false,
+      stateNames: {
+        users: 'users',
+        entries: 'entries',
+        selectedEntry: 'selectedEntry'
+      },
+      apis: {
+        users: '/users',
+        entries: '/blog',
+        entry: '/blog',
+        comment: '/comment',
+        login: '/login'
+      },
+      ui: {
+        alert: {
+          modalId: "alert",
+          titleId: "alert-title",
+          contentId: "alert-content",
+          cancelButtonId: "alert-cancel",
+          confirmButtonId: "alert-confirm",
+          closeButtonId: "alert-close",
+          hideClass: "d-none",
+          showClass: "d-block"
+        },
+        navigation: {
+          showMyEntriesId: 'navigationItemDashboard',
+          addNewEntryId: 'navigationItemAddNewEntry',
+          showAllEntriesId: 'navigationItemShowAll'
+        },
+        blogEntry: {},
+        entryDetailsSideBar: {
+          dom: {
+            sideBarId: 'detailsSideBar',
+            formId: 'details',
+            titleId: 'title',
+            contentId: 'content',
+            changedOnId: 'changedOn',
+            resultDataKeyId: 'id',
+            isDraggable: false,
+            isClickable: true
+          }
+        },
+        commentSideBar: {
+          dom: {
+            sideBarId: 'commentSideBar',
+            headerId: 'commentHeader',
+            resultsId: 'comments',
+            resultsElementType: 'button',
+            resultsElementAttributes: [['type', 'button']],
+            resultsClasses: 'list-group-item my-list-item truncate-comment list-group-item-action',
+            resultDataKeyId: 'id',
+            resultLegacyDataKeyId: 'id',
+            modifierClassNormal: 'float-right list-group-item-primary text-right',
+            modifierClassInactive: 'float-left list-group-item-dark text-left',
+            modifierClassActive: 'list-group-item-primary',
+            modifierClassWarning: 'list-group-item-warning',
+            iconNormal: '<i class="fas fa-trash-alt"></i>',
+            iconInactive: '',
+            iconActive: '',
+            iconWarning: '',
+            isDraggable: false,
+            isClickable: true,
+            newFormId: "newComment",
+            commentId: "comment",
+            submitCommentId: "submitComment"
+          }
+        }
+      },
+      uiPrefs: {
+        navigation: {},
+        blogEntry: {},
+        commentSideBar: {
+          view: {
+            location: 'right',
+            expandedSize: '50%'
+          }
+        },
+        entryDetailsSideBar: {
+          view: {
+            location: 'left',
+            expandedSize: '35%'
+          }
+        }
+      },
+      controller: {
+        events: {
+          entry: {
+            eventDataKeyId: 'entry-id'
+          }
+        },
+        dataLimit: {}
+      }
+    }; // event handlers
+
+    _this.cancelDelete = _this.cancelDelete.bind(_assertThisInitialized(_this));
+    _this.confirmDelete = _this.confirmDelete.bind(_assertThisInitialized(_this));
+    _this.handleShowMyEntries = _this.handleShowMyEntries.bind(_assertThisInitialized(_this));
+    _this.handleSelectEntryComments = _this.handleSelectEntryComments.bind(_assertThisInitialized(_this));
+    _this.handleShowEditEntry = _this.handleShowEditEntry.bind(_assertThisInitialized(_this));
+    _this.handleUpdateEntry = _this.handleUpdateEntry.bind(_assertThisInitialized(_this));
+    _this.handleAddEntry = _this.handleAddEntry.bind(_assertThisInitialized(_this));
+    _this.handleAddComment = _this.handleAddComment.bind(_assertThisInitialized(_this));
+    _this.handleDeleteEntry = _this.handleDeleteEntry.bind(_assertThisInitialized(_this));
+    _this.handleDeleteComment = _this.handleDeleteComment.bind(_assertThisInitialized(_this));
+    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].connectToApplication(_assertThisInitialized(_this), window.localStorage);
+    return _this;
+  }
+
+  var _proto = Root.prototype;
+
+  _proto.getCurrentUser = function getCurrentUser() {
+    return _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId();
+  };
+
+  _proto.alert = function alert(title, content) {
+    this.titleEl.textContent = title;
+    this.contentEl.textContent = content; // @ts-ignore
+
+    this.modalEl.classList.remove(this.state.ui.alert.hideClass); // @ts-ignore
+
+    this.modalEl.classList.add(this.state.ui.alert.showClass);
+  };
+
+  _proto.render = function render() {
+    var _this2 = this;
+
+    logger("Rendering App"); // @ts-ignore
+
+    logger(this.state.entries); // @ts-ignore
+
+    logger(this.state.applyUserFilter); // @ts-ignore
+
+    var entriesToDisplay = this.state.entries; // @ts-ignore
+
+    if (this.state.applyUserFilter && _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn() && _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId() > 0) {
+      entriesToDisplay = entriesToDisplay.filter(function (entry) {
+        return entry.createdBy === _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId();
+      });
+    }
+
+    var blog = entriesToDisplay.map(function (entry, index) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_component_BlogEntryView__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        key: index,
+        entry: entry,
+        showCommentsHandler: _this2.handleSelectEntryComments,
+        editEntryHandler: _this2.handleShowEditEntry,
+        deleteEntryHandler: _this2.handleDeleteEntry
+      });
+    });
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "Root row ml-1"
+    }, blog);
+  };
+
+  _proto.cancelDelete = function cancelDelete(event) {
+    // @ts-ignore
+    this.modalEl.classList.remove(this.state.ui.alert.showClass); // @ts-ignore
+
+    this.modalEl.classList.add(this.state.ui.alert.hideClass);
+    event.preventDefault();
+  };
+
+  _proto.confirmDelete = function confirmDelete(event) {
+    // @ts-ignore
+    this.modalEl.classList.remove(this.state.ui.alert.showClass); // @ts-ignore
+
+    this.modalEl.classList.add(this.state.ui.alert.hideClass);
+    event.preventDefault(); // @ts-ignore
+
+    var entryId = this.modalEl.getAttribute(this.state.controller.events.entry.eventDataKeyId);
+    logger("Handling Delete Entry " + entryId);
+
+    if (entryId) {
+      // find the entry from the state manager
+      entryId = parseInt(entryId); // @ts-ignore
+
+      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.entries, {
+        id: entryId
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+
+      if (entry) {
+        // delete the entry using the controller and remove the state manager
+        _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].deleteEntry(entry); // @ts-ignore
+
+        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].removeItemFromState(this.state.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+      }
+    }
+  };
+
+  _proto.componentDidMount = function componentDidMount() {
+    logger('component Did Mount'); // add the additional views and configure them
+
+    this.commentView = new _component_CommentSidebarView__WEBPACK_IMPORTED_MODULE_5__["default"](this, document);
+    this.commentView.onDocumentLoaded(); // reset the view state
+
+    this.detailsView = new _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_9__["default"](this, document);
+    this.detailsView.onDocumentLoaded(); // navigation item handlers
+
+    if (document) {
+      // @ts-ignore
+      document.getElementById(this.state.ui.navigation.addNewEntryId).addEventListener('click', this.handleAddEntry); // @ts-ignore
+
+      document.getElementById(this.state.ui.navigation.showMyEntriesId).addEventListener('click', this.handleShowMyEntries);
+    } // alert modal dialog setup
+    // @ts-ignore
+
+
+    this.modalEl = document.getElementById(this.state.ui.alert.modalId); // @ts-ignore
+
+    this.titleEl = document.getElementById(this.state.ui.alert.titleId); // @ts-ignore
+
+    this.contentEl = document.getElementById(this.state.ui.alert.contentId); // @ts-ignore
+
+    this.cancelBtnEl = document.getElementById(this.state.ui.alert.cancelButtonId); // @ts-ignore
+
+    this.confirmBtnEl = document.getElementById(this.state.ui.alert.confirmButtonId); // @ts-ignore
+
+    this.closeBtnEl = document.getElementById(this.state.ui.alert.closeButtonId); // event listeners for the confirm delete of entry
+
+    if (this.cancelBtnEl) this.cancelBtnEl.addEventListener('click', this.cancelDelete);
+    if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click', this.confirmDelete);
+    if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete); // ok lets try get things done
+
+    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].initialise(); // indexedDB access
+
+    var db = _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__["default"].getDB();
+    db.addNewItemToCollection("test", {
+      id: 1,
+      data: "Test"
+    });
+  };
+
+  _proto.hideAllSideBars = function hideAllSideBars() {
+    this.commentView.eventHide(null);
+    this.detailsView.eventHide(null);
+  };
+
+  _proto.handleShowMyEntries = function handleShowMyEntries(event) {
+    logger('Handling Show My Entries');
+    this.hideAllSideBars();
+
+    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
+      // @ts-ignore
+      window.location.href = this.state.apis.login;
+      return;
+    }
+
+    this.setState({
+      applyUserFilter: true
+    });
+  };
+
+  _proto.handleAllEntries = function handleAllEntries(event) {
+    logger('Handling Show All Entries');
+    this.setState({
+      applyUserFilter: false
+    });
+    this.hideAllSideBars();
+  };
+
+  _proto.handleAddEntry = function handleAddEntry(event) {
+    logger('Handling Add Entry');
+    event.preventDefault();
+    this.hideAllSideBars(); // prevent anything from happening if we are not logged in
+
+    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
+      // @ts-ignore
+      window.location.href = this.state.apis.login;
+      return;
+    } // find the current user
+    // @ts-ignore
+
+
+    var creator = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.users, {
+      id: _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+    logger(creator); // create an empty entry
+
+    var entry = {
+      title: '',
+      content: '',
+      createdBy: creator.id,
+      changedOn: parseInt(moment__WEBPACK_IMPORTED_MODULE_3___default()().format('YYYYMMDDHHmmss')),
+      Comments: [],
+      User: {
+        id: creator.id,
+        username: creator.username
+      }
+    };
+    logger(entry);
+    this.setState({
+      selectedEntry: entry
+    }); // @ts-ignore
+
+    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].setStateByName(this.state.stateNames.selectedEntry, entry);
+    this.detailsView.eventShow(event);
+  };
+
+  _proto.handleAddComment = function handleAddComment(event) {
+    logger('Handling Add Comment');
+    event.preventDefault(); // get the comment element
+    // @ts-ignore
+
+    var commentEl = document.getElementById(this.state.ui.commentSideBar.dom.commentId);
+    if (commentEl && commentEl.value.trim().length === 0) return; // prevent anything from happening if we are not logged in
+
+    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
+      // @ts-ignore
+      window.location.href = this.state.apis.login;
+      return;
+    } // find the current user
+    // @ts-ignore
+
+
+    var creator = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.users, {
+      id: _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+    logger(creator); // find the selected entry
+    // @ts-ignore
+
+    var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].getStateByName(this.state.stateNames.selectedEntry);
+
+    if (entry && commentEl) {
+      // create an empty comment
+      // @ts-ignore
+      var comment = {
+        createdBy: creator.id,
+        commentOn: entry.id,
+        changedOn: parseInt(moment__WEBPACK_IMPORTED_MODULE_3___default()().format('YYYYMMDDHHmmss')),
+        content: commentEl.value.trim()
+      };
+      commentEl.value = '';
+      _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].addComment(comment);
+      logger(comment);
+    }
+  };
+
+  _proto.handleSelectEntryComments = function handleSelectEntryComments(event) {
+    logger('Handling Select Entry Comments');
+    event.preventDefault();
+    this.hideAllSideBars(); // @ts-ignore
+
+    var entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
+    logger("Handling Show Edit Entry " + entryId);
+
+    if (entryId) {
+      // find the entry from the state manager
+      entryId = parseInt(entryId); // @ts-ignore
+
+      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.entries, {
+        id: entryId
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+      logger(entry);
+
+      if (entry) {
+        // select the entry and open the details sidebar
+        this.setState({
+          selectedEntry: entry
+        }); // @ts-ignore
+
+        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].setStateByName(this.state.stateNames.selectedEntry, entry);
+        this.commentView.eventShow(event);
+      }
+    }
+  };
+
+  _proto.handleShowEditEntry = function handleShowEditEntry(event) {
+    event.preventDefault();
+    this.hideAllSideBars(); // @ts-ignore
+
+    var entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
+    logger("Handling Show Edit Entry " + entryId);
+
+    if (entryId) {
+      // find the entry from the state manager
+      entryId = parseInt(entryId); // @ts-ignore
+
+      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.entries, {
+        id: entryId
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+      logger(entry);
+
+      if (entry) {
+        // select the entry and open the details sidebar
+        this.setState({
+          selectedEntry: entry
+        }); // @ts-ignore
+
+        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].setStateByName(this.state.stateNames.selectedEntry, entry);
+        this.detailsView.eventShow(event);
+      }
+    }
+  };
+
+  _proto.handleDeleteEntry = function handleDeleteEntry(event) {
+    event.preventDefault();
+    this.hideAllSideBars(); // @ts-ignore
+
+    var entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
+    logger("Handling Delete Entry " + entryId);
+
+    if (entryId) {
+      // @ts-ignore
+      this.modalEl.setAttribute(this.state.controller.events.entry.eventDataKeyId, entryId); // find the entry from the state manager
+
+      entryId = parseInt(entryId); // @ts-ignore
+
+      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.entries, {
+        id: entryId
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+      this.alert(entry.title, "Are you sure you want to delete this blog entry?");
+    }
+  };
+
+  _proto.handleDeleteComment = function handleDeleteComment(id) {
+    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].deleteComment(id);
+  } // @ts-ignore
+  ;
+
+  _proto.handleUpdateEntry = function handleUpdateEntry(entry) {
+    this.hideAllSideBars();
+    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].updateEntry(entry);
+  };
+
+  return Root;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component); //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
+
+
+localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts';
+debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
+
+var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
+  className: "container-fluid justify-content-around"
+});
+react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(element, document.getElementById('root'));
+
+/***/ }),
+
+/***/ "./src/Controller.ts":
+/*!***************************!*\
+  !*** ./src/Controller.ts ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./network/DownloadManager */ "./src/network/DownloadManager.ts");
+/* harmony import */ var _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state/StateManagementUtil */ "./src/state/StateManagementUtil.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+/* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./notification/NotificationManager */ "./src/notification/NotificationManager.ts");
+/* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./socket/SocketManager */ "./src/socket/SocketManager.ts");
+/* harmony import */ var _network_Types__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./network/Types */ "./src/network/Types.ts");
+
+
+
+
+
+
+
+var cLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('controller-ts');
+
+var Controller = /*#__PURE__*/function () {
+  function Controller() {}
+
+  var _proto = Controller.prototype;
+
+  _proto.connectToApplication = function connectToApplication(applicationView, clientSideStorage) {
+    this.applicationView = applicationView;
+    this.clientSideStorage = clientSideStorage;
+    this.config = this.applicationView.state; // setup Async callbacks for the fetch requests
+
+    this.callbackForUsers = this.callbackForUsers.bind(this);
+    this.callbackForEntries = this.callbackForEntries.bind(this);
+    this.callbackForCreateEntry = this.callbackForCreateEntry.bind(this);
+    this.callbackForCreateComment = this.callbackForCreateComment.bind(this); // state listener
+
+    this.stateChanged = this.stateChanged.bind(this);
+    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addChangeListenerForName(this.config.stateNames.entries, this);
+    return this;
+  };
+
+  _proto.stateChanged = function stateChanged(name, value) {
+    cLogger("State changes " + name);
+    cLogger(value);
+    this.applicationView.setState({
+      isLoggedIn: this.isLoggedIn(),
+      loggedInUserId: this.getLoggedInUserId(),
+      selectedEntry: {},
+      entries: value
+    });
+  }
+  /*
+  *
+  * Call back functions for database operations
+  *
+   */
+  ;
+
+  _proto.callbackForUsers = function callbackForUsers(data, status) {
+    cLogger('callback for all users');
+    var users = [];
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      cLogger(data);
+      var cbUsers = data; // covert the data to the AppType User
+
+      cbUsers.forEach(function (cbUser) {
+        var user = {
+          id: cbUser.id,
+          username: cbUser.username
+        };
+        users.push(user);
+      });
+    }
+
+    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.users, users);
+  };
+
+  Controller.convertJSONCommentToComment = function convertJSONCommentToComment(jsonComment) {
+    var comment = {
+      id: jsonComment.id,
+      content: jsonComment.content,
+      createdBy: jsonComment.createdBy,
+      changedOn: jsonComment.changedOn,
+      commentOn: jsonComment.commentOn
+    };
+    return comment;
+  };
+
+  Controller.convertJSONUserToUser = function convertJSONUserToUser(jsonUser) {
+    var user = {
+      id: jsonUser.id,
+      username: jsonUser.username
+    };
+    return user;
+  };
+
+  Controller.convertJSONEntryToBlogEntry = function convertJSONEntryToBlogEntry(jsonEntry) {
+    var entry = {
+      id: jsonEntry.id,
+      title: jsonEntry.title,
+      content: jsonEntry.content,
+      createdBy: jsonEntry.createdBy,
+      changedOn: jsonEntry.changedOn,
+      User: null,
+      Comments: []
+    };
+    var cbUser = jsonEntry.user;
+
+    if (cbUser) {
+      entry.User = Controller.convertJSONUserToUser(cbUser);
+    }
+
+    var cbComments = jsonEntry.comments;
+
+    if (cbComments) {
+      cbComments.forEach(function (cbComment) {
+        var comment = Controller.convertJSONCommentToComment(cbComment);
+        entry.Comments.push(comment);
+      });
+    }
+
+    return entry;
+  };
+
+  _proto.callbackForEntries = function callbackForEntries(data, status) {
+    cLogger('callback for all entries');
+    var entries = [];
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      cLogger(data);
+      data.forEach(function (cbEntry) {
+        var entry = Controller.convertJSONEntryToBlogEntry(cbEntry);
+        entries.push(entry);
+      });
+    }
+
+    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.entries, entries);
+  };
+
+  _proto.callbackForCreateEntry = function callbackForCreateEntry(data, status) {
+    cLogger('callback for create entry');
+    var entry = null;
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      cLogger(data);
+
+      var _entry = Controller.convertJSONEntryToBlogEntry(data);
+
+      _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addNewItemToState(this.config.stateNames.entries, _entry);
+    }
+  };
+
+  _proto.callbackForCreateComment = function callbackForCreateComment(data, status) {
+    cLogger('callback for create comment');
+    var comment = null;
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      var _comment = Controller.convertJSONCommentToComment(data);
+
+      cLogger(_comment); // find the corresponding entry in state
+
+      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.entries, {
+        id: _comment.commentOn
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+      cLogger(entry);
+
+      if (entry) {
+        cLogger('callback for create comment - updating entry'); // update the entry with the new comment
+
+        entry.Comments.push(_comment); // update the entry in the state manager
+
+        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // reselect the same entry
+
+        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.selectedEntry, entry);
+        cLogger(entry);
+      }
+    }
+  }
+  /*
+  *
+  *   API calls
+  *
+   */
+  ;
+
+  _proto.getAllUsers = function getAllUsers() {
+    cLogger('Getting All Users');
+    var jsonRequest = {
+      url: this.getServerAPIURL() + this.config.apis.users,
+      type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].GET,
+      params: {},
+      callback: this.callbackForUsers
+    };
+    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest, true);
+  };
+
+  _proto.getAllEntries = function getAllEntries() {
+    cLogger('Getting All Entries');
+    var jsonRequest = {
+      url: this.getServerAPIURL() + this.config.apis.entries,
+      type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].GET,
+      params: {},
+      callback: this.callbackForEntries
+    };
+    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest, true);
+  };
+
+  _proto.apiDeleteComment = function apiDeleteComment(id) {
+    var deleteCommentCB = function deleteCommentCB(data, status) {
+      cLogger('callback for delete comment');
+
+      if (status >= 200 && status <= 299) {
+        // do we have any data?
+        cLogger(data);
+      }
+    };
+
+    var jsonRequest = {
+      url: this.getServerAPIURL() + this.config.apis.comment,
+      type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].DELETE,
+      params: {
+        id: id
+      },
+      callback: deleteCommentCB
+    };
+    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest);
+  };
+
+  _proto.apiDeleteEntry = function apiDeleteEntry(entry) {
+    var deleteCB = function deleteCB(data, status) {
+      cLogger('callback for delete entry');
+
+      if (status >= 200 && status <= 299) {
+        // do we have any data?
+        cLogger(data);
+      }
+    };
+
+    if (entry) {
+      var jsonRequest = {
+        url: this.getServerAPIURL() + this.config.apis.entries,
+        type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].DELETE,
+        params: {
+          id: entry.id
+        },
+        callback: deleteCB
+      };
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest);
+    }
+  };
+
+  _proto.apiCreateEntry = function apiCreateEntry(entry) {
+    if (entry) {
+      var jsonRequest = {
+        url: this.getServerAPIURL() + this.config.apis.entries,
+        type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].POST,
+        params: entry,
+        callback: this.callbackForCreateEntry
+      };
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest, true);
+    }
+  };
+
+  _proto.apiCreateComment = function apiCreateComment(comment) {
+    if (comment) {
+      var jsonRequest = {
+        url: this.getServerAPIURL() + this.config.apis.comment,
+        type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].POST,
+        params: comment,
+        callback: this.callbackForCreateComment
+      };
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest, true);
+    }
+  };
+
+  _proto.apiUpdateEntry = function apiUpdateEntry(entry) {
+    var updateCB = function updateCB(data, status) {
+      cLogger('callback for update entry');
+
+      if (status >= 200 && status <= 299) {
+        // do we have any data?
+        cLogger(data);
+      }
+    };
+
+    if (entry) {
+      var jsonRequest = {
+        url: this.getServerAPIURL() + this.config.apis.entries,
+        type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].PUT,
+        params: entry,
+        callback: updateCB
+      };
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest);
+    }
+  }
+  /*
+  *
+  * Simple Application state (URL, logged in user)
+  *
+   */
+  ;
+
+  _proto.getServerAPIURL = function getServerAPIURL() {
+    var result = "/api"; // @ts-ignore
+
+    if (window.ENV && window.ENV.serverURL) {
+      // @ts-ignore
+      result = window.ENV.serverURL;
+    }
+
+    return result;
+  };
+
+  _proto.isLoggedIn = function isLoggedIn() {
+    var isLoggedIn = false;
+
+    try {
+      // @ts-ignore
+      if (loggedInUserId) {
+        isLoggedIn = true;
+      }
+    } catch (error) {}
+
+    cLogger("Are logged in: " + isLoggedIn);
+    return isLoggedIn;
+  };
+
+  _proto.getLoggedInUserId = function getLoggedInUserId() {
+    var result = -1;
+
+    try {
+      // @ts-ignore
+      if (loggedInUserId) {
+        // @ts-ignore
+        result = loggedInUserId;
+      }
+    } catch (error) {}
+
+    cLogger("Logged in user id: " + result);
+    return result;
+  }
+  /*
+    Get the base data for the application (users, entries)
+   */
+  ;
+
+  _proto.initialise = function initialise() {
+    cLogger('Initialising data state'); // listen for socket events
+
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].setListener(this); // load the users
+
+    this.getAllUsers(); // load the entries
+
+    this.getAllEntries();
+  } // Lets delete a comment
+  ;
+
+  _proto.deleteComment = function deleteComment(id) {
+    var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].getStateByName(this.config.stateNames.selectedEntry);
+
+    if (entry) {
+      cLogger("Handling delete comment for " + entry.id + " and comment " + id); // find the comment in the entry and remove it from the state
+
+      var comments = entry.Comments;
+      var foundIndex = comments.findIndex(function (element) {
+        return element.id === id;
+      });
+
+      if (foundIndex >= 0) {
+        // remove comment from the array
+        cLogger('Found comment in entry - removing');
+        comments.splice(foundIndex, 1);
+        cLogger(entry); // update the statement manager
+
+        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.selectedEntry, entry);
+        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+      }
+    }
+
+    this.apiDeleteComment(id);
+  };
+
+  _proto.deleteEntry = function deleteEntry(entry) {
+    if (entry) {
+      cLogger("Handling delete entry for " + entry.id); // update the state manager
+
+      _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeItemFromState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // initiate a call to remove from the database
+
+      this.apiDeleteEntry(entry);
+    }
+  };
+
+  _proto.updateEntry = function updateEntry(entry) {
+    if (entry) {
+      cLogger(entry);
+
+      if (entry.id) {
+        cLogger("Handling update for entry " + entry.id); // update the state manager
+
+        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // update the database
+
+        this.apiUpdateEntry(entry);
+      } else {
+        cLogger("Handling create for entry"); // new entry
+
+        this.apiCreateEntry(entry);
+      }
+    }
+  };
+
+  _proto.addComment = function addComment(comment) {
+    if (comment) {
+      cLogger(comment);
+      cLogger("Handling create for comment");
+      this.apiCreateComment(comment);
+    }
+  }
+  /*
+  *  sockets -
+  *  Handling data changes by other users
+  *
+   */
+  ;
+
+  _proto.handleMessage = function handleMessage(message) {
+    cLogger(message);
+  };
+
+  _proto.getCurrentUser = function getCurrentUser() {
+    return this.getLoggedInUserId();
+  };
+
+  _proto.handleDataChangedByAnotherUser = function handleDataChangedByAnotherUser(message) {
+    cLogger("Handling data change " + message.type + " on object type " + message.objectType + " made by user " + message.user);
+    var changeUser = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.users, {
+      id: message.user
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+    var stateObj = message.data;
+    cLogger(stateObj); // ok lets work out where this change belongs
+
+    try {
+      switch (message.type) {
+        case "create":
+          {
+            switch (message.objectType) {
+              case "Comment":
+                {
+                  // updating comments is more tricky as it is a sub object of the blog entry
+                  // find the entry in question
+                  var changedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.entries, {
+                    id: stateObj.commentOn
+                  }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+
+                  if (changedEntry) {
+                    var comment = Controller.convertJSONCommentToComment(stateObj); // add the new comment
+
+                    changedEntry.Comments.push(comment); // update the state
+
+                    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, changedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // was this entry current open by the user?
+
+                    var currentSelectedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].getStateByName(this.config.stateNames.selectedEntry);
+
+                    if (currentSelectedEntry) {
+                      if (currentSelectedEntry.id === changedEntry.id) {
+                        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.selectedEntry, changedEntry);
+                      }
+                    }
+
+                    var username = "unknown";
+
+                    if (changeUser) {
+                      username = changeUser.username;
+                    }
+
+                    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(changedEntry.title, username + " added comment " + stateObj.content);
+                  }
+
+                  break;
+                }
+
+              case "BlogEntry":
+                {
+                  var entry = Controller.convertJSONEntryToBlogEntry(stateObj);
+                  cLogger("Converting to BlogEntry type for Create");
+                  cLogger(entry); // add the new item to the state
+
+                  _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addNewItemToState(this.config.stateNames.entries, entry);
+                  var _username = "unknown";
+
+                  if (changeUser) {
+                    _username = changeUser.username;
+                  }
+
+                  _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(stateObj.title, _username + " added new entry");
+                  break;
+                }
+
+              case "User":
+                {
+                  var user = Controller.convertJSONUserToUser(stateObj); // add the new item to the state
+
+                  _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addNewItemToState(this.config.stateNames.users, user);
+                  _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(stateObj.username, stateObj.username + " has just registered.", 'message');
+                  break;
+                }
+            }
+
+            break;
+          }
+
+        case "update":
+          {
+            switch (message.objectType) {
+              case "BlogEntry":
+                {
+                  var _entry2 = Controller.convertJSONEntryToBlogEntry(stateObj);
+
+                  cLogger("Converting to BlogEntry type for Update");
+                  cLogger(_entry2); // update the item in the state
+
+                  _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, _entry2, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
+
+                  break;
+                }
+            }
+
+            break;
+          }
+
+        case "delete":
+          {
+            switch (message.objectType) {
+              case "Comment":
+                {
+                  // removing comments is more tricky as it is a sub object of the blog entry
+                  // find the entry in question
+                  var _changedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.entries, {
+                    id: stateObj.commentOn
+                  }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+
+                  cLogger(_changedEntry);
+
+                  if (_changedEntry) {
+                    // remove the comment
+                    var comments = _changedEntry.Comments;
+                    var foundIndex = comments.findIndex(function (element) {
+                      return element.id === stateObj.id;
+                    });
+
+                    if (foundIndex >= 0) {
+                      // remove comment from the array
+                      cLogger('Found comment in entry - removing');
+                      comments.splice(foundIndex, 1);
+                      cLogger(_changedEntry); // update the state
+
+                      _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, _changedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // was this entry current open by the user?
+
+                      var _currentSelectedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].getStateByName(this.config.stateNames.selectedEntry);
+
+                      if (_currentSelectedEntry) {
+                        if (_currentSelectedEntry.id === _changedEntry.id) {
+                          _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.selectedEntry, _changedEntry);
+                        }
+                      }
+                    }
+                  }
+
+                  break;
+                }
+
+              case "BlogEntry":
+                {
+                  cLogger("Deleting Blog Entry with id " + stateObj.id);
+                  var deletedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+                  cLogger(deletedEntry);
+
+                  if (deletedEntry) {
+                    cLogger("Deleting Blog Entry with id " + deletedEntry.id);
+                    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeItemFromState(this.config.stateNames.entries, deletedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // the current user could be accessing the comments in the entry that was just deleted
+
+                    var _currentSelectedEntry2 = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].getStateByName(this.config.stateNames.selectedEntry);
+
+                    if (_currentSelectedEntry2) {
+                      if (_currentSelectedEntry2.id === deletedEntry.id) {
+                        cLogger("Deleted entry is selected by user, closing sidebars"); // ask the application to close any access to the comments
+
+                        this.applicationView.hideAllSideBars();
+                      }
+                    }
+
+                    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(deletedEntry.title, deletedEntry.User.username + " has deleted this entry.", 'danger');
+                  }
+
+                  break;
+                }
+            }
+
+            break;
+          }
+      }
+    } catch (err) {
+      cLogger(err);
+    }
+  };
+
+  return Controller;
+}();
+
+var controller = new Controller();
+/* harmony default export */ __webpack_exports__["default"] = (controller);
+
+/***/ }),
+
+/***/ "./src/component/AbstractView.ts":
+/*!***************************************!*\
+  !*** ./src/component/AbstractView.ts ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AbstractView; });
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/BrowserUtil */ "./src/util/BrowserUtil.ts");
+
+
+var avLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('view-ts');
+
+var AbstractView = /*#__PURE__*/function () {
+  function AbstractView(applicationView, htmlDocument, uiConfig, uiPrefs) {
+    this.applicationView = applicationView;
+    this.document = document;
+    this.uiConfig = uiConfig;
+    this.uiPrefs = uiPrefs;
+    this.config = applicationView.state; // state change listening
+
+    this.stateChanged = this.stateChanged.bind(this); // event handlers
+
+    this.eventStartDrag = this.eventStartDrag.bind(this);
+    this.eventClickItem = this.eventClickItem.bind(this);
+  }
+
+  var _proto = AbstractView.prototype;
+
+  _proto.eventStartDrag = function eventStartDrag(event) {
+    avLogger('Abstract View : drag start', 10);
+    var data = JSON.stringify(this.getDragData(event));
+    avLogger(data, 10); // @ts-ignore
+
+    event.dataTransfer.setData(this.applicationView.state.ui.draggable.draggableDataKeyId, data);
+  };
+
+  _proto.createResultsForState = function createResultsForState(name, newState) {
+    var _this = this;
+
+    avLogger('Abstract View : creating Results', 10);
+    avLogger(newState);
+    var domConfig = this.uiConfig.dom; // remove the previous items from list
+
+    var viewEl = document.getElementById(domConfig.resultsId);
+    if (viewEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].removeAllChildren(viewEl); // add the new children
+
+    newState.map(function (item, index) {
+      var childEl = _this.document.createElement(domConfig.resultsElementType);
+
+      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.resultsClasses); // add the key ids for selection
+
+      childEl.setAttribute(domConfig.resultDataKeyId, _this.getIdForStateItem(name, item));
+      childEl.setAttribute(domConfig.resultLegacyDataKeyId, _this.getLegacyIdForStateItem(name, item));
+      childEl.setAttribute(domConfig.resultDataSourceId, domConfig.resultDataSourceValue);
+
+      var displayText = _this.getDisplayValueForStateItem(name, item); // add modifiers for patient state
+
+
+      var modifier = _this.getModifierForStateItem(name, item);
+
+      var secondModifier = _this.getSecondaryModifierForStateItem(name, item);
+
+      switch (modifier) {
+        case 'normal':
+          {
+            avLogger('Abstract View: normal item', 10);
+            _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal);
+
+            if (domConfig.iconNormal !== '') {
+              childEl.innerHTML = displayText + domConfig.iconNormal;
+            } else {
+              childEl.innerText = displayText;
+            }
+
+            switch (secondModifier) {
+              case 'warning':
+                {
+                  _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal, false);
+                  _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassWarning, true);
+
+                  if (domConfig.iconWarning !== '') {
+                    childEl.innerHTML += domConfig.iconWarning;
+                  }
+
+                  break;
+                }
+
+              case 'normal':
+                {}
+            }
+
+            break;
+          }
+
+        case 'active':
+          {
+            avLogger('Abstract View: active item', 10);
+            _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassActive);
+
+            if (domConfig.iconActive !== '') {
+              childEl.innerHTML = displayText + domConfig.iconActive;
+            } else {
+              childEl.innerText = displayText;
+            }
+
+            switch (secondModifier) {
+              case 'warning':
+                {
+                  _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal, false);
+                  _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassWarning, true);
+
+                  if (domConfig.iconWarning !== '') {
+                    childEl.innerHTML += domConfig.iconWarning;
+                  }
+
+                  break;
+                }
+
+              case 'normal':
+                {}
+            }
+
+            break;
+          }
+
+        case 'inactive':
+          {
+            avLogger('Abstract View: inactive item', 10);
+            _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassInactive);
+
+            if (domConfig.iconInactive !== '') {
+              childEl.innerHTML = displayText + domConfig.iconInactive;
+            } else {
+              childEl.innerText = displayText;
+            }
+
+            switch (secondModifier) {
+              case 'warning':
+                {
+                  if (domConfig.iconWarning !== '') {
+                    childEl.innerHTML += domConfig.iconWarning;
+                  }
+
+                  break;
+                }
+
+              case 'normal':
+                {}
+            }
+
+            break;
+          }
+      } // add draggable actions
+
+
+      if (domConfig.isDraggable) {
+        childEl.setAttribute('draggable', 'true');
+        childEl.addEventListener('dragstart', _this.eventStartDrag);
+      } // add selection actions
+
+
+      if (domConfig.isClickable) {
+        childEl.addEventListener('click', _this.eventClickItem);
+      }
+
+      avLogger("Abstract View: Adding child " + item.id);
+      if (viewEl) viewEl.appendChild(childEl);
+    });
+  };
+
+  _proto.stateChanged = function stateChanged(name, newValue) {
+    this.updateView(name, newValue);
+  };
+
+  return AbstractView;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/component/BlogEntryView.tsx":
+/*!*****************************************!*\
+  !*** ./src/component/BlogEntryView.tsx ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BlogEntryView; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+
+
+
+
+
+var beLogger = debug__WEBPACK_IMPORTED_MODULE_3___default()('view-ts:blogentry'); // @ts-ignore
+
+function BlogEntryView(_ref) {
+  var entry = _ref.entry,
+      showCommentsHandler = _ref.showCommentsHandler,
+      editEntryHandler = _ref.editEntryHandler,
+      deleteEntryHandler = _ref.deleteEntryHandler;
+
+  if (entry) {
+    beLogger("Entry " + entry.User.id + " === " + _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId());
+    var editButton;
+    var deleteButton;
+
+    if (entry.User.id === _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()) {
+      editButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        type: "button",
+        className: "btn-primary btn-sm rounded p-1 mr-2",
+        "entry-id": entry.id,
+        onClick: editEntryHandler
+      }, "\xA0\xA0Edit \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+        className: "fas fa-edit"
+      }), "\xA0\xA0");
+      deleteButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        type: "button",
+        className: "btn-warning btn-sm rounded p-1 mr-2",
+        "entry-id": entry.id,
+        onClick: deleteEntryHandler
+      }, "\xA0\xA0Delete \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+        className: "fas fa-trash-alt"
+      }), "\xA0\xA0");
+    } else {
+      editButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        type: "button",
+        className: "btn-outline-secondary btn-sm rounded p-1 mr-2 ",
+        disabled: true
+      }, "\xA0\xA0Edit \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+        className: "fas fa-edit"
+      }), "\xA0\xA0");
+      deleteButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        type: "button",
+        className: "btn-outline-secondary btn-sm rounded p-1 mr-2",
+        disabled: true
+      }, "\xA0\xA0Delete \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+        className: "fas fa-trash-alt"
+      }), "\xA0\xA0");
+    }
+
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card",
+      style: {
+        width: "350px"
+      }
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card-header"
+    }, entry.title, "\xA0\xA0\xA0\xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+      className: "text-decoration-none"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+      className: "fas fa-comments text-secondary",
+      "entry-id": entry.id,
+      onClick: showCommentsHandler
+    }), "\xA0\xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+      className: "badge badge-pill badge-primary text-right",
+      "entry-id": entry.id,
+      onClick: showCommentsHandler
+    }, "\xA0", entry.Comments.length, "\xA0"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card-body"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+      className: "card-text"
+    }, entry.content), editButton, deleteButton), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card-footer text-right text-muted"
+    }, entry.User.username, " on ", moment__WEBPACK_IMPORTED_MODULE_2___default()(entry.changedOn, 'YYYYMMDDHHmmss').format('DD/MM/YYYY'))));
+  } else {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null);
+  }
+}
+BlogEntryView.propTypes = {
+  entry: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.any.isRequired,
+  showCommentsHandler: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func.isRequired,
+  editEntryHandler: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func.isRequired,
+  deleteEntryHandler: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func.isRequired
+};
+
+/***/ }),
+
+/***/ "./src/component/CommentSidebarView.ts":
+/*!*********************************************!*\
+  !*** ./src/component/CommentSidebarView.ts ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+/* harmony import */ var _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../state/StateManagementUtil */ "./src/state/StateManagementUtil.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+/* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+
+
+
+
+var viewLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('view-ts:comments');
+
+var CommentSidebarView = /*#__PURE__*/function (_SidebarView) {
+  _inheritsLoose(CommentSidebarView, _SidebarView);
+
+  function CommentSidebarView(applicationView, htmlDocument) {
+    var _this;
+
+    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.commentSideBar, applicationView.state.uiPrefs.commentSideBar) || this; // handler binding
+
+    _this.updateView = _this.updateView.bind(_assertThisInitialized(_this)); // elements
+
+    _this.commentHeaderEl = htmlDocument.getElementById(_this.uiConfig.dom.headerId);
+    _this.newCommentFormEl = htmlDocument.getElementById(_this.uiConfig.dom.newFormId);
+    if (_this.newCommentFormEl) _this.newCommentFormEl.addEventListener('submit', _this.applicationView.handleAddComment);
+    _this.newCommentTextEl = htmlDocument.getElementById(_this.uiConfig.dom.commentId);
+    _this.newCommentSubmitEl = htmlDocument.getElementById(_this.uiConfig.dom.submitCommentId); // register state change listening
+
+    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].addChangeListenerForName(_this.config.stateNames.selectedEntry, _assertThisInitialized(_this));
+    return _this;
+  }
+
+  var _proto = CommentSidebarView.prototype;
+
+  _proto.getIdForStateItem = function getIdForStateItem(name, item) {
+    return item.id;
+  };
+
+  _proto.getLegacyIdForStateItem = function getLegacyIdForStateItem(name, item) {
+    return item.id;
+  };
+
+  _proto.getDisplayValueForStateItem = function getDisplayValueForStateItem(name, item) {
+    viewLogger("Getting display value for comment " + item.id + " with content " + item.content); // find the user for the item from the createdBy attribute
+
+    var createdBy = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].findItemInState(this.config.stateNames.users, {
+      id: item.createdBy
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_4__["isSame"]);
+    var createdOn = moment__WEBPACK_IMPORTED_MODULE_1___default()(item.changedOn, 'YYYYMMDDHHmmss').format('DD/MM/YYYY HH:mm');
+    return item.content + " - " + createdBy.username + " on " + createdOn + "  ";
+  };
+
+  _proto.getModifierForStateItem = function getModifierForStateItem(name, item) {
+    var result = 'inactive';
+
+    if (item.createdBy === _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getLoggedInUserId()) {
+      result = 'normal';
+    }
+
+    return result;
+  };
+
+  _proto.getSecondaryModifierForStateItem = function getSecondaryModifierForStateItem(name, item) {
+    return 'normal';
+  };
+
+  _proto.eventClickItem = function eventClickItem(event) {
+    event.preventDefault();
+    var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].getStateByName(this.config.stateNames.selectedEntry);
+    viewLogger(event.target); // @ts-ignore
+
+    var id = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
+
+    if (!id) {
+      //get the id from the containing element
+      // @ts-ignore
+      var parentEl = event.target.parentNode;
+      id = parentEl.getAttribute(this.uiConfig.dom.resultDataKeyId);
+    } // @ts-ignore
+
+
+    viewLogger("Comment " + event.target.innerText + " with id " + id + " clicked", 20);
+
+    if (id) {
+      id = parseInt(id); // find the comment in the selected entry
+
+      var comment = entry.Comments.find(function (comment) {
+        return comment.id === id;
+      });
+
+      if (comment) {
+        viewLogger("Comment created by " + comment.createdBy + " and current user is " + _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getLoggedInUserId()); // only able to delete if the comment was created by the current user
+
+        if (comment.createdBy === _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getLoggedInUserId()) {
+          this.applicationView.handleDeleteComment(parseInt(id));
+        }
+      }
+    }
+  };
+
+  _proto.updateView = function updateView(name, newState) {
+    viewLogger('Updating view');
+    viewLogger(newState);
+
+    if (_Controller__WEBPACK_IMPORTED_MODULE_2__["default"].isLoggedIn()) {
+      if (this.newCommentTextEl) this.newCommentTextEl.removeAttribute("readonly");
+      if (this.newCommentSubmitEl) this.newCommentSubmitEl.removeAttribute("disabled");
+    } else {
+      if (this.newCommentTextEl) this.newCommentTextEl.setAttribute("readonly", "true");
+      if (this.newCommentSubmitEl) this.newCommentSubmitEl.setAttribute("disabled", "true");
+    }
+
+    if (newState && newState.Comments) {
+      if (this.commentHeaderEl) this.commentHeaderEl.innerHTML = newState.title;
+      viewLogger(newState.Comments);
+      this.createResultsForState(name, newState.Comments);
+    }
+  };
+
+  _proto.getDragData = function getDragData(event) {};
+
+  return CommentSidebarView;
+}(_SidebarView__WEBPACK_IMPORTED_MODULE_5__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (CommentSidebarView);
+
+/***/ }),
+
+/***/ "./src/component/DetailsSidebarView.ts":
+/*!*********************************************!*\
+  !*** ./src/component/DetailsSidebarView.ts ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
+/* harmony import */ var _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../state/StateManagementUtil */ "./src/state/StateManagementUtil.ts");
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+
+
+var viewLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('view-ts:details');
+
+var DetailsSidebarView = /*#__PURE__*/function (_SidebarView) {
+  _inheritsLoose(DetailsSidebarView, _SidebarView);
+
+  function DetailsSidebarView(applicationView, htmlDocument) {
+    var _this;
+
+    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.entryDetailsSideBar, applicationView.state.uiPrefs.entryDetailsSideBar) || this; // handler binding
+
+    _this.updateView = _this.updateView.bind(_assertThisInitialized(_this));
+    _this.eventClickItem = _this.eventClickItem.bind(_assertThisInitialized(_this)); // field and form elements
+
+    _this.formEl = document.getElementById(_this.uiConfig.dom.formId);
+    _this.titleEl = document.getElementById(_this.uiConfig.dom.titleId);
+    _this.contentEl = document.getElementById(_this.uiConfig.dom.contentId);
+    _this.changeOnEl = document.getElementById(_this.uiConfig.dom.changedOnId); // register state change listening
+
+    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].addChangeListenerForName(_this.config.stateNames.selectedEntry, _assertThisInitialized(_this)); // listen for form submissions
+
+    if (_this.formEl) {
+      // @ts-ignore
+      _this.formEl.addEventListener('submit', _this.eventClickItem);
+    }
+
+    return _this;
+  }
+
+  var _proto = DetailsSidebarView.prototype;
+
+  _proto.getIdForStateItem = function getIdForStateItem(name, item) {
+    return item.id;
+  };
+
+  _proto.getLegacyIdForStateItem = function getLegacyIdForStateItem(name, item) {
+    return item.id;
+  };
+
+  _proto.eventClickItem = function eventClickItem(event) {
+    event.preventDefault();
+    viewLogger('Handling submit Details Sidebar View');
+    viewLogger(event.target);
+    var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].getStateByName(this.config.stateNames.selectedEntry);
+    viewLogger(entry);
+    entry.title = this.titleEl ? this.titleEl.value.trim() : '';
+    entry.content = this.contentEl ? this.contentEl.value.trim() : '';
+    entry.changedOn = parseInt(moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYYMMDDHHmmss'));
+    viewLogger(entry);
+    if (this.titleEl) this.titleEl.value = '';
+    if (this.contentEl) this.contentEl.value = '';
+    if (this.changeOnEl) this.changeOnEl.innerText = 'Last Changed On:';
+    this.applicationView.handleUpdateEntry(entry);
+  };
+
+  _proto.updateView = function updateView(name, newState) {
+    viewLogger('Handling update of Details Sidebar View');
+    viewLogger(newState);
+    var entry = newState;
+
+    if (entry && entry.title) {
+      if (this.titleEl) this.titleEl.value = entry.title;
+      if (this.contentEl) this.contentEl.value = entry.content;
+      if (this.changeOnEl) this.changeOnEl.innerText = "Last Changed On: " + moment__WEBPACK_IMPORTED_MODULE_0___default()(entry.changedOn, 'YYYYMMDDHHmmss').format('DD/MM/YYYY');
+    } else {
+      if (this.titleEl) this.titleEl.value = '';
+      if (this.contentEl) this.contentEl.value = '';
+      if (this.changeOnEl) this.changeOnEl.innerText = "Last Changed On: ";
+    }
+  };
+
+  _proto.getDisplayValueForStateItem = function getDisplayValueForStateItem(name, item) {
+    return "";
+  };
+
+  _proto.getDragData = function getDragData(event) {};
+
+  _proto.getModifierForStateItem = function getModifierForStateItem(name, item) {
+    return "";
+  };
+
+  _proto.getSecondaryModifierForStateItem = function getSecondaryModifierForStateItem(name, item) {
+    return "";
+  };
+
+  return DetailsSidebarView;
+}(_SidebarView__WEBPACK_IMPORTED_MODULE_2__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (DetailsSidebarView);
+
+/***/ }),
+
+/***/ "./src/component/SidebarView.ts":
+/*!**************************************!*\
+  !*** ./src/component/SidebarView.ts ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _AbstractView__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AbstractView */ "./src/component/AbstractView.ts");
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+var SidebarView = /*#__PURE__*/function (_AbstractView) {
+  _inheritsLoose(SidebarView, _AbstractView);
+
+  function SidebarView(applicationView, htmlDocument, uiConfig, uiPrefs) {
+    var _this;
+
+    _this = _AbstractView.call(this, applicationView, htmlDocument, uiConfig, uiPrefs) || this; // event handlers
+
+    _this.eventHide = _this.eventHide.bind(_assertThisInitialized(_this));
+    _this.eventShow = _this.eventShow.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  var _proto = SidebarView.prototype;
+
+  _proto.onDocumentLoaded = function onDocumentLoaded() {
+    // this should be called once at startup
+    // hide the side bar panel
+    this.eventHide(null); // add the event listener for the close button
+
+    var sidePanelEl = this.document.getElementById(this.uiConfig.dom.sideBarId);
+    if (sidePanelEl === null) return;
+    var closeButtonEl = sidePanelEl.querySelector('.close');
+
+    if (closeButtonEl) {
+      closeButtonEl.addEventListener('click', this.eventHide);
+    }
+  };
+
+  _proto.showHide = function showHide(newStyleValue) {
+    var sidePanelEl = this.document.getElementById(this.uiConfig.dom.sideBarId);
+    if (sidePanelEl === null) return;
+
+    switch (this.uiPrefs.view.location) {
+      case 'left':
+        {
+          sidePanelEl.style.width = newStyleValue;
+          break;
+        }
+
+      case 'right':
+        {
+          sidePanelEl.style.width = newStyleValue;
+          break;
+        }
+
+      case 'bottom':
+        {
+          sidePanelEl.style.height = newStyleValue;
+          break;
+        }
+
+      case 'top':
+        {
+          sidePanelEl.style.height = newStyleValue;
+          break;
+        }
+    }
+  };
+
+  _proto.eventHide = function eventHide(event) {
+    if (event) event.preventDefault();
+    this.showHide('0%');
+  };
+
+  _proto.eventShow = function eventShow(event) {
+    this.showHide(this.uiPrefs.view.expandedSize);
+  };
+
+  return SidebarView;
+}(_AbstractView__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (SidebarView);
+
+/***/ }),
+
+/***/ "./src/network/ApiUtil.ts":
+/*!********************************!*\
+  !*** ./src/network/ApiUtil.ts ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+
+var apiLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('api-ts');
+
+var ApiUtil = /*#__PURE__*/function () {
+  function ApiUtil() {}
+
+  var _proto = ApiUtil.prototype;
+
+  _proto.fetchJSON = function fetchJSON(url, parameters, callback, queueType, requestId) {
+    fetch(url, parameters).then(function (response) {
+      apiLogger("Response code was " + response.status);
+
+      if (response.status >= 200 && response.status <= 299) {
+        return response.json();
+      } // else {
+      //     callback(null, response.status,queueId, requestId);
+      //     throw new Error("no results");
+      // }
+
+    }).then(function (data) {
+      apiLogger(data);
+      callback(data, 200, queueType, requestId);
+    }).catch(function (error) {
+      apiLogger(error);
+      callback(null, 500, queueType, requestId);
+    });
+  }
+  /*
+      Utility function for calling JSON POST requests
+      Parameters:
+      1.  URL to send the POST request too;
+      2.  parameters object whose attribute (name/values) are the request parameters; and
+      3.  A function to receive the results when the fetch has completed
+          The callback function should have the following form
+          callback (jsonDataReturned, httpStatusCode)
+          a)  A successful fetch will return the JSON data in the first parameter and a status code of the server
+          b)  Parameters that cannot be converted to JSON format will give a null data and code 404
+          c)  A server error will give that code and no data
+    */
+  ;
+
+  _proto.apiFetchJSONWithPost = function apiFetchJSONWithPost(request) {
+    apiLogger("Executing fetch with URL " + request.originalRequest.url + " with body " + request.originalRequest.params);
+
+    try {
+      JSON.stringify(request.originalRequest.params);
+    } catch (error) {
+      apiLogger('Unable to convert parameters to JSON');
+      apiLogger(request.originalRequest.params, 100);
+      request.callback(null, 404, request.queueType, request.requestId);
+    }
+
+    var postParameters = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(_extends({}, request.originalRequest.params))
+    };
+    this.fetchJSON(request.originalRequest.url, postParameters, request.callback, request.queueType, request.requestId);
+  };
+
+  _proto.apiFetchJSONWithGet = function apiFetchJSONWithGet(request) {
+    apiLogger("Executing GET fetch with URL " + request.originalRequest.url + " with id " + request.originalRequest.params.id);
+    var getParameters = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    if (request.originalRequest.params.id) request.originalRequest.url += "/" + request.originalRequest.params.id;
+    this.fetchJSON(request.originalRequest.url, getParameters, request.callback, request.queueType, request.requestId);
+  };
+
+  _proto.apiFetchJSONWithDelete = function apiFetchJSONWithDelete(request) {
+    apiLogger("Executing DELETE fetch with URL " + request.originalRequest.url + " with id " + request.originalRequest.params.id);
+    var delParameters = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    if (request.originalRequest.params.id) request.originalRequest.url += "/" + request.originalRequest.params.id;
+    this.fetchJSON(request.originalRequest.url, delParameters, request.callback, request.queueType, request.requestId);
+  };
+
+  _proto.apiFetchJSONWithPut = function apiFetchJSONWithPut(request) {
+    apiLogger("Executing PUT fetch with URL " + request.originalRequest.url + " with id " + request.originalRequest.params.id);
+    var putParameters = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(_extends({}, request.originalRequest.params))
+    };
+    if (request.originalRequest.params.id) request.originalRequest.url += "/" + request.originalRequest.params.id;
+    this.fetchJSON(request.originalRequest.url, putParameters, request.callback, request.queueType, request.requestId);
+  };
+
+  return ApiUtil;
+}();
+
+var apiUtil = new ApiUtil();
+/* harmony default export */ __webpack_exports__["default"] = (apiUtil);
+
+/***/ }),
+
+/***/ "./src/network/DownloadManager.ts":
+/*!****************************************!*\
+  !*** ./src/network/DownloadManager.ts ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ApiUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ApiUtil */ "./src/network/ApiUtil.ts");
+/* harmony import */ var _util_UUID__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/UUID */ "./src/util/UUID.ts");
+/* harmony import */ var _Types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Types */ "./src/network/Types.ts");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_3__);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
+
+
+
+
+var dlLogger = debug__WEBPACK_IMPORTED_MODULE_3___default()('api-ts');
+
+var DownloadManager = /*#__PURE__*/function () {
+  function DownloadManager() {
+    this.backgroundQueue = [];
+    this.priorityQueue = [];
+    this.inProgress = [];
+    this.backgroundChangeListener = null;
+    this.priorityChangeListener = null;
+    this.callbackForQueueRequest = this.callbackForQueueRequest.bind(this);
+  }
+
+  var _proto = DownloadManager.prototype;
+
+  _proto.setBackgroundChangeListener = function setBackgroundChangeListener(uiChangeListener) {
+    this.backgroundChangeListener = uiChangeListener;
+  };
+
+  _proto.setPriorityChangeListener = function setPriorityChangeListener(uiChangeListener) {
+    this.priorityChangeListener = uiChangeListener;
+  };
+
+  _proto.getPriorityQueueCount = function getPriorityQueueCount() {
+    return this.priorityQueue.length;
+  };
+
+  _proto.getBackgroundQueueCount = function getBackgroundQueueCount() {
+    return this.backgroundQueue.length;
+  };
+
+  _proto.addApiRequest = function addApiRequest(jsonRequest, isPriority) {
+    if (isPriority === void 0) {
+      isPriority = false;
+    } // add a new requestId to the request for future tracking
+
+
+    var requestId = _util_UUID__WEBPACK_IMPORTED_MODULE_1__["default"].getUniqueId();
+    dlLogger("Download Manger: Adding Queue Request " + requestId);
+    dlLogger(jsonRequest, 200);
+
+    if (isPriority) {
+      var _managerRequest = {
+        originalRequest: jsonRequest,
+        requestId: requestId,
+        queueType: _Types__WEBPACK_IMPORTED_MODULE_2__["queueType"].PRIORITY,
+        callback: this.callbackForQueueRequest
+      };
+      this.priorityQueue.push(_managerRequest);
+      if (this.priorityChangeListener) this.priorityChangeListener.handleEventAddToQueue();
+    } else {
+      var _managerRequest2 = {
+        originalRequest: jsonRequest,
+        requestId: requestId,
+        queueType: _Types__WEBPACK_IMPORTED_MODULE_2__["queueType"].BACKGROUND,
+        callback: this.callbackForQueueRequest
+      };
+      this.backgroundQueue.push(_managerRequest2);
+      if (this.backgroundChangeListener) this.backgroundChangeListener.handleEventAddToQueue();
+    }
+
+    this.processQueues();
+  };
+
+  _proto.processPriorityQueue = /*#__PURE__*/function () {
+    var _processPriorityQueue = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      var queueItem;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              queueItem = this.priorityQueue.shift();
+              if (queueItem !== undefined) this.inProgress.push(queueItem);
+              if (queueItem !== undefined) this.initiateFetchForQueueItem(queueItem);
+
+            case 3:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    function processPriorityQueue() {
+      return _processPriorityQueue.apply(this, arguments);
+    }
+
+    return processPriorityQueue;
+  }();
+
+  _proto.processBackgroundQueue = /*#__PURE__*/function () {
+    var _processBackgroundQueue = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+      var queueItem;
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              queueItem = this.backgroundQueue.shift();
+              if (queueItem !== undefined) this.inProgress.push(queueItem);
+              if (queueItem !== undefined) this.initiateFetchForQueueItem(queueItem);
+
+            case 3:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, _callee2, this);
+    }));
+
+    function processBackgroundQueue() {
+      return _processBackgroundQueue.apply(this, arguments);
+    }
+
+    return processBackgroundQueue;
+  }();
+
+  _proto.processQueues = /*#__PURE__*/function () {
+    var _processQueues = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+      var totalQueuedItems;
+      return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              totalQueuedItems = this.priorityQueue.length + this.backgroundQueue.length;
+
+            case 1:
+              if (!(totalQueuedItems > 0)) {
+                _context3.next = 14;
+                break;
+              }
+
+              dlLogger("Download Manager: processing queue, items remaining " + totalQueuedItems); // priority queue takes priority
+
+              if (!(this.priorityQueue.length > 0)) {
+                _context3.next = 8;
+                break;
+              }
+
+              _context3.next = 6;
+              return this.processPriorityQueue();
+
+            case 6:
+              _context3.next = 11;
+              break;
+
+            case 8:
+              if (!(this.backgroundQueue.length > 0)) {
+                _context3.next = 11;
+                break;
+              }
+
+              _context3.next = 11;
+              return this.processBackgroundQueue();
+
+            case 11:
+              totalQueuedItems = this.priorityQueue.length + this.backgroundQueue.length;
+              _context3.next = 1;
+              break;
+
+            case 14:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3, this);
+    }));
+
+    function processQueues() {
+      return _processQueues.apply(this, arguments);
+    }
+
+    return processQueues;
+  }();
+
+  _proto.callbackForQueueRequest = function callbackForQueueRequest(jsonData, httpStatus, queueId, requestId) {
+    // let the listeners know about the completion
+    if (queueId === _Types__WEBPACK_IMPORTED_MODULE_2__["queueType"].PRIORITY) {
+      // priority
+      if (this.priorityChangeListener) this.priorityChangeListener.handleEventRemoveFromQueue();
+    } else if (this.backgroundChangeListener) this.backgroundChangeListener.handleEventRemoveFromQueue();
+
+    dlLogger("Download Manager: received callback for queue " + queueId + " request " + requestId + " with status " + httpStatus); // find the item in the in progress
+
+    var foundIndex = this.inProgress.findIndex(function (element) {
+      return element.requestId === requestId;
+    });
+
+    if (foundIndex >= 0) {
+      // remove from in progress
+      var queueItem = this.inProgress[foundIndex];
+      this.inProgress.splice(foundIndex, 1);
+      dlLogger(queueItem);
+      dlLogger("Download Manager: finished for queue item " + queueItem.requestId); // let the callback function know
+
+      queueItem.originalRequest.callback(jsonData, httpStatus);
+    }
+  };
+
+  _proto.initiateFetchForQueueItem = function initiateFetchForQueueItem(item) {
+    dlLogger("Download Manager: initiating fetch for queue item " + item.requestId);
+    dlLogger(item);
+
+    if (item.originalRequest.url !== null && item.originalRequest.params != null && item.originalRequest.callback != null) {
+      switch (item.originalRequest.type) {
+        case _Types__WEBPACK_IMPORTED_MODULE_2__["RequestType"].POST:
+          {
+            _ApiUtil__WEBPACK_IMPORTED_MODULE_0__["default"].apiFetchJSONWithPost(item);
+            break;
+          }
+
+        case _Types__WEBPACK_IMPORTED_MODULE_2__["RequestType"].GET:
+          {
+            _ApiUtil__WEBPACK_IMPORTED_MODULE_0__["default"].apiFetchJSONWithGet(item);
+            break;
+          }
+
+        case _Types__WEBPACK_IMPORTED_MODULE_2__["RequestType"].DELETE:
+          {
+            _ApiUtil__WEBPACK_IMPORTED_MODULE_0__["default"].apiFetchJSONWithDelete(item);
+            break;
+          }
+
+        case _Types__WEBPACK_IMPORTED_MODULE_2__["RequestType"].PUT:
+          {
+            _ApiUtil__WEBPACK_IMPORTED_MODULE_0__["default"].apiFetchJSONWithPut(item);
+            break;
+          }
+      }
+    }
+  };
+
+  return DownloadManager;
+}();
+
+var downloader = new DownloadManager();
+/* harmony default export */ __webpack_exports__["default"] = (downloader);
+
+/***/ }),
+
+/***/ "./src/network/Types.ts":
+/*!******************************!*\
+  !*** ./src/network/Types.ts ***!
+  \******************************/
+/*! exports provided: RequestType, queueType */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RequestType", function() { return RequestType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "queueType", function() { return queueType; });
+var RequestType;
+
+(function (RequestType) {
+  RequestType[RequestType["POST"] = 0] = "POST";
+  RequestType[RequestType["GET"] = 1] = "GET";
+  RequestType[RequestType["PUT"] = 2] = "PUT";
+  RequestType[RequestType["DELETE"] = 3] = "DELETE";
+})(RequestType || (RequestType = {}));
+
+;
+var queueType;
+
+(function (queueType) {
+  queueType[queueType["PRIORITY"] = 0] = "PRIORITY";
+  queueType[queueType["BACKGROUND"] = 1] = "BACKGROUND";
+})(queueType || (queueType = {}));
+
+/***/ }),
+
+/***/ "./src/notification/BootstrapNotification.ts":
+/*!***************************************************!*\
+  !*** ./src/notification/BootstrapNotification.ts ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BootstrapNotification; });
+/* harmony import */ var _Notification__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Notification */ "./src/notification/Notification.ts");
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+var BootstrapNotification = /*#__PURE__*/function (_Notification) {
+  _inheritsLoose(BootstrapNotification, _Notification);
+
+  function BootstrapNotification(notificationManager) {
+    return _Notification.call(this, notificationManager) || this;
+  } // Make the notification visible on the screen
+
+
+  var _proto = BootstrapNotification.prototype;
+
+  _proto.show = function show(title, message, topOffset, context, duration) {
+    var _this = this;
+
+    if (topOffset === void 0) {
+      topOffset = 0;
+    }
+
+    if (context === void 0) {
+      context = 'info';
+    }
+
+    if (duration === void 0) {
+      duration = 3000;
+    }
+
+    var containerId = this.notificationManager.getContainerId(); // convert the context to a background colour
+
+    var bgColorClass = '';
+
+    switch (context) {
+      case 'info':
+        {
+          bgColorClass = 'bg-info';
+          break;
+        }
+
+      case 'warning':
+        {
+          bgColorClass = 'bg-warning';
+          break;
+        }
+
+      case 'message':
+        {
+          bgColorClass = 'bg-primary';
+          break;
+        }
+
+      case 'priority':
+        {
+          bgColorClass = 'bg-danger';
+          break;
+        }
+
+      default:
+        {
+          bgColorClass = "bg-info";
+        }
+    } // Creating the notification container div
+
+
+    var containerNode = document.createElement('div');
+    containerNode.className = 'notification toast';
+    containerNode.style.top = topOffset + "px";
+    containerNode.setAttribute("role", "alert");
+    containerNode.setAttribute("data-autohide", "false"); // Adding the notification title node
+
+    var titleNode = document.createElement('div');
+    titleNode.className = "toast-header text-white " + bgColorClass;
+    var titleTextNode = document.createElement('strong');
+    titleTextNode.className = "mr-auto";
+    titleTextNode.textContent = title; // Adding a little button on the notification
+
+    var closeButtonNode = document.createElement('button');
+    closeButtonNode.className = 'ml-2 mb-1 close';
+    closeButtonNode.textContent = 'x';
+    closeButtonNode.addEventListener('click', function () {
+      _this.notificationManager.remove(containerNode);
+    }); // Adding the notification message content node
+
+    var messageNode = document.createElement('div');
+    messageNode.className = 'toast-body';
+    messageNode.textContent = message; // Appending the container with all the elements newly created
+
+    titleNode.appendChild(titleTextNode);
+    titleNode.appendChild(closeButtonNode);
+    containerNode.appendChild(titleNode);
+    containerNode.appendChild(messageNode);
+    containerNode.classList.add("is-" + context); // Inserting the notification to the page body
+
+    var containerEl = document.getElementById(containerId);
+    if (containerEl) containerEl.appendChild(containerNode); // activate it
+    // @ts-ignore
+
+    $(".notification").toast('show'); // Default duration delay
+
+    if (duration <= 0) {
+      duration = 2000;
+    }
+
+    setTimeout(function () {
+      _this.notificationManager.remove(containerNode);
+    }, duration);
+    return containerNode;
+  };
+
+  return BootstrapNotification;
+}(_Notification__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+
+
+/***/ }),
+
+/***/ "./src/notification/Notification.ts":
+/*!******************************************!*\
+  !*** ./src/notification/Notification.ts ***!
+  \******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Notification; });
+var Notification = function Notification(notificationManager) {
+  this.show = this.show.bind(this);
+  this.notificationManager = notificationManager; // Create DOM notification structure when instantiated
+
+  this.containerId = this.notificationManager.getContainerId();
+} // Make the notification visible on the screen
+;
+
+
+
+/***/ }),
+
+/***/ "./src/notification/NotificationFactory.ts":
+/*!*************************************************!*\
+  !*** ./src/notification/NotificationFactory.ts ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BootstrapNotification__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BootstrapNotification */ "./src/notification/BootstrapNotification.ts");
+
+
+var NotificationFactory = /*#__PURE__*/function () {
+  function NotificationFactory() {}
+
+  var _proto = NotificationFactory.prototype;
+
+  _proto.createNotification = function createNotification(manager) {
+    return new _BootstrapNotification__WEBPACK_IMPORTED_MODULE_0__["default"](manager);
+  };
+
+  return NotificationFactory;
+}();
+
+var notificationFactory = new NotificationFactory();
+/* harmony default export */ __webpack_exports__["default"] = (notificationFactory);
+
+/***/ }),
+
+/***/ "./src/notification/NotificationManager.ts":
+/*!*************************************************!*\
+  !*** ./src/notification/NotificationManager.ts ***!
+  \*************************************************/
+/*! exports provided: NotificationManager, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NotificationManager", function() { return NotificationManager; });
+/* harmony import */ var _NotificationFactory__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./NotificationFactory */ "./src/notification/NotificationFactory.ts");
+
+var NotificationManager = /*#__PURE__*/function () {
+  function NotificationManager() {
+    this.notifications = [];
+    this.currentCount = 0;
+    this.offsetPerNotification = 120;
+    this.containerId = 'notifications';
+    this.show = this.show.bind(this);
+  }
+
+  var _proto = NotificationManager.prototype;
+
+  _proto.getContainerId = function getContainerId() {
+    return this.containerId;
+  };
+
+  _proto.show = function show(title, message, context, duration) {
+    if (context === void 0) {
+      context = 'info';
+    }
+
+    if (duration === void 0) {
+      duration = 5000;
+    }
+
+    var notification = _NotificationFactory__WEBPACK_IMPORTED_MODULE_0__["default"].createNotification(this);
+    var notificationNode = notification.show(title, message, this.currentCount * this.offsetPerNotification, context, duration);
+    this.currentCount++;
+    this.notifications.push(notificationNode);
+  };
+
+  _proto.remove = function remove(notificationNode) {
+    var _this = this;
+
+    var foundIndex = this.notifications.findIndex(function (element) {
+      return element === notificationNode;
+    });
+
+    if (foundIndex >= 0) {
+      this.notifications.splice(foundIndex, 1); // re-arrange the remaining notifications
+
+      this.notifications.map(function (notificationNode, index) {
+        // @ts-ignore
+        notificationNode.style.top = _this.offsetPerNotification * index + "px";
+      });
+    }
+
+    var parentEl = notificationNode.parentElement;
+    if (parentEl !== null) parentEl.removeChild(notificationNode);
+    this.currentCount--;
+    if (this.currentCount < 0) this.currentCount = 0;
+  };
+
+  return NotificationManager;
+}();
+var notifier = new NotificationManager();
+/* harmony default export */ __webpack_exports__["default"] = (notifier);
+
+/***/ }),
+
+/***/ "./src/socket/SocketManager.ts":
+/*!*************************************!*\
+  !*** ./src/socket/SocketManager.ts ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+
+var sDebug = debug__WEBPACK_IMPORTED_MODULE_0___default()('socket-ts');
+
+var SocketManager = /*#__PURE__*/function () {
+  function SocketManager() {
+    this.callbackForMessage = this.callbackForMessage.bind(this);
+    this.callbackForData = this.callbackForData.bind(this);
+    this.listener = null;
+    this.socket = null;
+  }
+
+  var _proto = SocketManager.prototype;
+
+  _proto.callbackForMessage = function callbackForMessage(message) {
+    sDebug("Received message : " + message);
+    if (this.listener) this.listener.handleMessage(message);
+  }
+  /*
+  *
+  *  expecting a JSON data object with the following attributes
+  *  1.  type: "create"|"update"|"delete"
+  *  2.  objectType: string name of the object type changed
+  *  3.  data: the new representation of the object
+  *  4.  user: application specific id for the user who made the change
+  *        - the application view is required to implement getCurrentUser() to compare the user who made the change
+  *
+   */
+  ;
+
+  _proto.callbackForData = function callbackForData(message) {
+    sDebug("Received data");
+
+    try {
+      var dataObj = JSON.parse(message);
+      sDebug(dataObj);
+      if (this.listener === null) return;
+
+      if (dataObj.user === this.listener.getCurrentUser()) {
+        sDebug("change made by this user, ignoring");
+      } else {
+        sDebug("change made by another user, passing off to the application");
+        this.listener.handleDataChangedByAnotherUser(dataObj);
+      }
+    } catch (err) {
+      sDebug('Not JSON data');
+    }
+  };
+
+  _proto.setListener = function setListener(listener) {
+    sDebug('Setting listener');
+    this.listener = listener;
+    sDebug('Creating socket connection'); // @ts-ignore
+
+    this.socket = io();
+    sDebug('Waiting for messages');
+    this.socket.on('message', this.callbackForMessage);
+    this.socket.on('data', this.callbackForData);
+  };
+
+  _proto.sendMessage = function sendMessage(message) {
+    this.socket.emit('message', message);
+  };
+
+  return SocketManager;
+}();
+
+var socketManager = new SocketManager();
+/* harmony default export */ __webpack_exports__["default"] = (socketManager);
+
+/***/ }),
+
+/***/ "./src/state/IndexedDBUtil.ts":
+/*!************************************!*\
+  !*** ./src/state/IndexedDBUtil.ts ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+
+var idLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('indexeddb-ts'); // @ts-ignore
+
+window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB; // @ts-ignore
+
+window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || windows.msIDBTransaction || {
+  READ_WRITE: "readWrite"
+}; // @ts-ignore
+
+window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+var IndexedDBUtil = /*#__PURE__*/function () {
+  IndexedDBUtil.getDB = function getDB() {
+    if (IndexedDBUtil.instance === null) {
+      IndexedDBUtil.instance = new IndexedDBUtil();
+    }
+
+    return IndexedDBUtil.instance;
+  };
+
+  function IndexedDBUtil() {
+    var _this = this;
+
+    this.request = window.indexedDB.open('imboard-db', 1);
+
+    if (this.request) {
+      // @ts-ignore
+      this.request.onerror(function (ev) {
+        idLogger('Failed to open database');
+      });
+    }
+
+    if (this.request) {
+      // @ts-ignore
+      this.request.onsuccess(function (ev) {
+        // @ts-ignore
+        _this.db = ev.target.result;
+
+        if (_this.db) {
+          // @ts-ignore
+          _this.db.onerror(function (event) {
+            // @ts-ignore
+            idLogger('Database Error: ' + event.target.errorCode);
+          });
+        }
+      });
+    }
+  }
+
+  var _proto = IndexedDBUtil.prototype;
+
+  _proto.checkForObjectStore = function checkForObjectStore(transaction, key, keyField) {
+    var store;
+
+    if (!this.db.objectStoreNames.contains(key)) {
+      store = this.db.createObjectStore(key, {
+        keyPath: keyField,
+        autoIncrement: false
+      });
+    } else {
+      store = transaction.objectStore(key);
+    }
+
+    return store;
+  };
+
+  _proto.saveItemsToCollection = function saveItemsToCollection(objectStore, saveData, keyField) {
+    if (keyField === void 0) {
+      keyField = 'id';
+    }
+
+    saveData.forEach(function (data) {
+      var request = objectStore.add(data, data[keyField]);
+    });
+  };
+
+  _proto.saveWithCollectionKey = function saveWithCollectionKey(key, saveData, keyField) {
+    if (keyField === void 0) {
+      keyField = 'id';
+    }
+
+    idLogger("Saving with key " + key);
+    idLogger(saveData);
+    var transaction = this.db.transaction(key, "readwrite"); // @ts-ignore
+
+    transaction.oncomplete(function (event) {
+      idLogger("Save for key " + key + " - completed.");
+    });
+    var objectStore = this.checkForObjectStore(transaction, key, keyField);
+    this.saveItemsToCollection(objectStore, saveData, keyField);
+  };
+
+  _proto.getWithCollectionKey = function getWithCollectionKey(key, keyField) {
+    if (keyField === void 0) {
+      keyField = 'id';
+    }
+
+    var savedResults = [];
+    idLogger("Loading with key " + key);
+    var transaction = this.db.transaction(key);
+    var objectStore = this.checkForObjectStore(transaction, key, keyField); // @ts-ignore
+
+    objectStore.openCursor().onsuccess(function (event) {
+      // @ts-ignore
+      var cursor = event.target.result;
+
+      while (cursor) {
+        // @ts-ignore
+        savedResults.push(cursor.value);
+        cursor.continue();
+      }
+    });
+    return savedResults;
+  }
+  /* add a new item to the local storage if not already there */
+  ;
+
+  _proto.addNewItemToCollection = function addNewItemToCollection(key, item, keyField) {
+    if (keyField === void 0) {
+      keyField = 'id';
+    }
+
+    if (item !== null) {
+      idLogger("Adding with key " + key);
+      idLogger(item);
+    }
+
+    var transaction = this.db.transaction(key, "readwrite"); // @ts-ignore
+
+    transaction.oncomplete(function (event) {
+      idLogger("Add new item to key " + key + " - completed.");
+    });
+    var objectStore = this.checkForObjectStore(transaction, key, keyField);
+    this.saveItemsToCollection(objectStore, [item], keyField);
+  };
+
+  _proto.removeItemFromCollection = function removeItemFromCollection(key, item, keyField) {
+    if (keyField === void 0) {
+      keyField = 'id';
+    }
+
+    if (item !== null) {
+      idLogger("Removing with key " + key);
+      idLogger(item);
+      var transaction = this.db.transaction(key, "readwrite");
+      var objectStore = this.checkForObjectStore(transaction, key, keyField);
+      var request = objectStore.delete(item[keyField]); // @ts-ignore
+
+      request.onsuccess(function (event) {
+        idLogger("Removed item from key " + key + " - completed.");
+      });
+    }
+  };
+
+  _proto.updateItemInCollection = function updateItemInCollection(key, item, keyField) {
+    if (keyField === void 0) {
+      keyField = 'id';
+    }
+
+    if (item) {
+      idLogger("Updating item in storage " + key);
+      idLogger(item);
+      var transaction = this.db.transaction(key, "readwrite");
+      var objectStore = this.checkForObjectStore(transaction, key, keyField);
+      var request = objectStore.get(item[keyField]); // @ts-ignore
+
+      request.onsuccess(function (event) {
+        // @ts-ignore
+        var previousItem = event.target.result;
+
+        if (previousItem) {
+          objectStore.put(item, item[keyField]);
+        } else {
+          objectStore.add(item, item[keyField]);
+        }
+      });
+    }
+  };
+
+  return IndexedDBUtil;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (IndexedDBUtil);
+
+/***/ }),
+
+/***/ "./src/state/StateManagementUtil.ts":
+/*!******************************************!*\
+  !*** ./src/state/StateManagementUtil.ts ***!
+  \******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+
+var smLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('state-manager-ts');
+/** To Do - make state unchangeable outside of this class (i.e. deep copies) */
+
+var StateManagementUtil = /*#__PURE__*/function () {
+  /*
+    Singleton
+   */
+  StateManagementUtil.create = function create() {
+    if (StateManagementUtil._instance === null) {
+      StateManagementUtil._instance = new StateManagementUtil();
+    }
+
+    return StateManagementUtil._instance;
+  };
+
+  function StateManagementUtil() {
+    this.applicationState = [];
+    this.stateChangeListeners = [];
+  }
+
+  var _proto = StateManagementUtil.prototype;
+
+  _proto.isStatePresent = function isStatePresent(name) {
+    var result = this.applicationState.findIndex(function (element) {
+      return element.name === name;
+    }) >= 0;
+    smLogger("State Manager: Checking state of " + name + " is present = " + result);
+    return result;
+  };
+
+  _proto.informChangeListenersForStateWithName = function informChangeListenersForStateWithName(name, stateObjValue) {
+    smLogger("State Manager: Informing state listeners of " + name);
+    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex >= 0) {
+      smLogger("State Manager: Found state listeners of " + name);
+      /* let each state change listener know */
+
+      var changeListenersForName = this.stateChangeListeners[foundIndex];
+
+      for (var index = 0; index < changeListenersForName.listeners.length; index++) {
+        smLogger("State Manager: Found state listener of " + name + " - informing");
+        var listener = changeListenersForName.listeners[index];
+        listener.stateChanged(name, stateObjValue);
+      }
+    }
+  }
+  /*
+      Add a state listener for a given state name
+      the listener should be a function with two parameters
+      name - string - the name of the state variable that they want to be informed about
+      stateObjValue - object - the new state value
+     */
+  ;
+
+  _proto.addChangeListenerForName = function addChangeListenerForName(name, listener) {
+    smLogger("State Manager: Adding state listener for " + name);
+    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex >= 0) {
+      var changeListenersForName = this.stateChangeListeners[foundIndex];
+      changeListenersForName.listeners.push(listener);
+    } else {
+      smLogger("State Manager: Adding state listener for " + name + " - first occurrence");
+      var listenersNameArrayPair = {
+        name: name,
+        listeners: [listener]
+      };
+      this.stateChangeListeners.push(listenersNameArrayPair);
+    }
+  };
+
+  _proto.getStateByName = function getStateByName(name) {
+    smLogger("State Manager: Getting state for " + name);
+    var stateValueObj = {};
+    var foundIndex = this.applicationState.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex >= 0) {
+      // get the current state
+      var stateNameValuePair = this.applicationState[foundIndex];
+      stateValueObj = stateNameValuePair.value;
+      smLogger("State Manager: Found previous state for " + name);
+      smLogger(stateValueObj);
+    } else {
+      // create the state if not already present
+      stateValueObj = this.addStateByName(name, []);
+    }
+
+    return stateValueObj;
+  };
+
+  _proto.setStateByName = function setStateByName(name, stateObjectForName) {
+    smLogger("State Manager: Setting state for " + name);
+    smLogger(stateObjectForName);
+    var foundIndex = this.applicationState.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex >= 0) {
+      // set the current state
+      var stateNameValuePair = this.applicationState[foundIndex];
+      stateNameValuePair.value = stateObjectForName;
+    } else {
+      // create the state if not already present
+      this.addStateByName(name, stateObjectForName);
+    }
+
+    this.informChangeListenersForStateWithName(name, stateObjectForName);
+    return stateObjectForName;
+  };
+
+  _proto.addStateByName = function addStateByName(name, stateObjForName) {
+    /* create a new state attribute for the application state */
+    if (!this.isStatePresent(name)) {
+      smLogger("State Manager: Adding state for " + name + " - first occurrence");
+      smLogger(stateObjForName, 201);
+      var stateNameValuePair = {
+        name: name,
+        value: stateObjForName
+      };
+      this.applicationState.push(stateNameValuePair);
+    } else {
+      /* get the current state value and replace it */
+      this.setStateByName(name, stateObjForName);
+    }
+
+    return stateObjForName;
+  };
+
+  _proto.addNewItemToState = function addNewItemToState(name, item) {
+    // assumes state is an array
+    smLogger("State Manager: Adding item to state " + name);
+    var state = this.getStateByName(name);
+    state.push(item);
+    smLogger(state);
+    this.informChangeListenersForStateWithName(name, state);
+  };
+
+  _proto.findItemInState = function findItemInState(name, item, testForEqualityFunction) {
+    // assumes state is an array
+    var result = {};
+    var state = this.getStateByName(name);
+    var foundIndex = state.findIndex(function (element) {
+      return testForEqualityFunction(element, item);
+    });
+    smLogger("Finding item in state " + name + " - found index " + foundIndex);
+    smLogger(item);
+
+    if (foundIndex >= 0) {
+      result = state[foundIndex];
+    }
+
+    return result;
+  };
+
+  _proto.isItemInState = function isItemInState(name, item, testForEqualityFunction) {
+    // assumes state is an array
+    var result = false;
+    var state = this.getStateByName(name);
+    var foundIndex = state.findIndex(function (element) {
+      return testForEqualityFunction(element, item);
+    });
+
+    if (foundIndex >= 0) {
+      result = true;
+    }
+
+    return result;
+  };
+
+  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction) {
+    var result = false;
+    var state = this.getStateByName(name);
+    var foundIndex = state.findIndex(function (element) {
+      return testForEqualityFunction(element, item);
+    });
+
+    if (foundIndex >= 0) {
+      result = true; // remove the item from the state
+
+      smLogger('State Manager: Found item - removing ');
+      state.splice(foundIndex, 1);
+      smLogger(state);
+      this.setStateByName(name, state);
+    }
+
+    return result;
+  };
+
+  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction) {
+    var result = false;
+    var state = this.getStateByName(name);
+    var foundIndex = state.findIndex(function (element) {
+      return testForEqualityFunction(element, item);
+    });
+
+    if (foundIndex >= 0) {
+      result = true; // remove the item from the state
+
+      smLogger('State Manager: Found item - replacing ');
+      state.splice(foundIndex, 1, item); //state.push(item);
+
+      smLogger(state);
+      this.setStateByName(name, state);
+    } else {
+      // add the item to the state
+      this.addNewItemToState(name, item);
+    }
+
+    return result;
+  };
+
+  return StateManagementUtil;
+}();
+
+StateManagementUtil._instance = null;
+var stateManager = StateManagementUtil.create();
+/* harmony default export */ __webpack_exports__["default"] = (stateManager);
+
+/***/ }),
+
+/***/ "./src/util/BrowserUtil.ts":
+/*!*********************************!*\
+  !*** ./src/util/BrowserUtil.ts ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var BrowserUtil = /*#__PURE__*/function () {
+  function BrowserUtil() {}
+
+  var _proto = BrowserUtil.prototype;
+
+  _proto.scrollSmoothToId = function scrollSmoothToId(elementId) {
+    var element = document.getElementById(elementId);
+
+    if (element !== null) {
+      element.scrollIntoView({
+        block: 'start',
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  _proto.scrollSmoothTo = function scrollSmoothTo(element) {
+    element.scrollIntoView({
+      block: 'start',
+      behavior: 'smooth'
+    });
+  };
+
+  _proto.removeAllChildren = function removeAllChildren(element) {
+    if (element && element.firstChild) {
+      while (element.firstChild) {
+        var lastChild = element.lastChild;
+        if (lastChild) element.removeChild(lastChild);
+      }
+    }
+  };
+
+  _proto.addRemoveClasses = function addRemoveClasses(element, classesText, isAdding) {
+    if (isAdding === void 0) {
+      isAdding = true;
+    }
+
+    var classes = classesText.split(' ');
+    classes.forEach(function (classValue) {
+      if (classValue.trim().length > 0) {
+        if (isAdding) {
+          element.classList.add(classValue);
+        } else {
+          element.classList.remove(classValue);
+        }
+      }
+    });
+  };
+
+  return BrowserUtil;
+}();
+
+var browserUtil = new BrowserUtil();
+/* harmony default export */ __webpack_exports__["default"] = (browserUtil);
+
+/***/ }),
+
+/***/ "./src/util/EqualityFunctions.ts":
+/*!***************************************!*\
+  !*** ./src/util/EqualityFunctions.ts ***!
+  \***************************************/
+/*! exports provided: isSame */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSame", function() { return isSame; });
+function isSame(item1, item2) {
+  return item1.id === item2.id;
+}
+
+/***/ }),
+
+/***/ "./src/util/UUID.ts":
+/*!**************************!*\
+  !*** ./src/util/UUID.ts ***!
+  \**************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var UUID = /*#__PURE__*/function () {
+  function UUID() {}
+
+  var _proto = UUID.prototype;
+
+  _proto.getUniqueId = function getUniqueId() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0;
+      var v = c == 'x' ? r : r & 0x3 | 0x8;
+      return v.toString(16);
+    });
+  };
+
+  return UUID;
+}();
+
+var uuid = new UUID();
+/* harmony default export */ __webpack_exports__["default"] = (uuid);
+
+/***/ }),
+
+/***/ 0:
+/*!***************************!*\
+  !*** multi ./src/App.tsx ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! ./src/App.tsx */"./src/App.tsx");
+
+
+/***/ })
+
+/******/ });
 //# sourceMappingURL=app.bundle.js.map

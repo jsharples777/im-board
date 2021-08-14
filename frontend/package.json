@@ -7,9 +7,9 @@
     "tsc": "tsc",
     "build.prod": "webpack --mode production",
     "build.dev": "webpack --mode development",
-    "#watch": "webpack --mode development --watch",
-    "compile.dev": "babel src --out-dir ../backend/public/js  --verbose --extensions '.jsx,.js,.ts,.tsx'",
-    "watch.dev": "babel src --out-dir ../backend/public/js --watch --verbose  --extensions '.jsx,.js,.ts,.tsx'",
+    "watch.dev": "webpack --mode development --watch",
+    "compile.dev.babel": "babel src --out-dir ../backend/public/js  --verbose --extensions '.jsx,.js,.ts,.tsx'",
+    "watch.dev.babel": "babel src --out-dir ../backend/public/js --watch --verbose  --extensions '.jsx,.js,.ts,.tsx'",
     "lint": "eslint --ext js,jsx,tsx,ts --fix ."
   },
   "dependencies": {
@@ -20,7 +20,7 @@
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "socket.io": "^4.1.3"
+    "socket.io-client": "^4.1.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
@@ -32,7 +32,6 @@
     "@types/prop-types": "^15.7.4",
     "@types/react": "^17.0.15",
     "@types/react-dom": "^17.0.9",
-    "@types/socket.io": "^3.0.2",
     "babel-loader": "^8.2.2",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.1",

@@ -13,6 +13,7 @@ import {isSame} from "./util/EqualityFunctions";
 import DetailsSidebarView from "./component/DetailsSidebarView";
 
 import {BlogEntry, Comment} from './AppTypes';
+import IndexedDBUtil from "./state/IndexedDBUtil";
 
 
 const logger = debug('app');
@@ -266,6 +267,10 @@ class Root extends React.Component{
 
         // ok lets try get things done
         controller.initialise();
+        // indexedDB access
+        let db:IndexedDBUtil = IndexedDBUtil.getDB();
+        db.addNewItemToCollection("test",{id: 1, data: "Test"});
+
     }
 
     hideAllSideBars() {
@@ -437,8 +442,8 @@ class Root extends React.Component{
 }
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
-//localStorage.debug = 'app controller-ts socket-ts';
-// debug.log = console.info.bind(console);
+localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts';
+debug.log = console.info.bind(console);
 
 // @ts-ignore
 const element = <Root className="container-fluid justify-content-around"/>;
