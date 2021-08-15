@@ -477,10 +477,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Controller */ "./src/Controller.ts");
 /* harmony import */ var _component_CommentSidebarView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./component/CommentSidebarView */ "./src/component/CommentSidebarView.ts");
 /* harmony import */ var _component_BlogEntryView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./component/BlogEntryView */ "./src/component/BlogEntryView.tsx");
-/* harmony import */ var _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./state/StateManagementUtil */ "./src/state/StateManagementUtil.ts");
-/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
-/* harmony import */ var _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./component/DetailsSidebarView */ "./src/component/DetailsSidebarView.ts");
-/* harmony import */ var _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./state/IndexedDBUtil */ "./src/state/IndexedDBUtil.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+/* harmony import */ var _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./component/DetailsSidebarView */ "./src/component/DetailsSidebarView.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -494,8 +492,6 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 /* eslint "react/react-in-jsx-scope":"off" */
 
 /* eslint "react/jsx-no-undef":"off" */
-
-
 
 
 
@@ -701,15 +697,15 @@ var Root = /*#__PURE__*/function (_React$Component) {
       // find the entry from the state manager
       entryId = parseInt(entryId); // @ts-ignore
 
-      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.entries, {
+      var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.entries, {
         id: entryId
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__["isSame"]);
 
       if (entry) {
         // delete the entry using the controller and remove the state manager
         _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].deleteEntry(entry); // @ts-ignore
 
-        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].removeItemFromState(this.state.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+        _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().removeItemFromState(this.state.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__["isSame"]);
       }
     }
   };
@@ -722,10 +718,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
             case 0:
               logger('component Did Mount'); // add the additional views and configure them
 
-              this.commentView = new _component_CommentSidebarView__WEBPACK_IMPORTED_MODULE_5__["default"](this, document);
+              this.commentView = new _component_CommentSidebarView__WEBPACK_IMPORTED_MODULE_5__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager());
               this.commentView.onDocumentLoaded(); // reset the view state
 
-              this.detailsView = new _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_9__["default"](this, document);
+              this.detailsView = new _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_8__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager());
               this.detailsView.onDocumentLoaded(); // navigation item handlers
 
               if (document) {
@@ -753,21 +749,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
               if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click', this.confirmDelete);
               if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete); // ok lets try get things done
 
-              _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].initialise(); // indexedDB access
+              _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].initialise();
 
-              _context.next = 18;
-              return _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__["default"].getDB().initialise([{
-                name: "test",
-                keyField: "id"
-              }]);
-
-            case 18:
-              _context.next = 20;
-              return _state_IndexedDBUtil__WEBPACK_IMPORTED_MODULE_10__["default"].getDB().addNewItemToCollection("test", {
-                id: 1
-              });
-
-            case 20:
+            case 16:
             case "end":
               return _context.stop();
           }
@@ -823,9 +807,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
     // @ts-ignore
 
 
-    var creator = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.users, {
+    var creator = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.users, {
       id: _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__["isSame"]);
     logger(creator); // create an empty entry
 
     var entry = {
@@ -844,7 +828,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
       selectedEntry: entry
     }); // @ts-ignore
 
-    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].setStateByName(this.state.stateNames.selectedEntry, entry);
+    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().setStateByName(this.state.stateNames.selectedEntry, entry);
     this.detailsView.eventShow(event);
   };
 
@@ -864,13 +848,13 @@ var Root = /*#__PURE__*/function (_React$Component) {
     // @ts-ignore
 
 
-    var creator = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.users, {
+    var creator = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.users, {
       id: _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__["isSame"]);
     logger(creator); // find the selected entry
     // @ts-ignore
 
-    var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].getStateByName(this.state.stateNames.selectedEntry);
+    var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().getStateByName(this.state.stateNames.selectedEntry);
 
     if (entry && commentEl) {
       // create an empty comment
@@ -899,9 +883,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
       // find the entry from the state manager
       entryId = parseInt(entryId); // @ts-ignore
 
-      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.entries, {
+      var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.entries, {
         id: entryId
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__["isSame"]);
       logger(entry);
 
       if (entry) {
@@ -910,7 +894,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
           selectedEntry: entry
         }); // @ts-ignore
 
-        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].setStateByName(this.state.stateNames.selectedEntry, entry);
+        _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().setStateByName(this.state.stateNames.selectedEntry, entry);
         this.commentView.eventShow(event);
       }
     }
@@ -927,9 +911,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
       // find the entry from the state manager
       entryId = parseInt(entryId); // @ts-ignore
 
-      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.entries, {
+      var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.entries, {
         id: entryId
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__["isSame"]);
       logger(entry);
 
       if (entry) {
@@ -938,7 +922,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
           selectedEntry: entry
         }); // @ts-ignore
 
-        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].setStateByName(this.state.stateNames.selectedEntry, entry);
+        _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().setStateByName(this.state.stateNames.selectedEntry, entry);
         this.detailsView.eventShow(event);
       }
     }
@@ -957,9 +941,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
       entryId = parseInt(entryId); // @ts-ignore
 
-      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_7__["default"].findItemInState(this.state.stateNames.entries, {
+      var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.entries, {
         id: entryId
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_8__["isSame"]);
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__["isSame"]);
       this.alert(entry.title, "Are you sure you want to delete this blog entry?");
     }
   };
@@ -978,7 +962,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component); //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 
 
-localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts';
+localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -1000,11 +984,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./network/DownloadManager */ "./src/network/DownloadManager.ts");
-/* harmony import */ var _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state/StateManagementUtil */ "./src/state/StateManagementUtil.ts");
+/* harmony import */ var _state_MemoryStateManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state/MemoryStateManager */ "./src/state/MemoryStateManager.ts");
 /* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
 /* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./notification/NotificationManager */ "./src/notification/NotificationManager.ts");
 /* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./socket/SocketManager */ "./src/socket/SocketManager.ts");
 /* harmony import */ var _network_Types__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./network/Types */ "./src/network/Types.ts");
+/* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
+/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+/* harmony import */ var _state_IndexedDBStateManager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./state/IndexedDBStateManager */ "./src/state/IndexedDBStateManager.ts");
+
+
+
 
 
 
@@ -1015,7 +1005,28 @@ __webpack_require__.r(__webpack_exports__);
 var cLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('controller-ts');
 
 var Controller = /*#__PURE__*/function () {
-  function Controller() {}
+  function Controller() {
+    var aggregateStateManager = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_7__["AggregateStateManager"].getInstance();
+    this.stateManager = aggregateStateManager; // store information in local storage, indexeddb, and memory
+
+    aggregateStateManager.addStateManager(_state_MemoryStateManager__WEBPACK_IMPORTED_MODULE_2__["default"].getInstance());
+    aggregateStateManager.addStateManager(_state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_8__["default"].getInstance());
+    var objectStores = [{
+      name: 'users',
+      keyField: 'id'
+    }, {
+      name: 'entries',
+      keyField: 'id'
+    }, {
+      name: 'selectedEntry',
+      keyField: 'id'
+    }];
+    var indexedDBStateManager = _state_IndexedDBStateManager__WEBPACK_IMPORTED_MODULE_9__["default"].getInstance();
+    indexedDBStateManager.initialise(objectStores).then(function (result) {
+      cLogger('indexed DB setup');
+    });
+    aggregateStateManager.addStateManager(indexedDBStateManager);
+  }
 
   var _proto = Controller.prototype;
 
@@ -1030,19 +1041,29 @@ var Controller = /*#__PURE__*/function () {
     this.callbackForCreateComment = this.callbackForCreateComment.bind(this); // state listener
 
     this.stateChanged = this.stateChanged.bind(this);
-    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addChangeListenerForName(this.config.stateNames.entries, this);
+    this.stateChangedItemAdded = this.stateChangedItemAdded.bind(this);
+    this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
+    this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
+    this.getStateManager().addChangeListenerForName(this.config.stateNames.entries, this);
     return this;
+  }
+  /*
+  Get the base data for the application (users, entries)
+  */
+  ;
+
+  _proto.initialise = function initialise() {
+    cLogger('Initialising data state'); // listen for socket events
+
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].setListener(this); // load the users
+
+    this.getAllUsers(); // load the entries
+
+    this.getAllEntries();
   };
 
-  _proto.stateChanged = function stateChanged(name, value) {
-    cLogger("State changes " + name);
-    cLogger(value);
-    this.applicationView.setState({
-      isLoggedIn: this.isLoggedIn(),
-      loggedInUserId: this.getLoggedInUserId(),
-      selectedEntry: {},
-      entries: value
-    });
+  _proto.getStateManager = function getStateManager() {
+    return this.stateManager;
   }
   /*
   *
@@ -1057,10 +1078,9 @@ var Controller = /*#__PURE__*/function () {
 
     if (status >= 200 && status <= 299) {
       // do we have any data?
-      cLogger(data);
-      var cbUsers = data; // covert the data to the AppType User
+      cLogger(data); // covert the data to the AppType User
 
-      cbUsers.forEach(function (cbUser) {
+      data.forEach(function (cbUser) {
         var user = {
           id: cbUser.id,
           username: cbUser.username
@@ -1069,7 +1089,7 @@ var Controller = /*#__PURE__*/function () {
       });
     }
 
-    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.users, users);
+    this.getStateManager().setStateByName(this.config.stateNames.users, users);
   };
 
   Controller.convertJSONCommentToComment = function convertJSONCommentToComment(jsonComment) {
@@ -1132,46 +1152,41 @@ var Controller = /*#__PURE__*/function () {
       });
     }
 
-    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.entries, entries);
+    this.getStateManager().setStateByName(this.config.stateNames.entries, entries);
   };
 
   _proto.callbackForCreateEntry = function callbackForCreateEntry(data, status) {
     cLogger('callback for create entry');
-    var entry = null;
 
     if (status >= 200 && status <= 299) {
       // do we have any data?
       cLogger(data);
-
-      var _entry = Controller.convertJSONEntryToBlogEntry(data);
-
-      _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addNewItemToState(this.config.stateNames.entries, _entry);
+      var entry = Controller.convertJSONEntryToBlogEntry(data);
+      this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
     }
   };
 
   _proto.callbackForCreateComment = function callbackForCreateComment(data, status) {
     cLogger('callback for create comment');
-    var comment = null;
 
     if (status >= 200 && status <= 299) {
       // do we have any data?
-      var _comment = Controller.convertJSONCommentToComment(data);
+      var comment = Controller.convertJSONCommentToComment(data);
+      cLogger(comment); // find the corresponding entry in state
 
-      cLogger(_comment); // find the corresponding entry in state
-
-      var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.entries, {
-        id: _comment.commentOn
+      var entry = this.getStateManager().findItemInState(this.config.stateNames.entries, {
+        id: comment.commentOn
       }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
       cLogger(entry);
 
       if (entry) {
         cLogger('callback for create comment - updating entry'); // update the entry with the new comment
 
-        entry.Comments.push(_comment); // update the entry in the state manager
+        entry.Comments.push(comment); // update the entry in the state manager
 
-        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // reselect the same entry
+        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // reselect the same entry
 
-        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.selectedEntry, entry);
+        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, entry);
         cLogger(entry);
       }
     }
@@ -1338,25 +1353,11 @@ var Controller = /*#__PURE__*/function () {
 
     cLogger("Logged in user id: " + result);
     return result;
-  }
-  /*
-    Get the base data for the application (users, entries)
-   */
-  ;
-
-  _proto.initialise = function initialise() {
-    cLogger('Initialising data state'); // listen for socket events
-
-    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].setListener(this); // load the users
-
-    this.getAllUsers(); // load the entries
-
-    this.getAllEntries();
   } // Lets delete a comment
   ;
 
   _proto.deleteComment = function deleteComment(id) {
-    var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].getStateByName(this.config.stateNames.selectedEntry);
+    var entry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
 
     if (entry) {
       cLogger("Handling delete comment for " + entry.id + " and comment " + id); // find the comment in the entry and remove it from the state
@@ -1372,8 +1373,8 @@ var Controller = /*#__PURE__*/function () {
         comments.splice(foundIndex, 1);
         cLogger(entry); // update the statement manager
 
-        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.selectedEntry, entry);
-        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, entry);
+        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
       }
     }
 
@@ -1384,7 +1385,7 @@ var Controller = /*#__PURE__*/function () {
     if (entry) {
       cLogger("Handling delete entry for " + entry.id); // update the state manager
 
-      _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeItemFromState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // initiate a call to remove from the database
+      this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // initiate a call to remove from the database
 
       this.apiDeleteEntry(entry);
     }
@@ -1397,7 +1398,7 @@ var Controller = /*#__PURE__*/function () {
       if (entry.id) {
         cLogger("Handling update for entry " + entry.id); // update the state manager
 
-        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // update the database
+        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // update the database
 
         this.apiUpdateEntry(entry);
       } else {
@@ -1432,7 +1433,7 @@ var Controller = /*#__PURE__*/function () {
 
   _proto.handleDataChangedByAnotherUser = function handleDataChangedByAnotherUser(message) {
     cLogger("Handling data change " + message.type + " on object type " + message.objectType + " made by user " + message.user);
-    var changeUser = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.users, {
+    var changeUser = this.getStateManager().findItemInState(this.config.stateNames.users, {
       id: message.user
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
     var stateObj = message.data;
@@ -1447,7 +1448,7 @@ var Controller = /*#__PURE__*/function () {
                 {
                   // updating comments is more tricky as it is a sub object of the blog entry
                   // find the entry in question
-                  var changedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.entries, {
+                  var changedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, {
                     id: stateObj.commentOn
                   }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
 
@@ -1456,13 +1457,13 @@ var Controller = /*#__PURE__*/function () {
 
                     changedEntry.Comments.push(comment); // update the state
 
-                    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, changedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // was this entry current open by the user?
+                    this.getStateManager().updateItemInState(this.config.stateNames.entries, changedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // was this entry current open by the user?
 
-                    var currentSelectedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].getStateByName(this.config.stateNames.selectedEntry);
+                    var currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
 
                     if (currentSelectedEntry) {
                       if (currentSelectedEntry.id === changedEntry.id) {
-                        _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.selectedEntry, changedEntry);
+                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, changedEntry);
                       }
                     }
 
@@ -1484,7 +1485,7 @@ var Controller = /*#__PURE__*/function () {
                   cLogger("Converting to BlogEntry type for Create");
                   cLogger(entry); // add the new item to the state
 
-                  _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addNewItemToState(this.config.stateNames.entries, entry);
+                  this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
                   var _username = "unknown";
 
                   if (changeUser) {
@@ -1499,7 +1500,7 @@ var Controller = /*#__PURE__*/function () {
                 {
                   var user = Controller.convertJSONUserToUser(stateObj); // add the new item to the state
 
-                  _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addNewItemToState(this.config.stateNames.users, user);
+                  this.getStateManager().addNewItemToState(this.config.stateNames.users, user);
                   _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(stateObj.username, stateObj.username + " has just registered.", 'message');
                   break;
                 }
@@ -1513,12 +1514,12 @@ var Controller = /*#__PURE__*/function () {
             switch (message.objectType) {
               case "BlogEntry":
                 {
-                  var _entry2 = Controller.convertJSONEntryToBlogEntry(stateObj);
+                  var _entry = Controller.convertJSONEntryToBlogEntry(stateObj);
 
                   cLogger("Converting to BlogEntry type for Update");
-                  cLogger(_entry2); // update the item in the state
+                  cLogger(_entry); // update the item in the state
 
-                  _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, _entry2, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
+                  this.getStateManager().updateItemInState(this.config.stateNames.entries, _entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
 
                   break;
                 }
@@ -1534,7 +1535,7 @@ var Controller = /*#__PURE__*/function () {
                 {
                   // removing comments is more tricky as it is a sub object of the blog entry
                   // find the entry in question
-                  var _changedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.entries, {
+                  var _changedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, {
                     id: stateObj.commentOn
                   }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
 
@@ -1553,13 +1554,13 @@ var Controller = /*#__PURE__*/function () {
                       comments.splice(foundIndex, 1);
                       cLogger(_changedEntry); // update the state
 
-                      _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].updateItemInState(this.config.stateNames.entries, _changedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // was this entry current open by the user?
+                      this.getStateManager().updateItemInState(this.config.stateNames.entries, _changedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // was this entry current open by the user?
 
-                      var _currentSelectedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].getStateByName(this.config.stateNames.selectedEntry);
+                      var _currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
 
                       if (_currentSelectedEntry) {
                         if (_currentSelectedEntry.id === _changedEntry.id) {
-                          _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].setStateByName(this.config.stateNames.selectedEntry, _changedEntry);
+                          this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, _changedEntry);
                         }
                       }
                     }
@@ -1571,14 +1572,14 @@ var Controller = /*#__PURE__*/function () {
               case "BlogEntry":
                 {
                   cLogger("Deleting Blog Entry with id " + stateObj.id);
-                  var deletedEntry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].findItemInState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+                  var deletedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
                   cLogger(deletedEntry);
 
                   if (deletedEntry) {
                     cLogger("Deleting Blog Entry with id " + deletedEntry.id);
-                    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeItemFromState(this.config.stateNames.entries, deletedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // the current user could be accessing the comments in the entry that was just deleted
+                    this.getStateManager().removeItemFromState(this.config.stateNames.entries, deletedEntry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // the current user could be accessing the comments in the entry that was just deleted
 
-                    var _currentSelectedEntry2 = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_2__["default"].getStateByName(this.config.stateNames.selectedEntry);
+                    var _currentSelectedEntry2 = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
 
                     if (_currentSelectedEntry2) {
                       if (_currentSelectedEntry2.id === deletedEntry.id) {
@@ -1601,6 +1602,51 @@ var Controller = /*#__PURE__*/function () {
     } catch (err) {
       cLogger(err);
     }
+  } //  State Management listening
+  ;
+
+  _proto.stateChangedItemAdded = function stateChangedItemAdded(name, itemAdded) {
+    cLogger("State changed " + name + " - item Added");
+    cLogger(itemAdded);
+    this.applicationView.setState({
+      isLoggedIn: this.isLoggedIn(),
+      loggedInUserId: this.getLoggedInUserId(),
+      selectedEntry: {},
+      entries: this.getStateManager().getStateByName(name)
+    });
+  };
+
+  _proto.stateChangedItemRemoved = function stateChangedItemRemoved(name, itemRemoved) {
+    cLogger("State changed " + name + " - item removed");
+    cLogger(itemRemoved);
+    this.applicationView.setState({
+      isLoggedIn: this.isLoggedIn(),
+      loggedInUserId: this.getLoggedInUserId(),
+      selectedEntry: {},
+      entries: this.getStateManager().getStateByName(name)
+    });
+  };
+
+  _proto.stateChangedItemUpdated = function stateChangedItemUpdated(name, itemUpdated, itemNewValue) {
+    cLogger("State changed " + name + " - item updated");
+    cLogger(itemNewValue);
+    this.applicationView.setState({
+      isLoggedIn: this.isLoggedIn(),
+      loggedInUserId: this.getLoggedInUserId(),
+      selectedEntry: {},
+      entries: this.getStateManager().getStateByName(name)
+    });
+  };
+
+  _proto.stateChanged = function stateChanged(name, values) {
+    cLogger("State changed " + name);
+    cLogger(values);
+    this.applicationView.setState({
+      isLoggedIn: this.isLoggedIn(),
+      loggedInUserId: this.getLoggedInUserId(),
+      selectedEntry: {},
+      entries: values
+    });
   };
 
   return Controller;
@@ -1629,12 +1675,13 @@ __webpack_require__.r(__webpack_exports__);
 var avLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('view-ts');
 
 var AbstractView = /*#__PURE__*/function () {
-  function AbstractView(applicationView, htmlDocument, uiConfig, uiPrefs) {
+  function AbstractView(applicationView, htmlDocument, uiConfig, uiPrefs, stateManager) {
     this.applicationView = applicationView;
     this.document = document;
     this.uiConfig = uiConfig;
     this.uiPrefs = uiPrefs;
-    this.config = applicationView.state; // state change listening
+    this.config = applicationView.state;
+    this.stateManager = stateManager; // state change listening
 
     this.stateChanged = this.stateChanged.bind(this); // event handlers
 
@@ -1790,6 +1837,18 @@ var AbstractView = /*#__PURE__*/function () {
     this.updateView(name, newValue);
   };
 
+  _proto.stateChangedItemAdded = function stateChangedItemAdded(name, itemAdded) {
+    this.updateView(name, this.stateManager.getStateByName(name));
+  };
+
+  _proto.stateChangedItemRemoved = function stateChangedItemRemoved(name, itemRemoved) {
+    this.updateView(name, this.stateManager.getStateByName(name));
+  };
+
+  _proto.stateChangedItemUpdated = function stateChangedItemUpdated(name, itemUpdated, itemNewValue) {
+    this.updateView(name, this.stateManager.getStateByName(name));
+  };
+
   return AbstractView;
 }();
 
@@ -1921,9 +1980,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
-/* harmony import */ var _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../state/StateManagementUtil */ "./src/state/StateManagementUtil.ts");
-/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
-/* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+/* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -1953,16 +2011,15 @@ function _setPrototypeOf(o, p) {
 
 
 
-
 var viewLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('view-ts:comments');
 
 var CommentSidebarView = /*#__PURE__*/function (_SidebarView) {
   _inheritsLoose(CommentSidebarView, _SidebarView);
 
-  function CommentSidebarView(applicationView, htmlDocument) {
+  function CommentSidebarView(applicationView, htmlDocument, stateManager) {
     var _this;
 
-    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.commentSideBar, applicationView.state.uiPrefs.commentSideBar) || this; // handler binding
+    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.commentSideBar, applicationView.state.uiPrefs.commentSideBar, stateManager) || this; // handler binding
 
     _this.updateView = _this.updateView.bind(_assertThisInitialized(_this)); // elements
 
@@ -1972,7 +2029,8 @@ var CommentSidebarView = /*#__PURE__*/function (_SidebarView) {
     _this.newCommentTextEl = htmlDocument.getElementById(_this.uiConfig.dom.commentId);
     _this.newCommentSubmitEl = htmlDocument.getElementById(_this.uiConfig.dom.submitCommentId); // register state change listening
 
-    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].addChangeListenerForName(_this.config.stateNames.selectedEntry, _assertThisInitialized(_this));
+    _this.stateManager.addChangeListenerForName(_this.config.stateNames.selectedEntry, _assertThisInitialized(_this));
+
     return _this;
   }
 
@@ -1989,9 +2047,9 @@ var CommentSidebarView = /*#__PURE__*/function (_SidebarView) {
   _proto.getDisplayValueForStateItem = function getDisplayValueForStateItem(name, item) {
     viewLogger("Getting display value for comment " + item.id + " with content " + item.content); // find the user for the item from the createdBy attribute
 
-    var createdBy = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].findItemInState(this.config.stateNames.users, {
+    var createdBy = this.stateManager.findItemInState(this.config.stateNames.users, {
       id: item.createdBy
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_4__["isSame"]);
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
     var createdOn = moment__WEBPACK_IMPORTED_MODULE_1___default()(item.changedOn, 'YYYYMMDDHHmmss').format('DD/MM/YYYY HH:mm');
     return item.content + " - " + createdBy.username + " on " + createdOn + "  ";
   };
@@ -2012,7 +2070,7 @@ var CommentSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.eventClickItem = function eventClickItem(event) {
     event.preventDefault();
-    var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].getStateByName(this.config.stateNames.selectedEntry);
+    var entry = this.stateManager.getStateByName(this.config.stateNames.selectedEntry);
     viewLogger(event.target); // @ts-ignore
 
     var id = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
@@ -2066,7 +2124,7 @@ var CommentSidebarView = /*#__PURE__*/function (_SidebarView) {
   _proto.getDragData = function getDragData(event) {};
 
   return CommentSidebarView;
-}(_SidebarView__WEBPACK_IMPORTED_MODULE_5__["default"]);
+}(_SidebarView__WEBPACK_IMPORTED_MODULE_4__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (CommentSidebarView);
 
@@ -2086,7 +2144,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
-/* harmony import */ var _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../state/StateManagementUtil */ "./src/state/StateManagementUtil.ts");
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -2114,16 +2171,15 @@ function _setPrototypeOf(o, p) {
 
 
 
-
 var viewLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('view-ts:details');
 
 var DetailsSidebarView = /*#__PURE__*/function (_SidebarView) {
   _inheritsLoose(DetailsSidebarView, _SidebarView);
 
-  function DetailsSidebarView(applicationView, htmlDocument) {
+  function DetailsSidebarView(applicationView, htmlDocument, stateManager) {
     var _this;
 
-    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.entryDetailsSideBar, applicationView.state.uiPrefs.entryDetailsSideBar) || this; // handler binding
+    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.entryDetailsSideBar, applicationView.state.uiPrefs.entryDetailsSideBar, stateManager) || this; // handler binding
 
     _this.updateView = _this.updateView.bind(_assertThisInitialized(_this));
     _this.eventClickItem = _this.eventClickItem.bind(_assertThisInitialized(_this)); // field and form elements
@@ -2133,7 +2189,7 @@ var DetailsSidebarView = /*#__PURE__*/function (_SidebarView) {
     _this.contentEl = document.getElementById(_this.uiConfig.dom.contentId);
     _this.changeOnEl = document.getElementById(_this.uiConfig.dom.changedOnId); // register state change listening
 
-    _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].addChangeListenerForName(_this.config.stateNames.selectedEntry, _assertThisInitialized(_this)); // listen for form submissions
+    stateManager.addChangeListenerForName(_this.config.stateNames.selectedEntry, _assertThisInitialized(_this)); // listen for form submissions
 
     if (_this.formEl) {
       // @ts-ignore
@@ -2157,7 +2213,7 @@ var DetailsSidebarView = /*#__PURE__*/function (_SidebarView) {
     event.preventDefault();
     viewLogger('Handling submit Details Sidebar View');
     viewLogger(event.target);
-    var entry = _state_StateManagementUtil__WEBPACK_IMPORTED_MODULE_3__["default"].getStateByName(this.config.stateNames.selectedEntry);
+    var entry = this.stateManager.getStateByName(this.config.stateNames.selectedEntry);
     viewLogger(entry);
     entry.title = this.titleEl ? this.titleEl.value.trim() : '';
     entry.content = this.contentEl ? this.contentEl.value.trim() : '';
@@ -2245,10 +2301,10 @@ function _setPrototypeOf(o, p) {
 var SidebarView = /*#__PURE__*/function (_AbstractView) {
   _inheritsLoose(SidebarView, _AbstractView);
 
-  function SidebarView(applicationView, htmlDocument, uiConfig, uiPrefs) {
+  function SidebarView(applicationView, htmlDocument, uiConfig, uiPrefs, stateManager) {
     var _this;
 
-    _this = _AbstractView.call(this, applicationView, htmlDocument, uiConfig, uiPrefs) || this; // event handlers
+    _this = _AbstractView.call(this, applicationView, htmlDocument, uiConfig, uiPrefs, stateManager) || this; // event handlers
 
     _this.eventHide = _this.eventHide.bind(_assertThisInitialized(_this));
     _this.eventShow = _this.eventShow.bind(_assertThisInitialized(_this));
@@ -3122,10 +3178,505 @@ var socketManager = new SocketManager();
 
 /***/ }),
 
-/***/ "./src/state/IndexedDBUtil.ts":
-/*!************************************!*\
-  !*** ./src/state/IndexedDBUtil.ts ***!
-  \************************************/
+/***/ "./src/state/AbstractStateManager.ts":
+/*!*******************************************!*\
+  !*** ./src/state/AbstractStateManager.ts ***!
+  \*******************************************/
+/*! exports provided: stateEventType, AbstractStateManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "stateEventType", function() { return stateEventType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AbstractStateManager", function() { return AbstractStateManager; });
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+
+var smLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('state-manager-ts');
+var stateEventType;
+
+(function (stateEventType) {
+  stateEventType[stateEventType["ItemAdded"] = 0] = "ItemAdded";
+  stateEventType[stateEventType["ItemUpdated"] = 1] = "ItemUpdated";
+  stateEventType[stateEventType["ItemDeleted"] = 2] = "ItemDeleted";
+  stateEventType[stateEventType["StateChanged"] = 3] = "StateChanged";
+})(stateEventType || (stateEventType = {}));
+
+var AbstractStateManager = /*#__PURE__*/function () {
+  function AbstractStateManager() {
+    this.suppressEventEmits = false;
+    this.stateChangeListeners = [];
+    this.suppressEventEmits = false;
+  }
+
+  var _proto = AbstractStateManager.prototype;
+
+  _proto.suppressEvents = function suppressEvents() {
+    this.suppressEventEmits = true;
+  };
+
+  _proto.emitEvents = function emitEvents() {
+    this.suppressEventEmits = false;
+  };
+
+  _proto.isStatePresent = function isStatePresent(name) {
+    var result = this._isStatePresent(name);
+
+    smLogger("Checking state of " + name + " is present = " + result);
+    return result;
+  };
+
+  _proto.informChangeListenersForStateWithName = function informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue) {
+    if (eventType === void 0) {
+      eventType = stateEventType.StateChanged;
+    }
+
+    if (previousObjValue === void 0) {
+      previousObjValue = null;
+    }
+
+    smLogger("State Manager: Informing state listeners of " + name);
+
+    if (this.suppressEventEmits) {
+      smLogger("State Manager: Events suppressed");
+      return;
+    }
+
+    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex >= 0) {
+      smLogger("State Manager: Found state listeners of " + name);
+      /* let each state change listener know */
+
+      var changeListenersForName = this.stateChangeListeners[foundIndex];
+
+      for (var index = 0; index < changeListenersForName.listeners.length; index++) {
+        smLogger("State Manager: Found state listener of " + name + " - informing");
+        var listener = changeListenersForName.listeners[index];
+
+        switch (eventType) {
+          case stateEventType.StateChanged:
+            {
+              listener.stateChanged(name, stateObjValue);
+              break;
+            }
+
+          case stateEventType.ItemAdded:
+            {
+              listener.stateChangedItemAdded(name, stateObjValue);
+              break;
+            }
+
+          case stateEventType.ItemUpdated:
+            {
+              listener.stateChangedItemUpdated(name, previousObjValue, stateObjValue);
+              break;
+            }
+
+          case stateEventType.ItemDeleted:
+            {
+              listener.stateChangedItemRemoved(name, stateObjValue);
+              break;
+            }
+        }
+      }
+    }
+  }
+  /*
+        Add a state listener for a given state name
+        the listener should be a function with two parameters
+        name - string - the name of the state variable that they want to be informed about
+        stateObjValue - object - the new state value
+       */
+  ;
+
+  _proto.addChangeListenerForName = function addChangeListenerForName(name, listener) {
+    smLogger("State Manager: Adding state listener for " + name);
+    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex >= 0) {
+      var changeListenersForName = this.stateChangeListeners[foundIndex];
+      changeListenersForName.listeners.push(listener);
+    } else {
+      smLogger("State Manager: Adding state listener for " + name + " - first occurrence");
+      var listenersNameArrayPair = {
+        name: name,
+        listeners: [listener]
+      };
+      this.stateChangeListeners.push(listenersNameArrayPair);
+    }
+  };
+
+  _proto.addStateByName = function addStateByName(name, stateObjForName) {
+    /* create a new state attribute for the application state */
+    var state = {
+      name: name,
+      value: stateObjForName
+    };
+
+    if (!this.isStatePresent(name)) {
+      smLogger("State Manager: Adding state for " + name + " - first occurrence");
+      smLogger(stateObjForName, 201);
+
+      this._addNewNamedStateToStorage(state);
+    } else {
+      /* get the current state value and replace it */
+      this._replaceNamedStateInStorage(state);
+    }
+
+    this.informChangeListenersForStateWithName(name, stateObjForName, stateEventType.StateChanged);
+    return stateObjForName;
+  };
+
+  _proto.getStateByName = function getStateByName(name) {
+    smLogger("State Manager: Getting state for " + name);
+    var stateValueObj = {};
+
+    if (this._isStatePresent(name)) {
+      // get the current state
+      var _state = this._getState(name);
+
+      stateValueObj = _state.value;
+      smLogger("State Manager: Found previous state for " + name);
+      smLogger(stateValueObj);
+    } else {
+      // create the state if not already present
+      stateValueObj = this.addStateByName(name, []);
+    }
+
+    return stateValueObj;
+  };
+
+  _proto.setStateByName = function setStateByName(name, stateObjectForName, informListeners) {
+    if (informListeners === void 0) {
+      informListeners = true;
+    }
+
+    smLogger("State Manager: Setting state for " + name);
+    smLogger(stateObjectForName);
+
+    if (this._isStatePresent(name)) {
+      // set the current state
+      var _state2 = this._getState(name);
+
+      _state2.value = stateObjectForName;
+    } else {
+      // create the state if not already present
+      this.addStateByName(name, stateObjectForName);
+    }
+
+    this._saveState(name, stateObjectForName);
+
+    if (informListeners) this.informChangeListenersForStateWithName(name, stateObjectForName);
+    return stateObjectForName;
+  };
+
+  _proto.addNewItemToState = function addNewItemToState(name, item) {
+    // assumes state is an array
+    smLogger("State Manager: Adding item to state " + name);
+    var state = this.getStateByName(name);
+    state.push(item);
+    smLogger(state);
+
+    this._saveState(name, state);
+
+    this.informChangeListenersForStateWithName(name, state, stateEventType.ItemAdded);
+  };
+
+  _proto.findItemInState = function findItemInState(name, item, testForEqualityFunction) {
+    // assumes state is an array
+    var result = {};
+    var state = this.getStateByName(name);
+    var foundIndex = state.findIndex(function (element) {
+      return testForEqualityFunction(element, item);
+    });
+    smLogger("Finding item in state " + name + " - found index " + foundIndex);
+    smLogger(item);
+
+    if (foundIndex >= 0) {
+      result = state[foundIndex];
+    }
+
+    return result;
+  };
+
+  _proto.isItemInState = function isItemInState(name, item, testForEqualityFunction) {
+    // assumes state is an array
+    var result = false;
+    var state = this.getStateByName(name);
+    var foundIndex = state.findIndex(function (element) {
+      return testForEqualityFunction(element, item);
+    });
+
+    if (foundIndex >= 0) {
+      result = true;
+    }
+
+    return result;
+  };
+
+  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction) {
+    var result = false;
+    var state = this.getStateByName(name);
+    var foundIndex = state.findIndex(function (element) {
+      return testForEqualityFunction(element, item);
+    });
+
+    if (foundIndex >= 0) {
+      result = true; // remove the item from the state
+
+      smLogger('State Manager: Found item - removing ');
+      state.splice(foundIndex, 1);
+      smLogger(state);
+      this.setStateByName(name, state, false);
+      this.informChangeListenersForStateWithName(name, item, stateEventType.ItemDeleted);
+    }
+
+    return result;
+  };
+
+  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction) {
+    var result = false;
+    var state = this.getStateByName(name);
+    var foundIndex = state.findIndex(function (element) {
+      return testForEqualityFunction(element, item);
+    });
+
+    if (foundIndex >= 0) {
+      result = true;
+      var oldItem = state[foundIndex];
+      smLogger('State Manager: Found item - replacing ');
+      state.splice(foundIndex, 1, item);
+      smLogger(state);
+      this.setStateByName(name, state, false);
+      this.informChangeListenersForStateWithName(name, item, stateEventType.ItemUpdated, oldItem);
+    } else {
+      // add the item to the state
+      this.addNewItemToState(name, item);
+    }
+
+    return result;
+  };
+
+  return AbstractStateManager;
+}();
+
+/***/ }),
+
+/***/ "./src/state/AggregateStateManager.ts":
+/*!********************************************!*\
+  !*** ./src/state/AggregateStateManager.ts ***!
+  \********************************************/
+/*! exports provided: AggregateStateManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AggregateStateManager", function() { return AggregateStateManager; });
+/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
+  _inheritsLoose(AggregateStateManager, _AbstractStateManager);
+
+  AggregateStateManager.getInstance = function getInstance() {
+    if (!AggregateStateManager._instance) {
+      AggregateStateManager._instance = new AggregateStateManager();
+    }
+
+    return AggregateStateManager._instance;
+  };
+
+  function AggregateStateManager() {
+    var _this;
+
+    _this = _AbstractStateManager.call(this) || this;
+    _this.stateManagers = [];
+    return _this;
+  }
+
+  var _proto = AggregateStateManager.prototype;
+
+  _proto.addStateManager = function addStateManager(stateManager) {
+    this.stateManagers.push(stateManager);
+    stateManager.suppressEvents();
+  };
+
+  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
+    this.stateManagers.forEach(function (manager) {
+      manager._addNewNamedStateToStorage(state);
+    });
+  };
+
+  _proto._getState = function _getState(name) {
+    var state = {
+      name: name,
+      value: []
+    };
+
+    if (this.stateManagers.length > 0) {
+      state = this.stateManagers[0]._getState(name);
+    }
+
+    return state;
+  };
+
+  _proto._isStatePresent = function _isStatePresent(name) {
+    var result = false;
+
+    if (this.stateManagers.length > 0) {
+      result = this.stateManagers[0]._isStatePresent(name);
+    }
+
+    return result;
+  };
+
+  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
+    this.stateManagers.forEach(function (manager) {
+      manager._replaceNamedStateInStorage(state);
+    });
+  };
+
+  _proto._saveState = function _saveState(name, stateObj) {
+    this.stateManagers.forEach(function (manager) {
+      manager._saveState(name, stateObj);
+    });
+  };
+
+  return AggregateStateManager;
+}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["AbstractStateManager"]);
+
+/***/ }),
+
+/***/ "./src/state/BrowserStorageStateManager.ts":
+/*!*************************************************!*\
+  !*** ./src/state/BrowserStorageStateManager.ts ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BrowserStorageStateManager; });
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+var lsLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('local-storage');
+
+var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
+  _inheritsLoose(BrowserStorageStateManager, _AbstractStateManager);
+
+  BrowserStorageStateManager.getInstance = function getInstance(useLocalStorage) {
+    if (useLocalStorage === void 0) {
+      useLocalStorage = false;
+    }
+
+    if (!BrowserStorageStateManager._instance) {
+      BrowserStorageStateManager._instance = new BrowserStorageStateManager(useLocalStorage);
+    }
+
+    return BrowserStorageStateManager._instance;
+  };
+
+  function BrowserStorageStateManager(useLocalStorage) {
+    var _this;
+
+    if (useLocalStorage === void 0) {
+      useLocalStorage = false;
+    }
+
+    _this = _AbstractStateManager.call(this) || this;
+    _this.storage = window.sessionStorage;
+    if (useLocalStorage) _this.storage = window.localStorage;
+    return _this;
+  }
+
+  var _proto = BrowserStorageStateManager.prototype;
+
+  _proto._isStatePresent = function _isStatePresent(name) {
+    return this.storage.getItem(name) != null;
+  };
+
+  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
+    lsLogger("Local Storage: Saving with key " + state.name);
+    lsLogger(state);
+    var stringifiedSaveData = JSON.stringify(state.value);
+    lsLogger(stringifiedSaveData);
+    this.storage.setItem(state.name, stringifiedSaveData);
+  };
+
+  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
+    this._addNewNamedStateToStorage(state);
+  };
+
+  _proto._getState = function _getState(name) {
+    var savedResults = [];
+    lsLogger("Local Storage: Loading with key " + name);
+    var savedResultsJSON = this.storage.getItem(name);
+    lsLogger(savedResultsJSON);
+
+    if (savedResultsJSON !== null) {
+      savedResults = JSON.parse(savedResultsJSON);
+    }
+
+    return savedResults;
+  };
+
+  _proto._saveState = function _saveState(name, newValue) {
+    this._addNewNamedStateToStorage({
+      name: name,
+      value: newValue
+    });
+  };
+
+  return BrowserStorageStateManager;
+}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
+
+
+
+/***/ }),
+
+/***/ "./src/state/IndexedDBStateManager.ts":
+/*!********************************************!*\
+  !*** ./src/state/IndexedDBStateManager.ts ***!
+  \********************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3134,6 +3685,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var idb__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! idb */ "./node_modules/idb/build/esm/index.js");
+/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -3170,20 +3722,39 @@ function _asyncToGenerator(fn) {
   };
 }
 
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
 
 
 var idLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('indexeddb-ts');
 
-var IndexedDBUtil = /*#__PURE__*/function () {
-  IndexedDBUtil.getDB = function getDB() {
-    if (!IndexedDBUtil.instance) {
-      IndexedDBUtil.instance = new IndexedDBUtil();
+var IndexedDBStateManager = /*#__PURE__*/function (_AbstractStateManager) {
+  _inheritsLoose(IndexedDBStateManager, _AbstractStateManager);
+
+  IndexedDBStateManager.getInstance = function getInstance() {
+    if (!IndexedDBStateManager.instance) {
+      IndexedDBStateManager.instance = new IndexedDBStateManager();
     }
 
-    return IndexedDBUtil.instance;
+    return IndexedDBStateManager.instance;
   };
 
-  var _proto = IndexedDBUtil.prototype;
+  var _proto = IndexedDBStateManager.prototype;
 
   _proto.initialise = /*#__PURE__*/function () {
     var _initialise = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(collections) {
@@ -3224,8 +3795,12 @@ var IndexedDBUtil = /*#__PURE__*/function () {
     return initialise;
   }();
 
-  function IndexedDBUtil() {
+  function IndexedDBStateManager() {
+    var _this;
+
+    _this = _AbstractStateManager.call(this) || this;
     idLogger("Constructor");
+    return _this;
   }
 
   _proto.checkForObjectStore = /*#__PURE__*/function () {
@@ -3290,12 +3865,188 @@ var IndexedDBUtil = /*#__PURE__*/function () {
     return saveItemsToCollection;
   }();
 
-  _proto.saveWithCollectionKey = /*#__PURE__*/function () {
-    var _saveWithCollectionKey = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(key, saveData, keyField) {
+  _proto._isStatePresent = function _isStatePresent(name) {
+    return true;
+  };
+
+  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
+    var _this2 = this;
+
+    var fn = /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.next = 2;
+                return _this2.saveWithCollectionKey(state.name, state.value);
+
+              case 2:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }));
+
+      return function fn() {
+        return _ref.apply(this, arguments);
+      };
+    }();
+
+    fn();
+  };
+
+  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
+    var _this3 = this;
+
+    var fn = /*#__PURE__*/function () {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
+                return _this3.removeAllItemsFromCollectionKey(state.name);
+
+              case 2:
+                _context5.next = 4;
+                return _this3.saveWithCollectionKey(state.name, state.value);
+
+              case 4:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
+      }));
+
+      return function fn() {
+        return _ref2.apply(this, arguments);
+      };
+    }();
+
+    fn();
+  };
+
+  _proto._getState = function _getState(name) {
+    var _this4 = this;
+
+    var state = {
+      name: name,
+      value: []
+    };
+
+    var fn = /*#__PURE__*/function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return _this4.getWithCollectionKey(state.name);
+
+              case 2:
+                state.value = _context6.sent;
+
+              case 3:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6);
+      }));
+
+      return function fn() {
+        return _ref3.apply(this, arguments);
+      };
+    }();
+
+    return state;
+  };
+
+  _proto._saveState = function _saveState(name, stateObj) {
+    var _this5 = this;
+
+    var fn = /*#__PURE__*/function () {
+      var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                _context7.next = 2;
+                return _this5.removeAllItemsFromCollectionKey(name);
+
+              case 2:
+                _context7.next = 4;
+                return _this5.saveWithCollectionKey(name, stateObj);
+
+              case 4:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7);
+      }));
+
+      return function fn() {
+        return _ref4.apply(this, arguments);
+      };
+    }();
+
+    fn();
+  };
+
+  _proto.removeAllItemsFromCollectionKey = /*#__PURE__*/function () {
+    var _removeAllItemsFromCollectionKey = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(key, keyField) {
       var db, transaction, objectStore;
-      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      return regeneratorRuntime.wrap(function _callee8$(_context8) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              if (keyField === void 0) {
+                keyField = 'id';
+              }
+
+              idLogger("Clearing collection " + key);
+              _context8.next = 4;
+              return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
+
+            case 4:
+              db = _context8.sent;
+              _context8.next = 7;
+              return this.checkForObjectStore(db, key, keyField);
+
+            case 7:
+              // @ts-ignore
+              transaction = db.transaction(key, "readwrite"); // @ts-ignore
+
+              objectStore = transaction.store; // @ts-ignore
+
+              _context8.next = 11;
+              return objectStore.clear();
+
+            case 11:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, _callee8, this);
+    }));
+
+    function removeAllItemsFromCollectionKey(_x8, _x9) {
+      return _removeAllItemsFromCollectionKey.apply(this, arguments);
+    }
+
+    return removeAllItemsFromCollectionKey;
+  }();
+
+  _proto.saveWithCollectionKey = /*#__PURE__*/function () {
+    var _saveWithCollectionKey = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(key, saveData, keyField) {
+      var db, transaction, objectStore;
+      return regeneratorRuntime.wrap(function _callee9$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
             case 0:
               if (keyField === void 0) {
                 keyField = 'id';
@@ -3303,12 +4054,12 @@ var IndexedDBUtil = /*#__PURE__*/function () {
 
               idLogger("Saving with key " + key);
               idLogger(saveData);
-              _context4.next = 5;
+              _context9.next = 5;
               return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
 
             case 5:
-              db = _context4.sent;
-              _context4.next = 8;
+              db = _context9.sent;
+              _context9.next = 8;
               return this.checkForObjectStore(db, key, keyField);
 
             case 8:
@@ -3317,18 +4068,18 @@ var IndexedDBUtil = /*#__PURE__*/function () {
 
               objectStore = transaction.store; // @ts-ignore
 
-              _context4.next = 12;
+              _context9.next = 12;
               return this.saveItemsToCollection(objectStore, saveData, keyField);
 
             case 12:
             case "end":
-              return _context4.stop();
+              return _context9.stop();
           }
         }
-      }, _callee4, this);
+      }, _callee9, this);
     }));
 
-    function saveWithCollectionKey(_x8, _x9, _x10) {
+    function saveWithCollectionKey(_x10, _x11, _x12) {
       return _saveWithCollectionKey.apply(this, arguments);
     }
 
@@ -3336,11 +4087,11 @@ var IndexedDBUtil = /*#__PURE__*/function () {
   }();
 
   _proto.getWithCollectionKey = /*#__PURE__*/function () {
-    var _getWithCollectionKey = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(key, keyField) {
+    var _getWithCollectionKey = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10(key, keyField) {
       var savedResults, db, transaction, objectStore, cursor;
-      return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      return regeneratorRuntime.wrap(function _callee10$(_context10) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               if (keyField === void 0) {
                 keyField = 'id';
@@ -3348,12 +4099,12 @@ var IndexedDBUtil = /*#__PURE__*/function () {
 
               savedResults = [];
               idLogger("Loading with key " + key);
-              _context5.next = 5;
+              _context10.next = 5;
               return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
 
             case 5:
-              db = _context5.sent;
-              _context5.next = 8;
+              db = _context10.sent;
+              _context10.next = 8;
               return this.checkForObjectStore(db, key, keyField);
 
             case 8:
@@ -3363,41 +4114,41 @@ var IndexedDBUtil = /*#__PURE__*/function () {
 
               objectStore = transaction.store; // @ts-ignore
 
-              _context5.next = 13;
+              _context10.next = 13;
               return objectStore.openCursor();
 
             case 13:
-              cursor = _context5.sent;
+              cursor = _context10.sent;
 
             case 14:
               if (!cursor) {
-                _context5.next = 21;
+                _context10.next = 21;
                 break;
               } // @ts-ignore
 
 
               savedResults.push(cursor.value); // @ts-ignore
 
-              _context5.next = 18;
+              _context10.next = 18;
               return cursor.continue();
 
             case 18:
-              cursor = _context5.sent;
-              _context5.next = 14;
+              cursor = _context10.sent;
+              _context10.next = 14;
               break;
 
             case 21:
-              return _context5.abrupt("return", savedResults);
+              return _context10.abrupt("return", savedResults);
 
             case 22:
             case "end":
-              return _context5.stop();
+              return _context10.stop();
           }
         }
-      }, _callee5, this);
+      }, _callee10, this);
     }));
 
-    function getWithCollectionKey(_x11, _x12) {
+    function getWithCollectionKey(_x13, _x14) {
       return _getWithCollectionKey.apply(this, arguments);
     }
 
@@ -3407,11 +4158,11 @@ var IndexedDBUtil = /*#__PURE__*/function () {
   ;
 
   _proto.addNewItemToCollection = /*#__PURE__*/function () {
-    var _addNewItemToCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(key, item, keyField) {
+    var _addNewItemToCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(key, item, keyField) {
       var db, transaction, objectStore;
-      return regeneratorRuntime.wrap(function _callee6$(_context6) {
+      return regeneratorRuntime.wrap(function _callee11$(_context11) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
               if (keyField === void 0) {
                 keyField = 'id';
@@ -3422,12 +4173,12 @@ var IndexedDBUtil = /*#__PURE__*/function () {
                 idLogger(item);
               }
 
-              _context6.next = 4;
+              _context11.next = 4;
               return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
 
             case 4:
-              db = _context6.sent;
-              _context6.next = 7;
+              db = _context11.sent;
+              _context11.next = 7;
               return this.checkForObjectStore(db, key, keyField);
 
             case 7:
@@ -3440,13 +4191,13 @@ var IndexedDBUtil = /*#__PURE__*/function () {
 
             case 11:
             case "end":
-              return _context6.stop();
+              return _context11.stop();
           }
         }
-      }, _callee6, this);
+      }, _callee11, this);
     }));
 
-    function addNewItemToCollection(_x13, _x14, _x15) {
+    function addNewItemToCollection(_x15, _x16, _x17) {
       return _addNewItemToCollection.apply(this, arguments);
     }
 
@@ -3454,29 +4205,29 @@ var IndexedDBUtil = /*#__PURE__*/function () {
   }();
 
   _proto.removeItemFromCollection = /*#__PURE__*/function () {
-    var _removeItemFromCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(key, item, keyField) {
+    var _removeItemFromCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(key, item, keyField) {
       var db, transaction, objectStore;
-      return regeneratorRuntime.wrap(function _callee7$(_context7) {
+      return regeneratorRuntime.wrap(function _callee12$(_context12) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
               if (keyField === void 0) {
                 keyField = 'id';
               }
 
               if (!(item !== null)) {
-                _context7.next = 16;
+                _context12.next = 16;
                 break;
               }
 
               idLogger("Removing with key " + key);
               idLogger(item);
-              _context7.next = 6;
+              _context12.next = 6;
               return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
 
             case 6:
-              db = _context7.sent;
-              _context7.next = 9;
+              db = _context12.sent;
+              _context12.next = 9;
               return this.checkForObjectStore(db, key, keyField);
 
             case 9:
@@ -3486,22 +4237,22 @@ var IndexedDBUtil = /*#__PURE__*/function () {
 
               objectStore = transaction.store; // @ts-ignore
 
-              _context7.next = 14;
+              _context12.next = 14;
               return objectStore.delete(item[keyField]);
 
             case 14:
-              _context7.next = 16;
+              _context12.next = 16;
               return transaction.done;
 
             case 16:
             case "end":
-              return _context7.stop();
+              return _context12.stop();
           }
         }
-      }, _callee7, this);
+      }, _callee12, this);
     }));
 
-    function removeItemFromCollection(_x16, _x17, _x18) {
+    function removeItemFromCollection(_x18, _x19, _x20) {
       return _removeItemFromCollection.apply(this, arguments);
     }
 
@@ -3509,29 +4260,29 @@ var IndexedDBUtil = /*#__PURE__*/function () {
   }();
 
   _proto.updateItemInCollection = /*#__PURE__*/function () {
-    var _updateItemInCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(key, item, keyField) {
+    var _updateItemInCollection = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13(key, item, keyField) {
       var db, transaction, objectStore, previousItem;
-      return regeneratorRuntime.wrap(function _callee8$(_context8) {
+      return regeneratorRuntime.wrap(function _callee13$(_context13) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
               if (keyField === void 0) {
                 keyField = 'id';
               }
 
               if (!item) {
-                _context8.next = 24;
+                _context13.next = 24;
                 break;
               }
 
               idLogger("Updating item in storage " + key);
               idLogger(item);
-              _context8.next = 6;
+              _context13.next = 6;
               return Object(idb__WEBPACK_IMPORTED_MODULE_1__["openDB"])('imboard-db', 1);
 
             case 6:
-              db = _context8.sent;
-              _context8.next = 9;
+              db = _context13.sent;
+              _context13.next = 9;
               return this.checkForObjectStore(db, key, keyField);
 
             case 9:
@@ -3540,58 +4291,58 @@ var IndexedDBUtil = /*#__PURE__*/function () {
               transaction = db.transaction(key, "readwrite"); // @ts-ignore
 
               objectStore = transaction.store;
-              _context8.next = 14;
+              _context13.next = 14;
               return objectStore.get(item[keyField]);
 
             case 14:
-              previousItem = _context8.sent;
+              previousItem = _context13.sent;
 
               if (!previousItem) {
-                _context8.next = 20;
+                _context13.next = 20;
                 break;
               }
 
-              _context8.next = 18;
-              return objectStore.put(item, item[keyField]);
+              _context13.next = 18;
+              return objectStore.put(item);
 
             case 18:
-              _context8.next = 22;
+              _context13.next = 22;
               break;
 
             case 20:
-              _context8.next = 22;
-              return objectStore.add(item, item[keyField]);
+              _context13.next = 22;
+              return objectStore.add(item);
 
             case 22:
-              _context8.next = 24;
+              _context13.next = 24;
               return transaction.done;
 
             case 24:
             case "end":
-              return _context8.stop();
+              return _context13.stop();
           }
         }
-      }, _callee8, this);
+      }, _callee13, this);
     }));
 
-    function updateItemInCollection(_x19, _x20, _x21) {
+    function updateItemInCollection(_x21, _x22, _x23) {
       return _updateItemInCollection.apply(this, arguments);
     }
 
     return updateItemInCollection;
   }();
 
-  return IndexedDBUtil;
-}();
+  return IndexedDBStateManager;
+}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_2__["AbstractStateManager"]);
 
-/* harmony default export */ __webpack_exports__["default"] = (IndexedDBUtil);
+/* harmony default export */ __webpack_exports__["default"] = (IndexedDBStateManager);
 
 /***/ }),
 
-/***/ "./src/state/StateManagementUtil.ts":
-/*!******************************************!*\
-  !*** ./src/state/StateManagementUtil.ts ***!
-  \******************************************/
+/***/ "./src/state/MemoryStateManager.ts":
+/*!*****************************************!*\
+  !*** ./src/state/MemoryStateManager.ts ***!
+  \*****************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3599,231 +4350,83 @@ var IndexedDBUtil = /*#__PURE__*/function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
 
-var smLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('state-manager-ts');
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+var msManager = debug__WEBPACK_IMPORTED_MODULE_0___default()('state-manager-ms');
 /** To Do - make state unchangeable outside of this class (i.e. deep copies) */
 
-var StateManagementUtil = /*#__PURE__*/function () {
-  /*
-    Singleton
-   */
-  StateManagementUtil.create = function create() {
-    if (StateManagementUtil._instance === null) {
-      StateManagementUtil._instance = new StateManagementUtil();
+var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
+  _inheritsLoose(MemoryStateManager, _AbstractStateManager);
+
+  MemoryStateManager.getInstance = function getInstance() {
+    if (!MemoryStateManager._instance) {
+      MemoryStateManager._instance = new MemoryStateManager();
     }
 
-    return StateManagementUtil._instance;
+    return MemoryStateManager._instance;
   };
 
-  function StateManagementUtil() {
-    this.applicationState = [];
-    this.stateChangeListeners = [];
+  function MemoryStateManager() {
+    var _this;
+
+    _this = _AbstractStateManager.call(this) || this;
+    _this.applicationState = [];
+    return _this;
   }
 
-  var _proto = StateManagementUtil.prototype;
+  var _proto = MemoryStateManager.prototype;
 
-  _proto.isStatePresent = function isStatePresent(name) {
-    var result = this.applicationState.findIndex(function (element) {
-      return element.name === name;
-    }) >= 0;
-    smLogger("State Manager: Checking state of " + name + " is present = " + result);
-    return result;
-  };
-
-  _proto.informChangeListenersForStateWithName = function informChangeListenersForStateWithName(name, stateObjValue) {
-    smLogger("State Manager: Informing state listeners of " + name);
-    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
-      return element.name === name;
-    });
-
-    if (foundIndex >= 0) {
-      smLogger("State Manager: Found state listeners of " + name);
-      /* let each state change listener know */
-
-      var changeListenersForName = this.stateChangeListeners[foundIndex];
-
-      for (var index = 0; index < changeListenersForName.listeners.length; index++) {
-        smLogger("State Manager: Found state listener of " + name + " - informing");
-        var listener = changeListenersForName.listeners[index];
-        listener.stateChanged(name, stateObjValue);
-      }
-    }
-  }
-  /*
-      Add a state listener for a given state name
-      the listener should be a function with two parameters
-      name - string - the name of the state variable that they want to be informed about
-      stateObjValue - object - the new state value
-     */
-  ;
-
-  _proto.addChangeListenerForName = function addChangeListenerForName(name, listener) {
-    smLogger("State Manager: Adding state listener for " + name);
-    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
-      return element.name === name;
-    });
-
-    if (foundIndex >= 0) {
-      var changeListenersForName = this.stateChangeListeners[foundIndex];
-      changeListenersForName.listeners.push(listener);
-    } else {
-      smLogger("State Manager: Adding state listener for " + name + " - first occurrence");
-      var listenersNameArrayPair = {
-        name: name,
-        listeners: [listener]
-      };
-      this.stateChangeListeners.push(listenersNameArrayPair);
-    }
-  };
-
-  _proto.getStateByName = function getStateByName(name) {
-    smLogger("State Manager: Getting state for " + name);
-    var stateValueObj = {};
+  _proto._isStatePresent = function _isStatePresent(name) {
     var foundIndex = this.applicationState.findIndex(function (element) {
       return element.name === name;
     });
-
-    if (foundIndex >= 0) {
-      // get the current state
-      var stateNameValuePair = this.applicationState[foundIndex];
-      stateValueObj = stateNameValuePair.value;
-      smLogger("State Manager: Found previous state for " + name);
-      smLogger(stateValueObj);
-    } else {
-      // create the state if not already present
-      stateValueObj = this.addStateByName(name, []);
-    }
-
-    return stateValueObj;
+    return foundIndex >= 0;
   };
 
-  _proto.setStateByName = function setStateByName(name, stateObjectForName) {
-    smLogger("State Manager: Setting state for " + name);
-    smLogger(stateObjectForName);
+  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
+    this.applicationState.push(state);
+  };
+
+  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
     var foundIndex = this.applicationState.findIndex(function (element) {
+      return element.name === state.name;
+    });
+
+    if (foundIndex > 0) {
+      this.applicationState.splice(foundIndex, 1, state);
+    }
+  };
+
+  _proto._getState = function _getState(name) {
+    // @ts-ignore
+    return this.applicationState.find(function (element) {
       return element.name === name;
     });
-
-    if (foundIndex >= 0) {
-      // set the current state
-      var stateNameValuePair = this.applicationState[foundIndex];
-      stateNameValuePair.value = stateObjectForName;
-    } else {
-      // create the state if not already present
-      this.addStateByName(name, stateObjectForName);
-    }
-
-    this.informChangeListenersForStateWithName(name, stateObjectForName);
-    return stateObjectForName;
   };
 
-  _proto.addStateByName = function addStateByName(name, stateObjForName) {
-    /* create a new state attribute for the application state */
-    if (!this.isStatePresent(name)) {
-      smLogger("State Manager: Adding state for " + name + " - first occurrence");
-      smLogger(stateObjForName, 201);
-      var stateNameValuePair = {
-        name: name,
-        value: stateObjForName
-      };
-      this.applicationState.push(stateNameValuePair);
-    } else {
-      /* get the current state value and replace it */
-      this.setStateByName(name, stateObjForName);
-    }
+  _proto._saveState = function _saveState(name, stateObject) {};
 
-    return stateObjForName;
-  };
+  return MemoryStateManager;
+}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
 
-  _proto.addNewItemToState = function addNewItemToState(name, item) {
-    // assumes state is an array
-    smLogger("State Manager: Adding item to state " + name);
-    var state = this.getStateByName(name);
-    state.push(item);
-    smLogger(state);
-    this.informChangeListenersForStateWithName(name, state);
-  };
-
-  _proto.findItemInState = function findItemInState(name, item, testForEqualityFunction) {
-    // assumes state is an array
-    var result = {};
-    var state = this.getStateByName(name);
-    var foundIndex = state.findIndex(function (element) {
-      return testForEqualityFunction(element, item);
-    });
-    smLogger("Finding item in state " + name + " - found index " + foundIndex);
-    smLogger(item);
-
-    if (foundIndex >= 0) {
-      result = state[foundIndex];
-    }
-
-    return result;
-  };
-
-  _proto.isItemInState = function isItemInState(name, item, testForEqualityFunction) {
-    // assumes state is an array
-    var result = false;
-    var state = this.getStateByName(name);
-    var foundIndex = state.findIndex(function (element) {
-      return testForEqualityFunction(element, item);
-    });
-
-    if (foundIndex >= 0) {
-      result = true;
-    }
-
-    return result;
-  };
-
-  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction) {
-    var result = false;
-    var state = this.getStateByName(name);
-    var foundIndex = state.findIndex(function (element) {
-      return testForEqualityFunction(element, item);
-    });
-
-    if (foundIndex >= 0) {
-      result = true; // remove the item from the state
-
-      smLogger('State Manager: Found item - removing ');
-      state.splice(foundIndex, 1);
-      smLogger(state);
-      this.setStateByName(name, state);
-    }
-
-    return result;
-  };
-
-  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction) {
-    var result = false;
-    var state = this.getStateByName(name);
-    var foundIndex = state.findIndex(function (element) {
-      return testForEqualityFunction(element, item);
-    });
-
-    if (foundIndex >= 0) {
-      result = true; // remove the item from the state
-
-      smLogger('State Manager: Found item - replacing ');
-      state.splice(foundIndex, 1, item); //state.push(item);
-
-      smLogger(state);
-      this.setStateByName(name, state);
-    } else {
-      // add the item to the state
-      this.addNewItemToState(name, item);
-    }
-
-    return result;
-  };
-
-  return StateManagementUtil;
-}();
-
-StateManagementUtil._instance = null;
-var stateManager = StateManagementUtil.create();
-/* harmony default export */ __webpack_exports__["default"] = (stateManager);
+/* harmony default export */ __webpack_exports__["default"] = (MemoryStateManager);
 
 /***/ }),
 

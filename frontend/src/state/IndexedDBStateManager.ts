@@ -1,21 +1,22 @@
 import debug from 'debug';
 import {IDBPDatabase, IDBPObjectStore, IDBPTransaction, openDB} from "idb";
+import {AbstractStateManager, stateValue} from "./AbstractStateManager";
 
 const idLogger = debug('indexeddb-ts');
 
-type collection = {
+export type collection = {
     name:string,
     keyField:string
 };
 
-class IndexedDBUtil {
-    private static instance: IndexedDBUtil;
+class IndexedDBStateManager extends AbstractStateManager {
+    private static instance: IndexedDBStateManager;
 
-    public static getDB(): IndexedDBUtil {
-        if (!IndexedDBUtil.instance) {
-            IndexedDBUtil.instance = new IndexedDBUtil();
+    public static getInstance(): IndexedDBStateManager {
+        if (!IndexedDBStateManager.instance) {
+            IndexedDBStateManager.instance = new IndexedDBStateManager();
         }
-        return IndexedDBUtil.instance;
+        return IndexedDBStateManager.instance;
     }
 
     public async initialise(collections:collection[]) {
@@ -37,9 +38,12 @@ class IndexedDBUtil {
         });
     }
 
-    private constructor() {
+    protected constructor() {
+        super();
         idLogger(`Constructor`);
     }
+
+
 
     private async checkForObjectStore(db: IDBPDatabase, key: string, keyField: string) {
         if (!db.objectStoreNames.contains(key)) {
@@ -53,6 +57,55 @@ class IndexedDBUtil {
             // @ts-ignore
             objectStore.add(data);
         });
+    }
+
+    public _isStatePresent(name:string):boolean {
+        return true;
+    }
+
+    public _addNewNamedStateToStorage(state:stateValue):void {
+        let fn = async() => {
+            await this.saveWithCollectionKey(state.name,state.value);
+        };
+        fn();
+    }
+    public _replaceNamedStateInStorage(state:stateValue):void {
+        let fn = async() => {
+            await this.removeAllItemsFromCollectionKey(state.name);
+            await this.saveWithCollectionKey(state.name,state.value);
+        }
+        fn();
+    }
+
+    public _getState(name:string):stateValue {
+        let state:stateValue = {
+            name: name,
+            value: []
+        }
+        let fn = async() => {
+            state.value = await this.getWithCollectionKey(state.name);
+        }
+        return state;
+    }
+
+    public _saveState(name:string,stateObj:any):void {
+        let fn = async() => {
+            await this.removeAllItemsFromCollectionKey(name);
+            await this.saveWithCollectionKey(name,stateObj);
+        }
+        fn();
+    }
+
+    private async removeAllItemsFromCollectionKey(key:string,keyField:string = 'id') {
+        idLogger(`Clearing collection ${key}`);
+        let db: IDBPDatabase = await openDB('imboard-db', 1,);
+        await this.checkForObjectStore(db, key, keyField);
+        // @ts-ignore
+        let transaction: IDBPTransaction = db.transaction(key, "readwrite");
+        // @ts-ignore
+        let objectStore: IDBPObjectStore = transaction.store;
+        // @ts-ignore
+        await objectStore.clear();
     }
 
 
@@ -137,14 +190,14 @@ class IndexedDBUtil {
             let previousItem: any = await objectStore.get(item[keyField]);
             if (previousItem) {
                 // @ts-ignore
-                await objectStore.put(item, item[keyField]);
+                await objectStore.put(item);
             } else {
                 // @ts-ignore
-                await objectStore.add(item, item[keyField]);
+                await objectStore.add(item);
             }
             await transaction.done;
         }
     }
 }
 
-export default IndexedDBUtil;
+export default IndexedDBStateManager;

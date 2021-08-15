@@ -8,12 +8,11 @@ import moment from 'moment';
 import controller from './Controller';
 import CommentSidebarView from "./component/CommentSidebarView";
 import BlogEntryView from "./component/BlogEntryView";
-import stateManager from "./state/StateManagementUtil";
 import {isSame} from "./util/EqualityFunctions";
 import DetailsSidebarView from "./component/DetailsSidebarView";
 
 import {BlogEntry, Comment} from './AppTypes';
-import IndexedDBUtil from "./state/IndexedDBUtil";
+import IndexedDBUtil from "./state/IndexedDBStateManager";
 
 
 const logger = debug('app');
@@ -218,12 +217,12 @@ class Root extends React.Component{
             // find the entry from the state manager
             entryId = parseInt(entryId);
             // @ts-ignore
-            const entry = stateManager.findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
+            const entry = controller.getStateManager().findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
             if (entry) {
                 // delete the entry using the controller and remove the state manager
                 controller.deleteEntry(entry);
                 // @ts-ignore
-                stateManager.removeItemFromState(this.state.stateNames.entries,entry,isSame);
+                controller.getStateManager().removeItemFromState(this.state.stateNames.entries,entry,isSame);
             }
         }
     }
@@ -232,10 +231,10 @@ class Root extends React.Component{
         logger('component Did Mount');
 
         // add the additional views and configure them
-        this.commentView = new CommentSidebarView(this, document);
+        this.commentView = new CommentSidebarView(this, document,controller.getStateManager());
         this.commentView.onDocumentLoaded(); // reset the view state
 
-        this.detailsView = new DetailsSidebarView(this,document);
+        this.detailsView = new DetailsSidebarView(this,document,controller.getStateManager());
         this.detailsView.onDocumentLoaded();
 
         // navigation item handlers
@@ -267,11 +266,6 @@ class Root extends React.Component{
 
         // ok lets try get things done
         controller.initialise();
-        // indexedDB access
-        await IndexedDBUtil.getDB().initialise([{name:"test",keyField:"id"}]);
-        await IndexedDBUtil.getDB().addNewItemToCollection("test",{id:1});
-
-
     }
 
     hideAllSideBars() {
@@ -308,7 +302,7 @@ class Root extends React.Component{
         }
         // find the current user
         // @ts-ignore
-        let creator = stateManager.findItemInState(this.state.stateNames.users,
+        let creator = controller.getStateManager().findItemInState(this.state.stateNames.users,
             {id: controller.getLoggedInUserId()},
              isSame);
         logger(creator);
@@ -327,7 +321,7 @@ class Root extends React.Component{
         logger(entry);
         this.setState({selectedEntry:entry});
         // @ts-ignore
-        stateManager.setStateByName(this.state.stateNames.selectedEntry,entry);
+        controller.getStateManager().setStateByName(this.state.stateNames.selectedEntry,entry);
         this.detailsView.eventShow(event);
     }
 
@@ -347,13 +341,13 @@ class Root extends React.Component{
         }
         // find the current user
         // @ts-ignore
-        let creator = stateManager.findItemInState(this.state.stateNames.users,
+        let creator = controller.getStateManager().findItemInState(this.state.stateNames.users,
             {id: controller.getLoggedInUserId()},
             isSame);
         logger(creator);
         // find the selected entry
         // @ts-ignore
-        let entry = stateManager.getStateByName(this.state.stateNames.selectedEntry);
+        let entry = controller.getStateManager().getStateByName(this.state.stateNames.selectedEntry);
         if (entry && commentEl) {
             // create an empty comment
             // @ts-ignore
@@ -380,13 +374,13 @@ class Root extends React.Component{
             // find the entry from the state manager
             entryId = parseInt(entryId);
             // @ts-ignore
-            const entry = stateManager.findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
+            const entry = controller.getStateManager().findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
             logger(entry);
             if (entry) {
                 // select the entry and open the details sidebar
                 this.setState({selectedEntry:entry});
                 // @ts-ignore
-                stateManager.setStateByName(this.state.stateNames.selectedEntry,entry);
+                controller.getStateManager().setStateByName(this.state.stateNames.selectedEntry,entry);
                 this.commentView.eventShow(event);
             }
         }
@@ -402,13 +396,13 @@ class Root extends React.Component{
             // find the entry from the state manager
             entryId = parseInt(entryId);
             // @ts-ignore
-            const entry = stateManager.findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
+            const entry = controller.getStateManager().findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
             logger(entry);
             if (entry) {
                 // select the entry and open the details sidebar
                 this.setState({selectedEntry:entry});
                 // @ts-ignore
-                stateManager.setStateByName(this.state.stateNames.selectedEntry,entry);
+                controller.getStateManager().setStateByName(this.state.stateNames.selectedEntry,entry);
                 this.detailsView.eventShow(event);
             }
         }
@@ -426,7 +420,7 @@ class Root extends React.Component{
             // find the entry from the state manager
             entryId = parseInt(entryId);
             // @ts-ignore
-            const entry = stateManager.findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
+            const entry = controller.getStateManager().findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
             this.alert(entry.title,"Are you sure you want to delete this blog entry?")
         }
     }
@@ -443,7 +437,7 @@ class Root extends React.Component{
 }
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
-localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts';
+localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms';
 debug.log = console.info.bind(console);
 
 // @ts-ignore
