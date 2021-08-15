@@ -7,7 +7,7 @@
     "strict": true,
     "target": "es2015",
     "allowJs": true,
-    "noEmit": false,
+    "noEmit": true,
     "esModuleInterop": true,
     "declaration": true,
     "isolatedModules": true,
@@ -16,6 +16,9 @@
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 
 }

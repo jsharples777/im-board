@@ -2,11 +2,13 @@ import debug from 'debug';
 import moment from 'moment';
 
 import controller from "../Controller";
-import stateManager from '../state/StateManagementUtil';
+import stateManager from '../state/MemoryStateManager';
 import {isSame} from '../util/EqualityFunctions';
 
 import SidebarView from './SidebarView';
 import StateChangeListener from "../state/StateChangeListener";
+import MemoryStateManager from "../state/MemoryStateManager";
+import {AbstractStateManager} from "../state/AbstractStateManager";
 
 const viewLogger = debug('view-ts:comments');
 
@@ -17,8 +19,8 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
     protected newCommentSubmitEl:HTMLElement|null;
 
 
-    constructor(applicationView:any, htmlDocument:HTMLDocument) {
-        super(applicationView, htmlDocument, applicationView.state.ui.commentSideBar, applicationView.state.uiPrefs.commentSideBar);
+    constructor(applicationView:any, htmlDocument:HTMLDocument,stateManager:AbstractStateManager) {
+        super(applicationView, htmlDocument, applicationView.state.ui.commentSideBar, applicationView.state.uiPrefs.commentSideBar,stateManager);
 
         // handler binding
         this.updateView = this.updateView.bind(this);
@@ -31,7 +33,7 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
         this.newCommentSubmitEl = htmlDocument.getElementById(this.uiConfig.dom.submitCommentId);
 
         // register state change listening
-        stateManager.addChangeListenerForName(this.config.stateNames.selectedEntry, this);
+        this.stateManager.addChangeListenerForName(this.config.stateNames.selectedEntry, this);
     }
 
     getIdForStateItem(name:string, item:any) {
@@ -45,7 +47,7 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
     getDisplayValueForStateItem(name:string, item:any) {
         viewLogger(`Getting display value for comment ${item.id} with content ${item.content}`)
         // find the user for the item from the createdBy attribute
-        const createdBy = stateManager.findItemInState(this.config.stateNames.users, {id: item.createdBy}, isSame);
+        const createdBy = this.stateManager.findItemInState(this.config.stateNames.users, {id: item.createdBy}, isSame);
         const createdOn = moment(item.changedOn,'YYYYMMDDHHmmss').format('DD/MM/YYYY HH:mm');
         return `${item.content} - ${createdBy.username} on ${createdOn}  `;
     }
@@ -64,7 +66,7 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
 
     eventClickItem(event:MouseEvent) {
         event.preventDefault();
-        let entry = stateManager.getStateByName(this.config.stateNames.selectedEntry);
+        let entry = this.stateManager.getStateByName(this.config.stateNames.selectedEntry);
 
         viewLogger(event.target);
         // @ts-ignore
@@ -111,6 +113,7 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
     }
 
     getDragData(event:DragEvent) {}
+
 }
 
 export default CommentSidebarView;

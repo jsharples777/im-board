@@ -2,8 +2,9 @@ import moment from 'moment';
 import debug from 'debug';
 
 import SidebarView from './SidebarView';
-import stateManager from '../state/StateManagementUtil';
+import stateManager from '../state/MemoryStateManager';
 import {BlogEntry} from "../AppTypes";
+import {AbstractStateManager} from "../state/AbstractStateManager";
 
 const viewLogger = debug('view-ts:details');
 
@@ -13,8 +14,8 @@ class DetailsSidebarView extends SidebarView{
   protected contentEl:HTMLTextAreaElement|null;
   protected changeOnEl:HTMLLabelElement|null;
 
-  constructor(applicationView:any, htmlDocument:HTMLDocument) {
-    super(applicationView, htmlDocument, applicationView.state.ui.entryDetailsSideBar, applicationView.state.uiPrefs.entryDetailsSideBar);
+  constructor(applicationView:any, htmlDocument:HTMLDocument,stateManager:AbstractStateManager) {
+    super(applicationView, htmlDocument, applicationView.state.ui.entryDetailsSideBar, applicationView.state.uiPrefs.entryDetailsSideBar,stateManager);
 
     // handler binding
     this.updateView = this.updateView.bind(this);
@@ -47,7 +48,7 @@ class DetailsSidebarView extends SidebarView{
     event.preventDefault();
     viewLogger('Handling submit Details Sidebar View');
     viewLogger(event.target);
-    let entry = stateManager.getStateByName(this.config.stateNames.selectedEntry);
+    let entry = this.stateManager.getStateByName(this.config.stateNames.selectedEntry);
     viewLogger(entry);
     entry.title = (this.titleEl)?this.titleEl.value.trim():'';
     entry.content = (this.contentEl)?this.contentEl.value.trim():'';

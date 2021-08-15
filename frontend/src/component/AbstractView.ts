@@ -1,6 +1,7 @@
 import debug from 'debug';
 import browserUtil from '../util/BrowserUtil';
 import StateChangeListener from "../state/StateChangeListener";
+import {AbstractStateManager} from "../state/AbstractStateManager";
 
 const avLogger = debug('view-ts')
 
@@ -12,12 +13,15 @@ export default abstract class AbstractView implements StateChangeListener {
 
   protected config: any;
 
-  protected constructor(applicationView:any, htmlDocument:HTMLDocument, uiConfig:any, uiPrefs:any) {
+  protected stateManager: AbstractStateManager;
+
+  protected constructor(applicationView:any, htmlDocument:HTMLDocument, uiConfig:any, uiPrefs:any,stateManager:AbstractStateManager) {
     this.applicationView = applicationView;
     this.document = document;
     this.uiConfig = uiConfig;
     this.uiPrefs = uiPrefs;
     this.config = applicationView.state;
+    this.stateManager = stateManager;
 
     // state change listening
     this.stateChanged = this.stateChanged.bind(this);
@@ -157,4 +161,17 @@ export default abstract class AbstractView implements StateChangeListener {
   public stateChanged(name: string, newValue: any): void {
     this.updateView(name, newValue);
   }
+
+  stateChangedItemAdded(name: string, itemAdded: any): void {
+    this.updateView(name, this.stateManager.getStateByName(name));
+  }
+
+  stateChangedItemRemoved(name: string, itemRemoved: any): void {
+    this.updateView(name, this.stateManager.getStateByName(name));
+  }
+
+  stateChangedItemUpdated(name: string, itemUpdated: any, itemNewValue: any): void {
+    this.updateView(name, this.stateManager.getStateByName(name));
+  }
+
 }

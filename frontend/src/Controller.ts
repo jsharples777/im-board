@@ -1,6 +1,6 @@
 import debug from 'debug';
 import downloader from "./network/DownloadManager";
-import stateManager from "./state/StateManagementUtil";
+import MemoryStateManager from "./state/MemoryStateManager";
 import {isSame} from "./util/EqualityFunctions";
 import notifier from "./notification/NotificationManager";
 import SocketListener from "./socket/SocketListener";
@@ -8,6 +8,10 @@ import socketManager from "./socket/SocketManager";
 import StateChangeListener from "./state/StateChangeListener";
 import {jsonRequest, RequestType} from "./network/Types";
 import {BlogEntry, Comment, User} from "./AppTypes";
+import {AbstractStateManager} from "./state/AbstractStateManager";
+import {AggregateStateManager} from "./state/AggregateStateManager";
+import BrowserStorageStateManager from "./state/BrowserStorageStateManager";
+import IndexedDBStateManager,{collection} from "./state/IndexedDBStateManager";
 
 const cLogger = debug('controller-ts');
 
@@ -15,8 +19,24 @@ class Controller implements SocketListener, StateChangeListener {
     protected applicationView: any;
     protected clientSideStorage: any;
     protected config: any;
+    protected stateManager: AbstractStateManager;
 
     constructor() {
+        let aggregateStateManager:AggregateStateManager = AggregateStateManager.getInstance();
+        this.stateManager = aggregateStateManager;
+        // store information in local storage, indexeddb, and memory
+        aggregateStateManager.addStateManager(MemoryStateManager.getInstance());
+        aggregateStateManager.addStateManager(BrowserStorageStateManager.getInstance());
+        let objectStores:collection[] = [
+            { name: 'users', keyField: 'id'},
+            { name: 'entries', keyField: 'id'},
+            { name: 'selectedEntry', keyField: 'id'}
+        ];
+        let indexedDBStateManager = IndexedDBStateManager.getInstance();
+        indexedDBStateManager.initialise(objectStores).then((result) => {
+            cLogger('indexed DB setup');
+        });
+        aggregateStateManager.addStateManager(indexedDBStateManager);
     }
 
 
@@ -24,6 +44,7 @@ class Controller implements SocketListener, StateChangeListener {
         this.applicationView = applicationView;
         this.clientSideStorage = clientSideStorage;
         this.config = this.applicationView.state;
+        
 
         // setup Async callbacks for the fetch requests
         this.callbackForUsers = this.callbackForUsers.bind(this);
@@ -33,22 +54,32 @@ class Controller implements SocketListener, StateChangeListener {
 
         // state listener
         this.stateChanged = this.stateChanged.bind(this);
+        this.stateChangedItemAdded = this.stateChangedItemAdded.bind(this);
+        this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
+        this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
 
-        stateManager.addChangeListenerForName(this.config.stateNames.entries, this);
+        this.getStateManager().addChangeListenerForName(this.config.stateNames.entries, this);
 
         return this;
     }
 
-    stateChanged(name: string, value: any) {
-        cLogger(`State changes ${name}`);
-        cLogger(value);
-        this.applicationView.setState({
-            isLoggedIn: this.isLoggedIn(),
-            loggedInUserId: this.getLoggedInUserId(),
-            selectedEntry: {},
-            entries: value
-        });
+    /*
+  Get the base data for the application (users, entries)
+ */
+    public initialise():void {
+        cLogger('Initialising data state');
+        // listen for socket events
+        socketManager.setListener(this);
+        // load the users
+        this.getAllUsers();
+        // load the entries
+        this.getAllEntries();
     }
+    
+    public getStateManager():AbstractStateManager {
+        return this.stateManager;
+    }
+
 
     /*
     *
@@ -60,9 +91,8 @@ class Controller implements SocketListener, StateChangeListener {
         let users:User[] = [];
         if (status >= 200 && status <= 299) { // do we have any data?
             cLogger(data);
-            let cbUsers = data;
             // covert the data to the AppType User
-            cbUsers.forEach((cbUser:any) => {
+            data.forEach((cbUser:any) => {
                 let user:User = {
                     id:cbUser.id,
                     username:cbUser.username
@@ -70,7 +100,7 @@ class Controller implements SocketListener, StateChangeListener {
                 users.push(user);
             });
         }
-        stateManager.setStateByName(this.config.stateNames.users, users);
+        this.getStateManager().setStateByName(this.config.stateNames.users, users);
     }
 
     private static convertJSONCommentToComment(jsonComment:any):Comment {
@@ -126,36 +156,34 @@ class Controller implements SocketListener, StateChangeListener {
                 entries.push(entry);
             });
         }
-        stateManager.setStateByName(this.config.stateNames.entries, entries);
+        this.getStateManager().setStateByName(this.config.stateNames.entries, entries);
     }
 
     private callbackForCreateEntry(data: any, status: number) {
         cLogger('callback for create entry');
-        let entry = null;
         if (status >= 200 && status <= 299) { // do we have any data?
             cLogger(data);
             let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(data);
-            stateManager.addNewItemToState(this.config.stateNames.entries, entry);
+            this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
         }
     }
 
     private callbackForCreateComment(data: any, status: number) {
         cLogger('callback for create comment');
-        let comment = null;
         if (status >= 200 && status <= 299) { // do we have any data?
             let comment:Comment = Controller.convertJSONCommentToComment(data);
             cLogger(comment);
             // find the corresponding entry in state
-            let entry = <BlogEntry|null>stateManager.findItemInState(this.config.stateNames.entries, {id: comment.commentOn}, isSame);
+            let entry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: comment.commentOn}, isSame);
             cLogger(entry);
             if (entry) {
                 cLogger('callback for create comment - updating entry');
                 // update the entry with the new comment
                 entry.Comments.push(comment);
                 // update the entry in the state manager
-                stateManager.updateItemInState(this.config.stateNames.entries, entry, isSame);
+                this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
                 // reselect the same entry
-                stateManager.setStateByName(this.config.stateNames.selectedEntry, entry);
+                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, entry);
                 cLogger(entry);
             }
         }
@@ -317,22 +345,11 @@ class Controller implements SocketListener, StateChangeListener {
         return result;
     }
 
-    /*
-      Get the base data for the application (users, entries)
-     */
-    public initialise():void {
-        cLogger('Initialising data state');
-        // listen for socket events
-        socketManager.setListener(this);
-        // load the users
-        this.getAllUsers();
-        // load the entries
-        this.getAllEntries();
-    }
+
 
     // Lets delete a comment
     deleteComment(id:number) {
-        let entry = stateManager.getStateByName(this.config.stateNames.selectedEntry);
+        let entry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
         if (entry) {
             cLogger(`Handling delete comment for ${entry.id} and comment ${id}`);
             // find the comment in the entry and remove it from the state
@@ -344,8 +361,8 @@ class Controller implements SocketListener, StateChangeListener {
                 comments.splice(foundIndex, 1);
                 cLogger(entry);
                 // update the statement manager
-                stateManager.setStateByName(this.config.stateNames.selectedEntry, entry);
-                stateManager.updateItemInState(this.config.stateNames.entries, entry, isSame);
+                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, entry);
+                this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
             }
         }
         this.apiDeleteComment(id);
@@ -355,7 +372,7 @@ class Controller implements SocketListener, StateChangeListener {
         if (entry) {
             cLogger(`Handling delete entry for ${entry.id}`);
             // update the state manager
-            stateManager.removeItemFromState(this.config.stateNames.entries, entry, isSame);
+            this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, isSame);
             // initiate a call to remove from the database
             this.apiDeleteEntry(entry);
         }
@@ -367,7 +384,7 @@ class Controller implements SocketListener, StateChangeListener {
             if (entry.id) {
                 cLogger(`Handling update for entry ${entry.id}`);
                 // update the state manager
-                stateManager.updateItemInState(this.config.stateNames.entries, entry, isSame);
+                this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
                 // update the database
                 this.apiUpdateEntry(entry);
             } else {
@@ -402,7 +419,7 @@ class Controller implements SocketListener, StateChangeListener {
 
     public handleDataChangedByAnotherUser(message:any) {
         cLogger(`Handling data change ${message.type} on object type ${message.objectType} made by user ${message.user}`);
-        const changeUser = stateManager.findItemInState(this.config.stateNames.users, {id: message.user}, isSame);
+        const changeUser = this.getStateManager().findItemInState(this.config.stateNames.users, {id: message.user}, isSame);
         let stateObj = message.data;
         cLogger(stateObj);
         // ok lets work out where this change belongs
@@ -413,18 +430,18 @@ class Controller implements SocketListener, StateChangeListener {
                         case "Comment": {
                             // updating comments is more tricky as it is a sub object of the blog entry
                             // find the entry in question
-                            const changedEntry = <BlogEntry|null>stateManager.findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
+                            const changedEntry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
                             if (changedEntry) {
                                 let comment:Comment = Controller.convertJSONCommentToComment(stateObj);
                                 // add the new comment
                                 changedEntry.Comments.push(comment);
                                 // update the state
-                                stateManager.updateItemInState(this.config.stateNames.entries, changedEntry, isSame);
+                                this.getStateManager().updateItemInState(this.config.stateNames.entries, changedEntry, isSame);
                                 // was this entry current open by the user?
-                                const currentSelectedEntry = stateManager.getStateByName(this.config.stateNames.selectedEntry);
+                                const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
                                 if (currentSelectedEntry) {
                                     if (currentSelectedEntry.id === changedEntry.id) {
-                                        stateManager.setStateByName(this.config.stateNames.selectedEntry, changedEntry);
+                                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, changedEntry);
                                     }
                                 }
                                 let username = "unknown";
@@ -440,7 +457,7 @@ class Controller implements SocketListener, StateChangeListener {
                             cLogger("Converting to BlogEntry type for Create");
                             cLogger(entry);
                             // add the new item to the state
-                            stateManager.addNewItemToState(this.config.stateNames.entries, entry);
+                            this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
                             let username = "unknown";
                             if (changeUser) {
                                 username = changeUser.username;
@@ -452,7 +469,7 @@ class Controller implements SocketListener, StateChangeListener {
                         case "User": {
                             let user:User = Controller.convertJSONUserToUser(stateObj);
                             // add the new item to the state
-                            stateManager.addNewItemToState(this.config.stateNames.users, user);
+                            this.getStateManager().addNewItemToState(this.config.stateNames.users, user);
 
                             notifier.show(stateObj.username, `${stateObj.username} has just registered.`, 'message');
                             break;
@@ -467,7 +484,7 @@ class Controller implements SocketListener, StateChangeListener {
                             cLogger("Converting to BlogEntry type for Update");
                             cLogger(entry);
                             // update the item in the state
-                            stateManager.updateItemInState(this.config.stateNames.entries, entry, isSame);
+                            this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
                             // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
                             break;
                         }
@@ -479,7 +496,7 @@ class Controller implements SocketListener, StateChangeListener {
                         case "Comment": {
                             // removing comments is more tricky as it is a sub object of the blog entry
                             // find the entry in question
-                            const changedEntry = <BlogEntry|null>stateManager.findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
+                            const changedEntry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
                             cLogger(changedEntry);
                             if (changedEntry) {
                                 // remove the comment
@@ -492,12 +509,12 @@ class Controller implements SocketListener, StateChangeListener {
                                     cLogger(changedEntry);
 
                                     // update the state
-                                    stateManager.updateItemInState(this.config.stateNames.entries, changedEntry, isSame);
+                                    this.getStateManager().updateItemInState(this.config.stateNames.entries, changedEntry, isSame);
                                     // was this entry current open by the user?
-                                    const currentSelectedEntry = stateManager.getStateByName(this.config.stateNames.selectedEntry);
+                                    const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
                                     if (currentSelectedEntry) {
                                         if (currentSelectedEntry.id === changedEntry.id) {
-                                            stateManager.setStateByName(this.config.stateNames.selectedEntry, changedEntry);
+                                            this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, changedEntry);
                                         }
                                     }
                                 }
@@ -507,13 +524,13 @@ class Controller implements SocketListener, StateChangeListener {
                         }
                         case "BlogEntry": {
                             cLogger(`Deleting Blog Entry with id ${stateObj.id}`);
-                            const deletedEntry = stateManager.findItemInState(this.config.stateNames.entries, stateObj, isSame);
+                            const deletedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, stateObj, isSame);
                             cLogger(deletedEntry);
                             if (deletedEntry) {
                                 cLogger(`Deleting Blog Entry with id ${deletedEntry.id}`);
-                                stateManager.removeItemFromState(this.config.stateNames.entries, deletedEntry, isSame);
+                                this.getStateManager().removeItemFromState(this.config.stateNames.entries, deletedEntry, isSame);
                                 // the current user could be accessing the comments in the entry that was just deleted
-                                const currentSelectedEntry = stateManager.getStateByName(this.config.stateNames.selectedEntry);
+                                const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
                                 if (currentSelectedEntry) {
                                     if (currentSelectedEntry.id === deletedEntry.id) {
                                         cLogger(`Deleted entry is selected by user, closing sidebars`);
@@ -534,6 +551,51 @@ class Controller implements SocketListener, StateChangeListener {
             cLogger(err);
         }
 
+    }
+
+    //  State Management listening
+    stateChangedItemAdded(name: string, itemAdded: any): void {
+        cLogger(`State changed ${name} - item Added`);
+        cLogger(itemAdded);
+        this.applicationView.setState({
+            isLoggedIn: this.isLoggedIn(),
+            loggedInUserId: this.getLoggedInUserId(),
+            selectedEntry: {},
+            entries: this.getStateManager().getStateByName(name)
+        });
+    }
+
+    stateChangedItemRemoved(name: string, itemRemoved: any): void {
+        cLogger(`State changed ${name} - item removed`);
+        cLogger(itemRemoved);
+        this.applicationView.setState({
+            isLoggedIn: this.isLoggedIn(),
+            loggedInUserId: this.getLoggedInUserId(),
+            selectedEntry: {},
+            entries: this.getStateManager().getStateByName(name)
+        });
+    }
+
+    stateChangedItemUpdated(name: string, itemUpdated: any, itemNewValue: any): void {
+        cLogger(`State changed ${name} - item updated`);
+        cLogger(itemNewValue);
+        this.applicationView.setState({
+            isLoggedIn: this.isLoggedIn(),
+            loggedInUserId: this.getLoggedInUserId(),
+            selectedEntry: {},
+            entries: this.getStateManager().getStateByName(name)
+        });
+    }
+
+    stateChanged(name: string, values: any) {
+        cLogger(`State changed ${name}`);
+        cLogger(values);
+        this.applicationView.setState({
+            isLoggedIn: this.isLoggedIn(),
+            loggedInUserId: this.getLoggedInUserId(),
+            selectedEntry: {},
+            entries: values
+        });
     }
 
 }

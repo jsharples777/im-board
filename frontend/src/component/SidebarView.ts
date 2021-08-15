@@ -1,8 +1,9 @@
 import AbstractView from './AbstractView';
+import {AbstractStateManager} from "../state/AbstractStateManager";
 
 abstract class SidebarView extends AbstractView {
-  protected constructor(applicationView:any, htmlDocument:HTMLDocument, uiConfig:any, uiPrefs:any) {
-    super(applicationView, htmlDocument, uiConfig, uiPrefs);
+  protected constructor(applicationView:any, htmlDocument:HTMLDocument, uiConfig:any, uiPrefs:any,stateManager:AbstractStateManager) {
+    super(applicationView, htmlDocument, uiConfig, uiPrefs,stateManager);
     // event handlers
     this.eventHide = this.eventHide.bind(this);
     this.eventShow = this.eventShow.bind(this);
