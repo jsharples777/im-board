@@ -111,7 +111,7 @@ class DownloadManager {
       dlLogger(queueItem);
       dlLogger(`Download Manager: finished for queue item ${queueItem.requestId}`);
       // let the callback function know
-      queueItem.originalRequest.callback(jsonData, httpStatus);
+      queueItem.originalRequest.callback(jsonData, httpStatus,queueItem.originalRequest.associatedStateName);
     }
   }
 

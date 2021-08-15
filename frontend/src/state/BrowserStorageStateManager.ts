@@ -1,6 +1,7 @@
 import debug from 'debug';
 
 import {AbstractStateManager, stateValue} from "./AbstractStateManager";
+import {equalityFunction} from '../util/EqualityFunctions';
 
 const lsLogger = debug('local-storage');
 
@@ -20,6 +21,7 @@ export default class BrowserStorageStateManager extends AbstractStateManager {
     super();
     this.storage = window.sessionStorage;
     if (useLocalStorage) this.storage = window.localStorage;
+    this.forceSaves = true;
   }
 
   public  _isStatePresent(name:string):boolean {
@@ -51,5 +53,11 @@ export default class BrowserStorageStateManager extends AbstractStateManager {
   public  _saveState(name:string,newValue:any):void {
     this._addNewNamedStateToStorage({name:name,value:newValue});
   }
+
+  _addItemToState(name: string, stateObj: any): void {}
+
+  _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {}
+
+  _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {}
 
 }

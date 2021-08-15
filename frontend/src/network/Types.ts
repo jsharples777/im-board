@@ -15,7 +15,8 @@ export type jsonRequest = {
     url:string,
     type: RequestType,
     params:any,
-    callback: RequestCallBackFunction
+    callback: RequestCallBackFunction,
+    associatedStateName:string,
 };
 
 export type managerRequest = {
@@ -27,4 +28,4 @@ export type managerRequest = {
 
 
 export type ManagerCallbackFunction = (data:any,status:number,queueId:number,requestId:string) => void;
-export type RequestCallBackFunction = (data:any,status:number) => void;
+export type RequestCallBackFunction = (data:any,status:number,associatedStateName:string) => void;

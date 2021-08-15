@@ -1,6 +1,7 @@
 import debug from 'debug';
 import {IDBPDatabase, IDBPObjectStore, IDBPTransaction, openDB} from "idb";
 import {AbstractStateManager, stateValue} from "./AbstractStateManager";
+import {equalityFunction} from "../util/EqualityFunctions";
 
 const idLogger = debug('indexeddb-ts');
 
@@ -41,6 +42,7 @@ class IndexedDBStateManager extends AbstractStateManager {
     protected constructor() {
         super();
         idLogger(`Constructor`);
+        this.forceSaves = false;
     }
 
 
@@ -75,6 +77,18 @@ class IndexedDBStateManager extends AbstractStateManager {
             await this.saveWithCollectionKey(state.name,state.value);
         }
         fn();
+    }
+
+    _addItemToState(name: string, stateObj: any): void {
+        this.addNewItemToCollection(name,stateObj);
+    }
+
+    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+        this.removeItemFromCollection(name, stateObj);
+    }
+
+    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+        this.updateItemInCollection(name,stateObj);
     }
 
     public _getState(name:string):stateValue {
@@ -198,6 +212,8 @@ class IndexedDBStateManager extends AbstractStateManager {
             await transaction.done;
         }
     }
+
+
 }
 
 export default IndexedDBStateManager;

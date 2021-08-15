@@ -1017,15 +1017,12 @@ var Controller = /*#__PURE__*/function () {
     }, {
       name: 'entries',
       keyField: 'id'
-    }, {
-      name: 'selectedEntry',
-      keyField: 'id'
     }];
     var indexedDBStateManager = _state_IndexedDBStateManager__WEBPACK_IMPORTED_MODULE_9__["default"].getInstance();
     indexedDBStateManager.initialise(objectStores).then(function (result) {
       cLogger('indexed DB setup');
     });
-    aggregateStateManager.addStateManager(indexedDBStateManager);
+    aggregateStateManager.addStateManager(indexedDBStateManager, ['selectedEntry']);
   }
 
   var _proto = Controller.prototype;
@@ -1139,7 +1136,7 @@ var Controller = /*#__PURE__*/function () {
     return entry;
   };
 
-  _proto.callbackForEntries = function callbackForEntries(data, status) {
+  _proto.callbackForEntries = function callbackForEntries(data, status, stateName) {
     cLogger('callback for all entries');
     var entries = [];
 
@@ -1155,7 +1152,7 @@ var Controller = /*#__PURE__*/function () {
     this.getStateManager().setStateByName(this.config.stateNames.entries, entries);
   };
 
-  _proto.callbackForCreateEntry = function callbackForCreateEntry(data, status) {
+  _proto.callbackForCreateEntry = function callbackForCreateEntry(data, status, stateName) {
     cLogger('callback for create entry');
 
     if (status >= 200 && status <= 299) {
@@ -1166,7 +1163,7 @@ var Controller = /*#__PURE__*/function () {
     }
   };
 
-  _proto.callbackForCreateComment = function callbackForCreateComment(data, status) {
+  _proto.callbackForCreateComment = function callbackForCreateComment(data, status, stateName) {
     cLogger('callback for create comment');
 
     if (status >= 200 && status <= 299) {
@@ -1204,7 +1201,8 @@ var Controller = /*#__PURE__*/function () {
       url: this.getServerAPIURL() + this.config.apis.users,
       type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].GET,
       params: {},
-      callback: this.callbackForUsers
+      callback: this.callbackForUsers,
+      associatedStateName: this.config.apis.users
     };
     _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest, true);
   };
@@ -1215,13 +1213,14 @@ var Controller = /*#__PURE__*/function () {
       url: this.getServerAPIURL() + this.config.apis.entries,
       type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].GET,
       params: {},
-      callback: this.callbackForEntries
+      callback: this.callbackForEntries,
+      associatedStateName: this.config.apis.entries
     };
     _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest, true);
   };
 
   _proto.apiDeleteComment = function apiDeleteComment(id) {
-    var deleteCommentCB = function deleteCommentCB(data, status) {
+    var deleteCommentCB = function deleteCommentCB(data, status, stateName) {
       cLogger('callback for delete comment');
 
       if (status >= 200 && status <= 299) {
@@ -1236,13 +1235,14 @@ var Controller = /*#__PURE__*/function () {
       params: {
         id: id
       },
-      callback: deleteCommentCB
+      callback: deleteCommentCB,
+      associatedStateName: ''
     };
     _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest);
   };
 
   _proto.apiDeleteEntry = function apiDeleteEntry(entry) {
-    var deleteCB = function deleteCB(data, status) {
+    var deleteCB = function deleteCB(data, status, stateName) {
       cLogger('callback for delete entry');
 
       if (status >= 200 && status <= 299) {
@@ -1258,7 +1258,8 @@ var Controller = /*#__PURE__*/function () {
         params: {
           id: entry.id
         },
-        callback: deleteCB
+        callback: deleteCB,
+        associatedStateName: this.config.apis.entries
       };
       _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest);
     }
@@ -1270,7 +1271,8 @@ var Controller = /*#__PURE__*/function () {
         url: this.getServerAPIURL() + this.config.apis.entries,
         type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].POST,
         params: entry,
-        callback: this.callbackForCreateEntry
+        callback: this.callbackForCreateEntry,
+        associatedStateName: this.config.apis.entries
       };
       _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest, true);
     }
@@ -1282,14 +1284,15 @@ var Controller = /*#__PURE__*/function () {
         url: this.getServerAPIURL() + this.config.apis.comment,
         type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].POST,
         params: comment,
-        callback: this.callbackForCreateComment
+        callback: this.callbackForCreateComment,
+        associatedStateName: ''
       };
       _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest, true);
     }
   };
 
   _proto.apiUpdateEntry = function apiUpdateEntry(entry) {
-    var updateCB = function updateCB(data, status) {
+    var updateCB = function updateCB(data, status, stateName) {
       cLogger('callback for update entry');
 
       if (status >= 200 && status <= 299) {
@@ -1303,7 +1306,8 @@ var Controller = /*#__PURE__*/function () {
         url: this.getServerAPIURL() + this.config.apis.entries,
         type: _network_Types__WEBPACK_IMPORTED_MODULE_6__["RequestType"].PUT,
         params: entry,
-        callback: updateCB
+        callback: updateCB,
+        associatedStateName: this.config.apis.entries
       };
       _network_DownloadManager__WEBPACK_IMPORTED_MODULE_1__["default"].addApiRequest(jsonRequest);
     }
@@ -2757,7 +2761,7 @@ var DownloadManager = /*#__PURE__*/function () {
       dlLogger(queueItem);
       dlLogger("Download Manager: finished for queue item " + queueItem.requestId); // let the callback function know
 
-      queueItem.originalRequest.callback(jsonData, httpStatus);
+      queueItem.originalRequest.callback(jsonData, httpStatus, queueItem.originalRequest.associatedStateName);
     }
   };
 
@@ -3205,8 +3209,10 @@ var stateEventType;
 var AbstractStateManager = /*#__PURE__*/function () {
   function AbstractStateManager() {
     this.suppressEventEmits = false;
+    this.forceSaves = true;
     this.stateChangeListeners = [];
     this.suppressEventEmits = false;
+    this.forceSaves = true;
   }
 
   var _proto = AbstractStateManager.prototype;
@@ -3217,6 +3223,14 @@ var AbstractStateManager = /*#__PURE__*/function () {
 
   _proto.emitEvents = function emitEvents() {
     this.suppressEventEmits = false;
+  };
+
+  _proto.dontForceSavesOnAddRemoveUpdate = function dontForceSavesOnAddRemoveUpdate() {
+    this.forceSaves = false;
+  };
+
+  _proto.forceSavesOnAddRemoveUpdate = function forceSavesOnAddRemoveUpdate() {
+    this.forceSaves = true;
   };
 
   _proto.isStatePresent = function isStatePresent(name) {
@@ -3369,8 +3383,7 @@ var AbstractStateManager = /*#__PURE__*/function () {
       this.addStateByName(name, stateObjectForName);
     }
 
-    this._saveState(name, stateObjectForName);
-
+    if (this.forceSaves) this._saveState(name, stateObjectForName);
     if (informListeners) this.informChangeListenersForStateWithName(name, stateObjectForName);
     return stateObjectForName;
   };
@@ -3382,7 +3395,7 @@ var AbstractStateManager = /*#__PURE__*/function () {
     state.push(item);
     smLogger(state);
 
-    this._saveState(name, state);
+    this._addItemToState(name, item);
 
     this.informChangeListenersForStateWithName(name, state, stateEventType.ItemAdded);
   };
@@ -3432,6 +3445,9 @@ var AbstractStateManager = /*#__PURE__*/function () {
       smLogger('State Manager: Found item - removing ');
       state.splice(foundIndex, 1);
       smLogger(state);
+
+      this._removeItemFromState(name, item, testForEqualityFunction);
+
       this.setStateByName(name, state, false);
       this.informChangeListenersForStateWithName(name, item, stateEventType.ItemDeleted);
     }
@@ -3452,6 +3468,9 @@ var AbstractStateManager = /*#__PURE__*/function () {
       smLogger('State Manager: Found item - replacing ');
       state.splice(foundIndex, 1, item);
       smLogger(state);
+
+      this._updateItemInState(name, item, testForEqualityFunction);
+
       this.setStateByName(name, state, false);
       this.informChangeListenersForStateWithName(name, item, stateEventType.ItemUpdated, oldItem);
     } else {
@@ -3516,14 +3535,33 @@ var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 
   var _proto = AggregateStateManager.prototype;
 
-  _proto.addStateManager = function addStateManager(stateManager) {
-    this.stateManagers.push(stateManager);
+  _proto.addStateManager = function addStateManager(stateManager, filters) {
+    if (filters === void 0) {
+      filters = [];
+    }
+
+    var mWF = {
+      manager: stateManager,
+      filters: filters
+    };
+    this.stateManagers.push(mWF);
     stateManager.suppressEvents();
   };
 
+  _proto.stateNameInFilters = function stateNameInFilters(name, filters) {
+    var foundIndex = filters.findIndex(function (filter) {
+      return filter === name;
+    });
+    return foundIndex >= 0;
+  };
+
   _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
-    this.stateManagers.forEach(function (manager) {
-      manager._addNewNamedStateToStorage(state);
+    var _this2 = this;
+
+    this.stateManagers.forEach(function (managerWithFilters) {
+      if (!_this2.stateNameInFilters(state.name, managerWithFilters.filters)) {
+        managerWithFilters.manager._addNewNamedStateToStorage(state);
+      }
     });
   };
 
@@ -3534,7 +3572,7 @@ var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     };
 
     if (this.stateManagers.length > 0) {
-      state = this.stateManagers[0]._getState(name);
+      state = this.stateManagers[0].manager._getState(name);
     }
 
     return state;
@@ -3544,21 +3582,59 @@ var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     var result = false;
 
     if (this.stateManagers.length > 0) {
-      result = this.stateManagers[0]._isStatePresent(name);
+      result = this.stateManagers[0].manager._isStatePresent(name);
     }
 
     return result;
   };
 
   _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
-    this.stateManagers.forEach(function (manager) {
-      manager._replaceNamedStateInStorage(state);
+    var _this3 = this;
+
+    this.stateManagers.forEach(function (managerWithFilters) {
+      if (!_this3.stateNameInFilters(state.name, managerWithFilters.filters)) {
+        managerWithFilters.manager._replaceNamedStateInStorage(state);
+      }
     });
   };
 
   _proto._saveState = function _saveState(name, stateObj) {
-    this.stateManagers.forEach(function (manager) {
-      manager._saveState(name, stateObj);
+    var _this4 = this;
+
+    this.stateManagers.forEach(function (managerWithFilters) {
+      if (!_this4.stateNameInFilters(name, managerWithFilters.filters)) {
+        managerWithFilters.manager._saveState(name, stateObj);
+      }
+    });
+  };
+
+  _proto._addItemToState = function _addItemToState(name, stateObj) {
+    var _this5 = this;
+
+    this.stateManagers.forEach(function (managerWithFilters) {
+      if (!_this5.stateNameInFilters(name, managerWithFilters.filters)) {
+        managerWithFilters.manager._addItemToState(name, stateObj);
+      }
+    });
+  };
+
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
+    var _this6 = this;
+
+    this.stateManagers.forEach(function (managerWithFilters) {
+      if (!_this6.stateNameInFilters(name, managerWithFilters.filters)) {
+        managerWithFilters.manager._removeItemFromState(name, stateObj, testForEqualityFunction);
+      }
+    });
+  };
+
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
+    var _this7 = this;
+
+    this.stateManagers.forEach(function (managerWithFilters) {
+      if (!_this7.stateNameInFilters(name, managerWithFilters.filters)) {
+        managerWithFilters.manager._updateItemInState(name, stateObj, testForEqualityFunction);
+      }
     });
   };
 
@@ -3625,6 +3701,7 @@ var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     _this = _AbstractStateManager.call(this) || this;
     _this.storage = window.sessionStorage;
     if (useLocalStorage) _this.storage = window.localStorage;
+    _this.forceSaves = true;
     return _this;
   }
 
@@ -3665,6 +3742,12 @@ var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
       value: newValue
     });
   };
+
+  _proto._addItemToState = function _addItemToState(name, stateObj) {};
+
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {};
+
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {};
 
   return BrowserStorageStateManager;
 }(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
@@ -3800,6 +3883,7 @@ var IndexedDBStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 
     _this = _AbstractStateManager.call(this) || this;
     idLogger("Constructor");
+    _this.forceSaves = false;
     return _this;
   }
 
@@ -3927,6 +4011,18 @@ var IndexedDBStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     }();
 
     fn();
+  };
+
+  _proto._addItemToState = function _addItemToState(name, stateObj) {
+    this.addNewItemToCollection(name, stateObj);
+  };
+
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
+    this.removeItemFromCollection(name, stateObj);
+  };
+
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
+    this.updateItemInCollection(name, stateObj);
   };
 
   _proto._getState = function _getState(name) {
@@ -4388,6 +4484,7 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 
     _this = _AbstractStateManager.call(this) || this;
     _this.applicationState = [];
+    _this.forceSaves = true;
     return _this;
   }
 
@@ -4422,6 +4519,51 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
   };
 
   _proto._saveState = function _saveState(name, stateObject) {};
+
+  _proto._addItemToState = function _addItemToState(name, stateObj) {
+    var foundIndex = this.applicationState.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex > 0) {
+      var state = this.applicationState[foundIndex];
+      state.value.push(stateObj);
+    }
+  };
+
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
+    var foundIndex = this.applicationState.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex > 0) {
+      var state = this.applicationState[foundIndex];
+      var valueIndex = state.value.findIndex(function (element) {
+        return testForEqualityFunction(element, stateObj);
+      });
+
+      if (valueIndex >= 0) {
+        state.value.splice(valueIndex, 1);
+      }
+    }
+  };
+
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
+    var foundIndex = this.applicationState.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex > 0) {
+      var state = this.applicationState[foundIndex];
+      var valueIndex = state.value.findIndex(function (element) {
+        return testForEqualityFunction(element, stateObj);
+      });
+
+      if (valueIndex >= 0) {
+        state.value.splice(valueIndex, 1, stateObj);
+      }
+    }
+  };
 
   return MemoryStateManager;
 }(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);

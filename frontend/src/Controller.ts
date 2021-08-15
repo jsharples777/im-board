@@ -29,14 +29,13 @@ class Controller implements SocketListener, StateChangeListener {
         aggregateStateManager.addStateManager(BrowserStorageStateManager.getInstance());
         let objectStores:collection[] = [
             { name: 'users', keyField: 'id'},
-            { name: 'entries', keyField: 'id'},
-            { name: 'selectedEntry', keyField: 'id'}
+            { name: 'entries', keyField: 'id'}
         ];
         let indexedDBStateManager = IndexedDBStateManager.getInstance();
         indexedDBStateManager.initialise(objectStores).then((result) => {
             cLogger('indexed DB setup');
         });
-        aggregateStateManager.addStateManager(indexedDBStateManager);
+        aggregateStateManager.addStateManager(indexedDBStateManager,['selectedEntry']);
     }
 
 
@@ -146,7 +145,7 @@ class Controller implements SocketListener, StateChangeListener {
         return entry;
     }
 
-    private callbackForEntries(data: any, status: number) {
+    private callbackForEntries(data: any, status: number, stateName:string) {
         cLogger('callback for all entries');
         let entries:BlogEntry[] = [];
         if (status >= 200 && status <= 299) { // do we have any data?
@@ -159,7 +158,7 @@ class Controller implements SocketListener, StateChangeListener {
         this.getStateManager().setStateByName(this.config.stateNames.entries, entries);
     }
 
-    private callbackForCreateEntry(data: any, status: number) {
+    private callbackForCreateEntry(data: any, status: number, stateName:string) {
         cLogger('callback for create entry');
         if (status >= 200 && status <= 299) { // do we have any data?
             cLogger(data);
@@ -168,7 +167,7 @@ class Controller implements SocketListener, StateChangeListener {
         }
     }
 
-    private callbackForCreateComment(data: any, status: number) {
+    private callbackForCreateComment(data: any, status: number, stateName:string) {
         cLogger('callback for create comment');
         if (status >= 200 && status <= 299) { // do we have any data?
             let comment:Comment = Controller.convertJSONCommentToComment(data);
@@ -203,6 +202,7 @@ class Controller implements SocketListener, StateChangeListener {
             type: RequestType.GET,
             params: {},
             callback: this.callbackForUsers,
+            associatedStateName: this.config.apis.users
         };
         downloader.addApiRequest(jsonRequest, true);
     }
@@ -214,12 +214,13 @@ class Controller implements SocketListener, StateChangeListener {
             type: RequestType.GET,
             params: {},
             callback: this.callbackForEntries,
+            associatedStateName: this.config.apis.entries
         };
         downloader.addApiRequest(jsonRequest, true);
     }
 
     private apiDeleteComment(id: number):void {
-        const deleteCommentCB = function (data: any, status: number) {
+        const deleteCommentCB = function (data: any, status: number, stateName:string) {
             cLogger('callback for delete comment');
             if (status >= 200 && status <= 299) { // do we have any data?
                 cLogger(data);
@@ -234,13 +235,14 @@ class Controller implements SocketListener, StateChangeListener {
                 id: id
             },
             callback: deleteCommentCB,
+            associatedStateName: ''
         };
         downloader.addApiRequest(jsonRequest);
 
     }
 
     private apiDeleteEntry(entry: BlogEntry):void {
-        const deleteCB = function (data: any, status: number) {
+        const deleteCB = function (data: any, status: number, stateName:string) {
             cLogger('callback for delete entry');
             if (status >= 200 && status <= 299) { // do we have any data?
                 cLogger(data);
@@ -255,6 +257,7 @@ class Controller implements SocketListener, StateChangeListener {
                     id: entry.id
                 },
                 callback: deleteCB,
+                associatedStateName: this.config.apis.entries
             };
             downloader.addApiRequest(jsonRequest);
         }
@@ -267,6 +270,7 @@ class Controller implements SocketListener, StateChangeListener {
                 type: RequestType.POST,
                 params: entry,
                 callback: this.callbackForCreateEntry,
+                associatedStateName: this.config.apis.entries
             };
             downloader.addApiRequest(jsonRequest, true);
         }
@@ -279,13 +283,14 @@ class Controller implements SocketListener, StateChangeListener {
                 type: RequestType.POST,
                 params: comment,
                 callback: this.callbackForCreateComment,
+                associatedStateName: ''
             };
             downloader.addApiRequest(jsonRequest, true);
         }
     }
 
     private apiUpdateEntry(entry:BlogEntry):void {
-        const updateCB = function (data: any, status: number) {
+        const updateCB = function (data: any, status: number, stateName:string) {
             cLogger('callback for update entry');
             if (status >= 200 && status <= 299) { // do we have any data?
                 cLogger(data);
@@ -298,6 +303,7 @@ class Controller implements SocketListener, StateChangeListener {
                 type: RequestType.PUT,
                 params: entry,
                 callback: updateCB,
+                associatedStateName: this.config.apis.entries
             };
             downloader.addApiRequest(jsonRequest);
         }

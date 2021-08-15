@@ -16,10 +16,12 @@ export enum stateEventType {
 export abstract class AbstractStateManager {
     protected stateChangeListeners: stateListeners[];
     protected suppressEventEmits:boolean = false;
+    protected forceSaves:boolean = true;
 
     protected constructor() {
         this.stateChangeListeners = [];
         this.suppressEventEmits = false;
+        this.forceSaves = true;
     }
 
     public suppressEvents() {
@@ -28,6 +30,14 @@ export abstract class AbstractStateManager {
 
     public emitEvents() {
         this.suppressEventEmits = false;
+    }
+
+    public dontForceSavesOnAddRemoveUpdate() {
+        this.forceSaves = false;
+    }
+
+    public forceSavesOnAddRemoveUpdate() {
+        this.forceSaves = true;
     }
 
     private isStatePresent(name:string):boolean {
@@ -101,6 +111,9 @@ export abstract class AbstractStateManager {
     public abstract _replaceNamedStateInStorage(state:stateValue):void;
     public abstract _getState(name:string):stateValue;
     public abstract _saveState(name:string,stateObj:any):void;
+    public abstract _addItemToState(name:string,stateObj:any):void;
+    public abstract _removeItemFromState(name:string,stateObj:any,testForEqualityFunction:equalityFunction):void;
+    public abstract _updateItemInState(name:string,stateObj:any,testForEqualityFunction:equalityFunction):void;
 
     public addStateByName(name:string, stateObjForName:any):any {
         /* create a new state attribute for the application state */
@@ -147,7 +160,7 @@ export abstract class AbstractStateManager {
             // create the state if not already present
             this.addStateByName(name, stateObjectForName);
         }
-        this._saveState(name,stateObjectForName);
+        if (this.forceSaves) this._saveState(name,stateObjectForName);
         if (informListeners) this.informChangeListenersForStateWithName(name, stateObjectForName);
         return stateObjectForName;
     }
@@ -157,7 +170,7 @@ export abstract class AbstractStateManager {
         const state = this.getStateByName(name);
         state.push(item);
         smLogger(state);
-        this._saveState(name,state);
+        this._addItemToState(name,item);
         this.informChangeListenersForStateWithName(name, state,stateEventType.ItemAdded);
     }
 
@@ -193,6 +206,7 @@ export abstract class AbstractStateManager {
             smLogger('State Manager: Found item - removing ');
             state.splice(foundIndex, 1);
             smLogger(state);
+            this._removeItemFromState(name,item,testForEqualityFunction);
             this.setStateByName(name, state,false);
             this.informChangeListenersForStateWithName(name,item, stateEventType.ItemDeleted);
         }
@@ -209,6 +223,7 @@ export abstract class AbstractStateManager {
             smLogger('State Manager: Found item - replacing ');
             state.splice(foundIndex, 1, item);
             smLogger(state);
+            this._updateItemInState(name,item,testForEqualityFunction);
             this.setStateByName(name, state,false);
             this.informChangeListenersForStateWithName(name,item,stateEventType.ItemUpdated,oldItem);
         } else {

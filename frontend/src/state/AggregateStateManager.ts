@@ -1,7 +1,13 @@
 import {AbstractStateManager, stateValue} from "./AbstractStateManager";
+import {equalityFunction} from "../util/EqualityFunctions";
+
+type managerWithFilters = {
+    manager:AbstractStateManager,
+    filters:string[]
+}
 
 export class AggregateStateManager extends AbstractStateManager {
-    private stateManagers:AbstractStateManager[];
+    private stateManagers:managerWithFilters[];
     private static _instance:AggregateStateManager;
 
     public static getInstance() {
@@ -16,14 +22,25 @@ export class AggregateStateManager extends AbstractStateManager {
         this.stateManagers = [];
     }
 
-    public addStateManager(stateManager:AbstractStateManager) {
-        this.stateManagers.push(stateManager);
+    public addStateManager(stateManager:AbstractStateManager,filters:string[] = []) {
+        let mWF:managerWithFilters = {
+            manager: stateManager,
+            filters: filters
+        };
+        this.stateManagers.push(mWF);
         stateManager.suppressEvents();
     }
 
+    private stateNameInFilters(name:string,filters:string[]):boolean {
+        let foundIndex = filters.findIndex((filter) => filter === name);
+        return (foundIndex >= 0);
+    }
+
     public _addNewNamedStateToStorage(state: stateValue): void {
-        this.stateManagers.forEach((manager) => {
-           manager._addNewNamedStateToStorage(state);
+        this.stateManagers.forEach((managerWithFilters) => {
+           if (!this.stateNameInFilters(state.name,managerWithFilters.filters)) {
+               managerWithFilters.manager._addNewNamedStateToStorage(state);
+           }
         });
     }
 
@@ -33,7 +50,7 @@ export class AggregateStateManager extends AbstractStateManager {
             value: []
         }
         if (this.stateManagers.length > 0) {
-            state = this.stateManagers[0]._getState(name);
+            state = this.stateManagers[0].manager._getState(name);
         }
         return state;
     }
@@ -41,20 +58,48 @@ export class AggregateStateManager extends AbstractStateManager {
     public _isStatePresent(name: string): boolean {
         let result = false;
         if (this.stateManagers.length > 0) {
-            result = this.stateManagers[0]._isStatePresent(name);
+            result = this.stateManagers[0].manager._isStatePresent(name);
         }
         return result;
     }
 
     public _replaceNamedStateInStorage(state: stateValue): void {
-        this.stateManagers.forEach((manager) => {
-            manager._replaceNamedStateInStorage(state);
+        this.stateManagers.forEach((managerWithFilters) => {
+            if (!this.stateNameInFilters(state.name,managerWithFilters.filters)) {
+                managerWithFilters.manager._replaceNamedStateInStorage(state);
+            }
         });
     }
 
     public _saveState(name: string, stateObj: any): void {
-        this.stateManagers.forEach((manager) => {
-            manager._saveState(name,stateObj);
+        this.stateManagers.forEach((managerWithFilters) => {
+            if (!this.stateNameInFilters(name,managerWithFilters.filters)) {
+                managerWithFilters.manager._saveState(name,stateObj);
+            }
+        });
+    }
+
+    _addItemToState(name: string, stateObj: any): void {
+        this.stateManagers.forEach((managerWithFilters) => {
+            if (!this.stateNameInFilters(name,managerWithFilters.filters)) {
+                managerWithFilters.manager._addItemToState(name,stateObj);
+            }
+        });
+    }
+
+    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+        this.stateManagers.forEach((managerWithFilters) => {
+            if (!this.stateNameInFilters(name,managerWithFilters.filters)) {
+                managerWithFilters.manager._removeItemFromState(name,stateObj,testForEqualityFunction);
+            }
+        });
+    }
+
+    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+        this.stateManagers.forEach((managerWithFilters) => {
+            if (!this.stateNameInFilters(name,managerWithFilters.filters)) {
+                managerWithFilters.manager._updateItemInState(name,stateObj,testForEqualityFunction);
+            }
         });
     }
 

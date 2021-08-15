@@ -1,5 +1,6 @@
 import debug from 'debug';
 import {AbstractStateManager,stateValue} from './AbstractStateManager';
+import {equalityFunction} from "../util/EqualityFunctions";
 
 const msManager = debug('state-manager-ms');
 
@@ -21,6 +22,7 @@ class MemoryStateManager extends AbstractStateManager {
   protected constructor() {
     super();
     this.applicationState = [];
+    this.forceSaves = true;
   }
 
   public _isStatePresent(name:string):boolean {
@@ -45,6 +47,36 @@ class MemoryStateManager extends AbstractStateManager {
   }
 
   public _saveState(name:string,stateObject:any):void {}
+
+  _addItemToState(name: string, stateObj: any): void {
+    let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
+    if (foundIndex > 0) {
+      let state:stateValue = this.applicationState[foundIndex];
+      state.value.push(stateObj);
+    }
+  }
+
+  _removeItemFromState(name: string, stateObj: any,testForEqualityFunction:equalityFunction): void {
+    let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
+    if (foundIndex > 0) {
+      let state:stateValue = this.applicationState[foundIndex];
+      const valueIndex = state.value.findIndex((element: any) => testForEqualityFunction(element, stateObj));
+      if (valueIndex >= 0) {
+        state.value.splice(valueIndex, 1);
+      }
+    }
+  }
+
+  _updateItemInState(name: string, stateObj: any,testForEqualityFunction:equalityFunction): void {
+    let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
+    if (foundIndex > 0) {
+      let state:stateValue = this.applicationState[foundIndex];
+      const valueIndex = state.value.findIndex((element: any) => testForEqualityFunction(element, stateObj));
+      if (valueIndex >= 0) {
+        state.value.splice(valueIndex, 1,stateObj);
+      }
+    }
+  }
 
 }
 
