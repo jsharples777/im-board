@@ -962,9 +962,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
   return Root;
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component); //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
+//localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 
 
-localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
+localStorage.debug = 'controller-ts state-manager-ts state-manager-ms state-manager-aggregate state-manager-async';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -3512,12 +3513,16 @@ var AsyncStateManagerWrapper = /*#__PURE__*/function (_AbstractStateManager) {
     // received new state from the wrapped SM
     // pass the received state to the top level SM
     asyncLogger("Wrapped SM has supplied new state " + name + " passing to top level SM");
-    this.topLevelSM.setStateByName(name, newValue);
+
+    this.topLevelSM._saveState(name, newValue);
+
+    this.topLevelSM.informChangeListenersForStateWithName(name, newValue, _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].StateChanged);
   };
 
   _proto.stateChangedItemAdded = function stateChangedItemAdded(name, itemAdded) {
     asyncLogger("Wrapped SM has supplied new completed item for state " + name + " passing to top level SM");
-    this.topLevelSM.addNewItemToState(name, itemAdded, true);
+
+    this.topLevelSM._addItemToState(name, itemAdded, true);
   };
 
   return AsyncStateManagerWrapper;

@@ -1,4 +1,4 @@
-import {AbstractStateManager, stateValue} from "./AbstractStateManager";
+import {AbstractStateManager, stateEventType, stateValue} from "./AbstractStateManager";
 import StateChangeListener from "./StateChangeListener";
 import {equalityFunction} from "../util/EqualityFunctions";
 
@@ -65,12 +65,13 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
         // received new state from the wrapped SM
         // pass the received state to the top level SM
         asyncLogger(`Wrapped SM has supplied new state ${name} passing to top level SM`);
-        this.topLevelSM.setStateByName(name,newValue);
+        this.topLevelSM._saveState(name,newValue);
+        this.topLevelSM.informChangeListenersForStateWithName(name,newValue,stateEventType.StateChanged);
     }
 
     stateChangedItemAdded(name: string, itemAdded: any): void {
         asyncLogger(`Wrapped SM has supplied new completed item for state ${name} passing to top level SM`);
-        this.topLevelSM.addNewItemToState(name,itemAdded,true);
+        this.topLevelSM._addItemToState(name,itemAdded,true);
     }
 
 }

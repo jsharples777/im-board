@@ -40,7 +40,7 @@ export abstract class AbstractStateManager {
         this.forceSaves = true;
     }
 
-    protected informChangeListenersForStateWithName(name: string, stateObjValue: any, eventType:stateEventType = stateEventType.StateChanged, previousObjValue:any|null = null) {
+    public informChangeListenersForStateWithName(name: string, stateObjValue: any, eventType:stateEventType = stateEventType.StateChanged, previousObjValue:any|null = null) {
         smLogger(`State Manager: Informing state listeners of ${name}`);
         if (this.suppressEventEmits) {
             smLogger(`State Manager: Events suppressed`);
