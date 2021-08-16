@@ -1063,6 +1063,7 @@ var Controller = /*#__PURE__*/function () {
     this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
     this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
     this.getStateManager().addChangeListenerForName(this.config.stateNames.entries, this);
+    this.getStateManager().addChangeListenerForName(this.config.stateNames.comments, this);
     return this;
   }
   /*
@@ -1566,45 +1567,61 @@ var Controller = /*#__PURE__*/function () {
   _proto.stateChangedItemAdded = function stateChangedItemAdded(name, itemAdded) {
     cLogger("State changed " + name + " - item Added");
     cLogger(itemAdded);
-    this.applicationView.setState({
-      isLoggedIn: this.isLoggedIn(),
-      loggedInUserId: this.getLoggedInUserId(),
-      selectedEntry: {},
-      entries: this.getStateManager().getStateByName(name)
-    });
+
+    if (name === this.config.stateNames.entries) {
+      this.applicationView.setState({
+        isLoggedIn: this.isLoggedIn(),
+        loggedInUserId: this.getLoggedInUserId(),
+        selectedEntry: {},
+        entries: this.getStateManager().getStateByName(name)
+      });
+    }
   };
 
   _proto.stateChangedItemRemoved = function stateChangedItemRemoved(name, itemRemoved) {
     cLogger("State changed " + name + " - item removed");
     cLogger(itemRemoved);
-    this.applicationView.setState({
-      isLoggedIn: this.isLoggedIn(),
-      loggedInUserId: this.getLoggedInUserId(),
-      selectedEntry: {},
-      entries: this.getStateManager().getStateByName(name)
-    });
+
+    if (name === this.config.stateNames.entries) {
+      this.applicationView.setState({
+        isLoggedIn: this.isLoggedIn(),
+        loggedInUserId: this.getLoggedInUserId(),
+        selectedEntry: {},
+        entries: this.getStateManager().getStateByName(name)
+      });
+    }
   };
 
   _proto.stateChangedItemUpdated = function stateChangedItemUpdated(name, itemUpdated, itemNewValue) {
     cLogger("State changed " + name + " - item updated");
     cLogger(itemNewValue);
-    this.applicationView.setState({
-      isLoggedIn: this.isLoggedIn(),
-      loggedInUserId: this.getLoggedInUserId(),
-      selectedEntry: {},
-      entries: this.getStateManager().getStateByName(name)
-    });
+
+    if (name === this.config.stateNames.entries) {
+      this.applicationView.setState({
+        isLoggedIn: this.isLoggedIn(),
+        loggedInUserId: this.getLoggedInUserId(),
+        selectedEntry: {},
+        entries: this.getStateManager().getStateByName(name)
+      });
+    }
   };
 
   _proto.stateChanged = function stateChanged(name, values) {
     cLogger("State changed " + name);
-    cLogger(values);
-    this.applicationView.setState({
-      isLoggedIn: this.isLoggedIn(),
-      loggedInUserId: this.getLoggedInUserId(),
-      selectedEntry: {},
-      entries: values
-    });
+    cLogger(values); // entries or comments?
+
+    if (name === this.config.stateNames.entries) {
+      return; // waiting for comments to be done
+    }
+
+    if (name === this.config.stateNames.comments) {
+      this.applicationView.setState({
+        isLoggedIn: this.isLoggedIn(),
+        loggedInUserId: this.getLoggedInUserId(),
+        selectedEntry: {},
+        entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+      });
+    }
   };
 
   return Controller;
@@ -3895,9 +3912,8 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
 
     _this = _AsychronousStateMana.call(this) || this;
     _this.configuration = [];
-    _this.bHasCompletedRun = false;
     _this.forceSaves = false;
-    _this.bHasCompletedRun = false;
+    _this.bHasCompletedRun = [];
     _this.callbackForAddItem = _this.callbackForAddItem.bind(_assertThisInitialized(_this));
     _this.callbackForRemoveItem = _this.callbackForRemoveItem.bind(_assertThisInitialized(_this));
     _this.callbackForUpdateItem = _this.callbackForUpdateItem.bind(_assertThisInitialized(_this));
@@ -3915,16 +3931,46 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
     return results;
   };
 
-  _proto.hasCompletedRun = function hasCompletedRun() {
-    return this.bHasCompletedRun;
+  _proto.hasCompletedRun = function hasCompletedRun(stateName) {
+    var result = false;
+    var foundIndex = this.configuration.findIndex(function (config) {
+      return config.stateName === stateName;
+    });
+
+    if (foundIndex >= 0) {
+      result = this.bHasCompletedRun[foundIndex];
+    }
+
+    return result;
   };
 
-  _proto.forceResetForGet = function forceResetForGet() {
-    this.bHasCompletedRun = false;
+  _proto.setCompletedRun = function setCompletedRun(stateName) {
+    var foundIndex = this.configuration.findIndex(function (config) {
+      return config.stateName === stateName;
+    });
+
+    if (foundIndex >= 0) {
+      this.bHasCompletedRun[foundIndex] = true;
+    }
+  };
+
+  _proto.forceResetForGet = function forceResetForGet(stateName) {
+    var foundIndex = this.configuration.findIndex(function (config) {
+      return config.stateName === stateName;
+    });
+
+    if (foundIndex >= 0) {
+      this.bHasCompletedRun[foundIndex] = false;
+    }
   };
 
   _proto.initialise = function initialise(config) {
     this.configuration = config;
+    var runsComplete = [];
+    this.configuration.forEach(function (configItem) {
+      runsComplete.push(false);
+    });
+    this.bHasCompletedRun = runsComplete;
   };
 
   _proto.getConfigurationForStateName = function getConfigurationForStateName(name) {
@@ -3969,6 +4015,7 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
     if (status >= 200 && status <= 299) {
       // do we have any data?
       apiSMLogger(data);
+      this.setCompletedRun(associatedStateName);
       this.informChangeListenersForStateWithName(associatedStateName, data, _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].StateChanged);
     }
   };
@@ -3990,19 +4037,24 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
 
   _proto._getState = function _getState(name) {
     apiSMLogger("Getting All " + name);
-    var config = this.getConfigurationForStateName(name);
 
-    if (config.isActive) {
-      var jsonRequest = {
-        url: config.serverURL + config.api,
-        type: _network_Types__WEBPACK_IMPORTED_MODULE_1__["RequestType"].GET,
-        params: {},
-        callback: this.callbackForGetItems,
-        associatedStateName: name
-      };
-      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__["default"].addApiRequest(jsonRequest, true);
+    if (this.hasCompletedRun(name)) {
+      apiSMLogger("Getting All " + name + " - not done - previously retrieved");
     } else {
-      apiSMLogger("No configuration for state " + name);
+      var config = this.getConfigurationForStateName(name);
+
+      if (config.isActive) {
+        var jsonRequest = {
+          url: config.serverURL + config.api,
+          type: _network_Types__WEBPACK_IMPORTED_MODULE_1__["RequestType"].GET,
+          params: {},
+          callback: this.callbackForGetItems,
+          associatedStateName: name
+        };
+        _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__["default"].addApiRequest(jsonRequest, true);
+      } else {
+        apiSMLogger("No configuration for state " + name);
+      }
     }
 
     var state = {

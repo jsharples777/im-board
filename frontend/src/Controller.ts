@@ -86,6 +86,7 @@ class Controller implements SocketListener, StateChangeListener {
         this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
 
         this.getStateManager().addChangeListenerForName(this.config.stateNames.entries, this);
+        this.getStateManager().addChangeListenerForName(this.config.stateNames.comments, this);
 
         return this;
     }
@@ -583,45 +584,57 @@ class Controller implements SocketListener, StateChangeListener {
     stateChangedItemAdded(name: string, itemAdded: any): void {
         cLogger(`State changed ${name} - item Added`);
         cLogger(itemAdded);
-        this.applicationView.setState({
-            isLoggedIn: this.isLoggedIn(),
-            loggedInUserId: this.getLoggedInUserId(),
-            selectedEntry: {},
-            entries: this.getStateManager().getStateByName(name)
-        });
+        if (name === this.config.stateNames.entries) {
+            this.applicationView.setState({
+                isLoggedIn: this.isLoggedIn(),
+                loggedInUserId: this.getLoggedInUserId(),
+                selectedEntry: {},
+                entries: this.getStateManager().getStateByName(name)
+            });
+        }
     }
 
     stateChangedItemRemoved(name: string, itemRemoved: any): void {
         cLogger(`State changed ${name} - item removed`);
         cLogger(itemRemoved);
-        this.applicationView.setState({
-            isLoggedIn: this.isLoggedIn(),
-            loggedInUserId: this.getLoggedInUserId(),
-            selectedEntry: {},
-            entries: this.getStateManager().getStateByName(name)
-        });
+        if (name === this.config.stateNames.entries) {
+            this.applicationView.setState({
+                isLoggedIn: this.isLoggedIn(),
+                loggedInUserId: this.getLoggedInUserId(),
+                selectedEntry: {},
+                entries: this.getStateManager().getStateByName(name)
+            });
+        }
     }
 
     stateChangedItemUpdated(name: string, itemUpdated: any, itemNewValue: any): void {
         cLogger(`State changed ${name} - item updated`);
         cLogger(itemNewValue);
-        this.applicationView.setState({
-            isLoggedIn: this.isLoggedIn(),
-            loggedInUserId: this.getLoggedInUserId(),
-            selectedEntry: {},
-            entries: this.getStateManager().getStateByName(name)
-        });
+        if (name === this.config.stateNames.entries) {
+            this.applicationView.setState({
+                isLoggedIn: this.isLoggedIn(),
+                loggedInUserId: this.getLoggedInUserId(),
+                selectedEntry: {},
+                entries: this.getStateManager().getStateByName(name)
+            });
+        }
     }
 
     stateChanged(name: string, values: any) {
         cLogger(`State changed ${name}`);
         cLogger(values);
-        this.applicationView.setState({
-            isLoggedIn: this.isLoggedIn(),
-            loggedInUserId: this.getLoggedInUserId(),
-            selectedEntry: {},
-            entries: values
-        });
+        // entries or comments?
+        if (name === this.config.stateNames.entries) {
+            return; // waiting for comments to be done
+        }
+        if (name === this.config.stateNames.comments) {
+            this.applicationView.setState({
+                isLoggedIn: this.isLoggedIn(),
+                loggedInUserId: this.getLoggedInUserId(),
+                selectedEntry: {},
+                entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+            });
+        }
     }
 
 }
