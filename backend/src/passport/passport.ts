@@ -50,7 +50,7 @@ function setupPassport(passport:any, user:Account) {
                             }
                         }).then(function (user:Account) {
                             // @ts-ignore
-                            let message = {type: "create", objectType: "User", data: user, user: user.id}
+                            let message = {type: "create", stateName: "users", data: user, user: user.id}
                             socketManager.sendMessage(message);
 
                         });

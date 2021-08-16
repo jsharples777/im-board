@@ -105,10 +105,10 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
             if (this.newCommentSubmitEl) this.newCommentSubmitEl.setAttribute("disabled", "true");
         }
 
-        if (newState && newState.Comments) {
+        if (newState && newState.comments) {
             if (this.commentHeaderEl) this.commentHeaderEl.innerHTML = newState.title;
-            viewLogger(newState.Comments);
-            this.createResultsForState(name, newState.Comments);
+            viewLogger(newState.comments);
+            this.createResultsForState(name, newState.comments);
         }
     }
 

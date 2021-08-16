@@ -1,6 +1,6 @@
 type DataMessage = {
     type:string,
-    objectType: string,
+    stateName: string,
     data:any,
     user:string,
 };

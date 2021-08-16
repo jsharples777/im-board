@@ -25,9 +25,15 @@ class MemoryStateManager extends AbstractStateManager {
     this.forceSaves = true;
   }
 
-  public _isStatePresent(name:string):boolean {
+  public _ensureStatePresent(name:string) {
     let foundIndex = this.applicationState.findIndex(element => element.name === name);
-    return (foundIndex >= 0);
+    if (foundIndex < 0) {
+      let state:stateValue = {
+        name:name,
+        value:[]
+      };
+      this.applicationState.push(state);
+    }
   }
 
   public _addNewNamedStateToStorage(state:stateValue):void {
@@ -46,9 +52,16 @@ class MemoryStateManager extends AbstractStateManager {
     return this.applicationState.find(element => element.name === name);
   }
 
-  public _saveState(name:string,stateObject:any):void {}
+  public _saveState(name:string,stateObject:any):void {
+    let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
+    if (foundIndex > 0) {
+      let state:stateValue = this.applicationState[foundIndex];
+      state.value = stateObject;
+    }
+  }
 
-  _addItemToState(name: string, stateObj: any): void {
+  _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {
+    if (!isComplete) return; // dont add incomplete objects to the state
     let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
     if (foundIndex > 0) {
       let state:stateValue = this.applicationState[foundIndex];

@@ -24,8 +24,10 @@ export default class BrowserStorageStateManager extends AbstractStateManager {
     this.forceSaves = true;
   }
 
-  public  _isStatePresent(name:string):boolean {
-    return (this.storage.getItem(name) != null);
+  public  _ensureStatePresent(name:string):void {
+    if (this.storage.getItem(name) === null) {
+      this._addNewNamedStateToStorage({name:name, value:[]});
+    }
   }
 
   public  _addNewNamedStateToStorage(state:stateValue):void {
@@ -54,10 +56,8 @@ export default class BrowserStorageStateManager extends AbstractStateManager {
     this._addNewNamedStateToStorage({name:name,value:newValue});
   }
 
-  _addItemToState(name: string, stateObj: any): void {}
-
+  _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {}
   _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {}
-
   _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {}
 
 }

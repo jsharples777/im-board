@@ -4,18 +4,28 @@ import moment from 'moment';
 import debug from 'debug';
 
 import controller from "../Controller";
+import {isSame} from "../util/EqualityFunctions";
 
 const beLogger = debug('view-ts:blogentry');
 
 
 // @ts-ignore
-export default function BlogEntryView({entry, showCommentsHandler, editEntryHandler, deleteEntryHandler}) {
+export default function BlogEntryView({entry, showCommentsHandler, editEntryHandler, deleteEntryHandler,config}) {
     if (entry) {
-        beLogger(`Entry ${entry.User.id} === ${controller.getLoggedInUserId()}`);
+        beLogger(`Entry ${entry.createdBy} === ${controller.getLoggedInUserId()}`);
+
+        // find the user for the entry
+        const user:any = controller.getStateManager().findItemInState(config.stateNames.users,{id:entry.createdBy},isSame);
+        const allComments:any[] = controller.getStateManager().getStateByName(config.stateNames.comments);
+        // get the comments for the entry
+        const comments = allComments.filter((comment:any) => comment.commentOn === entry.id);
+
+        entry.user = user;
+        entry.comments = comments;
 
         let editButton;
         let deleteButton;
-        if (entry.User.id === controller.getLoggedInUserId()) {
+        if (entry.user.id === controller.getLoggedInUserId()) {
             editButton =
                 <button type="button"
                         className="btn-primary btn-sm rounded p-1 mr-2"
@@ -49,7 +59,7 @@ export default function BlogEntryView({entry, showCommentsHandler, editEntryHand
                         <i className="fas fa-comments text-secondary" entry-id={entry.id}
                            onClick={showCommentsHandler}></i>&nbsp;&nbsp;
                         <span className="badge badge-pill badge-primary text-right" entry-id={entry.id}
-                              onClick={showCommentsHandler}>&nbsp;{entry.Comments.length}&nbsp;</span></a>
+                              onClick={showCommentsHandler}>&nbsp;{entry.comments.length}&nbsp;</span></a>
                     </div>
                     <div className={"card-body"}>
                         <p className={"card-text"}>{entry.content}</p>
@@ -57,7 +67,7 @@ export default function BlogEntryView({entry, showCommentsHandler, editEntryHand
                         {deleteButton}
                     </div>
                     <div className={"card-footer text-right text-muted"}>
-                        {entry.User.username} on {moment(entry.changedOn, 'YYYYMMDDHHmmss').format('DD/MM/YYYY')}
+                        {entry.user.username} on {moment(entry.changedOn, 'YYYYMMDDHHmmss').format('DD/MM/YYYY')}
                     </div>
                 </div>
             </div>

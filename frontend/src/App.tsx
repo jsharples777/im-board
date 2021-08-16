@@ -44,13 +44,14 @@ class Root extends React.Component{
             stateNames: {
                 users: 'users',
                 entries: 'entries',
+                comments: 'comments',
                 selectedEntry: 'selectedEntry',
             },
             apis: {
                 users: '/users',
                 entries: '/blog',
                 entry: '/blog',
-                comment: '/comment',
+                comments: '/comment',
                 login: '/login',
             },
             ui: {
@@ -187,6 +188,7 @@ class Root extends React.Component{
                 showCommentsHandler={this.handleSelectEntryComments}
                 editEntryHandler={this.handleShowEditEntry}
                 deleteEntryHandler={this.handleDeleteEntry}
+                config={this.state}
             />
         );
         return (
@@ -437,7 +439,7 @@ class Root extends React.Component{
 }
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
-localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms';
+localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

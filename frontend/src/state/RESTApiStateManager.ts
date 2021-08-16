@@ -1,9 +1,7 @@
-import {AbstractStateManager, stateValue} from "./AbstractStateManager";
+import {AbstractStateManager, stateEventType, stateValue} from "./AbstractStateManager";
 import {equalityFunction} from "../util/EqualityFunctions";
-import {RequestType} from "../network/Types";
+import {jsonRequest, RequestType} from "../network/Types";
 import downloader from "../network/DownloadManager";
-import {jsonRequest} from '../network/Types';
-import {BlogEntry} from "../AppTypes";
 import debug from 'debug';
 
 const apiSMLogger = debug('state-manager-api');
@@ -12,18 +10,17 @@ type ApiConfig = {
     stateName:string,
     serverURL:string,
     api:string
-    isActive:boolean,
-    receivingStateManager:AbstractStateManager|null
+    isActive:boolean
 }
 
-export class ApiStateManager extends AbstractStateManager {
-    private static _instance:ApiStateManager;
+export class RESTApiStateManager extends AbstractStateManager {
+    private static _instance:RESTApiStateManager;
 
     public static getInstance() {
-        if (!(ApiStateManager._instance)) {
-            ApiStateManager._instance = new ApiStateManager();
+        if (!(RESTApiStateManager._instance)) {
+            RESTApiStateManager._instance = new RESTApiStateManager();
         }
-        return ApiStateManager._instance;
+        return RESTApiStateManager._instance;
     }
 
     protected configuration:ApiConfig[] = [];
@@ -47,11 +44,10 @@ export class ApiStateManager extends AbstractStateManager {
             stateName:name,
             serverURL:'',
             api:'',
-            isActive:false,
-            receivingStateManager:null
+            isActive:false
         }
         let foundIndex = this.configuration.findIndex((config) => config.stateName === name);
-        if (foundIndex > 0) {
+        if (foundIndex >= 0) {
             config = this.configuration[foundIndex];
         }
         return config;
@@ -72,10 +68,7 @@ export class ApiStateManager extends AbstractStateManager {
         apiSMLogger('callback for add item');
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
-            let config:ApiConfig = this.getConfigurationForStateName(associatedStateName);
-            if (config.receivingStateManager) {
-                config.receivingStateManager.setStateByName(associatedStateName,data);
-            }
+            this.informChangeListenersForStateWithName(associatedStateName,data,stateEventType.StateChanged);
         }
     }
 
@@ -84,9 +77,7 @@ export class ApiStateManager extends AbstractStateManager {
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
             let config:ApiConfig = this.getConfigurationForStateName(associatedStateName);
-            if (config.receivingStateManager) {
-                config.receivingStateManager.addNewItemToState(associatedStateName,data);
-            }
+            this.informChangeListenersForStateWithName(associatedStateName,data,stateEventType.ItemAdded);
         }
     }
 
@@ -113,13 +104,14 @@ export class ApiStateManager extends AbstractStateManager {
         return state;
     }
 
-    _isStatePresent(name: string): boolean { /* assume state exists */ return true;}
+    _ensureStatePresent(name: string): void { /* assume state exists */ }
 
     _replaceNamedStateInStorage(state: stateValue): void { /* not going to replace all state */ }
 
     _saveState(name: string, stateObj: any): void { /* not going to replace all state */ }
 
-    _addItemToState(name: string, stateObj: any): void {
+    _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {
+        if (isComplete) return; // dont add complete objects to the state - they are already processed
         apiSMLogger(`Adding item to ${name}`);
         apiSMLogger(stateObj);
         let config: ApiConfig = this.getConfigurationForStateName(name);

@@ -40,12 +40,6 @@ export abstract class AbstractStateManager {
         this.forceSaves = true;
     }
 
-    private isStatePresent(name:string):boolean {
-        const result = this._isStatePresent(name);
-        smLogger(`Checking state of ${name} is present = ${result}`);
-        return result;
-    }
-
     protected informChangeListenersForStateWithName(name: string, stateObjValue: any, eventType:stateEventType = stateEventType.StateChanged, previousObjValue:any|null = null) {
         smLogger(`State Manager: Informing state listeners of ${name}`);
         if (this.suppressEventEmits) {
@@ -54,7 +48,7 @@ export abstract class AbstractStateManager {
         }
         const foundIndex = this.stateChangeListeners.findIndex(element => element.name === name);
         if (foundIndex >= 0) {
-            smLogger(`State Manager: Found state listeners of ${name}`);
+            smLogger(`State Manager: Found state listeners of ${name} with event type ${eventType}`);
             /* let each state change listener know */
             const changeListenersForName = this.stateChangeListeners[foundIndex];
             for (let index = 0; index < changeListenersForName.listeners.length; index++) {
@@ -84,6 +78,17 @@ export abstract class AbstractStateManager {
     }
 
 
+    private ensureListenerSetupForName(name:string) {
+        const foundIndex = this.stateChangeListeners.findIndex(element => element.name === name);
+        if (foundIndex < 0) {
+            const listenersNameArrayPair = {
+                name,
+                listeners: [],
+            };
+            this.stateChangeListeners.push(listenersNameArrayPair);
+        }
+    }
+
     /*
           Add a state listener for a given state name
           the listener should be a function with two parameters
@@ -91,90 +96,73 @@ export abstract class AbstractStateManager {
           stateObjValue - object - the new state value
          */
     public addChangeListenerForName(name: string, listener: StateChangeListener): void {
+        this.ensureListenerSetupForName(name);
         smLogger(`State Manager: Adding state listener for ${name}`);
         const foundIndex = this.stateChangeListeners.findIndex(element => element.name === name);
         if (foundIndex >= 0) {
-            const changeListenersForName = this.stateChangeListeners[foundIndex];
+            let changeListenersForName = this.stateChangeListeners[foundIndex];
             changeListenersForName.listeners.push(listener);
-        } else {
-            smLogger(`State Manager: Adding state listener for ${name} - first occurrence`);
-            const listenersNameArrayPair = {
-                name,
-                listeners: [listener],
-            };
-            this.stateChangeListeners.push(listenersNameArrayPair);
         }
     }
 
-    public abstract _isStatePresent(name:string):boolean;
+    public abstract _ensureStatePresent(name:string):void;
     public abstract _addNewNamedStateToStorage(state:stateValue):void;
     public abstract _replaceNamedStateInStorage(state:stateValue):void;
     public abstract _getState(name:string):stateValue;
     public abstract _saveState(name:string,stateObj:any):void;
-    public abstract _addItemToState(name:string,stateObj:any):void;
+    public abstract _addItemToState(name:string,stateObj:any,isComplete:boolean):void;
     public abstract _removeItemFromState(name:string,stateObj:any,testForEqualityFunction:equalityFunction):void;
     public abstract _updateItemInState(name:string,stateObj:any,testForEqualityFunction:equalityFunction):void;
 
     public addStateByName(name:string, stateObjForName:any):any {
+        this._ensureStatePresent(name);
         /* create a new state attribute for the application state */
         const state:stateValue = {
             name,
             value: stateObjForName,
         };
-        if (!this.isStatePresent(name)) {
-            smLogger(`State Manager: Adding state for ${name} - first occurrence`);
-            smLogger(stateObjForName, 201);
-            this._addNewNamedStateToStorage(state);
-        } else {
-            /* get the current state value and replace it */
-            this._replaceNamedStateInStorage(state);
-        }
+        /* get the current state value and replace it */
+        this._replaceNamedStateInStorage(state);
         this.informChangeListenersForStateWithName(name,stateObjForName,stateEventType.StateChanged);
         return stateObjForName;
     }
 
     public getStateByName(name:string):any {
+        this._ensureStatePresent(name);
         smLogger(`State Manager: Getting state for ${name}`);
         let stateValueObj = {};
-        if (this._isStatePresent(name)) {
-            // get the current state
-            const state:stateValue = this._getState(name);
-            stateValueObj = state.value;
-            smLogger(`State Manager: Found previous state for ${name}`);
-            smLogger(stateValueObj);
-        } else {
-            // create the state if not already present
-            stateValueObj = this.addStateByName(name, []);
-        }
+        // get the current state
+        const state:stateValue = this._getState(name);
+        stateValueObj = state.value;
+        smLogger(`State Manager: Found previous state for ${name}`);
+        smLogger(stateValueObj);
         return stateValueObj;
     }
 
     public setStateByName(name:string, stateObjectForName:any, informListeners:boolean = true):void {
+        this._ensureStatePresent(name);
         smLogger(`State Manager: Setting state for ${name}`);
         smLogger(stateObjectForName);
-        if (this._isStatePresent(name)) {
-            // set the current state
-            const state:stateValue = this._getState(name);
-            state.value = stateObjectForName;
-        } else {
-            // create the state if not already present
-            this.addStateByName(name, stateObjectForName);
-        }
+        // set the current state
+        const state:stateValue = this._getState(name);
+        state.value = stateObjectForName;
         if (this.forceSaves) this._saveState(name,stateObjectForName);
         if (informListeners) this.informChangeListenersForStateWithName(name, stateObjectForName);
         return stateObjectForName;
     }
 
-    public addNewItemToState(name:string, item:any):void { // assumes state is an array
+    public addNewItemToState(name:string, item:any, isComplete:boolean = false):void { // assumes state is an array
+        this._ensureStatePresent(name);
         smLogger(`State Manager: Adding item to state ${name}`);
         const state = this.getStateByName(name);
         state.push(item);
         smLogger(state);
-        this._addItemToState(name,item);
+        this._addItemToState(name,item,isComplete);
         this.informChangeListenersForStateWithName(name, state,stateEventType.ItemAdded);
     }
 
     public findItemInState(name:string, item:any, testForEqualityFunction:equalityFunction):any { // assumes state is an array
+        this._ensureStatePresent(name);
         let result = {};
         const state = this.getStateByName(name);
         const foundIndex = state.findIndex((element: any) => testForEqualityFunction(element, item));
@@ -187,6 +175,7 @@ export abstract class AbstractStateManager {
     }
 
     public isItemInState(name:string, item:any, testForEqualityFunction:equalityFunction):boolean { // assumes state is an array
+        this._ensureStatePresent(name);
         let result = false;
         const state = this.getStateByName(name);
         const foundIndex = state.findIndex((element: any) => testForEqualityFunction(element, item));
@@ -197,6 +186,7 @@ export abstract class AbstractStateManager {
     }
 
     public removeItemFromState(name:string, item:any, testForEqualityFunction:equalityFunction):boolean {
+        this._ensureStatePresent(name);
         let result = false;
         const state = this.getStateByName(name);
         const foundIndex = state.findIndex((element: any) => testForEqualityFunction(element, item));
@@ -214,6 +204,7 @@ export abstract class AbstractStateManager {
     }
 
     public updateItemInState(name:string, item:any, testForEqualityFunction:equalityFunction):boolean {
+        this._ensureStatePresent(name);
         let result = false;
         const state = this.getStateByName(name);
         const foundIndex = state.findIndex((element: any) => testForEqualityFunction(element, item));

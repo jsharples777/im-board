@@ -12,6 +12,21 @@ const rDebug = debug('api');
 *    comments are retrieved with the tech blog entries, but we need to supply
 *    API calls for creating and deleting.
 * */
+router.get('/comment', (req,res) => {
+    rDebug('Getting all comments');
+
+    Comment.findAll({
+        order: ['commentOn','changedOn']
+    })
+        .then((blog) => {
+            res.json(blog);
+        })
+        .catch((err) => {
+            rDebug(err);
+            res.status(400).json(err);
+        });
+});
+
 router.post('/comment', (req,res) => {
     rDebug('Creating a Comment');
 
@@ -21,7 +36,7 @@ router.post('/comment', (req,res) => {
     Comment.create(req.body)
     .then((comment) => {
         // @ts-ignore
-        let message:DataMessage = {type:"create", objectType: "Comment", data:comment, user:req.user.id,};
+        let message:DataMessage = {type:"create", stateName: "comments", data:comment, user:req.user.id,};
         socketManager.sendMessage(message);
         res.json(comment);
     })
@@ -42,7 +57,7 @@ router.put('/comment/:id', (req,res) => {
         where: {id: req.params.id}
     }).then((comment) => {
         // @ts-ignore
-        const message:DataMessage = {type:"update",objectType: "Comment",data:comment,user:req.user.id,}
+        const message:DataMessage = {type:"update",stateName: "comments",data:comment,user:req.user.id,}
         socketManager.sendMessage(message);
 
         res.json(comment);
@@ -66,7 +81,7 @@ router.delete('/comment/:id', (req,res) => {
         Comment.destroy({where: {id: comment.id}
         }).then((result) => {
             // @ts-ignore
-            const message:DataMessage = {type:"delete",objectType: "Comment",data:comment,user:req.user.id,}
+            const message:DataMessage = {type:"delete",stateName: "comments",data:comment,user:req.user.id,}
             socketManager.sendMessage(message);
             res.json({result:true});
         })
@@ -88,10 +103,9 @@ router.delete('/comment/:id', (req,res) => {
   Tech Blog entries API - CRUD
 */
 router.get('/blog', (req,res) => {
-    rDebug('Getting all blog entries, their creators and any comments');
+    rDebug('Getting all blog entries');
 
     BlogEntry.findAll({
-        include: [Account, Comment],
         order: ['id','changedOn']
     })
         .then((blog) => {
@@ -115,11 +129,11 @@ router.post('/blog', (req,res) => {
             // @ts-ignore
             rDebug(`Created new blog entry with id ${blog.id} need full object now`);
             // @ts-ignore
-            BlogEntry.findOne({include: [Account, Comment], where: {id: blog.id}
+            BlogEntry.findOne({where: {id: blog.id}
             })
             .then((blog) => {
                 // @ts-ignore
-                const message:DataMessage = {type:"create",objectType: "BlogEntry",data:blog, user:req.user.id,}
+                const message:DataMessage = {type:"create",stateName: "entries",data:blog, user:req.user.id,}
                 socketManager.sendMessage(message);
                 res.json(blog);
             })
@@ -155,7 +169,7 @@ router.put('/blog/:id', (req,res) => {
             })
                 .then((blog) => {
                     // @ts-ignore
-                    const message:DataMessage = {type:"update",objectType: "BlogEntry",data:blog,user:req.user.id,}
+                    const message:DataMessage = {type:"update",stateName: "entries",data:blog,user:req.user.id,}
                     socketManager.sendMessage(message);
                     res.json(blog);
                 })
@@ -177,7 +191,7 @@ router.delete('/blog/:id', (req,res) => {
     })
         .then((result) => {
             // @ts-ignore
-            const message:DataMessage = {type:"delete",objectType: "BlogEntry",data:{ id: parseInt(req.params.id) },user:req.user.id,}
+            const message:DataMessage = {type:"delete",stateName: "entries",data:{ id: parseInt(req.params.id) },user:req.user.id,}
             socketManager.sendMessage(message);
             res.json({result:true});
          })
@@ -201,6 +215,24 @@ router.get('/users', (req,res) => {
             rDebug(err);
             res.status(400).json(err);
         });
+});
+
+router.post('/users', (req,res) => {
+    rDebug('Api call to create a user - not accepted');
+    res.status(404);
+    res.send();
+});
+
+router.put('/users', (req,res) => {
+    rDebug('Api call to update a user - not accepted');
+    res.status(404);
+    res.send();
+});
+
+router.delete('/users', (req,res) => {
+    rDebug('Api call to delete a user - not accepted');
+    res.status(404);
+    res.send();
 });
 
 module.exports = router;

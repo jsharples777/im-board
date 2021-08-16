@@ -45,6 +45,7 @@ class IndexedDBStateManager extends AbstractStateManager {
         this.forceSaves = false;
     }
 
+    public _ensureStatePresent(name:string):void {} // should be present with initialise
 
 
     private async checkForObjectStore(db: IDBPDatabase, key: string, keyField: string) {
@@ -61,9 +62,6 @@ class IndexedDBStateManager extends AbstractStateManager {
         });
     }
 
-    public _isStatePresent(name:string):boolean {
-        return true;
-    }
 
     public _addNewNamedStateToStorage(state:stateValue):void {
         let fn = async() => {
@@ -79,7 +77,8 @@ class IndexedDBStateManager extends AbstractStateManager {
         fn();
     }
 
-    _addItemToState(name: string, stateObj: any): void {
+    _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {
+        if (!isComplete) return; // dont add incomplete objects to the state
         this.addNewItemToCollection(name,stateObj);
     }
 
