@@ -107,7 +107,7 @@ export class RESTApiStateManager extends AsychronousStateManager {
     }
 
     private callbackForGetItems(data: any, status: number, associatedStateName: string) {
-        apiSMLogger('callback for add item');
+        apiSMLogger('callback for get items');
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
             this.setCompletedRun(associatedStateName);

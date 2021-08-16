@@ -86,6 +86,9 @@ export class AggregateStateManager extends AbstractStateManager {
     public _saveState(name: string, stateObj: any): void {
         this.stateManagers.forEach((managerWithFilters) => {
             if (!this.stateNameInFilters(name, managerWithFilters.filters)) {
+                aggLogger(`saving state in state manager for state ${name}`);
+                aggLogger(managerWithFilters.manager);
+                aggLogger(stateObj);
                 managerWithFilters.manager._saveState(name, stateObj);
             }
         });

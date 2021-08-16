@@ -65,6 +65,7 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
         // received new state from the wrapped SM
         // pass the received state to the top level SM
         asyncLogger(`Wrapped SM has supplied new state ${name} passing to top level SM`);
+        asyncLogger(newValue);
         this.topLevelSM._saveState(name,newValue);
         this.topLevelSM.informChangeListenersForStateWithName(name,newValue,stateEventType.StateChanged);
     }

@@ -965,7 +965,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 
 
-localStorage.debug = 'controller-ts state-manager-ts state-manager-ms state-manager-aggregate state-manager-async';
+localStorage.debug = 'controller-ts state-manager-ms state-manager-async state-manager-aggregate';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -3336,6 +3336,10 @@ var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 
     this.stateManagers.forEach(function (managerWithFilters) {
       if (!_this6.stateNameInFilters(name, managerWithFilters.filters)) {
+        aggLogger("saving state in state manager for state " + name);
+        aggLogger(managerWithFilters.manager);
+        aggLogger(stateObj);
+
         managerWithFilters.manager._saveState(name, stateObj);
       }
     });
@@ -3513,6 +3517,7 @@ var AsyncStateManagerWrapper = /*#__PURE__*/function (_AbstractStateManager) {
     // received new state from the wrapped SM
     // pass the received state to the top level SM
     asyncLogger("Wrapped SM has supplied new state " + name + " passing to top level SM");
+    asyncLogger(newValue);
 
     this.topLevelSM._saveState(name, newValue);
 
@@ -3766,6 +3771,8 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
   };
 
   _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
+    msManager("Adding new complete state " + name);
+    msManager(state.value);
     this.applicationState.push(state);
   };
 
@@ -3775,15 +3782,20 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     });
 
     if (foundIndex > 0) {
+      msManager("replacing complete state " + name);
+      msManager(state.value);
       this.applicationState.splice(foundIndex, 1, state);
     }
   };
 
   _proto._getState = function _getState(name) {
     // @ts-ignore
-    return this.applicationState.find(function (element) {
+    var state = this.applicationState.find(function (element) {
       return element.name === name;
     });
+    msManager("getting complete state " + name);
+    msManager(state.value);
+    return state;
   };
 
   _proto._saveState = function _saveState(name, stateObject) {
@@ -3793,6 +3805,8 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 
     if (foundIndex > 0) {
       var state = this.applicationState[foundIndex];
+      msManager("SAVING complete state " + name);
+      msManager(state.value);
       state.value = stateObject;
     }
   };
@@ -3810,6 +3824,8 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 
     if (foundIndex > 0) {
       var state = this.applicationState[foundIndex];
+      msManager("adding item to state " + name);
+      msManager(stateObj);
       state.value.push(stateObj);
     }
   };
@@ -3826,6 +3842,8 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
       });
 
       if (valueIndex >= 0) {
+        msManager("removing item from state " + name);
+        msManager(stateObj);
         state.value.splice(valueIndex, 1);
       }
     }
@@ -3844,6 +3862,8 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 
       if (valueIndex >= 0) {
         state.value.splice(valueIndex, 1, stateObj);
+        msManager("updating item ing state " + name);
+        msManager(stateObj);
       }
     }
   };
@@ -4015,7 +4035,7 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
   };
 
   _proto.callbackForGetItems = function callbackForGetItems(data, status, associatedStateName) {
-    apiSMLogger('callback for add item');
+    apiSMLogger('callback for get items');
 
     if (status >= 200 && status <= 299) {
       // do we have any data?

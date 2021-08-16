@@ -37,25 +37,34 @@ class MemoryStateManager extends AbstractStateManager {
   }
 
   public _addNewNamedStateToStorage(state:stateValue):void {
+    msManager(`Adding new complete state ${name}`);
+    msManager(state.value);
     this.applicationState.push(state);
   }
 
   public _replaceNamedStateInStorage(state:stateValue):void {
      let foundIndex:number = this.applicationState.findIndex(element => element.name === state.name);
      if (foundIndex > 0) {
+       msManager(`replacing complete state ${name}`);
+       msManager(state.value);
        this.applicationState.splice(foundIndex,1,state);
      }
   }
 
   public _getState(name:string):stateValue {
     // @ts-ignore
-    return this.applicationState.find(element => element.name === name);
+    let state:stateValue = this.applicationState.find(element => element.name === name);
+    msManager(`getting complete state ${name}`);
+    msManager(state.value);
+    return state;
   }
 
   public _saveState(name:string,stateObject:any):void {
     let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
     if (foundIndex > 0) {
       let state:stateValue = this.applicationState[foundIndex];
+      msManager(`SAVING complete state ${name}`);
+      msManager(state.value);
       state.value = stateObject;
     }
   }
@@ -65,6 +74,8 @@ class MemoryStateManager extends AbstractStateManager {
     let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
     if (foundIndex > 0) {
       let state:stateValue = this.applicationState[foundIndex];
+      msManager(`adding item to state ${name}`);
+      msManager(stateObj);
       state.value.push(stateObj);
     }
   }
@@ -75,6 +86,8 @@ class MemoryStateManager extends AbstractStateManager {
       let state:stateValue = this.applicationState[foundIndex];
       const valueIndex = state.value.findIndex((element: any) => testForEqualityFunction(element, stateObj));
       if (valueIndex >= 0) {
+        msManager(`removing item from state ${name}`);
+        msManager(stateObj);
         state.value.splice(valueIndex, 1);
       }
     }
@@ -87,6 +100,8 @@ class MemoryStateManager extends AbstractStateManager {
       const valueIndex = state.value.findIndex((element: any) => testForEqualityFunction(element, stateObj));
       if (valueIndex >= 0) {
         state.value.splice(valueIndex, 1,stateObj);
+        msManager(`updating item ing state ${name}`);
+        msManager(stateObj);
       }
     }
   }
