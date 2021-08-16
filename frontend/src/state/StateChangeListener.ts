@@ -1,6 +1,6 @@
 export default interface StateChangeListener {
-    stateChanged(name:string, newValue:any):void;
-    stateChangedItemAdded(name:string, itemAdded:any):void;
-    stateChangedItemRemoved(name:string, itemRemoved:any):void;
-    stateChangedItemUpdated(name:string, itemUpdated:any, itemNewValue:any):void;
+    stateChanged(managerName:string, name:string, newValue:any):void;
+    stateChangedItemAdded(managerName:string, name:string, itemAdded:any):void;
+    stateChangedItemRemoved(managerName:string, name:string, itemRemoved:any):void;
+    stateChangedItemUpdated(managerName:string, name:string, itemUpdated:any, itemNewValue:any):void;
 }

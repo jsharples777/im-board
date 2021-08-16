@@ -1,7 +1,8 @@
 import debug from 'debug';
 import {IDBPDatabase, IDBPObjectStore, IDBPTransaction, openDB} from "idb";
-import {AbstractStateManager, stateValue} from "./AbstractStateManager";
+import {AbstractStateManager} from "./AbstractStateManager";
 import {equalityFunction} from "../util/EqualityFunctions";
+import {stateValue} from "./StateManager";
 
 const idLogger = debug('indexeddb-ts');
 
@@ -40,7 +41,7 @@ class IndexedDBStateManager extends AbstractStateManager {
     }
 
     protected constructor() {
-        super();
+        super('indexeddb');
         idLogger(`Constructor`);
         this.forceSaves = false;
     }

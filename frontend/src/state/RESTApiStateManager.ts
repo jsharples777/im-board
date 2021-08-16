@@ -1,9 +1,13 @@
-import {stateEventType, stateValue} from "./AbstractStateManager";
+import {stateEventType, stateValue} from "./StateManager";
 import {equalityFunction} from "../util/EqualityFunctions";
 import {jsonRequest, RequestType} from "../network/Types";
 import downloader from "../network/DownloadManager";
 import debug from 'debug';
-import AsychronousStateManager from "./AsynchronousStateManager";
+import AsynchronousStateManager from "./AsynchronousStateManager";
+import StateChangedDelegate from "./StateChangedDelegate";
+import {StateChangeInformer} from "./StateChangeInformer";
+import StateChangeListener from "./StateChangeListener";
+
 
 const apiSMLogger = debug('state-manager-api');
 
@@ -14,7 +18,7 @@ type ApiConfig = {
     isActive: boolean
 }
 
-export class RESTApiStateManager extends AsychronousStateManager {
+export class RESTApiStateManager implements AsynchronousStateManager {
     private static _instance: RESTApiStateManager;
 
     public static getInstance() {
@@ -26,11 +30,13 @@ export class RESTApiStateManager extends AsychronousStateManager {
 
     protected configuration: ApiConfig[] = [];
     protected bHasCompletedRun: boolean[];
+    protected delegate:StateChangeInformer;
 
     protected constructor() {
-        super();
-        this.forceSaves = false;
+        this.delegate = new StateChangedDelegate('restapi');
+        this.emitEvents();
         this.bHasCompletedRun = [];
+
 
         this.callbackForAddItem = this.callbackForAddItem.bind(this);
         this.callbackForRemoveItem = this.callbackForRemoveItem.bind(this);
@@ -111,7 +117,7 @@ export class RESTApiStateManager extends AsychronousStateManager {
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
             this.setCompletedRun(associatedStateName);
-            this.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.StateChanged);
+            this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.StateChanged,null);
         }
     }
 
@@ -119,8 +125,7 @@ export class RESTApiStateManager extends AsychronousStateManager {
         apiSMLogger('callback for add item');
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
-            let config: ApiConfig = this.getConfigurationForStateName(associatedStateName);
-            this.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.ItemAdded);
+            this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.ItemAdded,null);
         }
     }
 
@@ -219,5 +224,49 @@ export class RESTApiStateManager extends AsychronousStateManager {
         } else {
             apiSMLogger(`No configuration for state ${name}`);
         }
+    }
+
+    addChangeListenerForName(name: string, listener: StateChangeListener): void {
+        this.delegate.addChangeListenerForName(name,listener);
+    }
+
+    addNewItemToState(name: string, item: any, isPersisted: boolean): void {
+        this._addItemToState(name,item,isPersisted);
+    }
+
+    emitEvents(): void {
+        this.delegate.emitEvents();
+    }
+
+    findItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): any {
+        throw Error("not implemented");
+    }
+
+    getStateByName(name: string): any {
+        this._getState(name);
+    }
+
+    informChangeListenersForStateWithName(name: string, stateObjValue: any, eventType: stateEventType, previousObjValue: any): void {
+        this.delegate.informChangeListenersForStateWithName(name,stateObjValue,eventType,previousObjValue);
+    }
+
+    isItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
+        return true;
+    }
+
+    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
+        this._removeItemFromState(name,item,testForEqualityFunction);
+        return true;
+    }
+
+    setStateByName(name: string, stateObjectForName: any, informListeners: boolean): void {}
+
+    suppressEvents(): void {
+        this.delegate.suppressEvents();
+    }
+
+    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
+        this._updateItemInState(name,item,testForEqualityFunction);
+        return true;
     }
 }

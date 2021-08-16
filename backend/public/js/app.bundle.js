@@ -668,8 +668,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
         entry: entry,
         showCommentsHandler: _this2.handleSelectEntryComments,
         editEntryHandler: _this2.handleShowEditEntry,
-        deleteEntryHandler: _this2.handleDeleteEntry,
-        config: _this2.state
+        deleteEntryHandler: _this2.handleDeleteEntry
       });
     });
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -836,7 +835,11 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
   _proto.handleAddComment = function handleAddComment(event) {
     logger('Handling Add Comment');
-    event.preventDefault(); // get the comment element
+    event.preventDefault();
+    logger('entry comments'); // @ts-ignore
+
+    var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().getStateByName(this.state.stateNames.selectedEntry);
+    logger(entry.comments.length); // get the comment element
     // @ts-ignore
 
     var commentEl = document.getElementById(this.state.ui.commentSideBar.dom.commentId);
@@ -853,10 +856,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
     var creator = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.users, {
       id: _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__["isSame"]);
+    logger('user');
     logger(creator); // find the selected entry
-    // @ts-ignore
-
-    var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().getStateByName(this.state.stateNames.selectedEntry);
 
     if (entry && commentEl) {
       // create an empty comment
@@ -868,8 +869,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
         content: commentEl.value.trim()
       };
       commentEl.value = '';
-      _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].addComment(comment);
+      logger('comment');
       logger(comment);
+      _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].addComment(comment);
     }
   };
 
@@ -965,7 +967,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 
 
-localStorage.debug = 'controller-ts state-manager-ms state-manager-async state-manager-aggregate';
+localStorage.debug = 'app controller-ts state-manager-api view-ts:details socket-ts view-ts:comments';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -986,15 +988,11 @@ react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(element, document.getEle
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _state_MemoryStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state/MemoryStateManager */ "./src/state/MemoryStateManager.ts");
+/* harmony import */ var _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state/MemoryBufferStateManager */ "./src/state/MemoryBufferStateManager.ts");
 /* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
-/* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./socket/SocketManager */ "./src/socket/SocketManager.ts");
-/* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
-/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
-/* harmony import */ var _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state/RESTApiStateManager */ "./src/state/RESTApiStateManager.ts");
-/* harmony import */ var _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./state/AsyncStateManagerWrapper */ "./src/state/AsyncStateManagerWrapper.ts");
-
-
+/* harmony import */ var _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./state/RESTApiStateManager */ "./src/state/RESTApiStateManager.ts");
+/* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./notification/NotificationManager */ "./src/notification/NotificationManager.ts");
+/* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./socket/SocketManager */ "./src/socket/SocketManager.ts");
 
 
 
@@ -1005,7 +1003,8 @@ var cLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('controller-ts');
 
 var Controller = /*#__PURE__*/function () {
   function Controller() {
-    this.stateManager = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_4__["AggregateStateManager"].getInstance();
+    this.stateManager = _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_1__["default"].getInstance();
+    this.apiStateManager = _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_3__["RESTApiStateManager"].getInstance();
   }
 
   var _proto = Controller.prototype;
@@ -1013,51 +1012,7 @@ var Controller = /*#__PURE__*/function () {
   _proto.connectToApplication = function connectToApplication(applicationView, clientSideStorage) {
     this.applicationView = applicationView;
     this.clientSideStorage = clientSideStorage;
-    this.config = this.applicationView.state;
-    var aggregateStateManager = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_4__["AggregateStateManager"].getInstance(); // store information in local storage, indexeddb, and memory
-
-    aggregateStateManager.addStateManager(_state_MemoryStateManager__WEBPACK_IMPORTED_MODULE_1__["default"].getInstance());
-    aggregateStateManager.addStateManager(_state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_5__["default"].getInstance());
-    var objectStores = [{
-      name: this.config.stateNames.users,
-      keyField: 'id'
-    }, {
-      name: this.config.stateNames.entries,
-      keyField: 'id'
-    }, {
-      name: this.config.stateNames.comments,
-      keyField: 'id'
-    }]; // let indexedDBStateManager = IndexedDBStateManager.getInstance();
-    // indexedDBStateManager.initialise(objectStores).then((result) => {
-    //     cLogger('indexed DB setup');
-    // });
-    // aggregateStateManager.addStateManager(indexedDBStateManager,['selectedEntry']);
-
-    var restAPIStateManager = _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_6__["RESTApiStateManager"].getInstance();
-    restAPIStateManager.initialise([{
-      stateName: this.config.stateNames.users,
-      serverURL: this.getServerAPIURL(),
-      api: this.config.apis.users,
-      isActive: true
-    }, {
-      stateName: this.config.stateNames.entries,
-      serverURL: this.getServerAPIURL(),
-      api: this.config.apis.entries,
-      isActive: true
-    }, {
-      stateName: this.config.stateNames.comments,
-      serverURL: this.getServerAPIURL(),
-      api: this.config.apis.comments,
-      isActive: true
-    }]);
-    var asyncSM = new _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_7__["default"](aggregateStateManager, restAPIStateManager); // link the REST API calls to the Aggregate SM
-
-    aggregateStateManager.addStateManager(asyncSM, ['selectedEntry']); // setup Async callbacks for the fetch requests
-    // this.callbackForUsers = this.callbackForUsers.bind(this);
-    // this.callbackForEntries = this.callbackForEntries.bind(this);
-    // this.callbackForCreateEntry = this.callbackForCreateEntry.bind(this);
-    // this.callbackForCreateComment = this.callbackForCreateComment.bind(this);
-    // state listener
+    this.config = this.applicationView.state; // state listener
 
     this.stateChanged = this.stateChanged.bind(this);
     this.stateChangedItemAdded = this.stateChangedItemAdded.bind(this);
@@ -1075,245 +1030,38 @@ var Controller = /*#__PURE__*/function () {
   _proto.initialise = function initialise() {
     cLogger('Initialising data state'); // listen for socket events
 
-    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].setListener(this); // load the users
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].setListener(this); // setup the API calls
 
-    this.getStateManager().getStateByName(this.config.stateNames.users); // load the entries
+    this.apiStateManager.initialise([{
+      stateName: this.config.stateNames.users,
+      serverURL: this.getServerAPIURL(),
+      api: this.config.apis.users,
+      isActive: true
+    }, {
+      stateName: this.config.stateNames.entries,
+      serverURL: this.getServerAPIURL(),
+      api: this.config.apis.entries,
+      isActive: true
+    }, {
+      stateName: this.config.stateNames.comments,
+      serverURL: this.getServerAPIURL(),
+      api: this.config.apis.comments,
+      isActive: true
+    }]);
+    this.apiStateManager.addChangeListenerForName(this.config.stateNames.entries, this);
+    this.apiStateManager.addChangeListenerForName(this.config.stateNames.comments, this);
+    this.apiStateManager.addChangeListenerForName(this.config.stateNames.users, this); // load the entries
 
-    this.getStateManager().getStateByName(this.config.stateNames.entries); // load the comments
+    this.apiStateManager.getStateByName(this.config.stateNames.entries); // load the users
 
-    this.getStateManager().getStateByName(this.config.stateNames.comments);
+    this.apiStateManager.getStateByName(this.config.stateNames.users); // load the comments
+
+    this.apiStateManager.getStateByName(this.config.stateNames.comments);
   };
 
   _proto.getStateManager = function getStateManager() {
     return this.stateManager;
   }
-  /*
-  *
-  * Call back functions for database operations
-  *
-   */
-  // private callbackForUsers(data: any, status: number) {
-  //     cLogger('callback for all users');
-  //     let users:User[] = [];
-  //     if (status >= 200 && status <= 299) { // do we have any data?
-  //         cLogger(data);
-  //         // covert the data to the AppType User
-  //         data.forEach((cbUser:any) => {
-  //             let user:User = {
-  //                 id:cbUser.id,
-  //                 username:cbUser.username
-  //             }
-  //             users.push(user);
-  //         });
-  //     }
-  //     this.getStateManager().setStateByName(this.config.stateNames.users, users);
-  // }
-  // private static convertJSONCommentToComment(jsonComment:any):Comment {
-  //     let comment:Comment = {
-  //         id:jsonComment.id,
-  //         content:jsonComment.content,
-  //         createdBy:jsonComment.createdBy,
-  //         changedOn:jsonComment.changedOn,
-  //         commentOn:jsonComment.commentOn,
-  //     };
-  //     return comment;
-  // }
-  //
-  // private static convertJSONUserToUser(jsonUser:any):User {
-  //     let user:User = {
-  //         id:jsonUser.id,
-  //         username:jsonUser.username,
-  //     }
-  //     return user;
-  // }
-  //
-  // private static convertJSONEntryToBlogEntry(jsonEntry:any):BlogEntry {
-  //     let entry:BlogEntry = {
-  //         id: jsonEntry.id,
-  //         title:jsonEntry.title,
-  //         content:jsonEntry.content,
-  //         createdBy:jsonEntry.createdBy,
-  //         changedOn:jsonEntry.changedOn,
-  //         User:null,
-  //         Comments:[],
-  //     }
-  //     const cbUser:User|null = jsonEntry.user;
-  //     if (cbUser) {
-  //         entry.User = Controller.convertJSONUserToUser(cbUser);
-  //     }
-  //     const cbComments:Comment[]|null = jsonEntry.comments;
-  //     if (cbComments) {
-  //         cbComments.forEach((cbComment:any) => {
-  //             let comment = Controller.convertJSONCommentToComment(cbComment);
-  //             entry.Comments.push(comment);
-  //         });
-  //     }
-  //     return entry;
-  // }
-  //
-  // private callbackForEntries(data: any, status: number, stateName:string) {
-  //     cLogger('callback for all entries');
-  //     let entries:BlogEntry[] = [];
-  //     if (status >= 200 && status <= 299) { // do we have any data?
-  //         cLogger(data);
-  //         data.forEach((cbEntry:any) => {
-  //             let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(cbEntry);
-  //             entries.push(entry);
-  //         });
-  //     }
-  //     this.getStateManager().setStateByName(this.config.stateNames.entries, entries);
-  // }
-  //
-  // private callbackForCreateEntry(data: any, status: number, stateName:string) {
-  //     cLogger('callback for create entry');
-  //     if (status >= 200 && status <= 299) { // do we have any data?
-  //         cLogger(data);
-  //         let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(data);
-  //         this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
-  //     }
-  // }
-  //
-  // private callbackForCreateComment(data: any, status: number, stateName:string) {
-  //     cLogger('callback for create comment');
-  //     if (status >= 200 && status <= 299) { // do we have any data?
-  //         let comment:Comment = Controller.convertJSONCommentToComment(data);
-  //         cLogger(comment);
-  //         // find the corresponding entry in state
-  //         let entry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: comment.commentOn}, isSame);
-  //         cLogger(entry);
-  //         if (entry) {
-  //             cLogger('callback for create comment - updating entry');
-  //             // update the entry with the new comment
-  //             entry.Comments.push(comment);
-  //             // update the entry in the state manager
-  //             this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
-  //             // reselect the same entry
-  //             this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, entry);
-  //             cLogger(entry);
-  //         }
-  //     }
-  //
-  // }
-
-  /*
-  *
-  *   API calls
-  *
-   */
-  // private getAllUsers(): void {
-  //     cLogger('Getting All Users');
-  //     const jsonRequest: jsonRequest = {
-  //         url: this.getServerAPIURL() + this.config.apis.users,
-  //         type: RequestType.GET,
-  //         params: {},
-  //         callback: this.callbackForUsers,
-  //         associatedStateName: this.config.apis.users
-  //     };
-  //     downloader.addApiRequest(jsonRequest, true);
-  // }
-  //
-  // private getAllEntries(): void {
-  //     cLogger('Getting All Entries');
-  //     const jsonRequest: jsonRequest = {
-  //         url: this.getServerAPIURL() + this.config.apis.entries,
-  //         type: RequestType.GET,
-  //         params: {},
-  //         callback: this.callbackForEntries,
-  //         associatedStateName: this.config.apis.entries
-  //     };
-  //     downloader.addApiRequest(jsonRequest, true);
-  // }
-  //
-  // private apiDeleteComment(id: number):void {
-  //     const deleteCommentCB = function (data: any, status: number, stateName:string) {
-  //         cLogger('callback for delete comment');
-  //         if (status >= 200 && status <= 299) { // do we have any data?
-  //             cLogger(data);
-  //         }
-  //     }
-  //
-  //
-  //     const jsonRequest: jsonRequest = {
-  //         url: this.getServerAPIURL() + this.config.apis.comment,
-  //         type: RequestType.DELETE,
-  //         params: {
-  //             id: id
-  //         },
-  //         callback: deleteCommentCB,
-  //         associatedStateName: ''
-  //     };
-  //     downloader.addApiRequest(jsonRequest);
-  //
-  // }
-  //
-  // private apiDeleteEntry(entry: BlogEntry):void {
-  //     const deleteCB = function (data: any, status: number, stateName:string) {
-  //         cLogger('callback for delete entry');
-  //         if (status >= 200 && status <= 299) { // do we have any data?
-  //             cLogger(data);
-  //         }
-  //     }
-  //
-  //     if (entry) {
-  //         const jsonRequest:jsonRequest = {
-  //             url: this.getServerAPIURL() + this.config.apis.entries,
-  //             type: RequestType.DELETE,
-  //             params: {
-  //                 id: entry.id
-  //             },
-  //             callback: deleteCB,
-  //             associatedStateName: this.config.apis.entries
-  //         };
-  //         downloader.addApiRequest(jsonRequest);
-  //     }
-  // }
-  //
-  // private apiCreateEntry(entry:BlogEntry):void {
-  //     if (entry) {
-  //         const jsonRequest:jsonRequest = {
-  //             url: this.getServerAPIURL() + this.config.apis.entries,
-  //             type: RequestType.POST,
-  //             params: entry,
-  //             callback: this.callbackForCreateEntry,
-  //             associatedStateName: this.config.apis.entries
-  //         };
-  //         downloader.addApiRequest(jsonRequest, true);
-  //     }
-  // }
-  //
-  // private apiCreateComment(comment:Comment):void {
-  //     if (comment) {
-  //         const jsonRequest:jsonRequest = {
-  //             url: this.getServerAPIURL() + this.config.apis.comment,
-  //             type: RequestType.POST,
-  //             params: comment,
-  //             callback: this.callbackForCreateComment,
-  //             associatedStateName: ''
-  //         };
-  //         downloader.addApiRequest(jsonRequest, true);
-  //     }
-  // }
-  //
-  // private apiUpdateEntry(entry:BlogEntry):void {
-  //     const updateCB = function (data: any, status: number, stateName:string) {
-  //         cLogger('callback for update entry');
-  //         if (status >= 200 && status <= 299) { // do we have any data?
-  //             cLogger(data);
-  //         }
-  //     }
-  //
-  //     if (entry) {
-  //         const jsonRequest:jsonRequest = {
-  //             url: this.getServerAPIURL() + this.config.apis.entries,
-  //             type: RequestType.PUT,
-  //             params: entry,
-  //             callback: updateCB,
-  //             associatedStateName: this.config.apis.entries
-  //         };
-  //         downloader.addApiRequest(jsonRequest);
-  //     }
-  // }
-
   /*
   *
   * Simple Application state (URL, logged in user)
@@ -1364,22 +1112,14 @@ var Controller = /*#__PURE__*/function () {
     var entry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
 
     if (entry) {
-      cLogger("Handling delete comment for " + entry.id + " and comment " + id); // find the comment in the entry and remove it from the state
+      cLogger("Handling delete comment for " + entry.id + " and comment " + id);
+      this.getStateManager().removeItemFromState(this.config.stateNames.comments, {
+        id: id
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]); // send the api call
 
-      var comments = this.getStateManager().getStateByName(this.config.stateNames.comments);
-      var foundIndex = comments.findIndex(function (element) {
-        return element.id === id;
-      });
-
-      if (foundIndex >= 0) {
-        // remove comment from the array
-        cLogger('Found comment in state - removing');
-        this.getStateManager().removeItemFromState(this.config.stateNames.comments, {
-          id: id
-        }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]); // update the statement manager
-
-        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, entry);
-      }
+      this.apiStateManager.removeItemFromState(this.config.stateNames.comments, {
+        id: id
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
     }
   };
 
@@ -1387,7 +1127,11 @@ var Controller = /*#__PURE__*/function () {
     if (entry) {
       cLogger("Handling delete entry for " + entry.id); // update the state manager
 
-      this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+      this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]); // send the api call
+
+      this.apiStateManager.removeItemFromState(this.config.stateNames.entries, {
+        id: entry.id
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
     }
   };
 
@@ -1398,10 +1142,13 @@ var Controller = /*#__PURE__*/function () {
       if (entry.id) {
         cLogger("Handling update for entry " + entry.id); // update the state manager
 
-        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]); // send the api call
+
+        this.apiStateManager.updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
       } else {
-        cLogger("Handling create for entry");
-        this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
+        cLogger("Handling create for entry"); // send the api call and let the completed entry with id come back asynchronously
+
+        this.apiStateManager.addNewItemToState(this.config.stateNames.entries, entry, false);
       }
     }
   };
@@ -1409,8 +1156,9 @@ var Controller = /*#__PURE__*/function () {
   _proto.addComment = function addComment(comment) {
     if (comment) {
       cLogger(comment);
-      cLogger("Handling create for comment");
-      this.getStateManager().addNewItemToState(this.config.stateNames.comments, comment);
+      cLogger("Handling create for comment"); // send the api call and let the completed entry with id come back asynchronously
+
+      this.apiStateManager.addNewItemToState(this.config.stateNames.comments, comment, false);
     }
   }
   /*
@@ -1433,195 +1181,331 @@ var Controller = /*#__PURE__*/function () {
     var changeUser = this.getStateManager().findItemInState(this.config.stateNames.users, {
       id: message.user
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    var username = "unknown";
+
+    if (changeUser) {
+      username = changeUser.username;
+    }
+
+    cLogger("Handling data change " + message.type + " on object type " + message.stateName + " made by user " + username);
     var stateObj = message.data;
     cLogger(stateObj); // ok lets work out where this change belongs
-    // try {
-    //     switch (message.type) {
-    //         case "create": {
-    //             switch (message.objectType) {
-    //                 case "Comment": {
-    //                     // updating comments is more tricky as it is a sub object of the blog entry
-    //                     // find the entry in question
-    //                     const changedEntry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
-    //                     if (changedEntry) {
-    //                         let comment:Comment = Controller.convertJSONCommentToComment(stateObj);
-    //                         // add the new comment
-    //                         changedEntry.Comments.push(comment);
-    //                         // update the state
-    //                         this.getStateManager().updateItemInState(this.config.stateNames.entries, changedEntry, isSame);
-    //                         // was this entry current open by the user?
-    //                         const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
-    //                         if (currentSelectedEntry) {
-    //                             if (currentSelectedEntry.id === changedEntry.id) {
-    //                                 this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, changedEntry);
-    //                             }
-    //                         }
-    //                         let username = "unknown";
-    //                         if (changeUser) {
-    //                             username = changeUser.username;
-    //                         }
-    //                         notifier.show(changedEntry.title, `${username} added comment ${stateObj.content}`);
-    //                     }
-    //                     break;
-    //                 }
-    //                 case "BlogEntry": {
-    //                     let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(stateObj);
-    //                     cLogger("Converting to BlogEntry type for Create");
-    //                     cLogger(entry);
-    //                     // add the new item to the state
-    //                     this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
-    //                     let username = "unknown";
-    //                     if (changeUser) {
-    //                         username = changeUser.username;
-    //                     }
-    //
-    //                     notifier.show(stateObj.title, `${username} added new entry`);
-    //                     break;
-    //                 }
-    //                 case "User": {
-    //                     let user:User = Controller.convertJSONUserToUser(stateObj);
-    //                     // add the new item to the state
-    //                     this.getStateManager().addNewItemToState(this.config.stateNames.users, user);
-    //
-    //                     notifier.show(stateObj.username, `${stateObj.username} has just registered.`, 'message');
-    //                     break;
-    //                 }
-    //             }
-    //             break;
-    //         }
-    //         case "update": {
-    //             switch (message.objectType) {
-    //                 case "BlogEntry": {
-    //                     let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(stateObj);
-    //                     cLogger("Converting to BlogEntry type for Update");
-    //                     cLogger(entry);
-    //                     // update the item in the state
-    //                     this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
-    //                     // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
-    //                     break;
-    //                 }
-    //             }
-    //             break;
-    //         }
-    //         case "delete": {
-    //             switch (message.objectType) {
-    //                 case "Comment": {
-    //                     // removing comments is more tricky as it is a sub object of the blog entry
-    //                     // find the entry in question
-    //                     const changedEntry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
-    //                     cLogger(changedEntry);
-    //                     if (changedEntry) {
-    //                         // remove the comment
-    //                         let comments = changedEntry.Comments;
-    //                         const foundIndex = comments.findIndex((element:any) => element.id === stateObj.id);
-    //                         if (foundIndex >= 0) {
-    //                             // remove comment from the array
-    //                             cLogger('Found comment in entry - removing');
-    //                             comments.splice(foundIndex, 1);
-    //                             cLogger(changedEntry);
-    //
-    //                             // update the state
-    //                             this.getStateManager().updateItemInState(this.config.stateNames.entries, changedEntry, isSame);
-    //                             // was this entry current open by the user?
-    //                             const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
-    //                             if (currentSelectedEntry) {
-    //                                 if (currentSelectedEntry.id === changedEntry.id) {
-    //                                     this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, changedEntry);
-    //                                 }
-    //                             }
-    //                         }
-    //
-    //                     }
-    //                     break;
-    //                 }
-    //                 case "BlogEntry": {
-    //                     cLogger(`Deleting Blog Entry with id ${stateObj.id}`);
-    //                     const deletedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, stateObj, isSame);
-    //                     cLogger(deletedEntry);
-    //                     if (deletedEntry) {
-    //                         cLogger(`Deleting Blog Entry with id ${deletedEntry.id}`);
-    //                         this.getStateManager().removeItemFromState(this.config.stateNames.entries, deletedEntry, isSame);
-    //                         // the current user could be accessing the comments in the entry that was just deleted
-    //                         const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
-    //                         if (currentSelectedEntry) {
-    //                             if (currentSelectedEntry.id === deletedEntry.id) {
-    //                                 cLogger(`Deleted entry is selected by user, closing sidebars`);
-    //                                 // ask the application to close any access to the comments
-    //                                 this.applicationView.hideAllSideBars();
-    //                             }
-    //                         }
-    //                         notifier.show(deletedEntry.title, `${deletedEntry.User.username} has deleted this entry.`, 'danger');
-    //                     }
-    //
-    //                     break;
-    //                 }
-    //             }
-    //             break;
-    //         }
-    //     }
-    // } catch (err) {
-    //     cLogger(err);
-    // }
+
+    try {
+      switch (message.type) {
+        case "create":
+          {
+            switch (message.stateName) {
+              case this.config.stateNames.comments:
+                {
+                  this.getStateManager().addNewItemToState(this.config.stateNames.comments, stateObj, true); // find the entry in question
+
+                  var changedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, {
+                    id: stateObj.commentOn
+                  }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+
+                  if (changedEntry) {
+                    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(changedEntry.title, username + " added comment " + stateObj.content);
+                  }
+
+                  break;
+                }
+
+              case this.config.stateNames.entries:
+                {
+                  this.getStateManager().addNewItemToState(this.config.stateNames.entries, stateObj, true);
+                  _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(stateObj.title, username + " added new entry");
+                  break;
+                }
+
+              case this.config.stateNames.users:
+                {
+                  this.getStateManager().addNewItemToState(this.config.stateNames.users, stateObj, true);
+                  _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(stateObj.username, stateObj.username + " has just registered.", 'message');
+                  break;
+                }
+            }
+
+            break;
+          }
+
+        case "update":
+          {
+            switch (message.stateName) {
+              case this.config.stateNames.entries:
+                {
+                  this.getStateManager().updateItemInState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]); // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
+
+                  break;
+                }
+            }
+
+            break;
+          }
+
+        case "delete":
+          {
+            switch (message.stateName) {
+              case this.config.stateNames.comments:
+                {
+                  this.getStateManager().removeItemFromState(this.config.stateNames.comments, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+                  break;
+                }
+
+              case this.config.stateNames.entries:
+                {
+                  var deletedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+                  this.getStateManager().removeItemFromState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+                  _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_4__["default"].show(deletedEntry.title, username + " has deleted this entry.", 'priority');
+                  break;
+                }
+            }
+
+            break;
+          }
+      }
+    } catch (err) {
+      cLogger(err);
+    }
   } //  State Management listening
   ;
 
-  _proto.stateChangedItemAdded = function stateChangedItemAdded(name, itemAdded) {
+  _proto.stateChangedItemAdded = function stateChangedItemAdded(managerName, name, itemAdded) {
     cLogger("State changed " + name + " - item Added");
     cLogger(itemAdded);
 
-    if (name === this.config.stateNames.entries) {
-      this.applicationView.setState({
-        isLoggedIn: this.isLoggedIn(),
-        loggedInUserId: this.getLoggedInUserId(),
-        selectedEntry: {},
-        entries: this.getStateManager().getStateByName(name)
-      });
+    switch (managerName) {
+      case 'memory':
+        {
+          cLogger("received state from " + managerName + " for state " + name + " - updating application view");
+          var selectedEntry = this.applicationView.state.selectedEntry;
+
+          switch (name) {
+            case this.config.stateNames.entries:
+              {
+                this.composeBlogEntry(itemAdded);
+                this.applicationView.setState({
+                  isLoggedIn: this.isLoggedIn(),
+                  loggedInUserId: this.getLoggedInUserId(),
+                  selectedEntry: selectedEntry,
+                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                });
+                break;
+              }
+
+            case this.config.stateNames.comments:
+              {
+                var updatedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, {
+                  id: itemAdded.commentOn
+                }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+                cLogger("updating comments for entry " + updatedEntry.id + " = " + updatedEntry.comments.length);
+                cLogger(updatedEntry);
+                this.composeBlogEntry(updatedEntry);
+                cLogger("updating comments for entry " + updatedEntry.id + " = " + updatedEntry.comments.length);
+                cLogger(updatedEntry);
+                this.composeBlogEntry(selectedEntry);
+                cLogger("updating comments for entry " + updatedEntry.id + " = " + updatedEntry.comments.length);
+                this.applicationView.setState({
+                  isLoggedIn: this.isLoggedIn(),
+                  loggedInUserId: this.getLoggedInUserId(),
+                  selectedEntry: selectedEntry,
+                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                });
+                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry);
+                break;
+              }
+          }
+
+          break;
+        }
+
+      case 'restapi':
+        {
+          cLogger("received state from " + managerName + " for state " + name + " - added items are unknown the the application");
+
+          if (name === this.config.stateNames.comments) {
+            cLogger(this.getStateManager().getStateByName(this.config.stateNames.comments).length);
+          }
+
+          this.getStateManager().addNewItemToState(name, itemAdded, true);
+
+          if (name === this.config.stateNames.comments) {
+            cLogger(this.getStateManager().getStateByName(this.config.stateNames.comments).length);
+          }
+
+          break;
+        }
     }
   };
 
-  _proto.stateChangedItemRemoved = function stateChangedItemRemoved(name, itemRemoved) {
-    cLogger("State changed " + name + " - item removed");
+  _proto.stateChangedItemRemoved = function stateChangedItemRemoved(managerName, name, itemRemoved) {
+    cLogger("State changed " + name + " - item Removed");
     cLogger(itemRemoved);
 
-    if (name === this.config.stateNames.entries) {
-      this.applicationView.setState({
-        isLoggedIn: this.isLoggedIn(),
-        loggedInUserId: this.getLoggedInUserId(),
-        selectedEntry: {},
-        entries: this.getStateManager().getStateByName(name)
-      });
+    switch (managerName) {
+      case 'memory':
+        {
+          cLogger("received state from " + managerName + " for state " + name + " - updating application view");
+          var selectedEntry = this.applicationView.state.selectedEntry;
+
+          switch (name) {
+            case this.config.stateNames.entries:
+              {
+                if (selectedEntry) {
+                  if (Object(_util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"])(selectedEntry, itemRemoved)) {
+                    selectedEntry = {};
+                    this.applicationView.hideAllSideBars();
+                  }
+                }
+
+                this.applicationView.setState({
+                  isLoggedIn: this.isLoggedIn(),
+                  loggedInUserId: this.getLoggedInUserId(),
+                  selectedEntry: selectedEntry,
+                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                });
+                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry);
+                break;
+              }
+
+            case this.config.stateNames.comments:
+              {
+                var updatedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, {
+                  id: itemRemoved.commentOn
+                }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+                this.composeBlogEntry(updatedEntry);
+                this.composeBlogEntry(selectedEntry);
+                this.applicationView.setState({
+                  isLoggedIn: this.isLoggedIn(),
+                  loggedInUserId: this.getLoggedInUserId(),
+                  selectedEntry: selectedEntry,
+                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                });
+                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry);
+                break;
+              }
+          }
+
+          break;
+        }
+
+      case 'restapi':
+        {
+          cLogger("received state from " + managerName + " for state " + name + " - ignoring, should be in memory already");
+          break;
+        }
     }
   };
 
-  _proto.stateChangedItemUpdated = function stateChangedItemUpdated(name, itemUpdated, itemNewValue) {
+  _proto.composeBlogEntry = function composeBlogEntry(entry) {
+    if (!entry) return; // find the user for the entry
+
+    var user = controller.getStateManager().findItemInState(this.config.stateNames.users, {
+      id: entry.createdBy
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    if (!user) user = {
+      id: -1,
+      username: 'unknown'
+    };
+    var allComments = controller.getStateManager().getStateByName(this.config.stateNames.comments); // get the comments for the entry
+
+    var comments = allComments.filter(function (comment) {
+      return comment.commentOn === entry.id;
+    });
+    if (!comments) comments = [];
+    entry.user = user;
+    entry.comments = comments;
+  };
+
+  _proto.composeAllBlogEntries = function composeAllBlogEntries() {
+    var _this = this;
+
+    var entries = this.getStateManager().getStateByName(this.config.stateNames.entries);
+    entries.forEach(function (entry) {
+      _this.composeBlogEntry(entry);
+    });
+  };
+
+  _proto.stateChangedItemUpdated = function stateChangedItemUpdated(managerName, name, itemUpdated, itemNewValue) {
     cLogger("State changed " + name + " - item updated");
-    cLogger(itemNewValue);
+    cLogger(itemUpdated);
 
-    if (name === this.config.stateNames.entries) {
-      this.applicationView.setState({
-        isLoggedIn: this.isLoggedIn(),
-        loggedInUserId: this.getLoggedInUserId(),
-        selectedEntry: {},
-        entries: this.getStateManager().getStateByName(name)
-      });
+    switch (managerName) {
+      case 'memory':
+        {
+          cLogger("received state from " + managerName + " for state " + name + " - updating application view");
+          var selectedEntry = this.applicationView.state.selectedEntry;
+
+          switch (name) {
+            case this.config.stateNames.entries:
+              {
+                this.composeBlogEntry(itemNewValue);
+                this.composeBlogEntry(selectedEntry);
+                this.applicationView.setState({
+                  isLoggedIn: this.isLoggedIn(),
+                  loggedInUserId: this.getLoggedInUserId(),
+                  selectedEntry: selectedEntry,
+                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                });
+                break;
+              }
+          }
+
+          break;
+        }
+
+      case 'restapi':
+        {
+          cLogger("received state from " + managerName + " for state " + name + " - ignoring, should be in memory already");
+          break;
+        }
     }
   };
 
-  _proto.stateChanged = function stateChanged(name, values) {
+  _proto.stateChanged = function stateChanged(managerName, name, values) {
     cLogger("State changed " + name);
-    cLogger(values); // entries or comments?
+    cLogger(values); // what has changed and by whom?
 
-    if (name === this.config.stateNames.entries) {
-      return; // waiting for comments to be done
-    }
+    switch (managerName) {
+      case 'memory':
+        {
+          cLogger("received state from " + managerName + " for state " + name + " - sending to application view");
 
-    if (name === this.config.stateNames.comments) {
-      this.applicationView.setState({
-        isLoggedIn: this.isLoggedIn(),
-        loggedInUserId: this.getLoggedInUserId(),
-        selectedEntry: {},
-        entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
-      });
+          switch (name) {
+            case this.config.stateNames.entries:
+              {
+                this.composeAllBlogEntries();
+                break;
+              }
+
+            case this.config.stateNames.comments:
+              {
+                this.composeAllBlogEntries();
+                cLogger(this.getStateManager().getStateByName(this.config.stateNames.entries));
+                this.applicationView.setState({
+                  isLoggedIn: this.isLoggedIn(),
+                  loggedInUserId: this.getLoggedInUserId(),
+                  selectedEntry: {},
+                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                });
+                break;
+              }
+
+            case this.config.stateNames.users:
+              {
+                break;
+              }
+          }
+
+          break;
+        }
+
+      case 'restapi':
+        {
+          cLogger("received state from " + managerName + " for state " + name + " - sending to application state manager");
+          this.getStateManager().setStateByName(name, values);
+          break;
+        }
     }
   };
 
@@ -1809,19 +1693,19 @@ var AbstractView = /*#__PURE__*/function () {
     });
   };
 
-  _proto.stateChanged = function stateChanged(name, newValue) {
+  _proto.stateChanged = function stateChanged(managerName, name, newValue) {
     this.updateView(name, newValue);
   };
 
-  _proto.stateChangedItemAdded = function stateChangedItemAdded(name, itemAdded) {
+  _proto.stateChangedItemAdded = function stateChangedItemAdded(managerName, name, itemAdded) {
     this.updateView(name, this.stateManager.getStateByName(name));
   };
 
-  _proto.stateChangedItemRemoved = function stateChangedItemRemoved(name, itemRemoved) {
+  _proto.stateChangedItemRemoved = function stateChangedItemRemoved(managerName, name, itemRemoved) {
     this.updateView(name, this.stateManager.getStateByName(name));
   };
 
-  _proto.stateChangedItemUpdated = function stateChangedItemUpdated(name, itemUpdated, itemNewValue) {
+  _proto.stateChangedItemUpdated = function stateChangedItemUpdated(managerName, name, itemUpdated, itemNewValue) {
     this.updateView(name, this.stateManager.getStateByName(name));
   };
 
@@ -1851,8 +1735,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
-/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
-
 
 
 
@@ -1864,22 +1746,10 @@ function BlogEntryView(_ref) {
   var entry = _ref.entry,
       showCommentsHandler = _ref.showCommentsHandler,
       editEntryHandler = _ref.editEntryHandler,
-      deleteEntryHandler = _ref.deleteEntryHandler,
-      config = _ref.config;
+      deleteEntryHandler = _ref.deleteEntryHandler;
 
   if (entry) {
-    beLogger("Entry " + entry.createdBy + " === " + _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()); // find the user for the entry
-
-    var user = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(config.stateNames.users, {
-      id: entry.createdBy
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_5__["isSame"]);
-    var allComments = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().getStateByName(config.stateNames.comments); // get the comments for the entry
-
-    var comments = allComments.filter(function (comment) {
-      return comment.commentOn === entry.id;
-    });
-    entry.user = user;
-    entry.comments = comments;
+    beLogger("Entry " + entry.createdBy + " === " + _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId());
     var editButton;
     var deleteButton;
 
@@ -2078,7 +1948,7 @@ var CommentSidebarView = /*#__PURE__*/function (_SidebarView) {
     if (id) {
       id = parseInt(id); // find the comment in the selected entry
 
-      var comment = entry.Comments.find(function (comment) {
+      var comment = entry.comments.find(function (comment) {
         return comment.id === id;
       });
 
@@ -2822,6 +2692,270 @@ var queueType;
 
 /***/ }),
 
+/***/ "./src/notification/BootstrapNotification.ts":
+/*!***************************************************!*\
+  !*** ./src/notification/BootstrapNotification.ts ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BootstrapNotification; });
+/* harmony import */ var _Notification__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Notification */ "./src/notification/Notification.ts");
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+var BootstrapNotification = /*#__PURE__*/function (_Notification) {
+  _inheritsLoose(BootstrapNotification, _Notification);
+
+  function BootstrapNotification(notificationManager) {
+    return _Notification.call(this, notificationManager) || this;
+  } // Make the notification visible on the screen
+
+
+  var _proto = BootstrapNotification.prototype;
+
+  _proto.show = function show(title, message, topOffset, context, duration) {
+    var _this = this;
+
+    if (topOffset === void 0) {
+      topOffset = 0;
+    }
+
+    if (context === void 0) {
+      context = 'info';
+    }
+
+    if (duration === void 0) {
+      duration = 3000;
+    }
+
+    var containerId = this.notificationManager.getContainerId(); // convert the context to a background colour
+
+    var bgColorClass = '';
+
+    switch (context) {
+      case 'info':
+        {
+          bgColorClass = 'bg-info';
+          break;
+        }
+
+      case 'warning':
+        {
+          bgColorClass = 'bg-warning';
+          break;
+        }
+
+      case 'message':
+        {
+          bgColorClass = 'bg-primary';
+          break;
+        }
+
+      case 'priority':
+        {
+          bgColorClass = 'bg-danger';
+          break;
+        }
+
+      default:
+        {
+          bgColorClass = "bg-info";
+        }
+    } // Creating the notification container div
+
+
+    var containerNode = document.createElement('div');
+    containerNode.className = 'notification toast';
+    containerNode.style.top = topOffset + "px";
+    containerNode.setAttribute("role", "alert");
+    containerNode.setAttribute("data-autohide", "false"); // Adding the notification title node
+
+    var titleNode = document.createElement('div');
+    titleNode.className = "toast-header text-white " + bgColorClass;
+    var titleTextNode = document.createElement('strong');
+    titleTextNode.className = "mr-auto";
+    titleTextNode.textContent = title; // Adding a little button on the notification
+
+    var closeButtonNode = document.createElement('button');
+    closeButtonNode.className = 'ml-2 mb-1 close';
+    closeButtonNode.textContent = 'x';
+    closeButtonNode.addEventListener('click', function () {
+      _this.notificationManager.remove(containerNode);
+    }); // Adding the notification message content node
+
+    var messageNode = document.createElement('div');
+    messageNode.className = 'toast-body';
+    messageNode.textContent = message; // Appending the container with all the elements newly created
+
+    titleNode.appendChild(titleTextNode);
+    titleNode.appendChild(closeButtonNode);
+    containerNode.appendChild(titleNode);
+    containerNode.appendChild(messageNode);
+    containerNode.classList.add("is-" + context); // Inserting the notification to the page body
+
+    var containerEl = document.getElementById(containerId);
+    if (containerEl) containerEl.appendChild(containerNode); // activate it
+    // @ts-ignore
+
+    $(".notification").toast('show'); // Default duration delay
+
+    if (duration <= 0) {
+      duration = 2000;
+    }
+
+    setTimeout(function () {
+      _this.notificationManager.remove(containerNode);
+    }, duration);
+    return containerNode;
+  };
+
+  return BootstrapNotification;
+}(_Notification__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+
+
+/***/ }),
+
+/***/ "./src/notification/Notification.ts":
+/*!******************************************!*\
+  !*** ./src/notification/Notification.ts ***!
+  \******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Notification; });
+var Notification = function Notification(notificationManager) {
+  this.show = this.show.bind(this);
+  this.notificationManager = notificationManager; // Create DOM notification structure when instantiated
+
+  this.containerId = this.notificationManager.getContainerId();
+} // Make the notification visible on the screen
+;
+
+
+
+/***/ }),
+
+/***/ "./src/notification/NotificationFactory.ts":
+/*!*************************************************!*\
+  !*** ./src/notification/NotificationFactory.ts ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BootstrapNotification__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BootstrapNotification */ "./src/notification/BootstrapNotification.ts");
+
+
+var NotificationFactory = /*#__PURE__*/function () {
+  function NotificationFactory() {}
+
+  var _proto = NotificationFactory.prototype;
+
+  _proto.createNotification = function createNotification(manager) {
+    return new _BootstrapNotification__WEBPACK_IMPORTED_MODULE_0__["default"](manager);
+  };
+
+  return NotificationFactory;
+}();
+
+var notificationFactory = new NotificationFactory();
+/* harmony default export */ __webpack_exports__["default"] = (notificationFactory);
+
+/***/ }),
+
+/***/ "./src/notification/NotificationManager.ts":
+/*!*************************************************!*\
+  !*** ./src/notification/NotificationManager.ts ***!
+  \*************************************************/
+/*! exports provided: NotificationManager, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NotificationManager", function() { return NotificationManager; });
+/* harmony import */ var _NotificationFactory__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./NotificationFactory */ "./src/notification/NotificationFactory.ts");
+
+var NotificationManager = /*#__PURE__*/function () {
+  function NotificationManager() {
+    this.notifications = [];
+    this.currentCount = 0;
+    this.offsetPerNotification = 120;
+    this.containerId = 'notifications';
+    this.show = this.show.bind(this);
+  }
+
+  var _proto = NotificationManager.prototype;
+
+  _proto.getContainerId = function getContainerId() {
+    return this.containerId;
+  };
+
+  _proto.show = function show(title, message, context, duration) {
+    if (context === void 0) {
+      context = 'info';
+    }
+
+    if (duration === void 0) {
+      duration = 5000;
+    }
+
+    var notification = _NotificationFactory__WEBPACK_IMPORTED_MODULE_0__["default"].createNotification(this);
+    var notificationNode = notification.show(title, message, this.currentCount * this.offsetPerNotification, context, duration);
+    this.currentCount++;
+    this.notifications.push(notificationNode);
+  };
+
+  _proto.remove = function remove(notificationNode) {
+    var _this = this;
+
+    var foundIndex = this.notifications.findIndex(function (element) {
+      return element === notificationNode;
+    });
+
+    if (foundIndex >= 0) {
+      this.notifications.splice(foundIndex, 1); // re-arrange the remaining notifications
+
+      this.notifications.map(function (notificationNode, index) {
+        // @ts-ignore
+        notificationNode.style.top = _this.offsetPerNotification * index + "px";
+      });
+    }
+
+    var parentEl = notificationNode.parentElement;
+    if (parentEl !== null) parentEl.removeChild(notificationNode);
+    this.currentCount--;
+    if (this.currentCount < 0) this.currentCount = 0;
+  };
+
+  return NotificationManager;
+}();
+var notifier = new NotificationManager();
+/* harmony default export */ __webpack_exports__["default"] = (notifier);
+
+/***/ }),
+
 /***/ "./src/socket/SocketManager.ts":
 /*!*************************************!*\
   !*** ./src/socket/SocketManager.ts ***!
@@ -2908,43 +3042,38 @@ var socketManager = new SocketManager();
 /*!*******************************************!*\
   !*** ./src/state/AbstractStateManager.ts ***!
   \*******************************************/
-/*! exports provided: stateEventType, AbstractStateManager */
+/*! exports provided: AbstractStateManager */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "stateEventType", function() { return stateEventType; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AbstractStateManager", function() { return AbstractStateManager; });
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _StateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./StateManager */ "./src/state/StateManager.ts");
+/* harmony import */ var _StateChangedDelegate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./StateChangedDelegate */ "./src/state/StateChangedDelegate.ts");
+
+
 
 var smLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('state-manager-ts');
-var stateEventType;
-
-(function (stateEventType) {
-  stateEventType[stateEventType["ItemAdded"] = 0] = "ItemAdded";
-  stateEventType[stateEventType["ItemUpdated"] = 1] = "ItemUpdated";
-  stateEventType[stateEventType["ItemDeleted"] = 2] = "ItemDeleted";
-  stateEventType[stateEventType["StateChanged"] = 3] = "StateChanged";
-})(stateEventType || (stateEventType = {}));
-
 var AbstractStateManager = /*#__PURE__*/function () {
-  function AbstractStateManager() {
-    this.suppressEventEmits = false;
+  function AbstractStateManager(managerName) {
     this.forceSaves = true;
-    this.stateChangeListeners = [];
-    this.suppressEventEmits = false;
+    this.managerName = '';
+    this.delegate = new _StateChangedDelegate__WEBPACK_IMPORTED_MODULE_2__["default"](managerName);
+    this.managerName = managerName;
+    this.emitEvents();
     this.forceSaves = true;
   }
 
   var _proto = AbstractStateManager.prototype;
 
   _proto.suppressEvents = function suppressEvents() {
-    this.suppressEventEmits = true;
+    this.delegate.suppressEvents();
   };
 
   _proto.emitEvents = function emitEvents() {
-    this.suppressEventEmits = false;
+    this.delegate.emitEvents();
   };
 
   _proto.dontForceSavesOnAddRemoveUpdate = function dontForceSavesOnAddRemoveUpdate() {
@@ -2957,95 +3086,18 @@ var AbstractStateManager = /*#__PURE__*/function () {
 
   _proto.informChangeListenersForStateWithName = function informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue) {
     if (eventType === void 0) {
-      eventType = stateEventType.StateChanged;
+      eventType = _StateManager__WEBPACK_IMPORTED_MODULE_1__["stateEventType"].StateChanged;
     }
 
     if (previousObjValue === void 0) {
       previousObjValue = null;
     }
 
-    smLogger("State Manager: Informing state listeners of " + name);
-
-    if (this.suppressEventEmits) {
-      smLogger("State Manager: Events suppressed");
-      return;
-    }
-
-    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
-      return element.name === name;
-    });
-
-    if (foundIndex >= 0) {
-      smLogger("State Manager: Found state listeners of " + name + " with event type " + eventType);
-      /* let each state change listener know */
-
-      var changeListenersForName = this.stateChangeListeners[foundIndex];
-
-      for (var index = 0; index < changeListenersForName.listeners.length; index++) {
-        smLogger("State Manager: Found state listener of " + name + " - informing");
-        var listener = changeListenersForName.listeners[index];
-
-        switch (eventType) {
-          case stateEventType.StateChanged:
-            {
-              listener.stateChanged(name, stateObjValue);
-              break;
-            }
-
-          case stateEventType.ItemAdded:
-            {
-              listener.stateChangedItemAdded(name, stateObjValue);
-              break;
-            }
-
-          case stateEventType.ItemUpdated:
-            {
-              listener.stateChangedItemUpdated(name, previousObjValue, stateObjValue);
-              break;
-            }
-
-          case stateEventType.ItemDeleted:
-            {
-              listener.stateChangedItemRemoved(name, stateObjValue);
-              break;
-            }
-        }
-      }
-    }
+    this.delegate.informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue);
   };
 
-  _proto.ensureListenerSetupForName = function ensureListenerSetupForName(name) {
-    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
-      return element.name === name;
-    });
-
-    if (foundIndex < 0) {
-      var listenersNameArrayPair = {
-        name: name,
-        listeners: []
-      };
-      this.stateChangeListeners.push(listenersNameArrayPair);
-    }
-  }
-  /*
-        Add a state listener for a given state name
-        the listener should be a function with two parameters
-        name - string - the name of the state variable that they want to be informed about
-        stateObjValue - object - the new state value
-       */
-  ;
-
   _proto.addChangeListenerForName = function addChangeListenerForName(name, listener) {
-    this.ensureListenerSetupForName(name);
-    smLogger("State Manager: Adding state listener for " + name);
-    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
-      return element.name === name;
-    });
-
-    if (foundIndex >= 0) {
-      var changeListenersForName = this.stateChangeListeners[foundIndex];
-      changeListenersForName.listeners.push(listener);
-    }
+    this.delegate.addChangeListenerForName(name, listener);
   };
 
   _proto.addStateByName = function addStateByName(name, stateObjForName) {
@@ -3061,7 +3113,7 @@ var AbstractStateManager = /*#__PURE__*/function () {
 
     this._replaceNamedStateInStorage(state);
 
-    this.informChangeListenersForStateWithName(name, stateObjForName, stateEventType.StateChanged);
+    this.informChangeListenersForStateWithName(name, stateObjForName, _StateManager__WEBPACK_IMPORTED_MODULE_1__["stateEventType"].StateChanged);
     return stateObjForName;
   };
 
@@ -3105,14 +3157,13 @@ var AbstractStateManager = /*#__PURE__*/function () {
 
     this._ensureStatePresent(name);
 
-    smLogger("State Manager: Adding item to state " + name);
-    var state = this.getStateByName(name);
-    state.push(item);
-    smLogger(state);
+    smLogger("State Manager: Adding item to state " + name); // const state = this.getStateByName(name);
+    // state.push(item);
+    // smLogger(state);
 
     this._addItemToState(name, item, isPersisted);
 
-    this.informChangeListenersForStateWithName(name, state, stateEventType.ItemAdded);
+    this.informChangeListenersForStateWithName(name, item, _StateManager__WEBPACK_IMPORTED_MODULE_1__["stateEventType"].ItemAdded);
   };
 
   _proto.findItemInState = function findItemInState(name, item, testForEqualityFunction) {
@@ -3161,16 +3212,17 @@ var AbstractStateManager = /*#__PURE__*/function () {
     });
 
     if (foundIndex >= 0) {
-      result = true; // remove the item from the state
+      result = true;
+      var oldItem = state[foundIndex]; // remove the item from the state
 
-      smLogger('State Manager: Found item - removing ');
-      state.splice(foundIndex, 1);
+      smLogger('State Manager: Found item - removing '); //state.splice(foundIndex, 1);
+
       smLogger(state);
 
       this._removeItemFromState(name, item, testForEqualityFunction);
 
       this.setStateByName(name, state, false);
-      this.informChangeListenersForStateWithName(name, item, stateEventType.ItemDeleted);
+      this.informChangeListenersForStateWithName(name, oldItem, _StateManager__WEBPACK_IMPORTED_MODULE_1__["stateEventType"].ItemDeleted);
     }
 
     return result;
@@ -3195,7 +3247,7 @@ var AbstractStateManager = /*#__PURE__*/function () {
       this._updateItemInState(name, item, testForEqualityFunction);
 
       this.setStateByName(name, state, false);
-      this.informChangeListenersForStateWithName(name, item, stateEventType.ItemUpdated, oldItem);
+      this.informChangeListenersForStateWithName(name, item, _StateManager__WEBPACK_IMPORTED_MODULE_1__["stateEventType"].ItemUpdated, oldItem);
     } else {
       // add the item to the state
       this.addNewItemToState(name, item);
@@ -3209,502 +3261,10 @@ var AbstractStateManager = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./src/state/AggregateStateManager.ts":
-/*!********************************************!*\
-  !*** ./src/state/AggregateStateManager.ts ***!
-  \********************************************/
-/*! exports provided: AggregateStateManager */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AggregateStateManager", function() { return AggregateStateManager; });
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-
-  _setPrototypeOf(subClass, superClass);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-
-
-var aggLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('state-manager-aggregate');
-var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
-  _inheritsLoose(AggregateStateManager, _AbstractStateManager);
-
-  AggregateStateManager.getInstance = function getInstance() {
-    if (!AggregateStateManager._instance) {
-      AggregateStateManager._instance = new AggregateStateManager();
-    }
-
-    return AggregateStateManager._instance;
-  };
-
-  function AggregateStateManager() {
-    var _this;
-
-    _this = _AbstractStateManager.call(this) || this;
-    _this.stateManagers = [];
-    _this.suppressEventEmits = false;
-    return _this;
-  }
-
-  var _proto = AggregateStateManager.prototype;
-
-  _proto.addStateManager = function addStateManager(stateManager, filters) {
-    if (filters === void 0) {
-      filters = [];
-    }
-
-    var mWF = {
-      manager: stateManager,
-      filters: filters
-    };
-    this.stateManagers.push(mWF);
-    stateManager.suppressEvents();
-    aggLogger('adding state manager with/without filters');
-  };
-
-  _proto.stateNameInFilters = function stateNameInFilters(name, filters) {
-    var foundIndex = filters.findIndex(function (filter) {
-      return filter === name;
-    });
-    return foundIndex >= 0;
-  };
-
-  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
-    var _this2 = this;
-
-    this.stateManagers.forEach(function (managerWithFilters) {
-      if (!_this2.stateNameInFilters(state.name, managerWithFilters.filters)) {
-        managerWithFilters.manager._addNewNamedStateToStorage(state);
-      }
-    });
-  };
-
-  _proto._getState = function _getState(name) {
-    var _this3 = this;
-
-    var state = {
-      name: name,
-      value: []
-    };
-    this.stateManagers.forEach(function (sm) {
-      if (!_this3.stateNameInFilters(state.name, sm.filters)) {
-        aggLogger("get state from state manager for state " + name);
-        aggLogger(sm.manager);
-        state = sm.manager._getState(name);
-      }
-    });
-    return state;
-  };
-
-  _proto._ensureStatePresent = function _ensureStatePresent(name) {
-    var _this4 = this;
-
-    this.stateManagers.forEach(function (managerWithFilters) {
-      if (!_this4.stateNameInFilters(name, managerWithFilters.filters)) {
-        managerWithFilters.manager._ensureStatePresent(name);
-      }
-    });
-  };
-
-  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
-    var _this5 = this;
-
-    this.stateManagers.forEach(function (managerWithFilters) {
-      if (!_this5.stateNameInFilters(state.name, managerWithFilters.filters)) {
-        managerWithFilters.manager._replaceNamedStateInStorage(state);
-      }
-    });
-  };
-
-  _proto._saveState = function _saveState(name, stateObj) {
-    var _this6 = this;
-
-    this.stateManagers.forEach(function (managerWithFilters) {
-      if (!_this6.stateNameInFilters(name, managerWithFilters.filters)) {
-        aggLogger("saving state in state manager for state " + name);
-        aggLogger(managerWithFilters.manager);
-        aggLogger(stateObj);
-
-        managerWithFilters.manager._saveState(name, stateObj);
-      }
-    });
-  };
-
-  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
-    var _this7 = this;
-
-    if (isPersisted === void 0) {
-      isPersisted = false;
-    }
-
-    this.stateManagers.forEach(function (managerWithFilters) {
-      if (!_this7.stateNameInFilters(name, managerWithFilters.filters)) {
-        aggLogger("adding item to state in  state manager for state " + name + ", is persisted = " + isPersisted);
-        aggLogger(managerWithFilters.manager);
-
-        managerWithFilters.manager._addItemToState(name, stateObj, isPersisted);
-      }
-    });
-  };
-
-  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
-    var _this8 = this;
-
-    this.stateManagers.forEach(function (managerWithFilters) {
-      if (!_this8.stateNameInFilters(name, managerWithFilters.filters)) {
-        aggLogger("removing item from state in state manager for state " + name);
-        aggLogger(managerWithFilters.manager);
-
-        managerWithFilters.manager._removeItemFromState(name, stateObj, testForEqualityFunction);
-      }
-    });
-  };
-
-  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
-    var _this9 = this;
-
-    this.stateManagers.forEach(function (managerWithFilters) {
-      if (!_this9.stateNameInFilters(name, managerWithFilters.filters)) {
-        aggLogger("updating item in state in  state manager for state " + name);
-        aggLogger(managerWithFilters.manager);
-
-        managerWithFilters.manager._updateItemInState(name, stateObj, testForEqualityFunction);
-      }
-    });
-  };
-
-  return AggregateStateManager;
-}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
-
-/***/ }),
-
-/***/ "./src/state/AsyncStateManagerWrapper.ts":
+/***/ "./src/state/MemoryBufferStateManager.ts":
 /*!***********************************************!*\
-  !*** ./src/state/AsyncStateManagerWrapper.ts ***!
+  !*** ./src/state/MemoryBufferStateManager.ts ***!
   \***********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AsyncStateManagerWrapper; });
-/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-
-  _setPrototypeOf(subClass, superClass);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-
-
-var asyncLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('state-manager-async');
-
-var AsyncStateManagerWrapper = /*#__PURE__*/function (_AbstractStateManager) {
-  _inheritsLoose(AsyncStateManagerWrapper, _AbstractStateManager);
-
-  function AsyncStateManagerWrapper(topLevelSM, wrappedSM) {
-    var _this;
-
-    _this = _AbstractStateManager.call(this) || this;
-    _this.topLevelSM = topLevelSM;
-    _this.wrappedSM = wrappedSM;
-    _this.forceSaves = false;
-
-    var stateNamesToMonitor = _this.wrappedSM.getConfiguredStateNames();
-
-    _this.stateChanged = _this.stateChanged.bind(_assertThisInitialized(_this));
-    _this.stateChangedItemAdded = _this.stateChangedItemAdded.bind(_assertThisInitialized(_this));
-    _this.stateChangedItemRemoved = _this.stateChangedItemRemoved.bind(_assertThisInitialized(_this));
-    _this.stateChangedItemUpdated = _this.stateChangedItemUpdated.bind(_assertThisInitialized(_this));
-    stateNamesToMonitor.forEach(function (stateName) {
-      _this.wrappedSM.addChangeListenerForName(stateName, _assertThisInitialized(_this));
-    });
-    return _this;
-  }
-
-  var _proto = AsyncStateManagerWrapper.prototype;
-
-  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
-    if (isPersisted === void 0) {
-      isPersisted = false;
-    }
-
-    asyncLogger("adding item to state " + name + " - is persisted " + isPersisted);
-
-    this.wrappedSM._addItemToState(name, stateObj, isPersisted);
-  };
-
-  _proto._getState = function _getState(name) {
-    // assume wrapped SM is asynchronous
-    // make the call to get state but supply the caller with an empty state for now
-    asyncLogger("getting state " + name);
-
-    this.wrappedSM._getState(name);
-
-    return {
-      name: name,
-      value: []
-    };
-  };
-
-  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
-    asyncLogger("removing item from state " + name);
-
-    this.wrappedSM._removeItemFromState(name, stateObj, testForEqualityFunction);
-  };
-
-  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
-    asyncLogger("updating item in state " + name);
-
-    this.wrappedSM._updateItemInState(name, stateObj, testForEqualityFunction);
-  };
-
-  _proto._ensureStatePresent = function _ensureStatePresent(name) {
-    this.wrappedSM._ensureStatePresent(name);
-  };
-
-  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {} // assume already present
-  ;
-
-  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {} // not implemented, not replacing state wholesale
-  ;
-
-  _proto._saveState = function _saveState(name, stateObj) {} // not implemented, not replacing state wholesale
-  ;
-
-  _proto.stateChangedItemRemoved = function stateChangedItemRemoved(name, itemRemoved) {} // not implemented, assumes called to wrapped SM worked
-  ;
-
-  _proto.stateChangedItemUpdated = function stateChangedItemUpdated(name, itemUpdated, itemNewValue) {} // not implemented, assumes called to wrapped SM worked
-  ;
-
-  _proto.stateChanged = function stateChanged(name, newValue) {
-    // received new state from the wrapped SM
-    // pass the received state to the top level SM
-    asyncLogger("Wrapped SM has supplied new state " + name + " passing to top level SM");
-    asyncLogger(newValue);
-
-    this.topLevelSM._saveState(name, newValue);
-
-    this.topLevelSM.informChangeListenersForStateWithName(name, newValue, _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].StateChanged);
-  };
-
-  _proto.stateChangedItemAdded = function stateChangedItemAdded(name, itemAdded) {
-    asyncLogger("Wrapped SM has supplied new completed item for state " + name + " passing to top level SM");
-
-    this.topLevelSM._addItemToState(name, itemAdded, true);
-  };
-
-  return AsyncStateManagerWrapper;
-}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["AbstractStateManager"]);
-
-
-
-/***/ }),
-
-/***/ "./src/state/AsynchronousStateManager.ts":
-/*!***********************************************!*\
-  !*** ./src/state/AsynchronousStateManager.ts ***!
-  \***********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-
-  _setPrototypeOf(subClass, superClass);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-
-
-var AsynchronousStateManager = /*#__PURE__*/function (_AbstractStateManager) {
-  _inheritsLoose(AsynchronousStateManager, _AbstractStateManager);
-
-  function AsynchronousStateManager() {
-    return _AbstractStateManager.apply(this, arguments) || this;
-  }
-
-  return AsynchronousStateManager;
-}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["AbstractStateManager"]);
-
-/* harmony default export */ __webpack_exports__["default"] = (AsynchronousStateManager);
-
-/***/ }),
-
-/***/ "./src/state/BrowserStorageStateManager.ts":
-/*!*************************************************!*\
-  !*** ./src/state/BrowserStorageStateManager.ts ***!
-  \*************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BrowserStorageStateManager; });
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-
-  _setPrototypeOf(subClass, superClass);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-
-
-var lsLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('local-storage');
-
-var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
-  _inheritsLoose(BrowserStorageStateManager, _AbstractStateManager);
-
-  BrowserStorageStateManager.getInstance = function getInstance(useLocalStorage) {
-    if (useLocalStorage === void 0) {
-      useLocalStorage = false;
-    }
-
-    if (!BrowserStorageStateManager._instance) {
-      BrowserStorageStateManager._instance = new BrowserStorageStateManager(useLocalStorage);
-    }
-
-    return BrowserStorageStateManager._instance;
-  };
-
-  function BrowserStorageStateManager(useLocalStorage) {
-    var _this;
-
-    if (useLocalStorage === void 0) {
-      useLocalStorage = false;
-    }
-
-    _this = _AbstractStateManager.call(this) || this;
-    _this.storage = window.sessionStorage;
-    if (useLocalStorage) _this.storage = window.localStorage;
-    _this.forceSaves = true;
-    return _this;
-  }
-
-  var _proto = BrowserStorageStateManager.prototype;
-
-  _proto._ensureStatePresent = function _ensureStatePresent(name) {
-    if (this.storage.getItem(name) === null) {
-      this._addNewNamedStateToStorage({
-        name: name,
-        value: []
-      });
-    }
-  };
-
-  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
-    lsLogger("Local Storage: Saving with key " + state.name);
-    lsLogger(state);
-    var stringifiedSaveData = JSON.stringify(state.value);
-    lsLogger(stringifiedSaveData);
-    this.storage.setItem(state.name, stringifiedSaveData);
-  };
-
-  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
-    this._addNewNamedStateToStorage(state);
-  };
-
-  _proto._getState = function _getState(name) {
-    var savedResults = [];
-    lsLogger("Local Storage: Loading with key " + name);
-    var savedResultsJSON = this.storage.getItem(name);
-    lsLogger(savedResultsJSON);
-
-    if (savedResultsJSON !== null) {
-      savedResults = JSON.parse(savedResultsJSON);
-    }
-
-    return savedResults;
-  };
-
-  _proto._saveState = function _saveState(name, newValue) {
-    this._addNewNamedStateToStorage({
-      name: name,
-      value: newValue
-    });
-  };
-
-  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
-    if (isPersisted === void 0) {
-      isPersisted = false;
-    }
-  };
-
-  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {};
-
-  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {};
-
-  return BrowserStorageStateManager;
-}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
-
-
-
-/***/ }),
-
-/***/ "./src/state/MemoryStateManager.ts":
-/*!*****************************************!*\
-  !*** ./src/state/MemoryStateManager.ts ***!
-  \*****************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3734,27 +3294,27 @@ function _setPrototypeOf(o, p) {
 var msManager = debug__WEBPACK_IMPORTED_MODULE_0___default()('state-manager-ms');
 /** To Do - make state unchangeable outside of this class (i.e. deep copies) */
 
-var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
-  _inheritsLoose(MemoryStateManager, _AbstractStateManager);
+var MemoryBufferStateManager = /*#__PURE__*/function (_AbstractStateManager) {
+  _inheritsLoose(MemoryBufferStateManager, _AbstractStateManager);
 
-  MemoryStateManager.getInstance = function getInstance() {
-    if (!MemoryStateManager._instance) {
-      MemoryStateManager._instance = new MemoryStateManager();
+  MemoryBufferStateManager.getInstance = function getInstance() {
+    if (!MemoryBufferStateManager._instance) {
+      MemoryBufferStateManager._instance = new MemoryBufferStateManager();
     }
 
-    return MemoryStateManager._instance;
+    return MemoryBufferStateManager._instance;
   };
 
-  function MemoryStateManager() {
+  function MemoryBufferStateManager() {
     var _this;
 
-    _this = _AbstractStateManager.call(this) || this;
+    _this = _AbstractStateManager.call(this, 'memory') || this;
     _this.applicationState = [];
     _this.forceSaves = true;
     return _this;
   }
 
-  var _proto = MemoryStateManager.prototype;
+  var _proto = MemoryBufferStateManager.prototype;
 
   _proto._ensureStatePresent = function _ensureStatePresent(name) {
     var foundIndex = this.applicationState.findIndex(function (element) {
@@ -3868,10 +3428,10 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     }
   };
 
-  return MemoryStateManager;
+  return MemoryBufferStateManager;
 }(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
 
-/* harmony default export */ __webpack_exports__["default"] = (MemoryStateManager);
+/* harmony default export */ __webpack_exports__["default"] = (MemoryBufferStateManager);
 
 /***/ }),
 
@@ -3885,45 +3445,19 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RESTApiStateManager", function() { return RESTApiStateManager; });
-/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
+/* harmony import */ var _StateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./StateManager */ "./src/state/StateManager.ts");
 /* harmony import */ var _network_Types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../network/Types */ "./src/network/Types.ts");
 /* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../network/DownloadManager */ "./src/network/DownloadManager.ts");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _AsynchronousStateManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AsynchronousStateManager */ "./src/state/AsynchronousStateManager.ts");
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-
-  _setPrototypeOf(subClass, superClass);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
+/* harmony import */ var _StateChangedDelegate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./StateChangedDelegate */ "./src/state/StateChangedDelegate.ts");
 
 
 
 
 
 var apiSMLogger = debug__WEBPACK_IMPORTED_MODULE_3___default()('state-manager-api');
-var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
-  _inheritsLoose(RESTApiStateManager, _AsychronousStateMana);
-
+var RESTApiStateManager = /*#__PURE__*/function () {
   RESTApiStateManager.getInstance = function getInstance() {
     if (!RESTApiStateManager._instance) {
       RESTApiStateManager._instance = new RESTApiStateManager();
@@ -3933,17 +3467,14 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
   };
 
   function RESTApiStateManager() {
-    var _this;
-
-    _this = _AsychronousStateMana.call(this) || this;
-    _this.configuration = [];
-    _this.forceSaves = false;
-    _this.bHasCompletedRun = [];
-    _this.callbackForAddItem = _this.callbackForAddItem.bind(_assertThisInitialized(_this));
-    _this.callbackForRemoveItem = _this.callbackForRemoveItem.bind(_assertThisInitialized(_this));
-    _this.callbackForUpdateItem = _this.callbackForUpdateItem.bind(_assertThisInitialized(_this));
-    _this.callbackForGetItems = _this.callbackForGetItems.bind(_assertThisInitialized(_this));
-    return _this;
+    this.configuration = [];
+    this.delegate = new _StateChangedDelegate__WEBPACK_IMPORTED_MODULE_4__["default"]('restapi');
+    this.emitEvents();
+    this.bHasCompletedRun = [];
+    this.callbackForAddItem = this.callbackForAddItem.bind(this);
+    this.callbackForRemoveItem = this.callbackForRemoveItem.bind(this);
+    this.callbackForUpdateItem = this.callbackForUpdateItem.bind(this);
+    this.callbackForGetItems = this.callbackForGetItems.bind(this);
   }
 
   var _proto = RESTApiStateManager.prototype;
@@ -4041,7 +3572,7 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
       // do we have any data?
       apiSMLogger(data);
       this.setCompletedRun(associatedStateName);
-      this.informChangeListenersForStateWithName(associatedStateName, data, _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].StateChanged);
+      this.delegate.informChangeListenersForStateWithName(associatedStateName, data, _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].StateChanged, null);
     }
   };
 
@@ -4051,8 +3582,7 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
     if (status >= 200 && status <= 299) {
       // do we have any data?
       apiSMLogger(data);
-      var config = this.getConfigurationForStateName(associatedStateName);
-      this.informChangeListenersForStateWithName(associatedStateName, data, _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].ItemAdded);
+      this.delegate.informChangeListenersForStateWithName(associatedStateName, data, _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].ItemAdded, null);
     }
   };
 
@@ -4166,8 +3696,208 @@ var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
     }
   };
 
+  _proto.addChangeListenerForName = function addChangeListenerForName(name, listener) {
+    this.delegate.addChangeListenerForName(name, listener);
+  };
+
+  _proto.addNewItemToState = function addNewItemToState(name, item, isPersisted) {
+    this._addItemToState(name, item, isPersisted);
+  };
+
+  _proto.emitEvents = function emitEvents() {
+    this.delegate.emitEvents();
+  };
+
+  _proto.findItemInState = function findItemInState(name, item, testForEqualityFunction) {
+    throw Error("not implemented");
+  };
+
+  _proto.getStateByName = function getStateByName(name) {
+    this._getState(name);
+  };
+
+  _proto.informChangeListenersForStateWithName = function informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue) {
+    this.delegate.informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue);
+  };
+
+  _proto.isItemInState = function isItemInState(name, item, testForEqualityFunction) {
+    return true;
+  };
+
+  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction) {
+    this._removeItemFromState(name, item, testForEqualityFunction);
+
+    return true;
+  };
+
+  _proto.setStateByName = function setStateByName(name, stateObjectForName, informListeners) {};
+
+  _proto.suppressEvents = function suppressEvents() {
+    this.delegate.suppressEvents();
+  };
+
+  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction) {
+    this._updateItemInState(name, item, testForEqualityFunction);
+
+    return true;
+  };
+
   return RESTApiStateManager;
-}(_AsynchronousStateManager__WEBPACK_IMPORTED_MODULE_4__["default"]);
+}();
+
+/***/ }),
+
+/***/ "./src/state/StateChangedDelegate.ts":
+/*!*******************************************!*\
+  !*** ./src/state/StateChangedDelegate.ts ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _StateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./StateManager */ "./src/state/StateManager.ts");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
+
+
+var smLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('state-manager-delegate');
+
+var StateChangedDelegate = /*#__PURE__*/function () {
+  function StateChangedDelegate(managerName) {
+    this.suppressEventEmits = false;
+    this.managerName = managerName;
+    this.stateChangeListeners = [];
+  }
+
+  var _proto = StateChangedDelegate.prototype;
+
+  _proto.suppressEvents = function suppressEvents() {
+    this.suppressEventEmits = true;
+  };
+
+  _proto.emitEvents = function emitEvents() {
+    this.suppressEventEmits = false;
+  };
+
+  _proto.informChangeListenersForStateWithName = function informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue) {
+    if (eventType === void 0) {
+      eventType = _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].StateChanged;
+    }
+
+    if (previousObjValue === void 0) {
+      previousObjValue = null;
+    }
+
+    smLogger("State Manager: Informing state listeners of " + name);
+
+    if (this.suppressEventEmits) {
+      smLogger("State Manager: Events suppressed");
+      return;
+    }
+
+    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex >= 0) {
+      smLogger("State Manager: Found state listeners of " + name + " with event type " + eventType);
+      /* let each state change listener know */
+
+      var changeListenersForName = this.stateChangeListeners[foundIndex];
+
+      for (var index = 0; index < changeListenersForName.listeners.length; index++) {
+        smLogger("State Manager: Found state listener of " + name + " - informing");
+        var listener = changeListenersForName.listeners[index];
+
+        switch (eventType) {
+          case _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].StateChanged:
+            {
+              listener.stateChanged(this.managerName, name, stateObjValue);
+              break;
+            }
+
+          case _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].ItemAdded:
+            {
+              listener.stateChangedItemAdded(this.managerName, name, stateObjValue);
+              break;
+            }
+
+          case _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].ItemUpdated:
+            {
+              listener.stateChangedItemUpdated(this.managerName, name, previousObjValue, stateObjValue);
+              break;
+            }
+
+          case _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].ItemDeleted:
+            {
+              listener.stateChangedItemRemoved(this.managerName, name, stateObjValue);
+              break;
+            }
+        }
+      }
+    }
+  };
+
+  _proto.ensureListenerSetupForName = function ensureListenerSetupForName(name) {
+    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex < 0) {
+      var listenersNameArrayPair = {
+        name: name,
+        listeners: []
+      };
+      this.stateChangeListeners.push(listenersNameArrayPair);
+    }
+  }
+  /*
+        Add a state listener for a given state name
+        the listener should be a function with two parameters
+        name - string - the name of the state variable that they want to be informed about
+        stateObjValue - object - the new state value
+       */
+  ;
+
+  _proto.addChangeListenerForName = function addChangeListenerForName(name, listener) {
+    this.ensureListenerSetupForName(name);
+    smLogger("State Manager: Adding state listener for " + name);
+    var foundIndex = this.stateChangeListeners.findIndex(function (element) {
+      return element.name === name;
+    });
+
+    if (foundIndex >= 0) {
+      var changeListenersForName = this.stateChangeListeners[foundIndex];
+      changeListenersForName.listeners.push(listener);
+    }
+  };
+
+  return StateChangedDelegate;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (StateChangedDelegate);
+
+/***/ }),
+
+/***/ "./src/state/StateManager.ts":
+/*!***********************************!*\
+  !*** ./src/state/StateManager.ts ***!
+  \***********************************/
+/*! exports provided: stateEventType */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "stateEventType", function() { return stateEventType; });
+var stateEventType;
+
+(function (stateEventType) {
+  stateEventType[stateEventType["ItemAdded"] = 0] = "ItemAdded";
+  stateEventType[stateEventType["ItemUpdated"] = 1] = "ItemUpdated";
+  stateEventType[stateEventType["ItemDeleted"] = 2] = "ItemDeleted";
+  stateEventType[stateEventType["StateChanged"] = 3] = "StateChanged";
+})(stateEventType || (stateEventType = {}));
 
 /***/ }),
 

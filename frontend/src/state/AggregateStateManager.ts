@@ -1,7 +1,8 @@
 import debug from 'debug';
 
-import {AbstractStateManager, stateValue} from "./AbstractStateManager";
+import {stateValue} from "./StateManager";
 import {equalityFunction} from "../util/EqualityFunctions";
+import {AbstractStateManager} from "./AbstractStateManager";
 
 
 const aggLogger = debug('state-manager-aggregate');
@@ -23,9 +24,10 @@ export class AggregateStateManager extends AbstractStateManager {
     }
 
     private constructor() {
-        super();
+        super('aggregate');
         this.stateManagers = [];
-        this.suppressEventEmits = false;
+        this.emitEvents();
+
     }
 
     public addStateManager(stateManager: AbstractStateManager, filters: string[] = []) {

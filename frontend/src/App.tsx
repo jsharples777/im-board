@@ -11,9 +11,6 @@ import BlogEntryView from "./component/BlogEntryView";
 import {isSame} from "./util/EqualityFunctions";
 import DetailsSidebarView from "./component/DetailsSidebarView";
 
-import {BlogEntry, Comment} from './AppTypes';
-import IndexedDBUtil from "./state/IndexedDBStateManager";
-
 
 const logger = debug('app');
 
@@ -177,18 +174,17 @@ class Root extends React.Component{
         let entriesToDisplay = this.state.entries;
         // @ts-ignore
         if (this.state.applyUserFilter && controller.isLoggedIn() && (controller.getLoggedInUserId() > 0)) {
-            entriesToDisplay = entriesToDisplay.filter((entry:BlogEntry) => {
+            entriesToDisplay = entriesToDisplay.filter((entry:any) => {
                 return (entry.createdBy === controller.getLoggedInUserId());
             });
         }
-        const blog = entriesToDisplay.map((entry:BlogEntry, index:number) =>
+        const blog = entriesToDisplay.map((entry:any, index:number) =>
             <BlogEntryView
                 key={index}
                 entry={entry}
                 showCommentsHandler={this.handleSelectEntryComments}
                 editEntryHandler={this.handleShowEditEntry}
                 deleteEntryHandler={this.handleDeleteEntry}
-                config={this.state}
             />
         );
         return (
@@ -330,6 +326,11 @@ class Root extends React.Component{
     handleAddComment(event:Event) {
         logger('Handling Add Comment');
         event.preventDefault();
+        logger('entry comments');
+        // @ts-ignore
+        let entry = controller.getStateManager().getStateByName(this.state.stateNames.selectedEntry);
+        logger(entry.comments.length);
+
         // get the comment element
         // @ts-ignore
         let commentEl:HTMLInputElement = document.getElementById(this.state.ui.commentSideBar.dom.commentId);
@@ -345,23 +346,25 @@ class Root extends React.Component{
         // @ts-ignore
         let creator = controller.getStateManager().findItemInState(this.state.stateNames.users,
             {id: controller.getLoggedInUserId()},
-            isSame);
+                  isSame);
+        logger('user');
         logger(creator);
         // find the selected entry
-        // @ts-ignore
-        let entry = controller.getStateManager().getStateByName(this.state.stateNames.selectedEntry);
         if (entry && commentEl) {
             // create an empty comment
             // @ts-ignore
-            let comment:Comment = {
+
+            let comment = {
                 createdBy: creator.id,
                 commentOn: entry.id,
                 changedOn: parseInt(moment().format('YYYYMMDDHHmmss')),
                 content: commentEl.value.trim()
             }
             commentEl.value = '';
-            controller.addComment(comment);
+            logger('comment');
             logger(comment);
+            controller.addComment(comment);
+
         }
     }
 
@@ -432,7 +435,7 @@ class Root extends React.Component{
     }
 
     // @ts-ignore
-    handleUpdateEntry(entry:BlogEntry) {
+    handleUpdateEntry(entry:any) {
         this.hideAllSideBars();
         controller.updateEntry(entry);
     }
@@ -440,7 +443,7 @@ class Root extends React.Component{
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
-localStorage.debug = 'controller-ts state-manager-ms state-manager-async state-manager-aggregate';
+localStorage.debug = 'app controller-ts state-manager-api view-ts:details socket-ts view-ts:comments';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

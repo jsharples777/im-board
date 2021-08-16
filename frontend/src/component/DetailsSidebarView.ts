@@ -2,7 +2,6 @@ import moment from 'moment';
 import debug from 'debug';
 
 import SidebarView from './SidebarView';
-import stateManager from '../state/MemoryStateManager';
 import {BlogEntry} from "../AppTypes";
 import {AbstractStateManager} from "../state/AbstractStateManager";
 
@@ -64,7 +63,7 @@ class DetailsSidebarView extends SidebarView{
   updateView(name:string, newState:any) {
     viewLogger('Handling update of Details Sidebar View');
     viewLogger(newState);
-    let entry = <BlogEntry>newState;
+    let entry = newState;
     if (entry && entry.title) {
       if (this.titleEl) this.titleEl.value = entry.title;
       if (this.contentEl) this.contentEl.value = entry.content;

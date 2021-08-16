@@ -2,13 +2,11 @@ import debug from 'debug';
 import moment from 'moment';
 
 import controller from "../Controller";
-import stateManager from '../state/MemoryStateManager';
 import {isSame} from '../util/EqualityFunctions';
 
 import SidebarView from './SidebarView';
 import StateChangeListener from "../state/StateChangeListener";
-import MemoryStateManager from "../state/MemoryStateManager";
-import {AbstractStateManager} from "../state/AbstractStateManager";
+import {StateManager} from "../state/StateManager";
 
 const viewLogger = debug('view-ts:comments');
 
@@ -19,7 +17,7 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
     protected newCommentSubmitEl:HTMLElement|null;
 
 
-    constructor(applicationView:any, htmlDocument:HTMLDocument,stateManager:AbstractStateManager) {
+    constructor(applicationView:any, htmlDocument:HTMLDocument,stateManager:StateManager) {
         super(applicationView, htmlDocument, applicationView.state.ui.commentSideBar, applicationView.state.uiPrefs.commentSideBar,stateManager);
 
         // handler binding
@@ -82,7 +80,7 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
         if (id) {
             id = parseInt(id);
             // find the comment in the selected entry
-            let comment = entry.Comments.find((comment:any) => comment.id === id);
+            let comment = entry.comments.find((comment:any) => comment.id === id);
             if (comment) {
                 viewLogger(`Comment created by ${comment.createdBy} and current user is ${controller.getLoggedInUserId()}`);
                 // only able to delete if the comment was created by the current user

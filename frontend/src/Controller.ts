@@ -1,19 +1,12 @@
 import debug from 'debug';
-import downloader from "./network/DownloadManager";
-import MemoryStateManager from "./state/MemoryStateManager";
+import MemoryBufferStateManager from "./state/MemoryBufferStateManager";
 import {isSame} from "./util/EqualityFunctions";
-import notifier from "./notification/NotificationManager";
 import SocketListener from "./socket/SocketListener";
-import socketManager from "./socket/SocketManager";
 import StateChangeListener from "./state/StateChangeListener";
-import {jsonRequest, RequestType} from "./network/Types";
-import {BlogEntry, Comment, User} from "./AppTypes";
 import {AbstractStateManager} from "./state/AbstractStateManager";
-import {AggregateStateManager} from "./state/AggregateStateManager";
-import BrowserStorageStateManager from "./state/BrowserStorageStateManager";
-import IndexedDBStateManager,{collection} from "./state/IndexedDBStateManager";
 import {RESTApiStateManager} from "./state/RESTApiStateManager";
-import AsyncStateManagerWrapper from "./state/AsyncStateManagerWrapper";
+import notifier from "./notification/NotificationManager";
+import socketManager from "./socket/SocketManager";
 
 const cLogger = debug('controller-ts');
 
@@ -22,9 +15,11 @@ class Controller implements SocketListener, StateChangeListener {
     protected clientSideStorage: any;
     protected config: any;
     protected stateManager: AbstractStateManager;
+    protected apiStateManager:RESTApiStateManager;
 
     constructor() {
-        this.stateManager = AggregateStateManager.getInstance();
+        this.stateManager = MemoryBufferStateManager.getInstance();
+        this.apiStateManager = RESTApiStateManager.getInstance();
     }
 
 
@@ -32,52 +27,6 @@ class Controller implements SocketListener, StateChangeListener {
         this.applicationView = applicationView;
         this.clientSideStorage = clientSideStorage;
         this.config = this.applicationView.state;
-
-        let aggregateStateManager:AggregateStateManager = AggregateStateManager.getInstance();
-        // store information in local storage, indexeddb, and memory
-        aggregateStateManager.addStateManager(MemoryStateManager.getInstance());
-        aggregateStateManager.addStateManager(BrowserStorageStateManager.getInstance());
-        let objectStores:collection[] = [
-            { name: this.config.stateNames.users, keyField: 'id'},
-            { name: this.config.stateNames.entries, keyField: 'id'},
-            { name: this.config.stateNames.comments, keyField: 'id'},
-
-        ];
-        // let indexedDBStateManager = IndexedDBStateManager.getInstance();
-        // indexedDBStateManager.initialise(objectStores).then((result) => {
-        //     cLogger('indexed DB setup');
-        // });
-        // aggregateStateManager.addStateManager(indexedDBStateManager,['selectedEntry']);
-        let restAPIStateManager = RESTApiStateManager.getInstance();
-        restAPIStateManager.initialise([
-            {
-                stateName: this.config.stateNames.users,
-                serverURL: this.getServerAPIURL(),
-                api: this.config.apis.users,
-                isActive:true
-            },
-            {
-                stateName: this.config.stateNames.entries,
-                serverURL: this.getServerAPIURL(),
-                api: this.config.apis.entries,
-                isActive:true
-            },
-            {
-                stateName: this.config.stateNames.comments,
-                serverURL: this.getServerAPIURL(),
-                api: this.config.apis.comments,
-                isActive:true
-            }
-        ]);
-        let asyncSM = new AsyncStateManagerWrapper(aggregateStateManager,restAPIStateManager); // link the REST API calls to the Aggregate SM
-        aggregateStateManager.addStateManager(asyncSM,['selectedEntry']);
-        
-
-        // setup Async callbacks for the fetch requests
-        // this.callbackForUsers = this.callbackForUsers.bind(this);
-        // this.callbackForEntries = this.callbackForEntries.bind(this);
-        // this.callbackForCreateEntry = this.callbackForCreateEntry.bind(this);
-        // this.callbackForCreateComment = this.callbackForCreateComment.bind(this);
 
         // state listener
         this.stateChanged = this.stateChanged.bind(this);
@@ -98,247 +47,42 @@ class Controller implements SocketListener, StateChangeListener {
         cLogger('Initialising data state');
         // listen for socket events
         socketManager.setListener(this);
-        // load the users
-        this.getStateManager().getStateByName(this.config.stateNames.users);
+        // setup the API calls
+        this.apiStateManager.initialise([
+            {
+                stateName: this.config.stateNames.users,
+                serverURL: this.getServerAPIURL(),
+                api: this.config.apis.users,
+                isActive:true
+            },
+            {
+                stateName: this.config.stateNames.entries,
+                serverURL: this.getServerAPIURL(),
+                api: this.config.apis.entries,
+                isActive:true
+            },
+            {
+                stateName: this.config.stateNames.comments,
+                serverURL: this.getServerAPIURL(),
+                api: this.config.apis.comments,
+                isActive:true
+            }
+        ]);
+        this.apiStateManager.addChangeListenerForName(this.config.stateNames.entries, this);
+        this.apiStateManager.addChangeListenerForName(this.config.stateNames.comments, this);
+        this.apiStateManager.addChangeListenerForName(this.config.stateNames.users, this);
+
         // load the entries
-        this.getStateManager().getStateByName(this.config.stateNames.entries);
+        this.apiStateManager.getStateByName(this.config.stateNames.entries);
+        // load the users
+        this.apiStateManager.getStateByName(this.config.stateNames.users);
         // load the comments
-        this.getStateManager().getStateByName(this.config.stateNames.comments);
+        this.apiStateManager.getStateByName(this.config.stateNames.comments);
     }
     
     public getStateManager():AbstractStateManager {
         return this.stateManager;
     }
-
-
-    /*
-    *
-    * Call back functions for database operations
-    *
-     */
-    // private callbackForUsers(data: any, status: number) {
-    //     cLogger('callback for all users');
-    //     let users:User[] = [];
-    //     if (status >= 200 && status <= 299) { // do we have any data?
-    //         cLogger(data);
-    //         // covert the data to the AppType User
-    //         data.forEach((cbUser:any) => {
-    //             let user:User = {
-    //                 id:cbUser.id,
-    //                 username:cbUser.username
-    //             }
-    //             users.push(user);
-    //         });
-    //     }
-    //     this.getStateManager().setStateByName(this.config.stateNames.users, users);
-    // }
-
-    // private static convertJSONCommentToComment(jsonComment:any):Comment {
-    //     let comment:Comment = {
-    //         id:jsonComment.id,
-    //         content:jsonComment.content,
-    //         createdBy:jsonComment.createdBy,
-    //         changedOn:jsonComment.changedOn,
-    //         commentOn:jsonComment.commentOn,
-    //     };
-    //     return comment;
-    // }
-    //
-    // private static convertJSONUserToUser(jsonUser:any):User {
-    //     let user:User = {
-    //         id:jsonUser.id,
-    //         username:jsonUser.username,
-    //     }
-    //     return user;
-    // }
-    //
-    // private static convertJSONEntryToBlogEntry(jsonEntry:any):BlogEntry {
-    //     let entry:BlogEntry = {
-    //         id: jsonEntry.id,
-    //         title:jsonEntry.title,
-    //         content:jsonEntry.content,
-    //         createdBy:jsonEntry.createdBy,
-    //         changedOn:jsonEntry.changedOn,
-    //         User:null,
-    //         Comments:[],
-    //     }
-    //     const cbUser:User|null = jsonEntry.user;
-    //     if (cbUser) {
-    //         entry.User = Controller.convertJSONUserToUser(cbUser);
-    //     }
-    //     const cbComments:Comment[]|null = jsonEntry.comments;
-    //     if (cbComments) {
-    //         cbComments.forEach((cbComment:any) => {
-    //             let comment = Controller.convertJSONCommentToComment(cbComment);
-    //             entry.Comments.push(comment);
-    //         });
-    //     }
-    //     return entry;
-    // }
-    //
-    // private callbackForEntries(data: any, status: number, stateName:string) {
-    //     cLogger('callback for all entries');
-    //     let entries:BlogEntry[] = [];
-    //     if (status >= 200 && status <= 299) { // do we have any data?
-    //         cLogger(data);
-    //         data.forEach((cbEntry:any) => {
-    //             let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(cbEntry);
-    //             entries.push(entry);
-    //         });
-    //     }
-    //     this.getStateManager().setStateByName(this.config.stateNames.entries, entries);
-    // }
-    //
-    // private callbackForCreateEntry(data: any, status: number, stateName:string) {
-    //     cLogger('callback for create entry');
-    //     if (status >= 200 && status <= 299) { // do we have any data?
-    //         cLogger(data);
-    //         let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(data);
-    //         this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
-    //     }
-    // }
-    //
-    // private callbackForCreateComment(data: any, status: number, stateName:string) {
-    //     cLogger('callback for create comment');
-    //     if (status >= 200 && status <= 299) { // do we have any data?
-    //         let comment:Comment = Controller.convertJSONCommentToComment(data);
-    //         cLogger(comment);
-    //         // find the corresponding entry in state
-    //         let entry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: comment.commentOn}, isSame);
-    //         cLogger(entry);
-    //         if (entry) {
-    //             cLogger('callback for create comment - updating entry');
-    //             // update the entry with the new comment
-    //             entry.Comments.push(comment);
-    //             // update the entry in the state manager
-    //             this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
-    //             // reselect the same entry
-    //             this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, entry);
-    //             cLogger(entry);
-    //         }
-    //     }
-    //
-    // }
-
-    /*
-    *
-    *   API calls
-    *
-     */
-
-    // private getAllUsers(): void {
-    //     cLogger('Getting All Users');
-    //     const jsonRequest: jsonRequest = {
-    //         url: this.getServerAPIURL() + this.config.apis.users,
-    //         type: RequestType.GET,
-    //         params: {},
-    //         callback: this.callbackForUsers,
-    //         associatedStateName: this.config.apis.users
-    //     };
-    //     downloader.addApiRequest(jsonRequest, true);
-    // }
-    //
-    // private getAllEntries(): void {
-    //     cLogger('Getting All Entries');
-    //     const jsonRequest: jsonRequest = {
-    //         url: this.getServerAPIURL() + this.config.apis.entries,
-    //         type: RequestType.GET,
-    //         params: {},
-    //         callback: this.callbackForEntries,
-    //         associatedStateName: this.config.apis.entries
-    //     };
-    //     downloader.addApiRequest(jsonRequest, true);
-    // }
-    //
-    // private apiDeleteComment(id: number):void {
-    //     const deleteCommentCB = function (data: any, status: number, stateName:string) {
-    //         cLogger('callback for delete comment');
-    //         if (status >= 200 && status <= 299) { // do we have any data?
-    //             cLogger(data);
-    //         }
-    //     }
-    //
-    //
-    //     const jsonRequest: jsonRequest = {
-    //         url: this.getServerAPIURL() + this.config.apis.comment,
-    //         type: RequestType.DELETE,
-    //         params: {
-    //             id: id
-    //         },
-    //         callback: deleteCommentCB,
-    //         associatedStateName: ''
-    //     };
-    //     downloader.addApiRequest(jsonRequest);
-    //
-    // }
-    //
-    // private apiDeleteEntry(entry: BlogEntry):void {
-    //     const deleteCB = function (data: any, status: number, stateName:string) {
-    //         cLogger('callback for delete entry');
-    //         if (status >= 200 && status <= 299) { // do we have any data?
-    //             cLogger(data);
-    //         }
-    //     }
-    //
-    //     if (entry) {
-    //         const jsonRequest:jsonRequest = {
-    //             url: this.getServerAPIURL() + this.config.apis.entries,
-    //             type: RequestType.DELETE,
-    //             params: {
-    //                 id: entry.id
-    //             },
-    //             callback: deleteCB,
-    //             associatedStateName: this.config.apis.entries
-    //         };
-    //         downloader.addApiRequest(jsonRequest);
-    //     }
-    // }
-    //
-    // private apiCreateEntry(entry:BlogEntry):void {
-    //     if (entry) {
-    //         const jsonRequest:jsonRequest = {
-    //             url: this.getServerAPIURL() + this.config.apis.entries,
-    //             type: RequestType.POST,
-    //             params: entry,
-    //             callback: this.callbackForCreateEntry,
-    //             associatedStateName: this.config.apis.entries
-    //         };
-    //         downloader.addApiRequest(jsonRequest, true);
-    //     }
-    // }
-    //
-    // private apiCreateComment(comment:Comment):void {
-    //     if (comment) {
-    //         const jsonRequest:jsonRequest = {
-    //             url: this.getServerAPIURL() + this.config.apis.comment,
-    //             type: RequestType.POST,
-    //             params: comment,
-    //             callback: this.callbackForCreateComment,
-    //             associatedStateName: ''
-    //         };
-    //         downloader.addApiRequest(jsonRequest, true);
-    //     }
-    // }
-    //
-    // private apiUpdateEntry(entry:BlogEntry):void {
-    //     const updateCB = function (data: any, status: number, stateName:string) {
-    //         cLogger('callback for update entry');
-    //         if (status >= 200 && status <= 299) { // do we have any data?
-    //             cLogger(data);
-    //         }
-    //     }
-    //
-    //     if (entry) {
-    //         const jsonRequest:jsonRequest = {
-    //             url: this.getServerAPIURL() + this.config.apis.entries,
-    //             type: RequestType.PUT,
-    //             params: entry,
-    //             callback: updateCB,
-    //             associatedStateName: this.config.apis.entries
-    //         };
-    //         downloader.addApiRequest(jsonRequest);
-    //     }
-    // }
 
     /*
     *
@@ -387,46 +131,46 @@ class Controller implements SocketListener, StateChangeListener {
         let entry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
         if (entry) {
             cLogger(`Handling delete comment for ${entry.id} and comment ${id}`);
-            // find the comment in the entry and remove it from the state
-            let comments = this.getStateManager().getStateByName(this.config.stateNames.comments);
-            const foundIndex = comments.findIndex((element: any) => element.id === id);
-            if (foundIndex >= 0) {
-                // remove comment from the array
-                cLogger('Found comment in state - removing');
-                this.getStateManager().removeItemFromState(this.config.stateNames.comments,{id:id},isSame)
-                // update the statement manager
-                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, entry);
-            }
+            this.getStateManager().removeItemFromState(this.config.stateNames.comments,{id:id},isSame)
+            // send the api call
+            this.apiStateManager.removeItemFromState(this.config.stateNames.comments,{id:id},isSame);
         }
     }
 
-    public deleteEntry(entry:BlogEntry):void {
+    public deleteEntry(entry:any):void {
         if (entry) {
             cLogger(`Handling delete entry for ${entry.id}`);
             // update the state manager
             this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, isSame);
+            // send the api call
+            this.apiStateManager.removeItemFromState(this.config.stateNames.entries,{id:entry.id},isSame);
         }
     }
 
-    public updateEntry(entry:BlogEntry):void {
+    public updateEntry(entry:any):void {
         if (entry) {
             cLogger(entry);
             if (entry.id) {
                 cLogger(`Handling update for entry ${entry.id}`);
                 // update the state manager
                 this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
+                // send the api call
+                this.apiStateManager.updateItemInState(this.config.stateNames.entries,entry,isSame);
+
             } else {
                 cLogger(`Handling create for entry`);
-                this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
+                // send the api call and let the completed entry with id come back asynchronously
+                this.apiStateManager.addNewItemToState(this.config.stateNames.entries,entry, false);
             }
         }
     }
 
-    public addComment(comment:Comment):void  {
+    public addComment(comment:any):void  {
         if (comment) {
             cLogger(comment);
             cLogger(`Handling create for comment`);
-            this.getStateManager().addNewItemToState(this.config.stateNames.comments,comment);
+            // send the api call and let the completed entry with id come back asynchronously
+            this.apiStateManager.addNewItemToState(this.config.stateNames.comments,comment, false);
         }
     }
 
@@ -447,193 +191,261 @@ class Controller implements SocketListener, StateChangeListener {
     public handleDataChangedByAnotherUser(message:any) {
         cLogger(`Handling data change ${message.type} on object type ${message.stateName} made by user ${message.user}`);
         const changeUser = this.getStateManager().findItemInState(this.config.stateNames.users, {id: message.user}, isSame);
+        let username = "unknown";
+        if (changeUser) {
+            username = changeUser.username;
+        }
+        cLogger(`Handling data change ${message.type} on object type ${message.stateName} made by user ${username}`);
+
         let stateObj = message.data;
         cLogger(stateObj);
         // ok lets work out where this change belongs
-        // try {
-        //     switch (message.type) {
-        //         case "create": {
-        //             switch (message.objectType) {
-        //                 case "Comment": {
-        //                     // updating comments is more tricky as it is a sub object of the blog entry
-        //                     // find the entry in question
-        //                     const changedEntry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
-        //                     if (changedEntry) {
-        //                         let comment:Comment = Controller.convertJSONCommentToComment(stateObj);
-        //                         // add the new comment
-        //                         changedEntry.Comments.push(comment);
-        //                         // update the state
-        //                         this.getStateManager().updateItemInState(this.config.stateNames.entries, changedEntry, isSame);
-        //                         // was this entry current open by the user?
-        //                         const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
-        //                         if (currentSelectedEntry) {
-        //                             if (currentSelectedEntry.id === changedEntry.id) {
-        //                                 this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, changedEntry);
-        //                             }
-        //                         }
-        //                         let username = "unknown";
-        //                         if (changeUser) {
-        //                             username = changeUser.username;
-        //                         }
-        //                         notifier.show(changedEntry.title, `${username} added comment ${stateObj.content}`);
-        //                     }
-        //                     break;
-        //                 }
-        //                 case "BlogEntry": {
-        //                     let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(stateObj);
-        //                     cLogger("Converting to BlogEntry type for Create");
-        //                     cLogger(entry);
-        //                     // add the new item to the state
-        //                     this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry);
-        //                     let username = "unknown";
-        //                     if (changeUser) {
-        //                         username = changeUser.username;
-        //                     }
-        //
-        //                     notifier.show(stateObj.title, `${username} added new entry`);
-        //                     break;
-        //                 }
-        //                 case "User": {
-        //                     let user:User = Controller.convertJSONUserToUser(stateObj);
-        //                     // add the new item to the state
-        //                     this.getStateManager().addNewItemToState(this.config.stateNames.users, user);
-        //
-        //                     notifier.show(stateObj.username, `${stateObj.username} has just registered.`, 'message');
-        //                     break;
-        //                 }
-        //             }
-        //             break;
-        //         }
-        //         case "update": {
-        //             switch (message.objectType) {
-        //                 case "BlogEntry": {
-        //                     let entry:BlogEntry = Controller.convertJSONEntryToBlogEntry(stateObj);
-        //                     cLogger("Converting to BlogEntry type for Update");
-        //                     cLogger(entry);
-        //                     // update the item in the state
-        //                     this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
-        //                     // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
-        //                     break;
-        //                 }
-        //             }
-        //             break;
-        //         }
-        //         case "delete": {
-        //             switch (message.objectType) {
-        //                 case "Comment": {
-        //                     // removing comments is more tricky as it is a sub object of the blog entry
-        //                     // find the entry in question
-        //                     const changedEntry = <BlogEntry|null>this.getStateManager().findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
-        //                     cLogger(changedEntry);
-        //                     if (changedEntry) {
-        //                         // remove the comment
-        //                         let comments = changedEntry.Comments;
-        //                         const foundIndex = comments.findIndex((element:any) => element.id === stateObj.id);
-        //                         if (foundIndex >= 0) {
-        //                             // remove comment from the array
-        //                             cLogger('Found comment in entry - removing');
-        //                             comments.splice(foundIndex, 1);
-        //                             cLogger(changedEntry);
-        //
-        //                             // update the state
-        //                             this.getStateManager().updateItemInState(this.config.stateNames.entries, changedEntry, isSame);
-        //                             // was this entry current open by the user?
-        //                             const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
-        //                             if (currentSelectedEntry) {
-        //                                 if (currentSelectedEntry.id === changedEntry.id) {
-        //                                     this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, changedEntry);
-        //                                 }
-        //                             }
-        //                         }
-        //
-        //                     }
-        //                     break;
-        //                 }
-        //                 case "BlogEntry": {
-        //                     cLogger(`Deleting Blog Entry with id ${stateObj.id}`);
-        //                     const deletedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, stateObj, isSame);
-        //                     cLogger(deletedEntry);
-        //                     if (deletedEntry) {
-        //                         cLogger(`Deleting Blog Entry with id ${deletedEntry.id}`);
-        //                         this.getStateManager().removeItemFromState(this.config.stateNames.entries, deletedEntry, isSame);
-        //                         // the current user could be accessing the comments in the entry that was just deleted
-        //                         const currentSelectedEntry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
-        //                         if (currentSelectedEntry) {
-        //                             if (currentSelectedEntry.id === deletedEntry.id) {
-        //                                 cLogger(`Deleted entry is selected by user, closing sidebars`);
-        //                                 // ask the application to close any access to the comments
-        //                                 this.applicationView.hideAllSideBars();
-        //                             }
-        //                         }
-        //                         notifier.show(deletedEntry.title, `${deletedEntry.User.username} has deleted this entry.`, 'danger');
-        //                     }
-        //
-        //                     break;
-        //                 }
-        //             }
-        //             break;
-        //         }
-        //     }
-        // } catch (err) {
-        //     cLogger(err);
-        // }
+        try {
+            switch (message.type) {
+                case "create": {
+                    switch (message.stateName) {
+                        case this.config.stateNames.comments: {
+                            this.getStateManager().addNewItemToState(this.config.stateNames.comments,stateObj,true);
+                            // find the entry in question
+                            const changedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
+                            if (changedEntry) {
+                                notifier.show(changedEntry.title, `${username} added comment ${stateObj.content}`);
+                            }
+                            break;
+                        }
+                        case this.config.stateNames.entries: {
+                            this.getStateManager().addNewItemToState(this.config.stateNames.entries, stateObj,true);
+                            notifier.show(stateObj.title, `${username} added new entry`);
+                            break;
+                        }
+                        case this.config.stateNames.users: {
+                            this.getStateManager().addNewItemToState(this.config.stateNames.users, stateObj,true);
+                            notifier.show(stateObj.username, `${stateObj.username} has just registered.`, 'message');
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case "update": {
+                    switch (message.stateName) {
+                        case this.config.stateNames.entries: {
+                            this.getStateManager().updateItemInState(this.config.stateNames.entries, stateObj, isSame);
+                            // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case "delete": {
+                    switch (message.stateName) {
+                        case this.config.stateNames.comments: {
+                            this.getStateManager().removeItemFromState(this.config.stateNames.comments,stateObj,isSame);
+                            break;
+                        }
+                        case this.config.stateNames.entries: {
+                            let deletedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, stateObj, isSame);
+                            this.getStateManager().removeItemFromState(this.config.stateNames.entries, stateObj, isSame);
+                            notifier.show(deletedEntry.title, `${username} has deleted this entry.`, 'priority');
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        } catch (err) {
+            cLogger(err);
+        }
 
     }
 
     //  State Management listening
-    stateChangedItemAdded(name: string, itemAdded: any): void {
+    stateChangedItemAdded(managerName:string, name: string, itemAdded: any): void {
         cLogger(`State changed ${name} - item Added`);
         cLogger(itemAdded);
-        if (name === this.config.stateNames.entries) {
-            this.applicationView.setState({
-                isLoggedIn: this.isLoggedIn(),
-                loggedInUserId: this.getLoggedInUserId(),
-                selectedEntry: {},
-                entries: this.getStateManager().getStateByName(name)
-            });
+        switch (managerName) {
+            case 'memory': {
+                cLogger(`received state from ${managerName} for state ${name} - updating application view`);
+                let selectedEntry = this.applicationView.state.selectedEntry;
+                switch (name) {
+                    case this.config.stateNames.entries: {
+                        this.composeBlogEntry(itemAdded);
+                        this.applicationView.setState({
+                            isLoggedIn: this.isLoggedIn(),
+                            loggedInUserId: this.getLoggedInUserId(),
+                            selectedEntry: selectedEntry,
+                            entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                        });
+                        break;
+                    }
+                    case this.config.stateNames.comments: {
+                        let updatedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries,{id:itemAdded.commentOn},isSame);
+                        cLogger(`updating comments for entry ${updatedEntry.id} = ${updatedEntry.comments.length}`);
+                        cLogger(updatedEntry);
+                        this.composeBlogEntry(updatedEntry);
+                        cLogger(`updating comments for entry ${updatedEntry.id} = ${updatedEntry.comments.length}`);
+                        cLogger(updatedEntry);
+                        this.composeBlogEntry(selectedEntry);
+                        cLogger(`updating comments for entry ${updatedEntry.id} = ${updatedEntry.comments.length}`);
+
+                        this.applicationView.setState({
+                            isLoggedIn: this.isLoggedIn(),
+                            loggedInUserId: this.getLoggedInUserId(),
+                            selectedEntry: selectedEntry,
+                            entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                        });
+                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry);
+                        break;
+                    }
+                }
+                break;
+            }
+            case 'restapi': {
+                cLogger(`received state from ${managerName} for state ${name} - added items are unknown the the application`);
+                if (name === this.config.stateNames.comments) {
+                    cLogger(this.getStateManager().getStateByName(this.config.stateNames.comments).length);
+                }
+                this.getStateManager().addNewItemToState(name,itemAdded,true);
+                if (name === this.config.stateNames.comments) {
+                    cLogger(this.getStateManager().getStateByName(this.config.stateNames.comments).length);
+                }
+                break;
+            }
         }
     }
 
-    stateChangedItemRemoved(name: string, itemRemoved: any): void {
-        cLogger(`State changed ${name} - item removed`);
+    stateChangedItemRemoved(managerName:string, name: string, itemRemoved: any): void {
+        cLogger(`State changed ${name} - item Removed`);
         cLogger(itemRemoved);
-        if (name === this.config.stateNames.entries) {
-            this.applicationView.setState({
-                isLoggedIn: this.isLoggedIn(),
-                loggedInUserId: this.getLoggedInUserId(),
-                selectedEntry: {},
-                entries: this.getStateManager().getStateByName(name)
-            });
+        switch (managerName) {
+            case 'memory': {
+                cLogger(`received state from ${managerName} for state ${name} - updating application view`);
+                let selectedEntry = this.applicationView.state.selectedEntry;
+                switch (name) {
+                    case this.config.stateNames.entries: {
+                        if (selectedEntry) {
+                            if (isSame(selectedEntry,itemRemoved)) {
+                                selectedEntry = {};
+                                this.applicationView.hideAllSideBars();
+                            }
+                        }
+                        this.applicationView.setState({
+                            isLoggedIn: this.isLoggedIn(),
+                            loggedInUserId: this.getLoggedInUserId(),
+                            selectedEntry: selectedEntry,
+                            entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                        });
+                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry);
+                        break;
+                    }
+                    case this.config.stateNames.comments: {
+                        let updatedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries,{id:itemRemoved.commentOn},isSame);
+                        this.composeBlogEntry(updatedEntry);
+                        this.composeBlogEntry(selectedEntry);
+                        this.applicationView.setState({
+                            isLoggedIn: this.isLoggedIn(),
+                            loggedInUserId: this.getLoggedInUserId(),
+                            selectedEntry: selectedEntry,
+                            entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                        });
+                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry);
+                        break;
+                    }
+                }
+                break;
+            }
+            case 'restapi': {
+                cLogger(`received state from ${managerName} for state ${name} - ignoring, should be in memory already`);
+                break;
+            }
         }
     }
 
-    stateChangedItemUpdated(name: string, itemUpdated: any, itemNewValue: any): void {
+    private composeBlogEntry(entry:any) {
+        if (!entry) return;
+        // find the user for the entry
+        let user:any = controller.getStateManager().findItemInState(this.config.stateNames.users,{id:entry.createdBy},isSame);
+        if (!user) user = { id:-1, username:'unknown'};
+
+        const allComments:any[] = controller.getStateManager().getStateByName(this.config.stateNames.comments);
+        // get the comments for the entry
+        let comments = allComments.filter((comment:any) => comment.commentOn === entry.id);
+        if (!comments) comments = [];
+
+        entry.user = user;
+        entry.comments = comments;
+    }
+
+    private composeAllBlogEntries() {
+        let entries = this.getStateManager().getStateByName(this.config.stateNames.entries);
+        entries.forEach((entry:any) => {
+            this.composeBlogEntry(entry);
+        });
+    }
+
+    stateChangedItemUpdated(managerName:string, name: string, itemUpdated: any, itemNewValue: any): void {
         cLogger(`State changed ${name} - item updated`);
-        cLogger(itemNewValue);
-        if (name === this.config.stateNames.entries) {
-            this.applicationView.setState({
-                isLoggedIn: this.isLoggedIn(),
-                loggedInUserId: this.getLoggedInUserId(),
-                selectedEntry: {},
-                entries: this.getStateManager().getStateByName(name)
-            });
+        cLogger(itemUpdated);
+        switch (managerName) {
+            case 'memory': {
+                cLogger(`received state from ${managerName} for state ${name} - updating application view`);
+                let selectedEntry = this.applicationView.state.selectedEntry;
+                switch (name) {
+                    case this.config.stateNames.entries: {
+                        this.composeBlogEntry(itemNewValue);
+                        this.composeBlogEntry(selectedEntry);
+                        this.applicationView.setState({
+                            isLoggedIn: this.isLoggedIn(),
+                            loggedInUserId: this.getLoggedInUserId(),
+                            selectedEntry: selectedEntry,
+                            entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                        });
+                        break;
+                    }
+                }
+                break;
+            }
+            case 'restapi': {
+                cLogger(`received state from ${managerName} for state ${name} - ignoring, should be in memory already`);
+                break;
+            }
         }
+
     }
 
-    stateChanged(name: string, values: any) {
+    stateChanged(managerName:string, name: string, values: any) {
         cLogger(`State changed ${name}`);
         cLogger(values);
-        // entries or comments?
-        if (name === this.config.stateNames.entries) {
-            return; // waiting for comments to be done
-        }
-        if (name === this.config.stateNames.comments) {
-            this.applicationView.setState({
-                isLoggedIn: this.isLoggedIn(),
-                loggedInUserId: this.getLoggedInUserId(),
-                selectedEntry: {},
-                entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
-            });
+        // what has changed and by whom?
+        switch (managerName) {
+            case 'memory': {
+                cLogger(`received state from ${managerName} for state ${name} - sending to application view`);
+                switch (name) {
+                    case this.config.stateNames.entries: {
+                        this.composeAllBlogEntries();
+                        break;
+                    }
+                    case this.config.stateNames.comments: {
+                        this.composeAllBlogEntries();
+                        cLogger(this.getStateManager().getStateByName(this.config.stateNames.entries));
+                        this.applicationView.setState({
+                            isLoggedIn: this.isLoggedIn(),
+                            loggedInUserId: this.getLoggedInUserId(),
+                            selectedEntry: {},
+                            entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
+                        });
+                        break;
+                    }
+                    case this.config.stateNames.users: {
+                        break;
+                    }
+                }
+                break;
+            }
+            case 'restapi': {
+                cLogger(`received state from ${managerName} for state ${name} - sending to application state manager`);
+                this.getStateManager().setStateByName(name,values);
+                break;
+            }
         }
     }
 

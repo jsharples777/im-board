@@ -1,18 +1,19 @@
 import debug from 'debug';
-import {AbstractStateManager,stateValue} from './AbstractStateManager';
+import {AbstractStateManager} from './AbstractStateManager';
 import {equalityFunction} from "../util/EqualityFunctions";
+import {stateValue} from "./StateManager";
 
 const msManager = debug('state-manager-ms');
 
 /** To Do - make state unchangeable outside of this class (i.e. deep copies) */
-class MemoryStateManager extends AbstractStateManager {
-  private static _instance:MemoryStateManager;
+class MemoryBufferStateManager extends AbstractStateManager {
+  private static _instance:MemoryBufferStateManager;
 
   public static getInstance() {
-    if (!(MemoryStateManager._instance)) {
-      MemoryStateManager._instance = new MemoryStateManager();
+    if (!(MemoryBufferStateManager._instance)) {
+      MemoryBufferStateManager._instance = new MemoryBufferStateManager();
     }
-    return MemoryStateManager._instance;
+    return MemoryBufferStateManager._instance;
   }
 
 
@@ -20,7 +21,7 @@ class MemoryStateManager extends AbstractStateManager {
   protected applicationState:stateValue[];
 
   protected constructor() {
-    super();
+    super('memory');
     this.applicationState = [];
     this.forceSaves = true;
   }
@@ -108,4 +109,4 @@ class MemoryStateManager extends AbstractStateManager {
 
 }
 
-export default MemoryStateManager;
+export default MemoryBufferStateManager;

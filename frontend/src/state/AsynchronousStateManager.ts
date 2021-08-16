@@ -1,9 +1,9 @@
-import {AbstractStateManager} from "./AbstractStateManager";
+import {StateManager} from "./StateManager";
 
-abstract class AsynchronousStateManager extends AbstractStateManager {
-    public abstract getConfiguredStateNames():string[];
-    public abstract hasCompletedRun(stateName:string):boolean;
-    public abstract forceResetForGet(stateName:string):void;
+interface AsynchronousStateManager extends StateManager{
+    getConfiguredStateNames():string[];
+    hasCompletedRun(stateName:string):boolean;
+    forceResetForGet(stateName:string):void;
 }
 
 export default AsynchronousStateManager;

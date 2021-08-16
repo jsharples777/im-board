@@ -1,7 +1,7 @@
 import debug from 'debug';
 import browserUtil from '../util/BrowserUtil';
 import StateChangeListener from "../state/StateChangeListener";
-import {AbstractStateManager} from "../state/AbstractStateManager";
+import {StateManager} from "../state/StateManager";
 
 const avLogger = debug('view-ts')
 
@@ -13,9 +13,9 @@ export default abstract class AbstractView implements StateChangeListener {
 
   protected config: any;
 
-  protected stateManager: AbstractStateManager;
+  protected stateManager: StateManager;
 
-  protected constructor(applicationView:any, htmlDocument:HTMLDocument, uiConfig:any, uiPrefs:any,stateManager:AbstractStateManager) {
+  protected constructor(applicationView:any, htmlDocument:HTMLDocument, uiConfig:any, uiPrefs:any,stateManager:StateManager) {
     this.applicationView = applicationView;
     this.document = document;
     this.uiConfig = uiConfig;
@@ -158,19 +158,19 @@ export default abstract class AbstractView implements StateChangeListener {
     });
   }
 
-  public stateChanged(name: string, newValue: any): void {
+  public stateChanged(managerName:string, name: string, newValue: any): void {
     this.updateView(name, newValue);
   }
 
-  stateChangedItemAdded(name: string, itemAdded: any): void {
+  stateChangedItemAdded(managerName:string, name: string, itemAdded: any): void {
     this.updateView(name, this.stateManager.getStateByName(name));
   }
 
-  stateChangedItemRemoved(name: string, itemRemoved: any): void {
+  stateChangedItemRemoved(managerName:string, name: string, itemRemoved: any): void {
     this.updateView(name, this.stateManager.getStateByName(name));
   }
 
-  stateChangedItemUpdated(name: string, itemUpdated: any, itemNewValue: any): void {
+  stateChangedItemUpdated(managerName:string, name: string, itemUpdated: any, itemNewValue: any): void {
     this.updateView(name, this.stateManager.getStateByName(name));
   }
 

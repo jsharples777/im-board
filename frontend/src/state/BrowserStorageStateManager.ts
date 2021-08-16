@@ -1,7 +1,8 @@
 import debug from 'debug';
 
-import {AbstractStateManager, stateValue} from "./AbstractStateManager";
+import {AbstractStateManager} from "./AbstractStateManager";
 import {equalityFunction} from '../util/EqualityFunctions';
+import {stateValue} from "./StateManager";
 
 const lsLogger = debug('local-storage');
 
@@ -18,7 +19,7 @@ export default class BrowserStorageStateManager extends AbstractStateManager {
 
 
   protected constructor(useLocalStorage:boolean = false) {
-    super();
+    super('browser');
     this.storage = window.sessionStorage;
     if (useLocalStorage) this.storage = window.localStorage;
     this.forceSaves = true;

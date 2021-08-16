@@ -10,18 +10,9 @@ const beLogger = debug('view-ts:blogentry');
 
 
 // @ts-ignore
-export default function BlogEntryView({entry, showCommentsHandler, editEntryHandler, deleteEntryHandler,config}) {
+export default function BlogEntryView({entry, showCommentsHandler, editEntryHandler, deleteEntryHandler}) {
     if (entry) {
         beLogger(`Entry ${entry.createdBy} === ${controller.getLoggedInUserId()}`);
-
-        // find the user for the entry
-        const user:any = controller.getStateManager().findItemInState(config.stateNames.users,{id:entry.createdBy},isSame);
-        const allComments:any[] = controller.getStateManager().getStateByName(config.stateNames.comments);
-        // get the comments for the entry
-        const comments = allComments.filter((comment:any) => comment.commentOn === entry.id);
-
-        entry.user = user;
-        entry.comments = comments;
 
         let editButton;
         let deleteButton;

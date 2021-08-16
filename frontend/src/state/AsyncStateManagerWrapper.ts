@@ -1,18 +1,20 @@
-import {AbstractStateManager, stateEventType, stateValue} from "./AbstractStateManager";
+import {stateEventType, stateValue} from "./StateManager";
 import StateChangeListener from "./StateChangeListener";
 import {equalityFunction} from "../util/EqualityFunctions";
 
 import debug from 'debug';
-import AsychronousStateManager from "./AsynchronousStateManager";
+import AsynchronousStateManager from "./AsynchronousStateManager";
+import {AbstractStateManager} from "./AbstractStateManager";
+
 
 const asyncLogger = debug('state-manager-async');
 
 export default class AsyncStateManagerWrapper extends AbstractStateManager implements StateChangeListener {
-    protected wrappedSM:AsychronousStateManager;
+    protected wrappedSM:AsynchronousStateManager;
     protected topLevelSM:AbstractStateManager;
 
-    public constructor(topLevelSM:AbstractStateManager, wrappedSM:AsychronousStateManager) {
-        super();
+    public constructor(topLevelSM:AbstractStateManager, wrappedSM:AsynchronousStateManager) {
+        super('async');
         this.topLevelSM = topLevelSM;
         this.wrappedSM = wrappedSM;
         this.forceSaves = false;
@@ -31,7 +33,7 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
 
     _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {
         asyncLogger(`adding item to state ${name} - is persisted ${isPersisted}`);
-        this.wrappedSM._addItemToState(name,stateObj,isPersisted);
+        this.wrappedSM.addNewItemToState(name,stateObj,isPersisted);
     }
 
 
@@ -39,21 +41,21 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
         // assume wrapped SM is asynchronous
         // make the call to get state but supply the caller with an empty state for now
         asyncLogger(`getting state ${name}`);
-        this.wrappedSM._getState(name);
+        this.wrappedSM.getStateByName(name);
         return {name:name, value: []};
     }
 
 
     _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
         asyncLogger(`removing item from state ${name}`);
-        this.wrappedSM._removeItemFromState(name,stateObj,testForEqualityFunction);
+        this.wrappedSM.removeItemFromState(name,stateObj,testForEqualityFunction);
     }
     _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
         asyncLogger(`updating item in state ${name}`);
-        this.wrappedSM._updateItemInState(name,stateObj,testForEqualityFunction);
+        this.wrappedSM.updateItemInState(name,stateObj,testForEqualityFunction);
     }
 
-    _ensureStatePresent(name: string): void {this.wrappedSM._ensureStatePresent(name);}
+    _ensureStatePresent(name: string): void {}// assume already present
     _addNewNamedStateToStorage(state: stateValue): void {} // assume already present
     _replaceNamedStateInStorage(state: stateValue): void {} // not implemented, not replacing state wholesale
     _saveState(name: string, stateObj: any): void {} // not implemented, not replacing state wholesale
@@ -66,13 +68,12 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
         // pass the received state to the top level SM
         asyncLogger(`Wrapped SM has supplied new state ${name} passing to top level SM`);
         asyncLogger(newValue);
-        this.topLevelSM._saveState(name,newValue);
-        this.topLevelSM.informChangeListenersForStateWithName(name,newValue,stateEventType.StateChanged);
+        this.topLevelSM.setStateByName(name,newValue);
     }
 
     stateChangedItemAdded(name: string, itemAdded: any): void {
         asyncLogger(`Wrapped SM has supplied new completed item for state ${name} passing to top level SM`);
-        this.topLevelSM._addItemToState(name,itemAdded,true);
+        this.topLevelSM.addNewItemToState(name,itemAdded,true);
     }
 
 }
