@@ -110,7 +110,7 @@ export abstract class AbstractStateManager {
     public abstract _replaceNamedStateInStorage(state:stateValue):void;
     public abstract _getState(name:string):stateValue;
     public abstract _saveState(name:string,stateObj:any):void;
-    public abstract _addItemToState(name:string,stateObj:any,isComplete:boolean):void;
+    public abstract _addItemToState(name:string,stateObj:any,isPersisted:boolean):void;
     public abstract _removeItemFromState(name:string,stateObj:any,testForEqualityFunction:equalityFunction):void;
     public abstract _updateItemInState(name:string,stateObj:any,testForEqualityFunction:equalityFunction):void;
 
@@ -151,13 +151,13 @@ export abstract class AbstractStateManager {
         return stateObjectForName;
     }
 
-    public addNewItemToState(name:string, item:any, isComplete:boolean = false):void { // assumes state is an array
+    public addNewItemToState(name:string, item:any, isPersisted:boolean = false):void { // assumes state is an array
         this._ensureStatePresent(name);
         smLogger(`State Manager: Adding item to state ${name}`);
         const state = this.getStateByName(name);
         state.push(item);
         smLogger(state);
-        this._addItemToState(name,item,isComplete);
+        this._addItemToState(name,item,isPersisted);
         this.informChangeListenersForStateWithName(name, state,stateEventType.ItemAdded);
     }
 

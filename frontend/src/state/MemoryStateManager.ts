@@ -60,8 +60,8 @@ class MemoryStateManager extends AbstractStateManager {
     }
   }
 
-  _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {
-    if (!isComplete) return; // dont add incomplete objects to the state
+  _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {
+    if (!isPersisted) return; // dont add incomplete objects to the state
     let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
     if (foundIndex > 0) {
       let state:stateValue = this.applicationState[foundIndex];

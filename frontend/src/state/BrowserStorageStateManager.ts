@@ -56,7 +56,7 @@ export default class BrowserStorageStateManager extends AbstractStateManager {
     this._addNewNamedStateToStorage({name:name,value:newValue});
   }
 
-  _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {}
+  _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {}
   _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {}
   _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {}
 

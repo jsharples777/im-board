@@ -77,8 +77,8 @@ class IndexedDBStateManager extends AbstractStateManager {
         fn();
     }
 
-    _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {
-        if (!isComplete) return; // dont add incomplete objects to the state
+    _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {
+        if (!isPersisted) return; // dont add incomplete objects to the state
         this.addNewItemToCollection(name,stateObj);
     }
 

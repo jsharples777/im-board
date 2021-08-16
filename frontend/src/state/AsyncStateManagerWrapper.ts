@@ -3,23 +3,35 @@ import StateChangeListener from "./StateChangeListener";
 import {equalityFunction} from "../util/EqualityFunctions";
 
 import debug from 'debug';
+import AsychronousStateManager from "./AsynchronousStateManager";
 
 const asyncLogger = debug('state-manager-async');
 
 export default class AsyncStateManagerWrapper extends AbstractStateManager implements StateChangeListener {
-    protected wrappedSM:AbstractStateManager;
+    protected wrappedSM:AsychronousStateManager;
     protected topLevelSM:AbstractStateManager;
 
-    public constructor(topLevelSM:AbstractStateManager, wrappedSM:AbstractStateManager) {
+    public constructor(topLevelSM:AbstractStateManager, wrappedSM:AsychronousStateManager) {
         super();
         this.topLevelSM = topLevelSM;
         this.wrappedSM = wrappedSM;
         this.forceSaves = false;
+        let stateNamesToMonitor = this.wrappedSM.getConfiguredStateNames();
+
+        this.stateChanged = this.stateChanged.bind(this);
+        this.stateChangedItemAdded = this.stateChangedItemAdded.bind(this);
+        this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
+        this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
+
+
+        stateNamesToMonitor.forEach((stateName) => {
+           this.wrappedSM.addChangeListenerForName(stateName,this);
+        });
     }
 
-    _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {
-        asyncLogger(`adding item to state ${name} - is complete ${isComplete}`);
-        this.wrappedSM._addItemToState(name,stateObj,isComplete);
+    _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {
+        asyncLogger(`adding item to state ${name} - is persisted ${isPersisted}`);
+        this.wrappedSM._addItemToState(name,stateObj,isPersisted);
     }
 
 

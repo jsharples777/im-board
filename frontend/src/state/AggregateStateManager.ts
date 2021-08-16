@@ -91,12 +91,12 @@ export class AggregateStateManager extends AbstractStateManager {
         });
     }
 
-    _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {
+    _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {
         this.stateManagers.forEach((managerWithFilters) => {
             if (!this.stateNameInFilters(name, managerWithFilters.filters)) {
-                aggLogger(`adding item to state in  state manager for state ${name}, is complete = ${isComplete}`);
+                aggLogger(`adding item to state in  state manager for state ${name}, is persisted = ${isPersisted}`);
                 aggLogger(managerWithFilters.manager);
-                managerWithFilters.manager._addItemToState(name, stateObj,isComplete);
+                managerWithFilters.manager._addItemToState(name, stateObj,isPersisted);
             }
         });
     }

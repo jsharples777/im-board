@@ -3,6 +3,7 @@ import {equalityFunction} from "../util/EqualityFunctions";
 import {jsonRequest, RequestType} from "../network/Types";
 import downloader from "../network/DownloadManager";
 import debug from 'debug';
+import AsychronousStateManager from "./AsynchronousStateManager";
 
 const apiSMLogger = debug('state-manager-api');
 
@@ -13,7 +14,7 @@ type ApiConfig = {
     isActive:boolean
 }
 
-export class RESTApiStateManager extends AbstractStateManager {
+export class RESTApiStateManager extends AsychronousStateManager{
     private static _instance:RESTApiStateManager;
 
     public static getInstance() {
@@ -24,15 +25,31 @@ export class RESTApiStateManager extends AbstractStateManager {
     }
 
     protected configuration:ApiConfig[] = [];
+    protected bHasCompletedRun:boolean = false;
 
     protected constructor() {
         super();
         this.forceSaves = false;
+        this.bHasCompletedRun = false;
 
         this.callbackForAddItem = this.callbackForAddItem.bind(this);
         this.callbackForRemoveItem = this.callbackForRemoveItem.bind(this);
         this.callbackForUpdateItem = this.callbackForUpdateItem.bind(this);
         this.callbackForGetItems = this.callbackForGetItems.bind(this);
+    }
+
+    getConfiguredStateNames(): string[] {
+       let results:string[] = [];
+       this.configuration.forEach((config) => {
+          results.push(config.stateName);
+       });
+       return results;
+    }
+    hasCompletedRun(): boolean {
+        return this.bHasCompletedRun;
+    }
+    forceResetForGet(): void {
+        this.bHasCompletedRun = false;
     }
 
     public initialise(config:ApiConfig[]) {
@@ -110,8 +127,8 @@ export class RESTApiStateManager extends AbstractStateManager {
 
     _saveState(name: string, stateObj: any): void { /* not going to replace all state */ }
 
-    _addItemToState(name: string, stateObj: any,isComplete:boolean = false): void {
-        if (isComplete) return; // dont add complete objects to the state - they are already processed
+    _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {
+        if (isPersisted) return; // dont add complete objects to the state - they are already processed
         apiSMLogger(`Adding item to ${name}`);
         apiSMLogger(stateObj);
         let config: ApiConfig = this.getConfigurationForStateName(name);

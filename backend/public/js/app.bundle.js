@@ -3079,9 +3079,9 @@ var AbstractStateManager = /*#__PURE__*/function () {
     return stateObjectForName;
   };
 
-  _proto.addNewItemToState = function addNewItemToState(name, item, isComplete) {
-    if (isComplete === void 0) {
-      isComplete = false;
+  _proto.addNewItemToState = function addNewItemToState(name, item, isPersisted) {
+    if (isPersisted === void 0) {
+      isPersisted = false;
     } // assumes state is an array
 
 
@@ -3092,7 +3092,7 @@ var AbstractStateManager = /*#__PURE__*/function () {
     state.push(item);
     smLogger(state);
 
-    this._addItemToState(name, item, isComplete);
+    this._addItemToState(name, item, isPersisted);
 
     this.informChangeListenersForStateWithName(name, state, stateEventType.ItemAdded);
   };
@@ -3323,19 +3323,19 @@ var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     });
   };
 
-  _proto._addItemToState = function _addItemToState(name, stateObj, isComplete) {
+  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
     var _this7 = this;
 
-    if (isComplete === void 0) {
-      isComplete = false;
+    if (isPersisted === void 0) {
+      isPersisted = false;
     }
 
     this.stateManagers.forEach(function (managerWithFilters) {
       if (!_this7.stateNameInFilters(name, managerWithFilters.filters)) {
-        aggLogger("adding item to state in  state manager for state " + name + ", is complete = " + isComplete);
+        aggLogger("adding item to state in  state manager for state " + name + ", is persisted = " + isPersisted);
         aggLogger(managerWithFilters.manager);
 
-        managerWithFilters.manager._addItemToState(name, stateObj, isComplete);
+        managerWithFilters.manager._addItemToState(name, stateObj, isPersisted);
       }
     });
   };
@@ -3384,6 +3384,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
 function _inheritsLoose(subClass, superClass) {
   subClass.prototype = Object.create(superClass.prototype);
   subClass.prototype.constructor = subClass;
@@ -3414,19 +3422,29 @@ var AsyncStateManagerWrapper = /*#__PURE__*/function (_AbstractStateManager) {
     _this.topLevelSM = topLevelSM;
     _this.wrappedSM = wrappedSM;
     _this.forceSaves = false;
+
+    var stateNamesToMonitor = _this.wrappedSM.getConfiguredStateNames();
+
+    _this.stateChanged = _this.stateChanged.bind(_assertThisInitialized(_this));
+    _this.stateChangedItemAdded = _this.stateChangedItemAdded.bind(_assertThisInitialized(_this));
+    _this.stateChangedItemRemoved = _this.stateChangedItemRemoved.bind(_assertThisInitialized(_this));
+    _this.stateChangedItemUpdated = _this.stateChangedItemUpdated.bind(_assertThisInitialized(_this));
+    stateNamesToMonitor.forEach(function (stateName) {
+      _this.wrappedSM.addChangeListenerForName(stateName, _assertThisInitialized(_this));
+    });
     return _this;
   }
 
   var _proto = AsyncStateManagerWrapper.prototype;
 
-  _proto._addItemToState = function _addItemToState(name, stateObj, isComplete) {
-    if (isComplete === void 0) {
-      isComplete = false;
+  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
+    if (isPersisted === void 0) {
+      isPersisted = false;
     }
 
-    asyncLogger("adding item to state " + name + " - is complete " + isComplete);
+    asyncLogger("adding item to state " + name + " - is persisted " + isPersisted);
 
-    this.wrappedSM._addItemToState(name, stateObj, isComplete);
+    this.wrappedSM._addItemToState(name, stateObj, isPersisted);
   };
 
   _proto._getState = function _getState(name) {
@@ -3489,6 +3507,48 @@ var AsyncStateManagerWrapper = /*#__PURE__*/function (_AbstractStateManager) {
 }(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["AbstractStateManager"]);
 
 
+
+/***/ }),
+
+/***/ "./src/state/AsynchronousStateManager.ts":
+/*!***********************************************!*\
+  !*** ./src/state/AsynchronousStateManager.ts ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+var AsynchronousStateManager = /*#__PURE__*/function (_AbstractStateManager) {
+  _inheritsLoose(AsynchronousStateManager, _AbstractStateManager);
+
+  function AsynchronousStateManager() {
+    return _AbstractStateManager.apply(this, arguments) || this;
+  }
+
+  return AsynchronousStateManager;
+}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["AbstractStateManager"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (AsynchronousStateManager);
 
 /***/ }),
 
@@ -3597,9 +3657,9 @@ var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     });
   };
 
-  _proto._addItemToState = function _addItemToState(name, stateObj, isComplete) {
-    if (isComplete === void 0) {
-      isComplete = false;
+  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
+    if (isPersisted === void 0) {
+      isPersisted = false;
     }
   };
 
@@ -3715,12 +3775,12 @@ var MemoryStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     }
   };
 
-  _proto._addItemToState = function _addItemToState(name, stateObj, isComplete) {
-    if (isComplete === void 0) {
-      isComplete = false;
+  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
+    if (isPersisted === void 0) {
+      isPersisted = false;
     }
 
-    if (!isComplete) return; // dont add incomplete objects to the state
+    if (!isPersisted) return; // dont add incomplete objects to the state
 
     var foundIndex = this.applicationState.findIndex(function (element) {
       return element.name === name;
@@ -3788,6 +3848,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../network/DownloadManager */ "./src/network/DownloadManager.ts");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _AsynchronousStateManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AsynchronousStateManager */ "./src/state/AsynchronousStateManager.ts");
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -3816,9 +3877,10 @@ function _setPrototypeOf(o, p) {
 
 
 
+
 var apiSMLogger = debug__WEBPACK_IMPORTED_MODULE_3___default()('state-manager-api');
-var RESTApiStateManager = /*#__PURE__*/function (_AbstractStateManager) {
-  _inheritsLoose(RESTApiStateManager, _AbstractStateManager);
+var RESTApiStateManager = /*#__PURE__*/function (_AsychronousStateMana) {
+  _inheritsLoose(RESTApiStateManager, _AsychronousStateMana);
 
   RESTApiStateManager.getInstance = function getInstance() {
     if (!RESTApiStateManager._instance) {
@@ -3831,9 +3893,11 @@ var RESTApiStateManager = /*#__PURE__*/function (_AbstractStateManager) {
   function RESTApiStateManager() {
     var _this;
 
-    _this = _AbstractStateManager.call(this) || this;
+    _this = _AsychronousStateMana.call(this) || this;
     _this.configuration = [];
+    _this.bHasCompletedRun = false;
     _this.forceSaves = false;
+    _this.bHasCompletedRun = false;
     _this.callbackForAddItem = _this.callbackForAddItem.bind(_assertThisInitialized(_this));
     _this.callbackForRemoveItem = _this.callbackForRemoveItem.bind(_assertThisInitialized(_this));
     _this.callbackForUpdateItem = _this.callbackForUpdateItem.bind(_assertThisInitialized(_this));
@@ -3842,6 +3906,22 @@ var RESTApiStateManager = /*#__PURE__*/function (_AbstractStateManager) {
   }
 
   var _proto = RESTApiStateManager.prototype;
+
+  _proto.getConfiguredStateNames = function getConfiguredStateNames() {
+    var results = [];
+    this.configuration.forEach(function (config) {
+      results.push(config.stateName);
+    });
+    return results;
+  };
+
+  _proto.hasCompletedRun = function hasCompletedRun() {
+    return this.bHasCompletedRun;
+  };
+
+  _proto.forceResetForGet = function forceResetForGet() {
+    this.bHasCompletedRun = false;
+  };
 
   _proto.initialise = function initialise(config) {
     this.configuration = config;
@@ -3944,12 +4024,12 @@ var RESTApiStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     /* not going to replace all state */
   };
 
-  _proto._addItemToState = function _addItemToState(name, stateObj, isComplete) {
-    if (isComplete === void 0) {
-      isComplete = false;
+  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
+    if (isPersisted === void 0) {
+      isPersisted = false;
     }
 
-    if (isComplete) return; // dont add complete objects to the state - they are already processed
+    if (isPersisted) return; // dont add complete objects to the state - they are already processed
 
     apiSMLogger("Adding item to " + name);
     apiSMLogger(stateObj);
@@ -4010,7 +4090,7 @@ var RESTApiStateManager = /*#__PURE__*/function (_AbstractStateManager) {
   };
 
   return RESTApiStateManager;
-}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_0__["AbstractStateManager"]);
+}(_AsynchronousStateManager__WEBPACK_IMPORTED_MODULE_4__["default"]);
 
 /***/ }),
 
