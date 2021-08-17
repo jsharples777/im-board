@@ -99,21 +99,21 @@ export class RESTApiStateManager implements AsynchronousStateManager {
     }
 
     private callbackForRemoveItem(data: any, status: number, associatedStateName: string) {
-        apiSMLogger('callback for remove item - assuming client state manager has already removed');
+        apiSMLogger(`callback for remove item for state ${associatedStateName} with status ${status} - not forwarded`);
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
         }
     }
 
     private callbackForUpdateItem(data: any, status: number, associatedStateName: string) {
-        apiSMLogger('callback for remove item - assuming client state manager has already updated');
+        apiSMLogger(`callback for update item for state ${associatedStateName} with status ${status} - not forwarded`);
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
         }
     }
 
     private callbackForGetItems(data: any, status: number, associatedStateName: string) {
-        apiSMLogger('callback for get items');
+        apiSMLogger(`callback for get items for state ${associatedStateName} with status ${status} - FORWARDING`);
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
             this.setCompletedRun(associatedStateName);
@@ -122,7 +122,7 @@ export class RESTApiStateManager implements AsynchronousStateManager {
     }
 
     private callbackForAddItem(data: any, status: number, associatedStateName: string) {
-        apiSMLogger('callback for add item');
+        apiSMLogger(`callback for add item for state ${associatedStateName} with status ${status} - FORWARDING`);
         if (status >= 200 && status <= 299) { // do we have any data?
             apiSMLogger(data);
             this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.ItemAdded,null);

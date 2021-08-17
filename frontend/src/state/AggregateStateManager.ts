@@ -2,13 +2,14 @@ import debug from 'debug';
 
 import {stateValue} from "./StateManager";
 import {equalityFunction} from "../util/EqualityFunctions";
+import {StateManager} from "./StateManager";
 import {AbstractStateManager} from "./AbstractStateManager";
 
 
 const aggLogger = debug('state-manager-aggregate');
 
 type managerWithFilters = {
-    manager:AbstractStateManager,
+    manager:StateManager,
     filters:string[]
 }
 
@@ -30,13 +31,13 @@ export class AggregateStateManager extends AbstractStateManager {
 
     }
 
-    public addStateManager(stateManager: AbstractStateManager, filters: string[] = []) {
+    public addStateManager(stateManager: AbstractStateManager, filters: string[] = [], emitEvents:boolean) {
         let mWF: managerWithFilters = {
             manager: stateManager,
             filters: filters
         };
         this.stateManagers.push(mWF);
-        stateManager.suppressEvents();
+        if (!emitEvents) stateManager.suppressEvents();
         aggLogger('adding state manager with/without filters');
     }
 
@@ -62,10 +63,14 @@ export class AggregateStateManager extends AbstractStateManager {
             if (!this.stateNameInFilters(state.name, sm.filters)) {
                 aggLogger(`get state from state manager for state ${name}`);
                 aggLogger(sm.manager);
-                state = sm.manager._getState(name);
+                sm.manager._getState(name);
             }
 
         });
+        // assuming the state manager is holding all the values
+        if (this.stateManagers.length > 0) {
+            state = this.stateManagers[0].manager._getState(name);
+        }
         return state;
     }
 
@@ -101,6 +106,7 @@ export class AggregateStateManager extends AbstractStateManager {
             if (!this.stateNameInFilters(name, managerWithFilters.filters)) {
                 aggLogger(`adding item to state in  state manager for state ${name}, is persisted = ${isPersisted}`);
                 aggLogger(managerWithFilters.manager);
+                aggLogger(stateObj);
                 managerWithFilters.manager._addItemToState(name, stateObj,isPersisted);
             }
         });
@@ -111,6 +117,7 @@ export class AggregateStateManager extends AbstractStateManager {
             if (!this.stateNameInFilters(name, managerWithFilters.filters)) {
                 aggLogger(`removing item from state in state manager for state ${name}`);
                 aggLogger(managerWithFilters.manager);
+                aggLogger(stateObj);
                 managerWithFilters.manager._removeItemFromState(name, stateObj, testForEqualityFunction);
             }
         });
@@ -121,6 +128,7 @@ export class AggregateStateManager extends AbstractStateManager {
             if (!this.stateNameInFilters(name, managerWithFilters.filters)) {
                 aggLogger(`updating item in state in  state manager for state ${name}`);
                 aggLogger(managerWithFilters.manager);
+                aggLogger(stateObj);
                 managerWithFilters.manager._updateItemInState(name, stateObj, testForEqualityFunction);
             }
         });

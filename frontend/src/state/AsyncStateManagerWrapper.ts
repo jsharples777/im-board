@@ -18,6 +18,8 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
         this.topLevelSM = topLevelSM;
         this.wrappedSM = wrappedSM;
         this.forceSaves = false;
+
+        this.wrappedSM.emitEvents();
         let stateNamesToMonitor = this.wrappedSM.getConfiguredStateNames();
 
         this.stateChanged = this.stateChanged.bind(this);

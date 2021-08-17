@@ -2,7 +2,6 @@ import moment from 'moment';
 import debug from 'debug';
 
 import SidebarView from './SidebarView';
-import {BlogEntry} from "../AppTypes";
 import {AbstractStateManager} from "../state/AbstractStateManager";
 
 const viewLogger = debug('view-ts:details');
