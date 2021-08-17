@@ -50,6 +50,7 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
         asyncLogger(`removing item from state ${name}`);
         this.wrappedSM.removeItemFromState(name,stateObj,testForEqualityFunction);
     }
+
     _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
         asyncLogger(`updating item in state ${name}`);
         this.wrappedSM.updateItemInState(name,stateObj,testForEqualityFunction);
@@ -59,11 +60,11 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
     _addNewNamedStateToStorage(state: stateValue): void {} // assume already present
     _replaceNamedStateInStorage(state: stateValue): void {} // not implemented, not replacing state wholesale
     _saveState(name: string, stateObj: any): void {} // not implemented, not replacing state wholesale
-    stateChangedItemRemoved(name: string, itemRemoved: any): void {} // not implemented, assumes called to wrapped SM worked
-    stateChangedItemUpdated(name: string, itemUpdated: any, itemNewValue: any): void {} // not implemented, assumes called to wrapped SM worked
+    stateChangedItemRemoved(managerName:string, name: string, itemRemoved: any): void {} // not implemented, assumes called to wrapped SM worked
+    stateChangedItemUpdated(managerName:string, name: string, itemUpdated: any, itemNewValue: any): void {} // not implemented, assumes called to wrapped SM worked
 
 
-    stateChanged(name: string, newValue: any): void {
+    stateChanged(managerName:string, name: string, newValue: any): void {
         // received new state from the wrapped SM
         // pass the received state to the top level SM
         asyncLogger(`Wrapped SM has supplied new state ${name} passing to top level SM`);
@@ -71,7 +72,7 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
         this.topLevelSM.setStateByName(name,newValue);
     }
 
-    stateChangedItemAdded(name: string, itemAdded: any): void {
+    stateChangedItemAdded(managerName:string, name: string, itemAdded: any): void {
         asyncLogger(`Wrapped SM has supplied new completed item for state ${name} passing to top level SM`);
         this.topLevelSM.addNewItemToState(name,itemAdded,true);
     }

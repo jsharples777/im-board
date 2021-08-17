@@ -130,41 +130,24 @@ export abstract class AbstractStateManager implements StateManager {
 
     removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
         this._ensureStatePresent(name);
-        let result = false;
-        const state = this.getStateByName(name);
-        const foundIndex = state.findIndex((element: any) => testForEqualityFunction(element, item));
-        if (foundIndex >= 0) {
-            result = true;
-            let oldItem = state[foundIndex];
-            // remove the item from the state
-            smLogger('State Manager: Found item - removing ');
-            //state.splice(foundIndex, 1);
-            smLogger(state);
-            this._removeItemFromState(name, item, testForEqualityFunction);
-            this.setStateByName(name, state, false);
-            this.informChangeListenersForStateWithName(name, oldItem, stateEventType.ItemDeleted);
-        }
+        let result = true;
+        let oldItem = this.findItemInState(name,item,testForEqualityFunction);
+        // remove the item from the state
+        smLogger('State Manager: Found item - removing ');
+        this._removeItemFromState(name, item, testForEqualityFunction);
+        //this.setStateByName(name, state, false);
+        this.informChangeListenersForStateWithName(name, oldItem, stateEventType.ItemDeleted);
         return result;
     }
 
     updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
         this._ensureStatePresent(name);
-        let result = false;
-        const state = this.getStateByName(name);
-        const foundIndex = state.findIndex((element: any) => testForEqualityFunction(element, item));
-        if (foundIndex >= 0) {
-            result = true;
-            let oldItem = state[foundIndex];
-            smLogger('State Manager: Found item - replacing ');
-            state.splice(foundIndex, 1, item);
-            smLogger(state);
-            this._updateItemInState(name, item, testForEqualityFunction);
-            this.setStateByName(name, state, false);
-            this.informChangeListenersForStateWithName(name, item, stateEventType.ItemUpdated, oldItem);
-        } else {
-            // add the item to the state
-            this.addNewItemToState(name, item);
-        }
+        let result = true;
+        let oldItem:any = this.findItemInState(name,item,testForEqualityFunction);
+        smLogger('State Manager: Found item - replacing ');
+        this._updateItemInState(name, item, testForEqualityFunction);
+        //this.setStateByName(name, this.getStateByName(name), false);
+        this.informChangeListenersForStateWithName(name, item, stateEventType.ItemUpdated, oldItem);
         return result;
     }
 

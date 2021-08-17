@@ -4,7 +4,6 @@ import moment from 'moment';
 import debug from 'debug';
 
 import controller from "../Controller";
-import {isSame} from "../util/EqualityFunctions";
 
 const beLogger = debug('view-ts:blogentry');
 
@@ -66,13 +65,6 @@ export default function BlogEntryView({entry, showCommentsHandler, editEntryHand
     } else {
         return (<div></div>);
     }
-
 }
 
 
-BlogEntryView.propTypes = {
-    entry: PropTypes.any.isRequired,
-    showCommentsHandler: PropTypes.func.isRequired,
-    editEntryHandler: PropTypes.func.isRequired,
-    deleteEntryHandler: PropTypes.func.isRequired,
-}

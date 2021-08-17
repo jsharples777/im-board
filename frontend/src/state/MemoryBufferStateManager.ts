@@ -101,9 +101,12 @@ class MemoryBufferStateManager extends AbstractStateManager {
       const valueIndex = state.value.findIndex((element: any) => testForEqualityFunction(element, stateObj));
       if (valueIndex >= 0) {
         state.value.splice(valueIndex, 1,stateObj);
-        msManager(`updating item ing state ${name}`);
+        msManager(`updating item in state ${name}`);
         msManager(stateObj);
       }
+    }
+    else {
+      this._addItemToState(name,stateObj,true);
     }
   }
 

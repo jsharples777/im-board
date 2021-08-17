@@ -7,8 +7,10 @@ import {AbstractStateManager} from "./state/AbstractStateManager";
 import {RESTApiStateManager} from "./state/RESTApiStateManager";
 import notifier from "./notification/NotificationManager";
 import socketManager from "./socket/SocketManager";
+import AsyncStateManagerWrapper from "./state/AsyncStateManagerWrapper";
 
 const cLogger = debug('controller-ts');
+const cLoggerDetail = debug('controller-ts-detail');
 
 class Controller implements SocketListener, StateChangeListener {
     protected applicationView: any;
@@ -16,6 +18,8 @@ class Controller implements SocketListener, StateChangeListener {
     protected config: any;
     protected stateManager: AbstractStateManager;
     protected apiStateManager:RESTApiStateManager;
+    // @ts-ignore
+    protected asyncSM:AsyncStateManagerWrapper;
 
     constructor() {
         this.stateManager = MemoryBufferStateManager.getInstance();
@@ -27,26 +31,6 @@ class Controller implements SocketListener, StateChangeListener {
         this.applicationView = applicationView;
         this.clientSideStorage = clientSideStorage;
         this.config = this.applicationView.state;
-
-        // state listener
-        this.stateChanged = this.stateChanged.bind(this);
-        this.stateChangedItemAdded = this.stateChangedItemAdded.bind(this);
-        this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
-        this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
-
-        this.getStateManager().addChangeListenerForName(this.config.stateNames.entries, this);
-        this.getStateManager().addChangeListenerForName(this.config.stateNames.comments, this);
-
-        return this;
-    }
-
-    /*
-  Get the base data for the application (users, entries)
- */
-    public initialise():void {
-        cLogger('Initialising data state');
-        // listen for socket events
-        socketManager.setListener(this);
         // setup the API calls
         this.apiStateManager.initialise([
             {
@@ -71,6 +55,28 @@ class Controller implements SocketListener, StateChangeListener {
         this.apiStateManager.addChangeListenerForName(this.config.stateNames.entries, this);
         this.apiStateManager.addChangeListenerForName(this.config.stateNames.comments, this);
         this.apiStateManager.addChangeListenerForName(this.config.stateNames.users, this);
+
+        this.asyncSM = new AsyncStateManagerWrapper(this.getStateManager(),this.apiStateManager);
+
+        // state listener
+        this.stateChanged = this.stateChanged.bind(this);
+        this.stateChangedItemAdded = this.stateChangedItemAdded.bind(this);
+        this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
+        this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
+
+        this.getStateManager().addChangeListenerForName(this.config.stateNames.entries, this);
+        this.getStateManager().addChangeListenerForName(this.config.stateNames.comments, this);
+
+        return this;
+    }
+
+    /*
+        Get the base data for the application (users, entries)
+    */
+    public initialise():void {
+        cLogger('Initialising data state');
+        // listen for socket events
+        socketManager.setListener(this);
 
         // load the entries
         this.apiStateManager.getStateByName(this.config.stateNames.entries);
@@ -121,6 +127,7 @@ class Controller implements SocketListener, StateChangeListener {
             }
         } catch (error) {
         }
+        cLoggerDetail(`Logged in user id is ${result}`);
         return result;
     }
 
@@ -133,7 +140,7 @@ class Controller implements SocketListener, StateChangeListener {
             cLogger(`Handling delete comment for ${entry.id} and comment ${id}`);
             this.getStateManager().removeItemFromState(this.config.stateNames.comments,{id:id},isSame)
             // send the api call
-            this.apiStateManager.removeItemFromState(this.config.stateNames.comments,{id:id},isSame);
+            this.asyncSM.removeItemFromState(this.config.stateNames.comments,{id:id},isSame);
         }
     }
 
@@ -143,7 +150,7 @@ class Controller implements SocketListener, StateChangeListener {
             // update the state manager
             this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, isSame);
             // send the api call
-            this.apiStateManager.removeItemFromState(this.config.stateNames.entries,{id:entry.id},isSame);
+            this.asyncSM.removeItemFromState(this.config.stateNames.entries,{id:entry.id},isSame);
         }
     }
 
@@ -155,12 +162,12 @@ class Controller implements SocketListener, StateChangeListener {
                 // update the state manager
                 this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
                 // send the api call
-                this.apiStateManager.updateItemInState(this.config.stateNames.entries,entry,isSame);
+                this.asyncSM.updateItemInState(this.config.stateNames.entries,entry,isSame);
 
             } else {
                 cLogger(`Handling create for entry`);
                 // send the api call and let the completed entry with id come back asynchronously
-                this.apiStateManager.addNewItemToState(this.config.stateNames.entries,entry, false);
+                this.asyncSM.addNewItemToState(this.config.stateNames.entries,entry, false);
             }
         }
     }
@@ -170,7 +177,7 @@ class Controller implements SocketListener, StateChangeListener {
             cLogger(comment);
             cLogger(`Handling create for comment`);
             // send the api call and let the completed entry with id come back asynchronously
-            this.apiStateManager.addNewItemToState(this.config.stateNames.comments,comment, false);
+            this.asyncSM.addNewItemToState(this.config.stateNames.comments,comment, false);
         }
     }
 
@@ -260,7 +267,7 @@ class Controller implements SocketListener, StateChangeListener {
 
     //  State Management listening
     stateChangedItemAdded(managerName:string, name: string, itemAdded: any): void {
-        cLogger(`State changed ${name} - item Added`);
+        cLogger(`State changed ${name} from ${managerName} - item Added`);
         cLogger(itemAdded);
         switch (managerName) {
             case 'memory': {
@@ -299,22 +306,22 @@ class Controller implements SocketListener, StateChangeListener {
                 }
                 break;
             }
-            case 'restapi': {
-                cLogger(`received state from ${managerName} for state ${name} - added items are unknown the the application`);
-                if (name === this.config.stateNames.comments) {
-                    cLogger(this.getStateManager().getStateByName(this.config.stateNames.comments).length);
-                }
-                this.getStateManager().addNewItemToState(name,itemAdded,true);
-                if (name === this.config.stateNames.comments) {
-                    cLogger(this.getStateManager().getStateByName(this.config.stateNames.comments).length);
-                }
-                break;
-            }
+            // case 'restapi': {
+            //     cLogger(`received state from ${managerName} for state ${name} - added items are unknown the the application`);
+            //     if (name === this.config.stateNames.comments) {
+            //         cLogger(this.getStateManager().getStateByName(this.config.stateNames.comments).length);
+            //     }
+            //     this.getStateManager().addNewItemToState(name,itemAdded,true);
+            //     if (name === this.config.stateNames.comments) {
+            //         cLogger(this.getStateManager().getStateByName(this.config.stateNames.comments).length);
+            //     }
+            //     break;
+            // }
         }
     }
 
     stateChangedItemRemoved(managerName:string, name: string, itemRemoved: any): void {
-        cLogger(`State changed ${name} - item Removed`);
+        cLogger(`State changed ${name} from ${managerName}  - item Removed`);
         cLogger(itemRemoved);
         switch (managerName) {
             case 'memory': {
@@ -353,10 +360,10 @@ class Controller implements SocketListener, StateChangeListener {
                 }
                 break;
             }
-            case 'restapi': {
-                cLogger(`received state from ${managerName} for state ${name} - ignoring, should be in memory already`);
-                break;
-            }
+            // case 'restapi': {
+            //     cLogger(`received state from ${managerName} for state ${name} - ignoring, should be in memory already`);
+            //     break;
+            // }
         }
     }
 
@@ -383,7 +390,7 @@ class Controller implements SocketListener, StateChangeListener {
     }
 
     stateChangedItemUpdated(managerName:string, name: string, itemUpdated: any, itemNewValue: any): void {
-        cLogger(`State changed ${name} - item updated`);
+        cLogger(`State changed ${name} from ${managerName} - item updated`);
         cLogger(itemUpdated);
         switch (managerName) {
             case 'memory': {
@@ -404,16 +411,16 @@ class Controller implements SocketListener, StateChangeListener {
                 }
                 break;
             }
-            case 'restapi': {
-                cLogger(`received state from ${managerName} for state ${name} - ignoring, should be in memory already`);
-                break;
-            }
+            // case 'restapi': {
+            //     cLogger(`received state from ${managerName} for state ${name} - ignoring, should be in memory already`);
+            //     break;
+            // }
         }
 
     }
 
     stateChanged(managerName:string, name: string, values: any) {
-        cLogger(`State changed ${name}`);
+        cLogger(`State changed ${name} from ${managerName} `);
         cLogger(values);
         // what has changed and by whom?
         switch (managerName) {
@@ -441,11 +448,11 @@ class Controller implements SocketListener, StateChangeListener {
                 }
                 break;
             }
-            case 'restapi': {
-                cLogger(`received state from ${managerName} for state ${name} - sending to application state manager`);
-                this.getStateManager().setStateByName(name,values);
-                break;
-            }
+            // case 'restapi': {
+            //     cLogger(`received state from ${managerName} for state ${name} - sending to application state manager`);
+            //     this.getStateManager().setStateByName(name,values);
+            //     break;
+            // }
         }
     }
 

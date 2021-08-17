@@ -168,12 +168,13 @@ class Root extends React.Component{
         // @ts-ignore
         logger(this.state.entries);
         // @ts-ignore
-        logger(this.state.applyUserFilter);
+        logger(`User filter ${this.state.applyUserFilter}`);
 
         // @ts-ignore
         let entriesToDisplay = this.state.entries;
         // @ts-ignore
         if (this.state.applyUserFilter && controller.isLoggedIn() && (controller.getLoggedInUserId() > 0)) {
+            logger(`fitlering entries`);
             entriesToDisplay = entriesToDisplay.filter((entry:any) => {
                 return (entry.createdBy === controller.getLoggedInUserId());
             });
@@ -443,7 +444,7 @@ class Root extends React.Component{
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
-localStorage.debug = 'app controller-ts state-manager-api view-ts:details socket-ts view-ts:comments';
+localStorage.debug = 'app controller-ts state-manager-api socket-ts state-manager-async controller-ts-detail view-ts:blogentry';
 debug.log = console.info.bind(console);
 
 // @ts-ignore
