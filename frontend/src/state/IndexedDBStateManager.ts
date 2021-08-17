@@ -83,11 +83,11 @@ class IndexedDBStateManager extends AbstractStateManager {
         this.addNewItemToCollection(name,stateObj);
     }
 
-    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
         this.removeItemFromCollection(name, stateObj);
     }
 
-    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
         this.updateItemInCollection(name,stateObj);
     }
 

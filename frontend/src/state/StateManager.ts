@@ -18,8 +18,8 @@ export interface StateManager extends StateChangeInformer {
     addNewItemToState(name: string, item: any, isPersisted: boolean): void;
     findItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): any;
     isItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean;
-    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean;
-    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean;
+    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean;
+    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean;
 
     // internal methods for optimization and aggregate SM (only use if writing a new state manager)
     _addNewNamedStateToStorage(state:stateValue): void;
@@ -28,7 +28,7 @@ export interface StateManager extends StateChangeInformer {
     _replaceNamedStateInStorage(state:stateValue):void;
     _saveState(name:string,stateObj:any):void;
     _addItemToState(name:string, stateObj:any,isPersisted:boolean):void;
-    _removeItemFromState(name:string, stateObj:any,testForEqualityFunction:equalityFunction):void;
-    _updateItemInState(name:string, stateObj:any,testForEqualityFunction:equalityFunction):void;
+    _removeItemFromState(name:string, stateObj:any,testForEqualityFunction:equalityFunction, isPersisted: boolean):void;
+    _updateItemInState(name:string, stateObj:any,testForEqualityFunction:equalityFunction, isPersisted: boolean):void;
 
 }

@@ -185,7 +185,8 @@ router.put('/blog/:id', (req,res) => {
 });
 
 router.delete('/blog/:id', (req,res) => {
-    rDebug(`Deleting blog entry with id ${req.params.id}`);
+    // @ts-ignore
+    rDebug(`Deleting blog entry with id ${req.params.id} from user ${req.user}`);
     BlogEntry.destroy({
         where: {id: req.params.id}
     })

@@ -54,8 +54,8 @@ export abstract class AbstractStateManager implements StateManager {
     public abstract _getState(name:string):stateValue;
     public abstract _saveState(name:string,stateObj:any):void;
     public abstract _addItemToState(name:string,stateObj:any,isPersisted:boolean):void;
-    public abstract _removeItemFromState(name:string,stateObj:any,testForEqualityFunction:equalityFunction):void;
-    public abstract _updateItemInState(name:string,stateObj:any,testForEqualityFunction:equalityFunction):void;
+    public abstract _removeItemFromState(name:string,stateObj:any,testForEqualityFunction:equalityFunction, isPersisted: boolean):void;
+    public abstract _updateItemInState(name:string,stateObj:any,testForEqualityFunction:equalityFunction, isPersisted: boolean):void;
 
     public addStateByName(name:string, stateObjForName:any):any {
         this._ensureStatePresent(name);
@@ -128,24 +128,24 @@ export abstract class AbstractStateManager implements StateManager {
         return result;
     }
 
-    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
+    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
         this._ensureStatePresent(name);
         let result = true;
         let oldItem = this.findItemInState(name,item,testForEqualityFunction);
         // remove the item from the state
         smLogger('State Manager: Found item - removing ');
-        this._removeItemFromState(name, item, testForEqualityFunction);
+        this._removeItemFromState(name, item, testForEqualityFunction, isPersisted);
         //this.setStateByName(name, state, false);
         this.informChangeListenersForStateWithName(name, oldItem, stateEventType.ItemDeleted);
         return result;
     }
 
-    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
+    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
         this._ensureStatePresent(name);
         let result = true;
         let oldItem:any = this.findItemInState(name,item,testForEqualityFunction);
         smLogger('State Manager: Found item - replacing ');
-        this._updateItemInState(name, item, testForEqualityFunction);
+        this._updateItemInState(name, item, testForEqualityFunction,isPersisted);
         //this.setStateByName(name, this.getStateByName(name), false);
         this.informChangeListenersForStateWithName(name, item, stateEventType.ItemUpdated, oldItem);
         return result;

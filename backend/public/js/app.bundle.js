@@ -996,6 +996,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./state/AsyncStateManagerWrapper */ "./src/state/AsyncStateManagerWrapper.ts");
 /* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
 /* harmony import */ var _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./SocketListenerDelegate */ "./src/SocketListenerDelegate.ts");
+/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+
 
 
 
@@ -1009,8 +1011,6 @@ var cLoggerDetail = debug__WEBPACK_IMPORTED_MODULE_0___default()('controller-ts-
 
 var Controller = /*#__PURE__*/function () {
   // @ts-ignore
-  //protected apiStateManager:RESTApiStateManager;
-  //protected asyncSM:AsyncStateManagerWrapper;
   function Controller() {}
 
   var _proto = Controller.prototype;
@@ -1036,14 +1036,28 @@ var Controller = /*#__PURE__*/function () {
       serverURL: this.getServerAPIURL(),
       api: this.config.apis.comments,
       isActive: true
-    }]); //this.apiStateManager.addChangeListenerForName(this.config.stateNames.entries, this);
-    //this.apiStateManager.addChangeListenerForName(this.config.stateNames.comments, this);
-    //this.apiStateManager.addChangeListenerForName(this.config.stateNames.users, this);
+    }]); // let indexedDBSM = IndexedDBStateManager.getInstance();
+    // indexedDBSM.initialise([
+    //     {
+    //         name:this.config.stateNames.users,
+    //         keyField:"id"
+    //     },
+    //     {
+    //         name:this.config.stateNames.entries,
+    //         keyField:"id"
+    //     },
+    //     {
+    //         name:this.config.stateNames.comments,
+    //         keyField:"id"
+    //     }
+    // ]);
 
     var aggregateSM = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__["AggregateStateManager"].getInstance();
     var memorySM = _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_1__["default"].getInstance();
     var asyncSM = new _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__["default"](aggregateSM, apiStateManager);
     aggregateSM.addStateManager(memorySM, [], false);
+    aggregateSM.addStateManager(_state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_8__["default"].getInstance(), [], false); //aggregateSM.addStateManager(indexedDBSM,[this.config.stateNames.selectedEntry],false );
+
     aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry], false);
     this.stateManager = aggregateSM; // state listener
 
@@ -1130,7 +1144,7 @@ var Controller = /*#__PURE__*/function () {
       cLogger("Handling delete comment for " + entry.id + " and comment " + id);
       this.getStateManager().removeItemFromState(this.config.stateNames.comments, {
         id: id
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]); // send the api call
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], false); // send the api call
       //this.asyncSM.removeItemFromState(this.config.stateNames.comments,{id:id},isSame);
     }
   };
@@ -1139,7 +1153,7 @@ var Controller = /*#__PURE__*/function () {
     if (entry) {
       cLogger("Handling delete entry for " + entry.id); // update the state manager
 
-      this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]); // send the api call
+      this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], false); // send the api call
       //this.asyncSM.removeItemFromState(this.config.stateNames.entries,{id:entry.id},isSame);
     }
   };
@@ -1151,7 +1165,8 @@ var Controller = /*#__PURE__*/function () {
       if (entry.id) {
         cLogger("Handling update for entry " + entry.id); // update the state manager
 
-        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]); // send the api call
+        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], false);
+        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], false); // send the api call
         //this.asyncSM.updateItemInState(this.config.stateNames.entries,entry,isSame);
       } else {
         cLogger("Handling create for entry"); // send the api call and let the completed entry with id come back asynchronously
@@ -1258,7 +1273,7 @@ var Controller = /*#__PURE__*/function () {
                   selectedEntry: selectedEntry,
                   entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
                 });
-                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry);
+                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry, true);
                 break;
               }
           }
@@ -1295,7 +1310,7 @@ var Controller = /*#__PURE__*/function () {
                   selectedEntry: selectedEntry,
                   entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
                 });
-                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry);
+                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry, true);
                 break;
               }
 
@@ -1312,7 +1327,7 @@ var Controller = /*#__PURE__*/function () {
                   selectedEntry: selectedEntry,
                   entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
                 });
-                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry);
+                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry, true);
                 break;
               }
           }
@@ -1488,7 +1503,7 @@ var SocketListenerDelegate = /*#__PURE__*/function () {
             switch (message.stateName) {
               case this.config.stateNames.entries:
                 {
-                  _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getStateManager().updateItemInState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]); // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
+                  _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getStateManager().updateItemInState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"], true); // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
 
                   break;
                 }
@@ -1502,14 +1517,14 @@ var SocketListenerDelegate = /*#__PURE__*/function () {
             switch (message.stateName) {
               case this.config.stateNames.comments:
                 {
-                  _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getStateManager().removeItemFromState(this.config.stateNames.comments, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+                  _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getStateManager().removeItemFromState(this.config.stateNames.comments, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"], true);
                   break;
                 }
 
               case this.config.stateNames.entries:
                 {
                   var deletedEntry = _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getStateManager().findItemInState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
-                  _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getStateManager().removeItemFromState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"]);
+                  _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].getStateManager().removeItemFromState(this.config.stateNames.entries, stateObj, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_3__["isSame"], true);
                   _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show(deletedEntry.title, username + " has deleted this entry.", 'priority');
                   break;
                 }
@@ -3214,7 +3229,7 @@ var AbstractStateManager = /*#__PURE__*/function () {
     return result;
   };
 
-  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction) {
+  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction, isPersisted) {
     this._ensureStatePresent(name);
 
     var result = true;
@@ -3222,21 +3237,21 @@ var AbstractStateManager = /*#__PURE__*/function () {
 
     smLogger('State Manager: Found item - removing ');
 
-    this._removeItemFromState(name, item, testForEqualityFunction); //this.setStateByName(name, state, false);
+    this._removeItemFromState(name, item, testForEqualityFunction, isPersisted); //this.setStateByName(name, state, false);
 
 
     this.informChangeListenersForStateWithName(name, oldItem, _StateManager__WEBPACK_IMPORTED_MODULE_1__["stateEventType"].ItemDeleted);
     return result;
   };
 
-  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction) {
+  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction, isPersisted) {
     this._ensureStatePresent(name);
 
     var result = true;
     var oldItem = this.findItemInState(name, item, testForEqualityFunction);
     smLogger('State Manager: Found item - replacing ');
 
-    this._updateItemInState(name, item, testForEqualityFunction); //this.setStateByName(name, this.getStateByName(name), false);
+    this._updateItemInState(name, item, testForEqualityFunction, isPersisted); //this.setStateByName(name, this.getStateByName(name), false);
 
 
     this.informChangeListenersForStateWithName(name, item, _StateManager__WEBPACK_IMPORTED_MODULE_1__["stateEventType"].ItemUpdated, oldItem);
@@ -3410,7 +3425,7 @@ var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     });
   };
 
-  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction, isPersisted) {
     var _this8 = this;
 
     this.stateManagers.forEach(function (managerWithFilters) {
@@ -3419,12 +3434,12 @@ var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
         aggLogger(managerWithFilters.manager);
         aggLogger(stateObj);
 
-        managerWithFilters.manager._removeItemFromState(name, stateObj, testForEqualityFunction);
+        managerWithFilters.manager._removeItemFromState(name, stateObj, testForEqualityFunction, isPersisted);
       }
     });
   };
 
-  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction, isPersisted) {
     var _this9 = this;
 
     this.stateManagers.forEach(function (managerWithFilters) {
@@ -3433,7 +3448,7 @@ var AggregateStateManager = /*#__PURE__*/function (_AbstractStateManager) {
         aggLogger(managerWithFilters.manager);
         aggLogger(stateObj);
 
-        managerWithFilters.manager._updateItemInState(name, stateObj, testForEqualityFunction);
+        managerWithFilters.manager._updateItemInState(name, stateObj, testForEqualityFunction, isPersisted);
       }
     });
   };
@@ -3531,14 +3546,14 @@ var AsyncStateManagerWrapper = /*#__PURE__*/function (_AbstractStateManager) {
     };
   };
 
-  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction, isPersisted) {
     asyncLogger("removing item from state " + name);
-    this.wrappedSM.removeItemFromState(name, stateObj, testForEqualityFunction);
+    this.wrappedSM.removeItemFromState(name, stateObj, testForEqualityFunction, isPersisted);
   };
 
-  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction, isPersisted) {
     asyncLogger("updating item in state " + name);
-    this.wrappedSM.updateItemInState(name, stateObj, testForEqualityFunction);
+    this.wrappedSM.updateItemInState(name, stateObj, testForEqualityFunction, isPersisted);
   };
 
   _proto._ensureStatePresent = function _ensureStatePresent(name) {} // assume already present
@@ -3573,6 +3588,169 @@ var AsyncStateManagerWrapper = /*#__PURE__*/function (_AbstractStateManager) {
   };
 
   return AsyncStateManagerWrapper;
+}(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
+
+
+
+/***/ }),
+
+/***/ "./src/state/BrowserStorageStateManager.ts":
+/*!*************************************************!*\
+  !*** ./src/state/BrowserStorageStateManager.ts ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BrowserStorageStateManager; });
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AbstractStateManager */ "./src/state/AbstractStateManager.ts");
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+var lsLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('local-storage');
+
+var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
+  _inheritsLoose(BrowserStorageStateManager, _AbstractStateManager);
+
+  BrowserStorageStateManager.getInstance = function getInstance(useLocalStorage) {
+    if (useLocalStorage === void 0) {
+      useLocalStorage = false;
+    }
+
+    if (!BrowserStorageStateManager._instance) {
+      BrowserStorageStateManager._instance = new BrowserStorageStateManager(useLocalStorage);
+    }
+
+    return BrowserStorageStateManager._instance;
+  };
+
+  function BrowserStorageStateManager(useLocalStorage) {
+    var _this;
+
+    if (useLocalStorage === void 0) {
+      useLocalStorage = false;
+    }
+
+    _this = _AbstractStateManager.call(this, 'browser') || this;
+    _this.storage = window.sessionStorage;
+    if (useLocalStorage) _this.storage = window.localStorage;
+    _this.forceSaves = true;
+    return _this;
+  }
+
+  var _proto = BrowserStorageStateManager.prototype;
+
+  _proto._ensureStatePresent = function _ensureStatePresent(name) {
+    if (this.storage.getItem(name) === null) {
+      this._addNewNamedStateToStorage({
+        name: name,
+        value: []
+      });
+    }
+  };
+
+  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
+    lsLogger("Local Storage: Saving with key " + state.name);
+    lsLogger(state);
+    var stringifiedSaveData = JSON.stringify(state.value);
+    lsLogger(stringifiedSaveData);
+    this.storage.setItem(state.name, stringifiedSaveData);
+  };
+
+  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
+    this._addNewNamedStateToStorage(state);
+  };
+
+  _proto._getState = function _getState(name) {
+    var savedResults = [];
+    lsLogger("Local Storage: Loading with key " + name);
+    var savedResultsJSON = this.storage.getItem(name);
+    lsLogger(savedResultsJSON);
+
+    if (savedResultsJSON !== null) {
+      savedResults = JSON.parse(savedResultsJSON);
+    }
+
+    return {
+      name: name,
+      value: savedResults
+    };
+  };
+
+  _proto._saveState = function _saveState(name, newValue) {
+    this._addNewNamedStateToStorage({
+      name: name,
+      value: newValue
+    });
+  };
+
+  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
+    if (isPersisted === void 0) {
+      isPersisted = false;
+    }
+
+    if (!isPersisted) return;
+
+    var state = this._getState(name);
+
+    lsLogger("adding item to state " + name);
+    lsLogger(stateObj);
+    state.value.push(stateObj);
+
+    this._replaceNamedStateInStorage(state);
+  };
+
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction, isPersisted) {
+    var state = this._getState(name);
+
+    var valueIndex = state.value.findIndex(function (element) {
+      return testForEqualityFunction(element, stateObj);
+    });
+
+    if (valueIndex >= 0) {
+      lsLogger("removing item from state " + name);
+      lsLogger(stateObj);
+      state.value.splice(valueIndex, 1);
+    }
+
+    this._replaceNamedStateInStorage(state);
+  };
+
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction, isPersisted) {
+    var state = this._getState(name);
+
+    var valueIndex = state.value.findIndex(function (element) {
+      return testForEqualityFunction(element, stateObj);
+    });
+
+    if (valueIndex >= 0) {
+      state.value.splice(valueIndex, 1, stateObj);
+      lsLogger("updating item in state " + name);
+      lsLogger(stateObj);
+    }
+
+    this._replaceNamedStateInStorage(state);
+  };
+
+  return BrowserStorageStateManager;
 }(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
 
 
@@ -3708,7 +3886,7 @@ var MemoryBufferStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     }
   };
 
-  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction, isPersisted) {
     var foundIndex = this.applicationState.findIndex(function (element) {
       return element.name === name;
     });
@@ -3727,7 +3905,7 @@ var MemoryBufferStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     }
   };
 
-  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction, isPersisted) {
     var foundIndex = this.applicationState.findIndex(function (element) {
       return element.name === name;
     });
@@ -3976,7 +4154,9 @@ var RESTApiStateManager = /*#__PURE__*/function () {
     }
   };
 
-  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction) {
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction, isPersisted) {
+    if (isPersisted) return; // dont remove complete objects to the state - they are already processed
+
     apiSMLogger("Removing item to " + name);
     apiSMLogger(stateObj);
     var config = this.getConfigurationForStateName(name);
@@ -3997,7 +4177,9 @@ var RESTApiStateManager = /*#__PURE__*/function () {
     }
   };
 
-  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction) {
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction, isPersisted) {
+    if (isPersisted) return; // dont update complete objects to the state - they are already processed
+
     apiSMLogger("Updating item in " + name);
     apiSMLogger(stateObj);
     var config = this.getConfigurationForStateName(name);
@@ -4044,8 +4226,8 @@ var RESTApiStateManager = /*#__PURE__*/function () {
     return true;
   };
 
-  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction) {
-    this._removeItemFromState(name, item, testForEqualityFunction);
+  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction, isPersisted) {
+    this._removeItemFromState(name, item, testForEqualityFunction, isPersisted);
 
     return true;
   };
@@ -4056,8 +4238,8 @@ var RESTApiStateManager = /*#__PURE__*/function () {
     this.delegate.suppressEvents();
   };
 
-  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction) {
-    this._updateItemInState(name, item, testForEqualityFunction);
+  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction, isPersisted) {
+    this._updateItemInState(name, item, testForEqualityFunction, isPersisted);
 
     return true;
   };

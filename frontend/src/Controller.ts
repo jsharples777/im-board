@@ -1,15 +1,15 @@
 import debug from 'debug';
 import MemoryBufferStateManager from "./state/MemoryBufferStateManager";
 import {isSame} from "./util/EqualityFunctions";
-import SocketListener from "./socket/SocketListener";
 import StateChangeListener from "./state/StateChangeListener";
-import {AbstractStateManager} from "./state/AbstractStateManager";
+import {StateManager} from "./state/StateManager";
 import {RESTApiStateManager} from "./state/RESTApiStateManager";
-import notifier from "./notification/NotificationManager";
 import socketManager from "./socket/SocketManager";
 import AsyncStateManagerWrapper from "./state/AsyncStateManagerWrapper";
 import {AggregateStateManager} from "./state/AggregateStateManager";
 import SocketListenerDelegate from "./SocketListenerDelegate";
+import BrowserStorageStateManager from "./state/BrowserStorageStateManager";
+import IndexedDBStateManager from "./state/IndexedDBStateManager";
 
 const cLogger = debug('controller-ts');
 const cLoggerDetail = debug('controller-ts-detail');
@@ -19,14 +19,9 @@ class Controller implements StateChangeListener {
     protected clientSideStorage: any;
     protected config: any;
     // @ts-ignore
-    protected stateManager: AbstractStateManager;
-    //protected apiStateManager:RESTApiStateManager;
-
-    //protected asyncSM:AsyncStateManagerWrapper;
-
+    protected stateManager: StateManager;
 
     constructor() {}
-
 
     connectToApplication(applicationView: any, clientSideStorage: any) {
         this.applicationView = applicationView;
@@ -54,10 +49,22 @@ class Controller implements StateChangeListener {
                 isActive:true
             }
         ]);
-        //this.apiStateManager.addChangeListenerForName(this.config.stateNames.entries, this);
-        //this.apiStateManager.addChangeListenerForName(this.config.stateNames.comments, this);
-        //this.apiStateManager.addChangeListenerForName(this.config.stateNames.users, this);
 
+        // let indexedDBSM = IndexedDBStateManager.getInstance();
+        // indexedDBSM.initialise([
+        //     {
+        //         name:this.config.stateNames.users,
+        //         keyField:"id"
+        //     },
+        //     {
+        //         name:this.config.stateNames.entries,
+        //         keyField:"id"
+        //     },
+        //     {
+        //         name:this.config.stateNames.comments,
+        //         keyField:"id"
+        //     }
+        // ]);
 
         let aggregateSM = AggregateStateManager.getInstance();
         let memorySM = MemoryBufferStateManager.getInstance();
@@ -65,6 +72,8 @@ class Controller implements StateChangeListener {
         let asyncSM = new AsyncStateManagerWrapper(aggregateSM,apiStateManager);
 
         aggregateSM.addStateManager(memorySM,[],false);
+        aggregateSM.addStateManager(BrowserStorageStateManager.getInstance(),[],false);
+        //aggregateSM.addStateManager(indexedDBSM,[this.config.stateNames.selectedEntry],false );
         aggregateSM.addStateManager(asyncSM,[this.config.stateNames.selectedEntry],false);
 
         this.stateManager = aggregateSM;
@@ -98,7 +107,7 @@ class Controller implements StateChangeListener {
         this.getStateManager().getStateByName(this.config.stateNames.comments);
     }
     
-    public getStateManager():AbstractStateManager {
+    public getStateManager():StateManager {
         return this.stateManager;
     }
 
@@ -150,7 +159,7 @@ class Controller implements StateChangeListener {
         let entry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
         if (entry) {
             cLogger(`Handling delete comment for ${entry.id} and comment ${id}`);
-            this.getStateManager().removeItemFromState(this.config.stateNames.comments,{id:id},isSame)
+            this.getStateManager().removeItemFromState(this.config.stateNames.comments,{id:id},isSame,false)
             // send the api call
             //this.asyncSM.removeItemFromState(this.config.stateNames.comments,{id:id},isSame);
         }
@@ -160,7 +169,7 @@ class Controller implements StateChangeListener {
         if (entry) {
             cLogger(`Handling delete entry for ${entry.id}`);
             // update the state manager
-            this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, isSame);
+            this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, isSame,false);
             // send the api call
             //this.asyncSM.removeItemFromState(this.config.stateNames.entries,{id:entry.id},isSame);
         }
@@ -172,7 +181,8 @@ class Controller implements StateChangeListener {
             if (entry.id) {
                 cLogger(`Handling update for entry ${entry.id}`);
                 // update the state manager
-                this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame);
+                this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame,false);
+                this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, isSame,false);
                 // send the api call
                 //this.asyncSM.updateItemInState(this.config.stateNames.entries,entry,isSame);
 
@@ -270,7 +280,7 @@ class Controller implements StateChangeListener {
                             selectedEntry: selectedEntry,
                             entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
                         });
-                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry);
+                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry,true);
                         break;
                     }
                 }
@@ -301,7 +311,7 @@ class Controller implements StateChangeListener {
                             selectedEntry: selectedEntry,
                             entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
                         });
-                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry);
+                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry,true);
                         break;
                     }
                     case this.config.stateNames.comments: {
@@ -314,7 +324,7 @@ class Controller implements StateChangeListener {
                             selectedEntry: selectedEntry,
                             entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
                         });
-                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry);
+                        this.getStateManager().setStateByName(this.config.stateNames.selectedEntry,selectedEntry,true);
                         break;
                     }
                 }

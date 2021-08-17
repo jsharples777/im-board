@@ -81,7 +81,7 @@ class MemoryBufferStateManager extends AbstractStateManager {
     }
   }
 
-  _removeItemFromState(name: string, stateObj: any,testForEqualityFunction:equalityFunction): void {
+  _removeItemFromState(name: string, stateObj: any,testForEqualityFunction:equalityFunction, isPersisted: boolean): void {
     let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
     if (foundIndex >= 0) {
       let state:stateValue = this.applicationState[foundIndex];
@@ -94,7 +94,7 @@ class MemoryBufferStateManager extends AbstractStateManager {
     }
   }
 
-  _updateItemInState(name: string, stateObj: any,testForEqualityFunction:equalityFunction): void {
+  _updateItemInState(name: string, stateObj: any,testForEqualityFunction:equalityFunction, isPersisted: boolean): void {
     let foundIndex:number = this.applicationState.findIndex(element => element.name === name);
     if (foundIndex >= 0) {
       let state:stateValue = this.applicationState[foundIndex];

@@ -55,7 +55,7 @@ export default class SocketListenerDelegate implements SocketListener {
                 case "update": {
                     switch (message.stateName) {
                         case this.config.stateNames.entries: {
-                            controller.getStateManager().updateItemInState(this.config.stateNames.entries, stateObj, isSame);
+                            controller.getStateManager().updateItemInState(this.config.stateNames.entries, stateObj, isSame, true);
                             // the entry could be selected by this (different user) but that would only be for comments, which is not what changed, so we are done
                             break;
                         }
@@ -65,12 +65,12 @@ export default class SocketListenerDelegate implements SocketListener {
                 case "delete": {
                     switch (message.stateName) {
                         case this.config.stateNames.comments: {
-                            controller.getStateManager().removeItemFromState(this.config.stateNames.comments,stateObj,isSame);
+                            controller.getStateManager().removeItemFromState(this.config.stateNames.comments,stateObj,isSame, true);
                             break;
                         }
                         case this.config.stateNames.entries: {
                             let deletedEntry = controller.getStateManager().findItemInState(this.config.stateNames.entries, stateObj, isSame);
-                            controller.getStateManager().removeItemFromState(this.config.stateNames.entries, stateObj, isSame);
+                            controller.getStateManager().removeItemFromState(this.config.stateNames.entries, stateObj, isSame,true);
                             notifier.show(deletedEntry.title, `${username} has deleted this entry.`, 'priority');
                             break;
                         }

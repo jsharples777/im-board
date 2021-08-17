@@ -186,7 +186,8 @@ export class RESTApiStateManager implements AsynchronousStateManager {
     }
 
 
-    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
+        if (isPersisted) return; // dont remove complete objects to the state - they are already processed
         apiSMLogger(`Removing item to ${name}`);
         apiSMLogger(stateObj);
         let config: ApiConfig = this.getConfigurationForStateName(name);
@@ -207,7 +208,8 @@ export class RESTApiStateManager implements AsynchronousStateManager {
         }
     }
 
-    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
+        if (isPersisted) return; // dont update complete objects to the state - they are already processed
         apiSMLogger(`Updating item in ${name}`);
         apiSMLogger(stateObj);
         let config: ApiConfig = this.getConfigurationForStateName(name);
@@ -254,8 +256,8 @@ export class RESTApiStateManager implements AsynchronousStateManager {
         return true;
     }
 
-    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
-        this._removeItemFromState(name,item,testForEqualityFunction);
+    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
+        this._removeItemFromState(name,item,testForEqualityFunction,isPersisted);
         return true;
     }
 
@@ -265,8 +267,8 @@ export class RESTApiStateManager implements AsynchronousStateManager {
         this.delegate.suppressEvents();
     }
 
-    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
-        this._updateItemInState(name,item,testForEqualityFunction);
+    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
+        this._updateItemInState(name,item,testForEqualityFunction,isPersisted);
         return true;
     }
 }

@@ -2,7 +2,7 @@ import moment from 'moment';
 import debug from 'debug';
 
 import SidebarView from './SidebarView';
-import {AbstractStateManager} from "../state/AbstractStateManager";
+import {StateManager} from "../state/StateManager";
 
 const viewLogger = debug('view-ts:details');
 
@@ -12,7 +12,7 @@ class DetailsSidebarView extends SidebarView{
   protected contentEl:HTMLTextAreaElement|null;
   protected changeOnEl:HTMLLabelElement|null;
 
-  constructor(applicationView:any, htmlDocument:HTMLDocument,stateManager:AbstractStateManager) {
+  constructor(applicationView:any, htmlDocument:HTMLDocument,stateManager:StateManager) {
     super(applicationView, htmlDocument, applicationView.state.ui.entryDetailsSideBar, applicationView.state.uiPrefs.entryDetailsSideBar,stateManager);
 
     // handler binding

@@ -48,14 +48,14 @@ export default class AsyncStateManagerWrapper extends AbstractStateManager imple
     }
 
 
-    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
         asyncLogger(`removing item from state ${name}`);
-        this.wrappedSM.removeItemFromState(name,stateObj,testForEqualityFunction);
+        this.wrappedSM.removeItemFromState(name,stateObj,testForEqualityFunction,isPersisted);
     }
 
-    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction): void {
+    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
         asyncLogger(`updating item in state ${name}`);
-        this.wrappedSM.updateItemInState(name,stateObj,testForEqualityFunction);
+        this.wrappedSM.updateItemInState(name,stateObj,testForEqualityFunction,isPersisted);
     }
 
     _ensureStatePresent(name: string): void {}// assume already present
