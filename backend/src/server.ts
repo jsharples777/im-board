@@ -1,5 +1,7 @@
 // Configuration and Logging handlers
 /* eslint-disable import/first */
+import BGGDataSource from "./graphql/BGGDataSource";
+
 require('dotenv').config();
 import morgan from 'morgan';
 import debug from 'debug';
@@ -126,8 +128,11 @@ if (isDevelopment) {
 // ensure the user is logged in with a path
 
 serverDebug('Installing routes');
-app.use('/', routes);// add the middleware path routing
-app.use('/api',apiRoutes);// add the api path routing
+//app.use('/', routes);// add the middleware path routing
+//app.use('/api',apiRoutes);// add the api path routing
+// setup the QL server for the Board Game Geek Data retrieval (just for fun, don't need Graph QL, but good practise)
+serverDebug('Setting up Board Game Geek API interface via Graph QL');
+new BGGDataSource(app);
 
 // Setup authentication
 serverDebug('Setting up User model and authentication with Passport');
@@ -188,8 +193,14 @@ if (isDevelopment) {
     });
 }
 
+
+// construct the web server
+serverDebug('Create HTTP Server');
 const httpServer = new http.Server(app);
+
+
 // setup the sockets manager with the server
+serverDebug('Setting up Socket manager');
 socketManager.connectToServer(httpServer);
 
 

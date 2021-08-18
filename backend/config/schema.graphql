@@ -1,0 +1,31 @@
+type BoardGame {
+    id: Int!
+    name:String!
+    year: Int
+}
+
+type BoardGameDetail {
+    id: Int!
+    thumb: String!
+    image: String!
+    name: String!
+    description: String!
+    year: Int!
+    minPlayers: Int
+    maxPlayers: Int
+    minPlayTime: Int
+    maxPlayTime: Int
+    minAge: Int
+    designers: String
+    artists: String
+    publisher: String
+    numOfRaters: Int
+    averageScore: Float
+    rank: Int
+}
+
+##### top level declarations
+type Query {
+    findBoardGames(query:String!): [BoardGame!]!
+    getBoardGameDetails(id:Int!): BoardGameDetail
+}

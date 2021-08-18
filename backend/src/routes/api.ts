@@ -80,9 +80,11 @@ router.delete('/comment/:id', (req,res) => {
         // @ts-ignore
         Comment.destroy({where: {id: comment.id}
         }).then((result) => {
-            // @ts-ignore
-            const message:DataMessage = {type:"delete",stateName: "comments",data:comment,user:req.user.id,}
-            socketManager.sendMessage(message);
+            if (result > 0) {
+                // @ts-ignore
+                const message: DataMessage = {type: "delete", stateName: "comments", data: comment, user: req.user.id,}
+                socketManager.sendMessage(message);
+            }
             res.json({result:true});
         })
         .catch((err) => {
@@ -191,9 +193,11 @@ router.delete('/blog/:id', (req,res) => {
         where: {id: req.params.id}
     })
         .then((result) => {
-            // @ts-ignore
-            const message:DataMessage = {type:"delete",stateName: "entries",data:{ id: parseInt(req.params.id) },user:req.user.id,}
-            socketManager.sendMessage(message);
+            if (result > 0) {
+                // @ts-ignore
+                const message:DataMessage = {type:"delete",stateName: "entries",data:{ id: parseInt(req.params.id) },user:req.user.id,}
+                socketManager.sendMessage(message);
+            }
             res.json({result:true});
          })
         .catch((err) => {
