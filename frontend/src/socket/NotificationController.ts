@@ -1,8 +1,8 @@
 import {ChatLog, ChatManager} from "./ChatManager";
-import {ChatEventListener} from "./ChatEventListener";
+import {ChatEventListener, ChatUserEventListener} from "./ChatEventListener";
 import notifier from "../notification/NotificationManager";
 
-export class NotificationController implements ChatEventListener {
+export class NotificationController implements ChatEventListener,ChatUserEventListener {
     private static _instance: NotificationController;
 
     public static getInstance(): NotificationController {
@@ -14,12 +14,14 @@ export class NotificationController implements ChatEventListener {
 
     private doNotDisturb:boolean = false;
     private chatManager:ChatManager;
-    private chatListener:ChatEventListener|null;
+    private chatListeners:ChatEventListener[];
+    private chatUserListeners:ChatUserEventListener[];
 
     private constructor() {
         this.chatManager = ChatManager.getInstance();
         this.doNotDisturb = false;
-        this.chatListener = null;
+        this.chatListeners = [];
+        this.chatUserListeners = [];
 
         //bind the methods
         this.handleChatLogUpdated = this.handleChatLogUpdated.bind(this);
@@ -27,11 +29,15 @@ export class NotificationController implements ChatEventListener {
         this.handleFavouriteUserLoggedIn = this.handleFavouriteUserLoggedIn.bind(this);
         this.handleFavouriteUserLoggedOut = this.handleFavouriteUserLoggedOut.bind(this);
 
-        this.chatManager.setChatEventHandler(this);
+        this.chatManager.addChatEventHandler(this);
+        this.chatManager.addChatUserEventHandler(this);
     }
 
-    public setListener(listener:ChatEventListener) {
-        this.chatListener = listener;
+    public addListener(listener:ChatEventListener) {
+        this.chatListeners.push(listener);
+    }
+    public addUserListener(listener:ChatUserEventListener) {
+        this.chatUserListeners.push(listener);
     }
 
     public setDoNotDisturb(dontDisturbMe = true) {
@@ -56,12 +62,20 @@ export class NotificationController implements ChatEventListener {
         }
     }
 
+    public isFavouriteUser(username:string):boolean {
+        return this.chatManager.isUserInFavouriteList(username);
+    }
+
+    public isBlockedUser(username:string):boolean {
+        return this.chatManager.isUserInBlockedList(username);
+    }
+
     handleChatLogUpdated(log: ChatLog): void {
         // avoid no actual messages
         if (log.messages.length === 0) return;
 
         // pass on the changes
-        if (this.chatListener) this.chatListener.handleChatLogUpdated(log);
+        this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(log));
 
         // provide visual notifications if do not disturb is not on
         if (this.doNotDisturb) return;
@@ -73,12 +87,12 @@ export class NotificationController implements ChatEventListener {
 
     handleLoggedInUsersUpdated(usernames: string[]): void {
         // allow the view to change the user statuses
-        if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(usernames);
+        this.chatUserListeners.forEach((listener) => listener.handleLoggedInUsersUpdated(usernames));
     }
 
     handleFavouriteUserLoggedIn(username: string): void {
         // allow the view to change the user statuses
-        if (this.chatListener) this.chatListener.handleFavouriteUserLoggedIn(username);
+        this.chatUserListeners.forEach((listener) => listener.handleFavouriteUserLoggedIn(username));
 
         // provide visual notifications if do not disturb is not on
         if (this.doNotDisturb) return;
@@ -87,12 +101,25 @@ export class NotificationController implements ChatEventListener {
 
     handleFavouriteUserLoggedOut(username: string): void {
         // allow the view to change the user statuses
-        if (this.chatListener) this.chatListener.handleFavouriteUserLoggedOut(username);
+        this.chatUserListeners.forEach((listener) => listener.handleFavouriteUserLoggedOut(username));
 
         // provide visual notifications if do not disturb is not on
         if (this.doNotDisturb) return;
         notifier.show(username,`User ${username} has logged out.`,'priority',4000);
 
     }
+
+    handleBlockedUsersChanged(usernames: string[]): void {
+        this.chatUserListeners.forEach((listener) => listener.handleBlockedUsersChanged(usernames));
+    }
+
+    handleFavouriteUsersChanged(usernames: string[]): void {
+        this.chatUserListeners.forEach((listener) => listener.handleFavouriteUsersChanged(usernames));
+    }
+
+    public startChatWithUser(username:string) {
+        ChatManager.getInstance().startChatWithUser(username);
+    }
+
 
 }

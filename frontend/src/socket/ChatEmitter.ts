@@ -6,5 +6,5 @@ export interface ChatEmitter {
     leaveChat(room:string):void;
 
     sendMessage(room:string, message:string):void;
-
+    sendInvite(to:string, room:string):void;
 }

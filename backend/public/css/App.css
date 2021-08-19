@@ -111,3 +111,19 @@ small-heading {
     white-space: nowrap;
 }
 
+.scroll-user-search {
+    height: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.scroll-favourite-users {
+    height: 100px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.scroll-blocked-users {
+    height: 100px;
+    max-height: 300px;
+    overflow-y: auto;
+}

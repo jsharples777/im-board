@@ -6,7 +6,7 @@ import {ChatEmitter} from "./ChatEmitter";
 import {StateManager} from "../state/StateManager";
 import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
 import socketManager from "./SocketManager";
-import {ChatEventListener} from "./ChatEventListener";
+import {ChatEventListener, ChatUserEventListener} from "./ChatEventListener";
 import uuid from "../util/UUID";
 
 export type ChatLog = {
@@ -48,39 +48,24 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     protected loggedInUsers: string[] = [];
 
 
-    protected chatListener:ChatEventListener|null;
+    protected chatListeners:ChatEventListener[];
+    protected chatUserListeners:ChatUserEventListener[];
 
-    public setChatEventHandler(receiver:ChatEventListener):void {
-        this.chatListener = receiver;
+    public addChatEventHandler(receiver:ChatEventListener):void {
+        this.chatListeners.push(receiver);
     }
 
+    public addChatUserEventHandler(receiver:ChatUserEventListener):void {
+        this.chatUserListeners.push(receiver);
+    }
 
     private constructor() {
         cmLogger('Setting up chat logs, blocked list, and favourites');
 
         this.chatLogs = [];
-        this.chatListener = null;
+        this.chatListeners = [];
+        this.chatUserListeners = [];
         this.localStorage = new BrowserStorageStateManager(true);
-        // load previous logs
-        let savedLogs = this.localStorage.getStateByName(ChatManager.chatLogKey);
-        cmLogger(savedLogs);
-        if (savedLogs) {
-            this.chatLogs = savedLogs;
-        }
-
-        // load previous blocked list
-        let blockedList = this.localStorage.getStateByName(ChatManager.blockedListKey);
-        cmLogger(blockedList);
-        if (blockedList) {
-            this.blockedList = blockedList;
-        }
-
-        // load previous favourite list
-        let favouriteList = this.localStorage.getStateByName(ChatManager.favouriteListKey);
-        cmLogger(favouriteList);
-        if (favouriteList) {
-            this.favouriteList = favouriteList;
-        }
 
         // connect to the socket manager
         socketManager.setChatReceiver(this);
@@ -101,15 +86,15 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     }
 
     private saveLogs():void {
-        this.localStorage.setStateByName(ChatManager.chatLogKey,this.chatLogs,false);
+        this.localStorage.setStateByName(ChatManager.chatLogKey+this.currentUsername,this.chatLogs,false);
     }
 
     private saveBlockedList():void {
-        this.localStorage.setStateByName(ChatManager.blockedListKey,this.blockedList, false);
+        this.localStorage.setStateByName(ChatManager.blockedListKey+this.currentUsername,this.blockedList, false);
     }
 
     private saveFavouriteList():void {
-        this.localStorage.setStateByName(ChatManager.favouriteListKey,this.favouriteList, false);
+        this.localStorage.setStateByName(ChatManager.favouriteListKey+this.currentUsername,this.favouriteList, false);
     }
 
     public addUserToBlockedList(username:string):void {
@@ -117,6 +102,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         if (index < 0) {
             this.blockedList.push(username);
             this.saveBlockedList();
+            this.chatUserListeners.forEach((listener) => listener.handleBlockedUsersChanged(this.favouriteList));
         }
     }
 
@@ -125,6 +111,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         if (index >= 0) {
             this.blockedList.splice(index,1);
             this.saveBlockedList();
+            this.chatUserListeners.forEach((listener) => listener.handleBlockedUsersChanged(this.favouriteList));
         }
 
     }
@@ -139,6 +126,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         if (index < 0) {
             this.favouriteList.push(username);
             this.saveFavouriteList();
+            this.chatUserListeners.forEach((listener) => listener.handleFavouriteUsersChanged(this.favouriteList));
         }
     }
 
@@ -147,6 +135,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         if (index >= 0) {
             this.favouriteList.splice(index,1);
             this.saveFavouriteList();
+            this.chatUserListeners.forEach((listener) => listener.handleFavouriteUsersChanged(this.favouriteList));
         }
 
     }
@@ -159,6 +148,27 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     public setCurrentUser(username:string):void {
         cmLogger(`Setting current user ${username}`);
         this.currentUsername = username;
+        // load previous logs
+        let savedLogs = this.localStorage.getStateByName(ChatManager.chatLogKey+this.currentUsername);
+        cmLogger(savedLogs);
+        if (savedLogs) {
+            this.chatLogs = savedLogs;
+        }
+
+        // load previous blocked list
+        let blockedList = this.localStorage.getStateByName(ChatManager.blockedListKey+this.currentUsername);
+        cmLogger(blockedList);
+        if (blockedList) {
+            this.blockedList = blockedList;
+        }
+
+        // load previous favourite list
+        let favouriteList = this.localStorage.getStateByName(ChatManager.favouriteListKey+this.currentUsername);
+        cmLogger(favouriteList);
+        if (favouriteList) {
+            this.favouriteList = favouriteList;
+        }
+
     }
 
     public getCurrentUser():string {
@@ -225,12 +235,12 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         let index = this.loggedInUsers.findIndex((user) => user === username);
         if (index < 0) this.loggedInUsers.push(username);
 
-        if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(this.loggedInUsers);
+        this.chatUserListeners.forEach((listener) => listener.handleLoggedInUsersUpdated(this.loggedInUsers));
 
         // if the user in in favourites and not in blocked list passing this on to the listener
         if (!this.isUserInBlockedList(username) && this.isUserInFavouriteList(username)) {
             cmLogger(`User ${username} logging in`);
-            if (this.chatListener) this.chatListener.handleFavouriteUserLoggedIn(username);
+            this.chatUserListeners.forEach((listener) => listener.handleFavouriteUserLoggedIn(username));
         }
     }
 
@@ -238,12 +248,12 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         let index = this.loggedInUsers.findIndex((user) => user === username);
         if (index >= 0) this.loggedInUsers.splice(index,1);
 
-        if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(this.loggedInUsers);
+        this.chatUserListeners.forEach((listener) => listener.handleLoggedInUsersUpdated(this.loggedInUsers));
 
         // if the user in in favourites and not in blocked list passing this on to the listener
         if (!this.isUserInBlockedList(username) && this.isUserInFavouriteList(username)) {
             cmLogger(`User ${username} logging out`);
-            if (this.chatListener) this.chatListener.handleFavouriteUserLoggedOut(username);
+            this.chatUserListeners.forEach((listener) => listener.handleFavouriteUserLoggedOut(username));
         }
     }
 
@@ -275,7 +285,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         cmLogger(`Message received`);
         cmLogger(message);
 
-        if (this.chatListener) this.chatListener.handleChatLogUpdated(chatLog);
+        this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(chatLog));
     }
 
     receiveQueuedInvites(invites: any): void {
@@ -309,8 +319,10 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         socketManager.login(this.getCurrentUser());
         // get the current user list
         socketManager.getUserList();
-        // setup a default room for the user
-        //socketManager.joinChat(this.getCurrentUser(),uuid.getUniqueId());
+        // connect to the chat rooms already in logs
+        this.chatLogs.forEach((log) => {
+            socketManager.joinChat(this.currentUsername,log.roomName);
+        });
     }
 
     logout(): void {
@@ -344,5 +356,9 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
     public getChatLogs():ChatLog[] {
         return this.chatLogs;
+    }
+
+    public startChatWithUser(username:string) {
+
     }
 }

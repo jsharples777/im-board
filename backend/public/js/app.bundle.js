@@ -479,6 +479,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _component_BlogEntryView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./component/BlogEntryView */ "./src/component/BlogEntryView.tsx");
 /* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
 /* harmony import */ var _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./component/DetailsSidebarView */ "./src/component/DetailsSidebarView.ts");
+/* harmony import */ var _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./component/UserSearchSidebarView */ "./src/component/UserSearchSidebarView.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -501,11 +502,13 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('app');
 
 var Root = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(Root, _React$Component);
 
+  // @ts-ignore
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
@@ -526,7 +529,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
         users: 'users',
         entries: 'entries',
         comments: 'comments',
-        selectedEntry: 'selectedEntry'
+        selectedEntry: 'selectedEntry',
+        recentUserSearches: 'recentUserSearches'
       },
       apis: {
         users: '/users',
@@ -536,6 +540,15 @@ var Root = /*#__PURE__*/function (_React$Component) {
         login: '/login'
       },
       ui: {
+        draggable: {
+          draggableDataKeyId: 'text/plain',
+          draggedType: 'draggedType',
+          draggedFrom: 'draggedFrom',
+          draggedTypeUser: 'user',
+          draggedTypeBoardGame: 'boardGame',
+          draggedFromUserSearch: 'userSearch',
+          draggedFromBoardGameSearch: 'boardGameSearch'
+        },
         alert: {
           modalId: "alert",
           titleId: "alert-title",
@@ -547,9 +560,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
           showClass: "d-block"
         },
         navigation: {
-          showMyEntriesId: 'navigationItemDashboard',
-          addNewEntryId: 'navigationItemAddNewEntry',
-          showAllEntriesId: 'navigationItemShowAll'
+          showMyFavourites: 'navigationItemShowMyFavourites',
+          boardGameSearchId: 'navigationItemBoardGameSearch',
+          userSearchId: 'navigationItemUserSearch'
         },
         blogEntry: {},
         entryDetailsSideBar: {
@@ -588,11 +601,43 @@ var Root = /*#__PURE__*/function (_React$Component) {
             commentId: "comment",
             submitCommentId: "submitComment"
           }
+        },
+        userSearchSideBar: {
+          dom: {
+            sideBarId: 'userSearchSideBar',
+            resultsId: 'recentUserSearches',
+            resultsElementType: 'button',
+            resultsElementAttributes: [['type', 'button']],
+            resultsClasses: 'list-group-item my-list-item truncate-notification list-group-item-action',
+            resultDataKeyId: 'user-id',
+            resultLegacyDataKeyId: 'legacy-user-id',
+            resultDataSourceId: 'data-source',
+            resultDataSourceValue: 'recentUserSearches',
+            modifierClassNormal: 'list-group-item-light',
+            modifierClassInactive: 'list-group-item-dark',
+            modifierClassActive: 'list-group-item-primary',
+            modifierClassWarning: 'list-group-item-warning',
+            iconNormal: '<i class="fas fa-comment"></i>',
+            iconInactive: '',
+            iconActive: '<i class="fas fa-heart"></i>',
+            iconWarning: '<i class="fas fa-exclamation-circle"></i>',
+            isDraggable: true,
+            isClickable: true,
+            extra: {
+              fastSearchInputId: 'fastSearchUserNames'
+            }
+          }
         }
       },
       uiPrefs: {
         navigation: {},
         blogEntry: {},
+        userSearchSideBar: {
+          view: {
+            location: 'left',
+            expandedSize: '35%'
+          }
+        },
         commentSideBar: {
           view: {
             location: 'right',
@@ -612,7 +657,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
             eventDataKeyId: 'entry-id'
           }
         },
-        dataLimit: {}
+        dataLimit: {
+          recentUserSearches: 10
+        }
       }
     }; // event handlers
 
@@ -626,6 +673,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
     _this.handleAddComment = _this.handleAddComment.bind(_assertThisInitialized(_this));
     _this.handleDeleteEntry = _this.handleDeleteEntry.bind(_assertThisInitialized(_this));
     _this.handleDeleteComment = _this.handleDeleteComment.bind(_assertThisInitialized(_this));
+    _this.handleShowUserSearch = _this.handleShowUserSearch.bind(_assertThisInitialized(_this));
     _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].connectToApplication(_assertThisInitialized(_this), window.localStorage);
     return _this;
   }
@@ -724,13 +772,17 @@ var Root = /*#__PURE__*/function (_React$Component) {
               this.commentView.onDocumentLoaded(); // reset the view state
 
               this.detailsView = new _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_8__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager());
-              this.detailsView.onDocumentLoaded(); // navigation item handlers
+              this.detailsView.onDocumentLoaded();
+              this.userSearchView = new _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_9__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager());
+              this.userSearchView.onDocumentLoaded(); // navigation item handlers
 
               if (document) {
                 // @ts-ignore
-                document.getElementById(this.state.ui.navigation.addNewEntryId).addEventListener('click', this.handleAddEntry); // @ts-ignore
+                document.getElementById(this.state.ui.navigation.showMyFavourites).addEventListener('click', function () {}); // @ts-ignore
 
-                document.getElementById(this.state.ui.navigation.showMyEntriesId).addEventListener('click', this.handleShowMyEntries);
+                document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', function () {}); // @ts-ignore
+
+                document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch);
               } // alert modal dialog setup
               // @ts-ignore
 
@@ -753,7 +805,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
               _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].initialise();
 
-            case 16:
+            case 18:
             case "end":
               return _context.stop();
           }
@@ -794,6 +846,20 @@ var Root = /*#__PURE__*/function (_React$Component) {
       applyUserFilter: false
     });
     this.hideAllSideBars();
+  };
+
+  _proto.handleShowUserSearch = function handleShowUserSearch(event) {
+    logger('Handling Show User Search');
+    event.preventDefault();
+    this.hideAllSideBars(); // prevent anything from happening if we are not logged in
+
+    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
+      // @ts-ignore
+      window.location.href = this.state.apis.login;
+      return;
+    }
+
+    this.userSearchView.eventShow(event);
   };
 
   _proto.handleAddEntry = function handleAddEntry(event) {
@@ -968,7 +1034,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 
 
-localStorage.debug = 'app controller-ts controller-ts-detail socket-ts socket-listener chat-manager';
+localStorage.debug = 'app controller-ts controller-ts-detail socket-ts socket-listener chat-manager view-ts view:user-search-sidebar';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -1062,7 +1128,7 @@ var Controller = /*#__PURE__*/function () {
     aggregateSM.addStateManager(memorySM, [], false);
     aggregateSM.addStateManager(_state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_8__["default"].getInstance(), [], false); //aggregateSM.addStateManager(indexedDBSM,[this.config.stateNames.selectedEntry],false );
 
-    aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry], false);
+    aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry, this.config.stateNames.recentUserSearches], false);
     this.stateManager = aggregateSM; // state listener
 
     this.stateChanged = this.stateChanged.bind(this);
@@ -1093,7 +1159,6 @@ var Controller = /*#__PURE__*/function () {
 
       var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_10__["NotificationController"].getInstance();
       chatManager.setCurrentUser(this.getLoggedInUsername());
-      chatManager.setChatEventHandler(chatNotificationController);
       chatManager.login();
     } // load the entries
 
@@ -2294,6 +2359,224 @@ var SidebarView = /*#__PURE__*/function (_AbstractView) {
 
 /***/ }),
 
+/***/ "./src/component/UserSearchSidebarView.ts":
+/*!************************************************!*\
+  !*** ./src/component/UserSearchSidebarView.ts ***!
+  \************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+/* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../socket/NotificationController */ "./src/socket/NotificationController.ts");
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+
+
+
+
+
+var vLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('view:user-search-sidebar');
+
+var PatientSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
+  _inheritsLoose(PatientSearchSidebarView, _SidebarView);
+
+  function PatientSearchSidebarView(applicationView, htmlDocument, stateManager) {
+    var _this;
+
+    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.userSearchSideBar, applicationView.state.uiPrefs.userSearchSideBar, stateManager) || this;
+    _this.config = applicationView.state;
+    _this.loggedInUsers = []; // handler binding
+
+    _this.updateView = _this.updateView.bind(_assertThisInitialized(_this));
+    _this.eventClickItem = _this.eventClickItem.bind(_assertThisInitialized(_this));
+    _this.eventUserSelected = _this.eventUserSelected.bind(_assertThisInitialized(_this));
+    _this.handleLoggedInUsersUpdated = _this.handleBlockedUsersChanged.bind(_assertThisInitialized(_this)); // register state change listening
+
+    stateManager.addChangeListenerForName(_this.config.stateNames.users, _assertThisInitialized(_this));
+    stateManager.addChangeListenerForName(_this.config.stateNames.recentUserSearches, _assertThisInitialized(_this));
+    _socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().addUserListener(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  var _proto = PatientSearchSidebarView.prototype;
+
+  _proto.handleLoggedInUsersUpdated = function handleLoggedInUsersUpdated(usernames) {
+    this.loggedInUsers = usernames;
+  };
+
+  _proto.handleFavouriteUserLoggedIn = function handleFavouriteUserLoggedIn(username) {};
+
+  _proto.handleFavouriteUserLoggedOut = function handleFavouriteUserLoggedOut(username) {};
+
+  _proto.handleFavouriteUsersChanged = function handleFavouriteUsersChanged(usernames) {};
+
+  _proto.handleBlockedUsersChanged = function handleBlockedUsersChanged(usernames) {};
+
+  _proto.onDocumentLoaded = function onDocumentLoaded() {
+    _SidebarView.prototype.onDocumentLoaded.call(this); // @ts-ignore
+
+
+    var fastSearchEl = $("#" + this.uiConfig.dom.extra.fastSearchInputId);
+    fastSearchEl.on('autocompleteselect', this.eventUserSelected);
+  };
+
+  _proto.getIdForStateItem = function getIdForStateItem(name, item) {
+    return item.id;
+  };
+
+  _proto.getLegacyIdForStateItem = function getLegacyIdForStateItem(name, item) {
+    return item.id;
+  };
+
+  _proto.getDisplayValueForStateItem = function getDisplayValueForStateItem(name, item) {
+    return item.username;
+  };
+
+  _proto.getModifierForStateItem = function getModifierForStateItem(name, item) {
+    var result = 'normal'; // if the user is currently logged out make the item inactive
+
+    if (this.loggedInUsers.findIndex(function (user) {
+      return user === item.username;
+    }) < 0) {
+      result = 'inactive';
+    }
+
+    return result;
+  };
+
+  _proto.getSecondaryModifierForStateItem = function getSecondaryModifierForStateItem(name, item) {
+    var result = 'normal'; // if the user is in the black list then show warning and a favourite user is highlighted
+
+    if (_socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().isFavouriteUser(item.username)) {
+      result = 'active';
+    }
+
+    if (_socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().isBlockedUser(item.username)) {
+      result = 'warning';
+    }
+
+    return result;
+  };
+
+  _proto.eventClickItem = function eventClickItem(event) {
+    event.preventDefault();
+    console.log(event.target); // @ts-ignore
+
+    var userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
+
+    vLogger("User " + event.target.innerText + " with id " + userId + " clicked");
+    var user = this.stateManager.findItemInState(this.config.stateNames.users, {
+      id: userId
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    vLogger(user);
+    _socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().startChatWithUser(user.username);
+  };
+
+  _proto.eventUserSelected = function eventUserSelected(event, ui) {
+    event.preventDefault();
+    vLogger("User " + ui.item.label + " with id " + ui.item.value + " selected"); // @ts-ignore
+
+    event.target.innerText = ''; // add the selected user to the recent user searches
+
+    if (this.stateManager.isItemInState(this.config.stateNames.recentUserSearches, {
+      id: ui.item.value
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"])) return;
+    var recentUserSearches = this.stateManager.getStateByName(this.config.stateNames.recentUserSearches);
+    vLogger("saved searches too long? " + recentUserSearches.length);
+
+    if (recentUserSearches.length >= this.config.controller.dataLimit.recentUserSearches) {
+      vLogger('saved searches too long - removing first'); // remove the first item from recent searches
+
+      var item = recentUserSearches.shift();
+      this.stateManager.removeItemFromState(this.config.stateNames.recentUserSearches, item, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], true);
+    } // save the searches
+
+
+    this.stateManager.addNewItemToState(this.config.stateNames.recentUserSearches, {
+      id: ui.item.value,
+      username: ui.item.label
+    }, true);
+  };
+
+  _proto.updateView = function updateView(name, newState) {
+    if (name === this.config.stateNames.recentUserSearches) {
+      this.createResultsForState(name, newState);
+    }
+
+    if (name === this.config.stateNames.users) {
+      // load the search names into the search field
+      // what is my username?
+      var myUsername = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUsername(); // @ts-ignore
+
+      var fastSearchEl = $("#" + this.uiConfig.dom.extra.fastSearchInputId); // for each name, construct the patient details to display and the id referenced
+
+      var fastSearchValues = [];
+      newState.forEach(function (item) {
+        var searchValue = {
+          label: item.username,
+          value: item.id
+        };
+        if (myUsername !== item.username) fastSearchValues.push(searchValue); // don't search for ourselves
+      });
+      fastSearchEl.autocomplete({
+        source: fastSearchValues
+      });
+      fastSearchEl.autocomplete('option', {
+        disabled: false,
+        minLength: 1
+      });
+    }
+  };
+
+  _proto.getDragData = function getDragData(event) {
+    // use the actual id to pass the user to the droppable target
+    // @ts-ignore
+    var userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
+
+    vLogger("User " + event.target.innerText + " with id " + userId + " dragging");
+    var user = this.stateManager.findItemInState(this.config.stateNames.users, {
+      id: userId
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    user[this.config.ui.draggable.draggedType] = this.config.ui.draggable.draggedTypeUser;
+    user[this.config.ui.draggable.draggedFrom] = this.config.ui.draggable.draggedFromUserSearch;
+    return user;
+  };
+
+  return PatientSearchSidebarView;
+}(_SidebarView__WEBPACK_IMPORTED_MODULE_1__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (PatientSearchSidebarView);
+
+/***/ }),
+
 /***/ "./src/network/ApiUtil.ts":
 /*!********************************!*\
   !*** ./src/network/ApiUtil.ts ***!
@@ -3056,8 +3339,12 @@ var ChatManager = /*#__PURE__*/function () {
 
   var _proto = ChatManager.prototype;
 
-  _proto.setChatEventHandler = function setChatEventHandler(receiver) {
-    this.chatListener = receiver;
+  _proto.addChatEventHandler = function addChatEventHandler(receiver) {
+    this.chatListeners.push(receiver);
+  };
+
+  _proto.addChatUserEventHandler = function addChatUserEventHandler(receiver) {
+    this.chatUserListeners.push(receiver);
   };
 
   function ChatManager() {
@@ -3067,32 +3354,9 @@ var ChatManager = /*#__PURE__*/function () {
     this.loggedInUsers = [];
     cmLogger('Setting up chat logs, blocked list, and favourites');
     this.chatLogs = [];
-    this.chatListener = null;
-    this.localStorage = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_2__["default"](true); // load previous logs
-
-    var savedLogs = this.localStorage.getStateByName(ChatManager.chatLogKey);
-    cmLogger(savedLogs);
-
-    if (savedLogs) {
-      this.chatLogs = savedLogs;
-    } // load previous blocked list
-
-
-    var blockedList = this.localStorage.getStateByName(ChatManager.blockedListKey);
-    cmLogger(blockedList);
-
-    if (blockedList) {
-      this.blockedList = blockedList;
-    } // load previous favourite list
-
-
-    var favouriteList = this.localStorage.getStateByName(ChatManager.favouriteListKey);
-    cmLogger(favouriteList);
-
-    if (favouriteList) {
-      this.favouriteList = favouriteList;
-    } // connect to the socket manager
-
+    this.chatListeners = [];
+    this.chatUserListeners = [];
+    this.localStorage = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_2__["default"](true); // connect to the socket manager
 
     _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].setChatReceiver(this); // bind the receiver methods
 
@@ -3111,18 +3375,20 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.saveLogs = function saveLogs() {
-    this.localStorage.setStateByName(ChatManager.chatLogKey, this.chatLogs, false);
+    this.localStorage.setStateByName(ChatManager.chatLogKey + this.currentUsername, this.chatLogs, false);
   };
 
   _proto.saveBlockedList = function saveBlockedList() {
-    this.localStorage.setStateByName(ChatManager.blockedListKey, this.blockedList, false);
+    this.localStorage.setStateByName(ChatManager.blockedListKey + this.currentUsername, this.blockedList, false);
   };
 
   _proto.saveFavouriteList = function saveFavouriteList() {
-    this.localStorage.setStateByName(ChatManager.favouriteListKey, this.favouriteList, false);
+    this.localStorage.setStateByName(ChatManager.favouriteListKey + this.currentUsername, this.favouriteList, false);
   };
 
   _proto.addUserToBlockedList = function addUserToBlockedList(username) {
+    var _this = this;
+
     var index = this.blockedList.findIndex(function (blocked) {
       return blocked === username;
     });
@@ -3130,10 +3396,15 @@ var ChatManager = /*#__PURE__*/function () {
     if (index < 0) {
       this.blockedList.push(username);
       this.saveBlockedList();
+      this.chatUserListeners.forEach(function (listener) {
+        return listener.handleBlockedUsersChanged(_this.favouriteList);
+      });
     }
   };
 
   _proto.removeUserFromBlockedList = function removeUserFromBlockedList(username) {
+    var _this2 = this;
+
     var index = this.blockedList.findIndex(function (blocked) {
       return blocked === username;
     });
@@ -3141,6 +3412,9 @@ var ChatManager = /*#__PURE__*/function () {
     if (index >= 0) {
       this.blockedList.splice(index, 1);
       this.saveBlockedList();
+      this.chatUserListeners.forEach(function (listener) {
+        return listener.handleBlockedUsersChanged(_this2.favouriteList);
+      });
     }
   };
 
@@ -3151,6 +3425,8 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.addUserToFavouriteList = function addUserToFavouriteList(username) {
+    var _this3 = this;
+
     var index = this.favouriteList.findIndex(function (favourite) {
       return favourite === username;
     });
@@ -3158,10 +3434,15 @@ var ChatManager = /*#__PURE__*/function () {
     if (index < 0) {
       this.favouriteList.push(username);
       this.saveFavouriteList();
+      this.chatUserListeners.forEach(function (listener) {
+        return listener.handleFavouriteUsersChanged(_this3.favouriteList);
+      });
     }
   };
 
   _proto.removeUserFromFavouriteList = function removeUserFromFavouriteList(username) {
+    var _this4 = this;
+
     var index = this.favouriteList.findIndex(function (blocked) {
       return blocked === username;
     });
@@ -3169,6 +3450,9 @@ var ChatManager = /*#__PURE__*/function () {
     if (index >= 0) {
       this.favouriteList.splice(index, 1);
       this.saveFavouriteList();
+      this.chatUserListeners.forEach(function (listener) {
+        return listener.handleFavouriteUsersChanged(_this4.favouriteList);
+      });
     }
   };
 
@@ -3180,7 +3464,30 @@ var ChatManager = /*#__PURE__*/function () {
 
   _proto.setCurrentUser = function setCurrentUser(username) {
     cmLogger("Setting current user " + username);
-    this.currentUsername = username;
+    this.currentUsername = username; // load previous logs
+
+    var savedLogs = this.localStorage.getStateByName(ChatManager.chatLogKey + this.currentUsername);
+    cmLogger(savedLogs);
+
+    if (savedLogs) {
+      this.chatLogs = savedLogs;
+    } // load previous blocked list
+
+
+    var blockedList = this.localStorage.getStateByName(ChatManager.blockedListKey + this.currentUsername);
+    cmLogger(blockedList);
+
+    if (blockedList) {
+      this.blockedList = blockedList;
+    } // load previous favourite list
+
+
+    var favouriteList = this.localStorage.getStateByName(ChatManager.favouriteListKey + this.currentUsername);
+    cmLogger(favouriteList);
+
+    if (favouriteList) {
+      this.favouriteList = favouriteList;
+    }
   };
 
   _proto.getCurrentUser = function getCurrentUser() {
@@ -3243,29 +3550,41 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.receiveLogin = function receiveLogin(username) {
-    // keep track of the logged in users
+    var _this5 = this; // keep track of the logged in users
+
+
     var index = this.loggedInUsers.findIndex(function (user) {
       return user === username;
     });
     if (index < 0) this.loggedInUsers.push(username);
-    if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(this.loggedInUsers); // if the user in in favourites and not in blocked list passing this on to the listener
+    this.chatUserListeners.forEach(function (listener) {
+      return listener.handleLoggedInUsersUpdated(_this5.loggedInUsers);
+    }); // if the user in in favourites and not in blocked list passing this on to the listener
 
     if (!this.isUserInBlockedList(username) && this.isUserInFavouriteList(username)) {
       cmLogger("User " + username + " logging in");
-      if (this.chatListener) this.chatListener.handleFavouriteUserLoggedIn(username);
+      this.chatUserListeners.forEach(function (listener) {
+        return listener.handleFavouriteUserLoggedIn(username);
+      });
     }
   };
 
   _proto.receiveLogout = function receiveLogout(username) {
+    var _this6 = this;
+
     var index = this.loggedInUsers.findIndex(function (user) {
       return user === username;
     });
     if (index >= 0) this.loggedInUsers.splice(index, 1);
-    if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(this.loggedInUsers); // if the user in in favourites and not in blocked list passing this on to the listener
+    this.chatUserListeners.forEach(function (listener) {
+      return listener.handleLoggedInUsersUpdated(_this6.loggedInUsers);
+    }); // if the user in in favourites and not in blocked list passing this on to the listener
 
     if (!this.isUserInBlockedList(username) && this.isUserInFavouriteList(username)) {
       cmLogger("User " + username + " logging out");
-      if (this.chatListener) this.chatListener.handleFavouriteUserLoggedOut(username);
+      this.chatUserListeners.forEach(function (listener) {
+        return listener.handleFavouriteUserLoggedOut(username);
+      });
     }
   };
 
@@ -3295,24 +3614,26 @@ var ChatManager = /*#__PURE__*/function () {
     this.addMessageToChatLog(chatLog, message);
     cmLogger("Message received");
     cmLogger(message);
-    if (this.chatListener) this.chatListener.handleChatLogUpdated(chatLog);
+    this.chatListeners.forEach(function (listener) {
+      return listener.handleChatLogUpdated(chatLog);
+    });
   };
 
   _proto.receiveQueuedInvites = function receiveQueuedInvites(invites) {
-    var _this = this; // just loop through and process each invite
+    var _this7 = this; // just loop through and process each invite
 
 
     invites.forEach(function (invite) {
-      _this.receiveInvitation(invite);
+      _this7.receiveInvitation(invite);
     });
   };
 
   _proto.receiveQueuedMessages = function receiveQueuedMessages(messages) {
-    var _this2 = this; // just loop through a process each message
+    var _this8 = this; // just loop through a process each message
 
 
     messages.forEach(function (message) {
-      _this2.receiveMessage(message);
+      _this8.receiveMessage(message);
     });
   };
 
@@ -3331,12 +3652,17 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.login = function login() {
+    var _this9 = this;
+
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
     _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].login(this.getCurrentUser()); // get the current user list
 
-    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].getUserList(); // setup a default room for the user
-    //socketManager.joinChat(this.getCurrentUser(),uuid.getUniqueId());
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].getUserList(); // connect to the chat rooms already in logs
+
+    this.chatLogs.forEach(function (log) {
+      _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(_this9.currentUsername, log.roomName);
+    });
   };
 
   _proto.logout = function logout() {
@@ -3374,6 +3700,8 @@ var ChatManager = /*#__PURE__*/function () {
     return this.chatLogs;
   };
 
+  _proto.startChatWithUser = function startChatWithUser(username) {};
+
   return ChatManager;
 }();
 ChatManager.chatLogKey = 'im-board-chat-logs';
@@ -3409,19 +3737,25 @@ var NotificationController = /*#__PURE__*/function () {
     this.doNotDisturb = false;
     this.chatManager = _ChatManager__WEBPACK_IMPORTED_MODULE_0__["ChatManager"].getInstance();
     this.doNotDisturb = false;
-    this.chatListener = null; //bind the methods
+    this.chatListeners = [];
+    this.chatUserListeners = []; //bind the methods
 
     this.handleChatLogUpdated = this.handleChatLogUpdated.bind(this);
     this.handleLoggedInUsersUpdated = this.handleLoggedInUsersUpdated.bind(this);
     this.handleFavouriteUserLoggedIn = this.handleFavouriteUserLoggedIn.bind(this);
     this.handleFavouriteUserLoggedOut = this.handleFavouriteUserLoggedOut.bind(this);
-    this.chatManager.setChatEventHandler(this);
+    this.chatManager.addChatEventHandler(this);
+    this.chatManager.addChatUserEventHandler(this);
   }
 
   var _proto = NotificationController.prototype;
 
-  _proto.setListener = function setListener(listener) {
-    this.chatListener = listener;
+  _proto.addListener = function addListener(listener) {
+    this.chatListeners.push(listener);
+  };
+
+  _proto.addUserListener = function addUserListener(listener) {
+    this.chatUserListeners.push(listener);
   };
 
   _proto.setDoNotDisturb = function setDoNotDisturb(dontDisturbMe) {
@@ -3456,11 +3790,21 @@ var NotificationController = /*#__PURE__*/function () {
     }
   };
 
+  _proto.isFavouriteUser = function isFavouriteUser(username) {
+    return this.chatManager.isUserInFavouriteList(username);
+  };
+
+  _proto.isBlockedUser = function isBlockedUser(username) {
+    return this.chatManager.isUserInBlockedList(username);
+  };
+
   _proto.handleChatLogUpdated = function handleChatLogUpdated(log) {
     // avoid no actual messages
     if (log.messages.length === 0) return; // pass on the changes
 
-    if (this.chatListener) this.chatListener.handleChatLogUpdated(log); // provide visual notifications if do not disturb is not on
+    this.chatListeners.forEach(function (listener) {
+      return listener.handleChatLogUpdated(log);
+    }); // provide visual notifications if do not disturb is not on
 
     if (this.doNotDisturb) return; // get the last message added, it won't be from ourselves (the chat manager takes care of that)
 
@@ -3470,12 +3814,16 @@ var NotificationController = /*#__PURE__*/function () {
 
   _proto.handleLoggedInUsersUpdated = function handleLoggedInUsersUpdated(usernames) {
     // allow the view to change the user statuses
-    if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(usernames);
+    this.chatUserListeners.forEach(function (listener) {
+      return listener.handleLoggedInUsersUpdated(usernames);
+    });
   };
 
   _proto.handleFavouriteUserLoggedIn = function handleFavouriteUserLoggedIn(username) {
     // allow the view to change the user statuses
-    if (this.chatListener) this.chatListener.handleFavouriteUserLoggedIn(username); // provide visual notifications if do not disturb is not on
+    this.chatUserListeners.forEach(function (listener) {
+      return listener.handleFavouriteUserLoggedIn(username);
+    }); // provide visual notifications if do not disturb is not on
 
     if (this.doNotDisturb) return;
     _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show(username, "User " + username + " has logged in.", 'warning', 5000);
@@ -3483,10 +3831,28 @@ var NotificationController = /*#__PURE__*/function () {
 
   _proto.handleFavouriteUserLoggedOut = function handleFavouriteUserLoggedOut(username) {
     // allow the view to change the user statuses
-    if (this.chatListener) this.chatListener.handleFavouriteUserLoggedOut(username); // provide visual notifications if do not disturb is not on
+    this.chatUserListeners.forEach(function (listener) {
+      return listener.handleFavouriteUserLoggedOut(username);
+    }); // provide visual notifications if do not disturb is not on
 
     if (this.doNotDisturb) return;
     _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show(username, "User " + username + " has logged out.", 'priority', 4000);
+  };
+
+  _proto.handleBlockedUsersChanged = function handleBlockedUsersChanged(usernames) {
+    this.chatUserListeners.forEach(function (listener) {
+      return listener.handleBlockedUsersChanged(usernames);
+    });
+  };
+
+  _proto.handleFavouriteUsersChanged = function handleFavouriteUsersChanged(usernames) {
+    this.chatUserListeners.forEach(function (listener) {
+      return listener.handleFavouriteUsersChanged(usernames);
+    });
+  };
+
+  _proto.startChatWithUser = function startChatWithUser(username) {
+    _ChatManager__WEBPACK_IMPORTED_MODULE_0__["ChatManager"].getInstance().startChatWithUser(username);
   };
 
   return NotificationController;

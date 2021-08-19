@@ -76,7 +76,7 @@ class Controller implements StateChangeListener {
         aggregateSM.addStateManager(memorySM, [], false);
         aggregateSM.addStateManager(BrowserStorageStateManager.getInstance(), [], false);
         //aggregateSM.addStateManager(indexedDBSM,[this.config.stateNames.selectedEntry],false );
-        aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry], false);
+        aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry,this.config.stateNames.recentUserSearches], false);
 
         this.stateManager = aggregateSM;
 
@@ -110,7 +110,6 @@ class Controller implements StateChangeListener {
             // setup the chat notification system
             let chatNotificationController = NotificationController.getInstance();
             chatManager.setCurrentUser(this.getLoggedInUsername());
-            chatManager.setChatEventHandler(chatNotificationController);
 
             chatManager.login();
         }

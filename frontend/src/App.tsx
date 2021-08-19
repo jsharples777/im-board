@@ -10,6 +10,7 @@ import CommentSidebarView from "./component/CommentSidebarView";
 import BlogEntryView from "./component/BlogEntryView";
 import {isSame} from "./util/EqualityFunctions";
 import DetailsSidebarView from "./component/DetailsSidebarView";
+import UserSearchSidebarView from "./component/UserSearchSidebarView";
 
 
 const logger = debug('app');
@@ -22,6 +23,10 @@ class Root extends React.Component{
     private commentView: CommentSidebarView;
     // @ts-ignore
     private detailsView: DetailsSidebarView;
+
+    // @ts-ignore
+    private userSearchView: UserSearchSidebarView;
+
     // @ts-ignore
     private cancelBtnEl: HTMLElement | null;
     // @ts-ignore
@@ -43,6 +48,7 @@ class Root extends React.Component{
                 entries: 'entries',
                 comments: 'comments',
                 selectedEntry: 'selectedEntry',
+                recentUserSearches: 'recentUserSearches',
             },
             apis: {
                 users: '/users',
@@ -52,6 +58,15 @@ class Root extends React.Component{
                 login: '/login',
             },
             ui: {
+                draggable: {
+                    draggableDataKeyId: 'text/plain',
+                    draggedType: 'draggedType',
+                    draggedFrom: 'draggedFrom',
+                    draggedTypeUser: 'user',
+                    draggedTypeBoardGame: 'boardGame',
+                    draggedFromUserSearch: 'userSearch',
+                    draggedFromBoardGameSearch: 'boardGameSearch',
+                },
                 alert: {
                     modalId: "alert",
                     titleId: "alert-title",
@@ -63,9 +78,9 @@ class Root extends React.Component{
                     showClass: "d-block",
                 },
                 navigation: {
-                    showMyEntriesId: 'navigationItemDashboard',
-                    addNewEntryId: 'navigationItemAddNewEntry',
-                    showAllEntriesId: 'navigationItemShowAll'
+                    showMyFavourites: 'navigationItemShowMyFavourites',
+                    boardGameSearchId: 'navigationItemBoardGameSearch',
+                    userSearchId: 'navigationItemUserSearch'
                 },
                 blogEntry: {},
                 entryDetailsSideBar: {
@@ -107,10 +122,44 @@ class Root extends React.Component{
                         submitCommentId: "submitComment",
                     },
                 },
+                userSearchSideBar: {
+                    dom: {
+                        sideBarId: 'userSearchSideBar',
+                        resultsId: 'recentUserSearches',
+                        resultsElementType: 'button',
+                        resultsElementAttributes: [
+                            ['type', 'button'],
+                        ],
+                        resultsClasses: 'list-group-item my-list-item truncate-notification list-group-item-action',
+                        resultDataKeyId: 'user-id',
+                        resultLegacyDataKeyId: 'legacy-user-id',
+                        resultDataSourceId: 'data-source',
+                        resultDataSourceValue: 'recentUserSearches',
+                        modifierClassNormal: 'list-group-item-light',
+                        modifierClassInactive: 'list-group-item-dark',
+                        modifierClassActive: 'list-group-item-primary',
+                        modifierClassWarning: 'list-group-item-warning',
+                        iconNormal: '<i class="fas fa-comment"></i>',
+                        iconInactive: '',
+                        iconActive: '<i class="fas fa-heart"></i>',
+                        iconWarning: '<i class="fas fa-exclamation-circle"></i>',
+                        isDraggable: true,
+                        isClickable: true,
+                        extra: {
+                            fastSearchInputId: 'fastSearchUserNames',
+                        },
+                    },
+                },
             },
             uiPrefs: {
                 navigation: {},
                 blogEntry: {},
+                userSearchSideBar: {
+                    view: {
+                        location: 'left',
+                        expandedSize: '35%',
+                    },
+                },
                 commentSideBar: {
                     view: {
                         location: 'right',
@@ -131,6 +180,7 @@ class Root extends React.Component{
                     },
                 },
                 dataLimit: {
+                    recentUserSearches: 10,
                 },
             },
         };
@@ -146,6 +196,10 @@ class Root extends React.Component{
         this.handleAddComment = this.handleAddComment.bind(this);
         this.handleDeleteEntry = this.handleDeleteEntry.bind(this);
         this.handleDeleteComment = this.handleDeleteComment.bind(this);
+
+
+
+        this.handleShowUserSearch = this.handleShowUserSearch.bind(this);
 
         controller.connectToApplication(this, window.localStorage);
     }
@@ -236,12 +290,18 @@ class Root extends React.Component{
         this.detailsView = new DetailsSidebarView(this,document,controller.getStateManager());
         this.detailsView.onDocumentLoaded();
 
+
+        this.userSearchView = new UserSearchSidebarView(this,document,controller.getStateManager());
+        this.userSearchView.onDocumentLoaded();
+
         // navigation item handlers
         if (document) {
             // @ts-ignore
-            document.getElementById(this.state.ui.navigation.addNewEntryId).addEventListener('click', this.handleAddEntry);
+            document.getElementById(this.state.ui.navigation.showMyFavourites).addEventListener('click', () => {});
             // @ts-ignore
-            document.getElementById(this.state.ui.navigation.showMyEntriesId).addEventListener('click', this.handleShowMyEntries);
+            document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', () => {});
+            // @ts-ignore
+            document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch);
         }
 
         // alert modal dialog setup
@@ -287,6 +347,20 @@ class Root extends React.Component{
         logger('Handling Show All Entries');
         this.setState({applyUserFilter:false});
         this.hideAllSideBars();
+    }
+
+    handleShowUserSearch(event:Event) {
+        logger('Handling Show User Search');
+        event.preventDefault();
+        this.hideAllSideBars();
+        // prevent anything from happening if we are not logged in
+        if (!controller.isLoggedIn()) {
+            // @ts-ignore
+            window.location.href = this.state.apis.login;
+            return;
+        }
+        this.userSearchView.eventShow(event);
+
     }
 
     handleAddEntry(event:Event) {
@@ -444,7 +518,7 @@ class Root extends React.Component{
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
-localStorage.debug = 'app controller-ts controller-ts-detail socket-ts socket-listener chat-manager';
+localStorage.debug = 'app controller-ts controller-ts-detail socket-ts socket-listener chat-manager view-ts view:user-search-sidebar';
 debug.log = console.info.bind(console);
 
 // @ts-ignore
