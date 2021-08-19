@@ -3053,7 +3053,7 @@ var SocketManager = /*#__PURE__*/function () {
     this.socket.on('data', this.callbackForData);
   };
 
-  _proto.sendMessage = function sendMessage(message) {
+  _proto.sendDataMessage = function sendMessage(message) {
     this.socket.emit('message', message);
   };
 

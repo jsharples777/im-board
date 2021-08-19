@@ -1,5 +1,5 @@
 import bCrypt from 'bcrypt-nodejs';
-import socketManager from '../util/SocketManager';
+import socketManager from '../socket/SocketManager';
 import Account from '../models/account';
 import {Request} from "express";
 
@@ -51,7 +51,7 @@ function setupPassport(passport:any, user:Account) {
                         }).then(function (user:Account) {
                             // @ts-ignore
                             let message = {type: "create", stateName: "users", data: user, user: user.id}
-                            socketManager.sendMessage(message);
+                            socketManager.sendDataMessage(message);
 
                         });
                         if (!newUser) {

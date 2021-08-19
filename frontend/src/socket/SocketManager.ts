@@ -13,12 +13,57 @@ class SocketManager {
         this.callbackForData = this.callbackForData.bind(this);
         this.listener = null;
         this.socket = null;
+        this.callbackForMessage = this.callbackForMessage.bind(this);
+        this.callbackForLogin = this.callbackForLogin.bind(this);
+        this.callbackForLogout = this.callbackForLogout.bind(this);
+        this.callbackForJoinRoom = this.callbackForJoinRoom.bind(this);
+        this.callbackForExitRoom = this.callbackForExitRoom.bind(this);
+        this.callbackForInvite = this.callbackForInvite.bind(this);
+        this.callbackForChat = this.callbackForChat.bind(this);
+        this.callbackForQueue = this.callbackForQueue.bind(this);
     }
 
     private callbackForMessage(message:any):void {
         sDebug(`Received message : ${message}`);
         if (this.listener) this.listener.handleMessage(message);
     }
+
+
+    private callbackForLogin(message:any):void {
+        sDebug(`Received message : ${message}`);
+        if (this.listener) this.listener.handleMessage(message);
+    }
+
+    private callbackForLogout(message:any):void {
+        sDebug(`Received message : ${message}`);
+        if (this.listener) this.listener.handleMessage(message);
+    }
+
+    private callbackForJoinRoom(message:any):void {
+        sDebug(`Received message : ${message}`);
+        if (this.listener) this.listener.handleMessage(message);
+    }
+
+    private callbackForExitRoom(message:any):void {
+        sDebug(`Received message : ${message}`);
+        if (this.listener) this.listener.handleMessage(message);
+    }
+
+    private callbackForInvite(message:any):void {
+        sDebug(`Received message : ${message}`);
+        if (this.listener) this.listener.handleMessage(message);
+    }
+
+    private callbackForChat(message:any):void {
+        sDebug(`Received message : ${message}`);
+        if (this.listener) this.listener.handleMessage(message);
+    }
+
+    private callbackForQueue(message:any):void {
+        sDebug(`Received message : ${message}`);
+        if (this.listener) this.listener.handleMessage(message);
+    }
+
 
     /*
     *
@@ -58,7 +103,14 @@ class SocketManager {
         this.socket = io();
         sDebug('Waiting for messages');
         this.socket.on('message',this.callbackForMessage);
-        this.socket.on('data',this.callbackForData)
+        this.socket.on('data',this.callbackForData);
+        this.socket.on('login',this.callbackForLogin);
+        this.socket.on('logout',this.callbackForLogout);
+        this.socket.on('joinroom',this.callbackForJoinRoom);
+        this.socket.on('exitroom',this.callbackForExitRoom);
+        this.socket.on('invite',this.callbackForInvite);
+        this.socket.on('chat',this.callbackForChat);
+        this.socket.on('queue',this.callbackForQueue);
     }
 
     public sendMessage(message:string):void {

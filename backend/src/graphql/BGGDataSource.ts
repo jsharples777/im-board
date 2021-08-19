@@ -166,7 +166,6 @@ class BGGDataSource {
 
                 let results:any[] = [];
 
-
                 if (error) reject(error.message);
 
                 let parser = new Parser();
@@ -204,8 +203,6 @@ class BGGDataSource {
 
 
                 if (error) reject(error.message);
-
-                bggLogger(body);
 
                 let parser = new Parser();
                 parser.parseString(body, (err:any, parsedResults:any) => {

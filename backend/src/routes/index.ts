@@ -18,6 +18,7 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/dashboard', auth.ensureAuthenticated, (req, res, next) => {
+  rDebug(req.user);
   res.render('index', { user: req.user });
 });
 

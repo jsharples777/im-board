@@ -19,7 +19,7 @@ import cookieParser from 'cookie-parser';
 import connectFlash from 'connect-flash';
 
 // Sockets
-import socketManager from './util/SocketManager';
+import socketManager from './socket/SocketManager';
 
 // Authentication middleware
 import passport from 'passport';
@@ -128,8 +128,8 @@ if (isDevelopment) {
 // ensure the user is logged in with a path
 
 serverDebug('Installing routes');
-//app.use('/', routes);// add the middleware path routing
-//app.use('/api',apiRoutes);// add the api path routing
+app.use('/', routes);// add the middleware path routing
+app.use('/api',apiRoutes);// add the api path routing
 // setup the QL server for the Board Game Geek Data retrieval (just for fun, don't need Graph QL, but good practise)
 serverDebug('Setting up Board Game Geek API interface via Graph QL');
 new BGGDataSource(app);

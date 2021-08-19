@@ -2,8 +2,8 @@ import express from 'express';
 import debug from 'debug';
 import {Account,BlogEntry,Comment} from '../models/index';
 import moment from 'moment';
-import socketManager from '../util/SocketManager';
-import DataMessage from "../util/DataMessage";
+import socketManager from '../socket/SocketManager';
+import {DataMessage} from "../socket/SocketTypes";
 
 const router = express.Router();
 const rDebug = debug('api');
@@ -37,7 +37,7 @@ router.post('/comment', (req,res) => {
     .then((comment) => {
         // @ts-ignore
         let message:DataMessage = {type:"create", stateName: "comments", data:comment, user:req.user.id,};
-        socketManager.sendMessage(message);
+        socketManager.sendDataMessage(message);
         res.json(comment);
     })
     .catch((err) => {
@@ -58,7 +58,7 @@ router.put('/comment/:id', (req,res) => {
     }).then((comment) => {
         // @ts-ignore
         const message:DataMessage = {type:"update",stateName: "comments",data:comment,user:req.user.id,}
-        socketManager.sendMessage(message);
+        socketManager.sendDataMessage(message);
 
         res.json(comment);
     })
@@ -83,7 +83,7 @@ router.delete('/comment/:id', (req,res) => {
             if (result > 0) {
                 // @ts-ignore
                 const message: DataMessage = {type: "delete", stateName: "comments", data: comment, user: req.user.id,}
-                socketManager.sendMessage(message);
+                socketManager.sendDataMessage(message);
             }
             res.json({result:true});
         })
@@ -136,7 +136,7 @@ router.post('/blog', (req,res) => {
             .then((blog) => {
                 // @ts-ignore
                 const message:DataMessage = {type:"create",stateName: "entries",data:blog, user:req.user.id,}
-                socketManager.sendMessage(message);
+                socketManager.sendDataMessage(message);
                 res.json(blog);
             })
             .catch((err) => {
@@ -172,7 +172,7 @@ router.put('/blog/:id', (req,res) => {
                 .then((blog) => {
                     // @ts-ignore
                     const message:DataMessage = {type:"update",stateName: "entries",data:blog,user:req.user.id,}
-                    socketManager.sendMessage(message);
+                    socketManager.sendDataMessage(message);
                     res.json(blog);
                 })
                 .catch((err) => {
@@ -196,7 +196,7 @@ router.delete('/blog/:id', (req,res) => {
             if (result > 0) {
                 // @ts-ignore
                 const message:DataMessage = {type:"delete",stateName: "entries",data:{ id: parseInt(req.params.id) },user:req.user.id,}
-                socketManager.sendMessage(message);
+                socketManager.sendDataMessage(message);
             }
             res.json({result:true});
          })
