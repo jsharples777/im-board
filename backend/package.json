@@ -16,7 +16,6 @@
     "start.dev_old": "nodemon -e js,json,graphql,env -w . -w .env  -w dist -w server.js dist/js/server.js"
   },
   "dependencies": {
-    "@code-bucket/board-game-geek": "^0.2.2",
     "apollo-server-express": "^2.25.2",
     "bcrypt": "^5.0.1",
     "bcrypt-nodejs": "0.0.3",
@@ -50,7 +49,8 @@
     "webpack": "^5.47.1",
     "webpack-cli": "^4.7.2",
     "webpack-dev-middleware": "^5.0.0",
-    "webpack-hot-middleware": "^2.25.0"
+    "webpack-hot-middleware": "^2.25.0",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
@@ -73,6 +73,7 @@
     "@types/passport-local": "^1.0.34",
     "@types/request": "^2.48.7",
     "@types/sequelize": "^4.28.10",
+    "@types/xml2js": "^0.4.9",
     "babel-loader": "^8.2.2",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",

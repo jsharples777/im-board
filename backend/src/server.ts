@@ -118,7 +118,7 @@ if (isDevelopment) {
     /* log call requests with body */
     app.use((request, response, next) => {
         serverDebug(`Received request for ${request.url} with/without body`);
-        if (request.body) console.log(request.body);
+        //if (request.body) console.log(request.body);
         next();
     });
 } else {

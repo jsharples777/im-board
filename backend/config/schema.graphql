@@ -10,7 +10,7 @@ type BoardGameDetail {
     image: String!
     name: String!
     description: String!
-    year: Int!
+    year: Int
     minPlayers: Int
     maxPlayers: Int
     minPlayTime: Int
@@ -22,10 +22,11 @@ type BoardGameDetail {
     numOfRaters: Int
     averageScore: Float
     rank: Int
+    categories: [String!]
 }
 
 ##### top level declarations
 type Query {
-    findBoardGames(query:String!): [BoardGame!]!
+    findBoardGames(query:String!): [BoardGame]
     getBoardGameDetails(id:Int!): BoardGameDetail
 }
