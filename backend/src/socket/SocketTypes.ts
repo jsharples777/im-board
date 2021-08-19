@@ -9,12 +9,14 @@ export type ChatMessage = {
     room: string,
     message: string,
     user: string,
+    created: number
 }
 
 export type InviteMessage = {
     from: string,
     message: string,
-    room:string
+    room:string,
+    created: number
 }
 
 export type ChatUser = {

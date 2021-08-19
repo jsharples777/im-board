@@ -14,13 +14,13 @@
 </div>
 {{> footers/footer-main }}
 </body>
+{{#if user}}
+    <script>
+        let loggedInUserId = {{user.id}};
+        let loggedInUsername = "{{user.username}}";
+    </script>
+{{/if}}
 {{> jsincludes/js-vendors}}
 {{> jsincludes/js-popovers-tooltips}}
 {{> jsincludes/js-app}}
-{{#if user}}
-<script>
-    let loggedInUserId = {{user.id}};
-    let loggedInUsername = {{user.username}};
-</script>
-{{/if}}
 </html>

@@ -37,13 +37,16 @@ export default class MessageQueueManager {
         let queueItems: QueuedMessages | null = null;
         let index = this.messageQueue.findIndex((queue) => queue.username === username);
         if (index >= 0) {
+            mqLogger(`User ${username} has logged back in, messages in queue`);
             let queue: UserQueue = this.messageQueue[index];
             queue.status = Status.LoggedIn;
             queueItems = {
-                invites: queue.invites,
-                messages: queue.messages
+                invites: [...queue.invites],
+                messages: [...queue.messages]
             }
+            mqLogger(queueItems);
             // remove the queued items from memory
+            this.messageQueue.splice(index,1);
 
         }
         return queueItems;
@@ -53,6 +56,7 @@ export default class MessageQueueManager {
         // create a new queue for the user
         let queue: UserQueue;
         let index = this.messageQueue.findIndex((queue) => queue.username === username);
+        mqLogger(`User ${username} has logged out, emptying queues, and setting status to logged out`);
         if (index >= 0) {
             queue = this.messageQueue[index];
             queue.status = Status.LoggedOut;
@@ -76,9 +80,11 @@ export default class MessageQueueManager {
         let index = this.messageQueue.findIndex((queue) => queue.username === username);
         if (index >= 0) {
             queue = this.messageQueue[index];
+            mqLogger(`User ${username} is logged in ${queue.status}`);
             result = (queue.status === Status.LoggedIn);
         }
         else {
+            mqLogger(`User ${username} is NOT logged in`);
             queue = {
                 username: username,
                 status: Status.LoggedOut,
@@ -106,6 +112,7 @@ export default class MessageQueueManager {
             }
             this.messageQueue.push(queue);
         }
+        mqLogger(`Queuing invite from ${message.from} to room ${message.room} to user ${receiver.username}`);
         queue.invites.push(message);
 
     }
@@ -126,6 +133,7 @@ export default class MessageQueueManager {
             }
             this.messageQueue.push(queue);
         }
+        mqLogger(`Queuing message from ${message.user} to room ${message.room} to user ${receiver.username}`);
         queue.messages.push(message);
 
     }

@@ -968,7 +968,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 
 
-localStorage.debug = 'app controller-ts socket-ts api-ts state-manager-aggregate state-manager-api state-manager-aggregate state-manager-async socket-listener';
+localStorage.debug = 'app controller-ts controller-ts-detail socket-ts socket-listener chat-manager';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -997,6 +997,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
 /* harmony import */ var _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./SocketListenerDelegate */ "./src/SocketListenerDelegate.ts");
 /* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./socket/ChatManager */ "./src/socket/ChatManager.ts");
+/* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./socket/NotificationController */ "./src/socket/NotificationController.ts");
+
+
 
 
 
@@ -1078,7 +1082,21 @@ var Controller = /*#__PURE__*/function () {
     cLogger('Initialising data state'); // listen for socket events
 
     var socketListerDelegate = new _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_7__["default"](this.config);
-    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_4__["default"].setListener(socketListerDelegate); // load the entries
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_4__["default"].setListener(socketListerDelegate); // now that we have all the user we can setup the chat system but only if we are logged in
+
+    cLogger("Setting up chat system for user " + this.getLoggedInUserId() + ": " + this.getLoggedInUsername());
+
+    if (this.getLoggedInUserId() > 0) {
+      // setup the chat system
+      var chatManager = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_9__["ChatManager"].getInstance(); // this connects the manager to the socket system
+      // setup the chat notification system
+
+      var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_10__["NotificationController"].getInstance();
+      chatManager.setCurrentUser(this.getLoggedInUsername());
+      chatManager.setChatEventHandler(chatNotificationController);
+      chatManager.login();
+    } // load the entries
+
 
     this.getStateManager().getStateByName(this.config.stateNames.entries); // load the users
 
@@ -1133,6 +1151,21 @@ var Controller = /*#__PURE__*/function () {
     } catch (error) {}
 
     cLoggerDetail("Logged in user id is " + result);
+    return result;
+  };
+
+  _proto.getLoggedInUsername = function getLoggedInUsername() {
+    var result = '';
+
+    try {
+      // @ts-ignore
+      if (loggedInUsername) {
+        // @ts-ignore
+        result = loggedInUsername;
+      }
+    } catch (error) {}
+
+    cLoggerDetail("Logged in user is " + result);
     return result;
   } // Lets delete a comment
   ;
@@ -2983,6 +3016,484 @@ var notifier = new NotificationManager();
 
 /***/ }),
 
+/***/ "./src/socket/ChatManager.ts":
+/*!***********************************!*\
+  !*** ./src/socket/ChatManager.ts ***!
+  \***********************************/
+/*! exports provided: ChatManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChatManager", function() { return ChatManager; });
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+/* harmony import */ var _SocketManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SocketManager */ "./src/socket/SocketManager.ts");
+
+
+
+
+var UserStatus;
+
+(function (UserStatus) {
+  UserStatus[UserStatus["LoggedOut"] = 0] = "LoggedOut";
+  UserStatus[UserStatus["LoggedIn"] = 1] = "LoggedIn";
+})(UserStatus || (UserStatus = {}));
+
+var cmLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('chat-manager');
+var ChatManager = /*#__PURE__*/function () {
+  ChatManager.getInstance = function getInstance() {
+    if (!ChatManager._instance) {
+      ChatManager._instance = new ChatManager();
+    }
+
+    return ChatManager._instance;
+  } // TO DO chat logs, blocked list, favourites per user
+  ;
+
+  var _proto = ChatManager.prototype;
+
+  _proto.setChatEventHandler = function setChatEventHandler(receiver) {
+    this.chatListener = receiver;
+  };
+
+  function ChatManager() {
+    this.currentUsername = '';
+    this.blockedList = [];
+    this.favouriteList = [];
+    this.loggedInUsers = [];
+    cmLogger('Setting up chat logs, blocked list, and favourites');
+    this.chatLogs = [];
+    this.chatListener = null;
+    this.localStorage = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_2__["default"](true); // load previous logs
+
+    var savedLogs = this.localStorage.getStateByName(ChatManager.chatLogKey);
+    cmLogger(savedLogs);
+
+    if (savedLogs) {
+      this.chatLogs = savedLogs;
+    } // load previous blocked list
+
+
+    var blockedList = this.localStorage.getStateByName(ChatManager.blockedListKey);
+    cmLogger(blockedList);
+
+    if (blockedList) {
+      this.blockedList = blockedList;
+    } // load previous favourite list
+
+
+    var favouriteList = this.localStorage.getStateByName(ChatManager.favouriteListKey);
+    cmLogger(favouriteList);
+
+    if (favouriteList) {
+      this.favouriteList = favouriteList;
+    } // connect to the socket manager
+
+
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].setChatReceiver(this); // bind the receiver methods
+
+    this.receiveLogin = this.receiveLogin.bind(this);
+    this.receiveLogout = this.receiveLogout.bind(this);
+    this.receiveInvitation = this.receiveInvitation.bind(this);
+    this.receiveMessage = this.receiveMessage.bind(this);
+    this.receiveQueuedMessages = this.receiveQueuedMessages.bind(this);
+    this.receiveQueuedInvites = this.receiveQueuedInvites.bind(this);
+    this.receiveJoinedRoom = this.receiveJoinedRoom.bind(this);
+    this.receivedLeftRoom = this.receivedLeftRoom.bind(this);
+  }
+
+  _proto.receiveUserList = function receiveUserList(users) {
+    this.loggedInUsers = users;
+  };
+
+  _proto.saveLogs = function saveLogs() {
+    this.localStorage.setStateByName(ChatManager.chatLogKey, this.chatLogs, false);
+  };
+
+  _proto.saveBlockedList = function saveBlockedList() {
+    this.localStorage.setStateByName(ChatManager.blockedListKey, this.blockedList, false);
+  };
+
+  _proto.saveFavouriteList = function saveFavouriteList() {
+    this.localStorage.setStateByName(ChatManager.favouriteListKey, this.favouriteList, false);
+  };
+
+  _proto.addUserToBlockedList = function addUserToBlockedList(username) {
+    var index = this.blockedList.findIndex(function (blocked) {
+      return blocked === username;
+    });
+
+    if (index < 0) {
+      this.blockedList.push(username);
+      this.saveBlockedList();
+    }
+  };
+
+  _proto.removeUserFromBlockedList = function removeUserFromBlockedList(username) {
+    var index = this.blockedList.findIndex(function (blocked) {
+      return blocked === username;
+    });
+
+    if (index >= 0) {
+      this.blockedList.splice(index, 1);
+      this.saveBlockedList();
+    }
+  };
+
+  _proto.isUserInBlockedList = function isUserInBlockedList(username) {
+    return this.blockedList.findIndex(function (blocked) {
+      return blocked === username;
+    }) >= 0;
+  };
+
+  _proto.addUserToFavouriteList = function addUserToFavouriteList(username) {
+    var index = this.favouriteList.findIndex(function (favourite) {
+      return favourite === username;
+    });
+
+    if (index < 0) {
+      this.favouriteList.push(username);
+      this.saveFavouriteList();
+    }
+  };
+
+  _proto.removeUserFromFavouriteList = function removeUserFromFavouriteList(username) {
+    var index = this.favouriteList.findIndex(function (blocked) {
+      return blocked === username;
+    });
+
+    if (index >= 0) {
+      this.favouriteList.splice(index, 1);
+      this.saveFavouriteList();
+    }
+  };
+
+  _proto.isUserInFavouriteList = function isUserInFavouriteList(username) {
+    return this.favouriteList.findIndex(function (blocked) {
+      return blocked === username;
+    }) >= 0;
+  };
+
+  _proto.setCurrentUser = function setCurrentUser(username) {
+    cmLogger("Setting current user " + username);
+    this.currentUsername = username;
+  };
+
+  _proto.getCurrentUser = function getCurrentUser() {
+    return this.currentUsername;
+  };
+
+  _proto.ensureChatLogExists = function ensureChatLogExists(room) {
+    var log;
+    var index = this.chatLogs.findIndex(function (log) {
+      return log.roomName === room;
+    });
+
+    if (index < 0) {
+      log = {
+        roomName: room,
+        users: [this.getCurrentUser()],
+        messages: [],
+        lastViewed: parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss')),
+        numOfNewMessages: 0
+      };
+      this.chatLogs.push(log);
+      this.saveLogs();
+    } else {
+      log = this.chatLogs[index];
+    }
+
+    return log;
+  };
+
+  _proto.receiveJoinedRoom = function receiveJoinedRoom(users) {
+    // we get this for all changes to a room, if the username is us can safely ignore
+    if (users.username === this.currentUsername) return;
+    this.ensureChatLogExists(users.room);
+    var index = this.chatLogs.findIndex(function (log) {
+      return log.roomName === users.room;
+    });
+
+    if (index >= 0) {
+      cmLogger("User list for room " + users.room + " - " + users.userList.join(','));
+      var log = this.chatLogs[index];
+      log.users = users.userList;
+      this.saveLogs();
+    }
+  };
+
+  _proto.receivedLeftRoom = function receivedLeftRoom(users) {
+    this.receiveJoinedRoom(users);
+  };
+
+  _proto.receiveInvitation = function receiveInvitation(invite) {
+    //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
+    if (!this.isUserInBlockedList(invite.from)) {
+      this.ensureChatLogExists(invite.room);
+      cmLogger("Joining chat " + invite.room);
+      cmLogger(invite);
+      _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(this.getCurrentUser(), invite.room);
+    } else {
+      cmLogger("User " + invite.from + " blocked");
+    }
+  };
+
+  _proto.receiveLogin = function receiveLogin(username) {
+    // keep track of the logged in users
+    var index = this.loggedInUsers.findIndex(function (user) {
+      return user === username;
+    });
+    if (index < 0) this.loggedInUsers.push(username);
+    if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(this.loggedInUsers); // if the user in in favourites and not in blocked list passing this on to the listener
+
+    if (!this.isUserInBlockedList(username) && this.isUserInFavouriteList(username)) {
+      cmLogger("User " + username + " logging in");
+      if (this.chatListener) this.chatListener.handleFavouriteUserLoggedIn(username);
+    }
+  };
+
+  _proto.receiveLogout = function receiveLogout(username) {
+    var index = this.loggedInUsers.findIndex(function (user) {
+      return user === username;
+    });
+    if (index >= 0) this.loggedInUsers.splice(index, 1);
+    if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(this.loggedInUsers); // if the user in in favourites and not in blocked list passing this on to the listener
+
+    if (!this.isUserInBlockedList(username) && this.isUserInFavouriteList(username)) {
+      cmLogger("User " + username + " logging out");
+      if (this.chatListener) this.chatListener.handleFavouriteUserLoggedOut(username);
+    }
+  };
+
+  _proto.addMessageToChatLog = function addMessageToChatLog(log, message) {
+    log.numOfNewMessages++;
+    log.messages.push(message);
+
+    if (message.from === this.getCurrentUser()) {
+      this.touchChatLog(log.roomName); // this will also save the logs
+    } else {
+      this.saveLogs();
+    }
+  };
+
+  _proto.touchChatLog = function touchChatLog(room) {
+    var chatLog = this.ensureChatLogExists(room);
+    chatLog.numOfNewMessages = 0;
+    chatLog.lastViewed = parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss'));
+    this.saveLogs();
+  };
+
+  _proto.receiveMessage = function receiveMessage(message) {
+    // double check the message is not from us somehow
+    if (message.from === this.getCurrentUser()) return; // ok, so we need to add the message to the chat log, increase the new message count, save the logs and pass it on
+
+    var chatLog = this.ensureChatLogExists(message.room);
+    this.addMessageToChatLog(chatLog, message);
+    cmLogger("Message received");
+    cmLogger(message);
+    if (this.chatListener) this.chatListener.handleChatLogUpdated(chatLog);
+  };
+
+  _proto.receiveQueuedInvites = function receiveQueuedInvites(invites) {
+    var _this = this; // just loop through and process each invite
+
+
+    invites.forEach(function (invite) {
+      _this.receiveInvitation(invite);
+    });
+  };
+
+  _proto.receiveQueuedMessages = function receiveQueuedMessages(messages) {
+    var _this2 = this; // just loop through a process each message
+
+
+    messages.forEach(function (message) {
+      _this2.receiveMessage(message);
+    });
+  };
+
+  _proto.joinChat = function joinChat(room) {
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+    this.ensureChatLogExists(room);
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(this.getCurrentUser(), room);
+  };
+
+  _proto.leaveChat = function leaveChat(room) {
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+    // this.removeChatLog(room);  // leave the chat log for now (essentially history)
+
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].leaveChat(this.getCurrentUser(), room);
+  };
+
+  _proto.login = function login() {
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].login(this.getCurrentUser()); // get the current user list
+
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].getUserList(); // setup a default room for the user
+    //socketManager.joinChat(this.getCurrentUser(),uuid.getUniqueId());
+  };
+
+  _proto.logout = function logout() {
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].logout(this.getCurrentUser());
+  };
+
+  _proto.sendInvite = function sendInvite(to, room) {
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+    // can't accidentally send an invite to blacklisted
+
+    if (this.isUserInBlockedList(to)) return;
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].sendInvite(this.getCurrentUser(), to, room);
+  };
+
+  _proto.sendMessage = function sendMessage(room, content) {
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+    var log = this.ensureChatLogExists(room); // send the message
+
+    var created = parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss'));
+    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].sendMessage(this.getCurrentUser(), room, content, created); // add the message to the chat log
+
+    var sent = {
+      from: this.getCurrentUser(),
+      room: room,
+      message: content,
+      created: created
+    };
+    this.addMessageToChatLog(log, sent);
+  };
+
+  _proto.getChatLogs = function getChatLogs() {
+    return this.chatLogs;
+  };
+
+  return ChatManager;
+}();
+ChatManager.chatLogKey = 'im-board-chat-logs';
+ChatManager.blockedListKey = 'im-board-blocked-list';
+ChatManager.favouriteListKey = 'im-board-favourite-list';
+
+/***/ }),
+
+/***/ "./src/socket/NotificationController.ts":
+/*!**********************************************!*\
+  !*** ./src/socket/NotificationController.ts ***!
+  \**********************************************/
+/*! exports provided: NotificationController */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NotificationController", function() { return NotificationController; });
+/* harmony import */ var _ChatManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ChatManager */ "./src/socket/ChatManager.ts");
+/* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../notification/NotificationManager */ "./src/notification/NotificationManager.ts");
+
+
+var NotificationController = /*#__PURE__*/function () {
+  NotificationController.getInstance = function getInstance() {
+    if (!NotificationController._instance) {
+      NotificationController._instance = new NotificationController();
+    }
+
+    return NotificationController._instance;
+  };
+
+  function NotificationController() {
+    this.doNotDisturb = false;
+    this.chatManager = _ChatManager__WEBPACK_IMPORTED_MODULE_0__["ChatManager"].getInstance();
+    this.doNotDisturb = false;
+    this.chatListener = null; //bind the methods
+
+    this.handleChatLogUpdated = this.handleChatLogUpdated.bind(this);
+    this.handleLoggedInUsersUpdated = this.handleLoggedInUsersUpdated.bind(this);
+    this.handleFavouriteUserLoggedIn = this.handleFavouriteUserLoggedIn.bind(this);
+    this.handleFavouriteUserLoggedOut = this.handleFavouriteUserLoggedOut.bind(this);
+    this.chatManager.setChatEventHandler(this);
+  }
+
+  var _proto = NotificationController.prototype;
+
+  _proto.setListener = function setListener(listener) {
+    this.chatListener = listener;
+  };
+
+  _proto.setDoNotDisturb = function setDoNotDisturb(dontDisturbMe) {
+    if (dontDisturbMe === void 0) {
+      dontDisturbMe = true;
+    }
+
+    this.doNotDisturb = dontDisturbMe;
+  };
+
+  _proto.blackListUser = function blackListUser(username, isBlackedListed) {
+    if (isBlackedListed === void 0) {
+      isBlackedListed = true;
+    }
+
+    if (isBlackedListed) {
+      this.chatManager.addUserToBlockedList(username);
+    } else {
+      this.chatManager.removeUserFromBlockedList(username);
+    }
+  };
+
+  _proto.favouriteUser = function favouriteUser(username, isFavourited) {
+    if (isFavourited === void 0) {
+      isFavourited = true;
+    }
+
+    if (isFavourited) {
+      this.chatManager.addUserToFavouriteList(username);
+    } else {
+      this.chatManager.removeUserFromFavouriteList(username);
+    }
+  };
+
+  _proto.handleChatLogUpdated = function handleChatLogUpdated(log) {
+    // avoid no actual messages
+    if (log.messages.length === 0) return; // pass on the changes
+
+    if (this.chatListener) this.chatListener.handleChatLogUpdated(log); // provide visual notifications if do not disturb is not on
+
+    if (this.doNotDisturb) return; // get the last message added, it won't be from ourselves (the chat manager takes care of that)
+
+    var displayMessage = log.messages[log.messages.length - 1];
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show(displayMessage.from, displayMessage.message, 'message', 3000);
+  };
+
+  _proto.handleLoggedInUsersUpdated = function handleLoggedInUsersUpdated(usernames) {
+    // allow the view to change the user statuses
+    if (this.chatListener) this.chatListener.handleLoggedInUsersUpdated(usernames);
+  };
+
+  _proto.handleFavouriteUserLoggedIn = function handleFavouriteUserLoggedIn(username) {
+    // allow the view to change the user statuses
+    if (this.chatListener) this.chatListener.handleFavouriteUserLoggedIn(username); // provide visual notifications if do not disturb is not on
+
+    if (this.doNotDisturb) return;
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show(username, "User " + username + " has logged in.", 'warning', 5000);
+  };
+
+  _proto.handleFavouriteUserLoggedOut = function handleFavouriteUserLoggedOut(username) {
+    // allow the view to change the user statuses
+    if (this.chatListener) this.chatListener.handleFavouriteUserLoggedOut(username); // provide visual notifications if do not disturb is not on
+
+    if (this.doNotDisturb) return;
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show(username, "User " + username + " has logged out.", 'priority', 4000);
+  };
+
+  return NotificationController;
+}();
+
+/***/ }),
+
 /***/ "./src/socket/SocketManager.ts":
 /*!*************************************!*\
   !*** ./src/socket/SocketManager.ts ***!
@@ -2998,18 +3509,131 @@ __webpack_require__.r(__webpack_exports__);
 var sDebug = debug__WEBPACK_IMPORTED_MODULE_0___default()('socket-ts');
 
 var SocketManager = /*#__PURE__*/function () {
+  var _proto = SocketManager.prototype;
+
+  _proto.setChatReceiver = function setChatReceiver(receiver) {
+    this.chatReceiver = receiver;
+  };
+
   function SocketManager() {
     this.callbackForMessage = this.callbackForMessage.bind(this);
     this.callbackForData = this.callbackForData.bind(this);
     this.listener = null;
     this.socket = null;
+    this.chatReceiver = null;
+    this.callbackForMessage = this.callbackForMessage.bind(this);
+    this.callbackForLogin = this.callbackForLogin.bind(this);
+    this.callbackForLogout = this.callbackForLogout.bind(this);
+    this.callbackForJoinRoom = this.callbackForJoinRoom.bind(this);
+    this.callbackForExitRoom = this.callbackForExitRoom.bind(this);
+    this.callbackForInvite = this.callbackForInvite.bind(this);
+    this.callbackForChat = this.callbackForChat.bind(this);
+    this.callbackForQueue = this.callbackForQueue.bind(this);
+    this.callbackForUserList = this.callbackForUserList.bind(this);
   }
 
-  var _proto = SocketManager.prototype;
+  _proto.callbackForMessage = function callbackForMessage(content) {
+    sDebug("Received message : " + content);
+    if (this.chatReceiver === null) return;
 
-  _proto.callbackForMessage = function callbackForMessage(message) {
-    sDebug("Received message : " + message);
-    if (this.listener) this.listener.handleMessage(message);
+    try {
+      // should be a server side ChatMessage {room, message,user}
+      var dataObj = JSON.parse(content);
+      this.chatReceiver.receiveMessage(dataObj);
+    } catch (err) {
+      sDebug('Not JSON data');
+    }
+  };
+
+  _proto.callbackForLogin = function callbackForLogin(message) {
+    sDebug("Received login : " + message);
+    if (this.chatReceiver === null) return;
+    this.chatReceiver.receiveLogin(message);
+  };
+
+  _proto.callbackForUserList = function callbackForUserList(message) {
+    sDebug("Received user list : " + message);
+    if (this.chatReceiver === null) return;
+    this.chatReceiver.receiveUserList(message);
+  };
+
+  _proto.callbackForLogout = function callbackForLogout(message) {
+    sDebug("Received logout : " + message);
+    if (this.chatReceiver === null) return;
+    this.chatReceiver.receiveLogout(message);
+  };
+
+  _proto.callbackForJoinRoom = function callbackForJoinRoom(data) {
+    sDebug("Received joined room : " + data);
+    if (this.chatReceiver === null) return;
+
+    try {
+      var dataObj = JSON.parse(data);
+      sDebug(dataObj);
+      this.chatReceiver.receiveJoinedRoom(dataObj);
+    } catch (err) {
+      sDebug('Not JSON data');
+    }
+  };
+
+  _proto.callbackForExitRoom = function callbackForExitRoom(data) {
+    sDebug("Received left room : " + data);
+    if (this.chatReceiver === null) return;
+
+    try {
+      var dataObj = JSON.parse(data);
+      sDebug(dataObj);
+      this.chatReceiver.receivedLeftRoom(dataObj);
+    } catch (err) {
+      sDebug('Not JSON data');
+    }
+  };
+
+  _proto.callbackForInvite = function callbackForInvite(data) {
+    sDebug("Received invite : " + data);
+    if (this.chatReceiver === null) return;
+
+    try {
+      var dataObj = JSON.parse(data);
+      sDebug(dataObj);
+      this.chatReceiver.receiveInvitation(dataObj);
+    } catch (err) {
+      sDebug('Not JSON data');
+    }
+  };
+
+  _proto.callbackForChat = function callbackForChat(content) {
+    sDebug("Received chat : " + content);
+    if (this.chatReceiver === null) return;
+
+    try {
+      // should be a server side ChatMessage {room, message,user}
+      var dataObj = JSON.parse(content);
+      sDebug(dataObj);
+      this.chatReceiver.receiveMessage(dataObj);
+    } catch (err) {
+      sDebug('Not JSON data');
+    }
+  };
+
+  _proto.callbackForQueue = function callbackForQueue(data) {
+    sDebug("Received queued items : " + data);
+    if (this.chatReceiver === null) return;
+
+    try {
+      var dataObj = JSON.parse(data);
+      sDebug(dataObj); // this object should contain two arrays of invites and messages
+
+      if (dataObj.invites && dataObj.invites.length > 0) {
+        this.chatReceiver.receiveQueuedInvites(dataObj.invites);
+      }
+
+      if (dataObj.messages && dataObj.messages.length > 0) {
+        this.chatReceiver.receiveQueuedInvites(dataObj.invites);
+      }
+    } catch (err) {
+      sDebug('Not JSON data');
+    }
   }
   /*
   *
@@ -3051,10 +3675,61 @@ var SocketManager = /*#__PURE__*/function () {
     sDebug('Waiting for messages');
     this.socket.on('message', this.callbackForMessage);
     this.socket.on('data', this.callbackForData);
+    this.socket.on('login', this.callbackForLogin);
+    this.socket.on('logout', this.callbackForLogout);
+    this.socket.on('joinroom', this.callbackForJoinRoom);
+    this.socket.on('exitroom', this.callbackForExitRoom);
+    this.socket.on('invite', this.callbackForInvite);
+    this.socket.on('chat', this.callbackForChat);
+    this.socket.on('queue', this.callbackForQueue);
+    this.socket.on('userlist', this.callbackForUserList);
   };
 
-  _proto.sendDataMessage = function sendMessage(message) {
-    this.socket.emit('message', message);
+  _proto.login = function login(username) {
+    this.socket.emit('login', {
+      username: username
+    });
+  };
+
+  _proto.logout = function logout(username) {
+    this.socket.emit('logout', {
+      username: username
+    });
+  };
+
+  _proto.joinChat = function joinChat(username, room) {
+    this.socket.emit('joinroom', {
+      username: username,
+      room: room
+    });
+  };
+
+  _proto.leaveChat = function leaveChat(username, room) {
+    this.socket.emit('exitroom', {
+      username: username,
+      room: room
+    });
+  };
+
+  _proto.sendInvite = function sendInvite(from, to, room) {
+    this.socket.emit('exitroom', {
+      from: from,
+      to: to,
+      room: room
+    });
+  };
+
+  _proto.sendMessage = function sendMessage(from, room, message, created) {
+    this.socket.emit('chat', {
+      from: from,
+      room: room,
+      message: message,
+      created: created
+    });
+  };
+
+  _proto.getUserList = function getUserList() {
+    this.socket.emit('userlist');
   };
 
   return SocketManager;

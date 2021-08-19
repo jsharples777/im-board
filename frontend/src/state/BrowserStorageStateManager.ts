@@ -18,7 +18,7 @@ export default class BrowserStorageStateManager extends AbstractStateManager {
   }
 
 
-  protected constructor(useLocalStorage:boolean = false) {
+  public constructor(useLocalStorage:boolean = false) {
     super('browser');
     this.storage = window.sessionStorage;
     if (useLocalStorage) this.storage = window.localStorage;

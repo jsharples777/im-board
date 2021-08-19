@@ -2,6 +2,9 @@ import bCrypt from 'bcrypt-nodejs';
 import socketManager from '../socket/SocketManager';
 import Account from '../models/account';
 import {Request} from "express";
+import debug from 'debug';
+
+const passportLogger = debug('my-passport');
 
 
 // @ts-ignore
@@ -102,6 +105,7 @@ function setupPassport(passport:any, user:Account) {
                 }
 
                 const userinfo = user.get();
+                passportLogger(userinfo);
                 return done(null, userinfo);
             }).catch(function(err:Error) {
                 return done(err);
