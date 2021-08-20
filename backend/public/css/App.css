@@ -28,7 +28,6 @@
     margin-left:2px;
     padding-top: 5px;
     padding-bottom: 5px;
-    font-size: 8pt;
 }
 
 /* The sidebar menu */
@@ -109,6 +108,18 @@ small-heading {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.scroll-chatlogs {
+    height: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.scroll-chat {
+    height: 300px;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .scroll-user-search {

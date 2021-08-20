@@ -40,16 +40,12 @@ export default abstract class AbstractView implements StateChangeListener {
     protected abstract eventDeleteClickItem(event: MouseEvent): void;
 
     protected abstract getDragData(event: DragEvent): any;
-
     protected abstract getIdForStateItem(name: string, item: any): string;
-
     protected abstract getLegacyIdForStateItem(name: string, item: any): string;
-
     protected abstract getDisplayValueForStateItem(name: string, item: any): string;
-
     protected abstract getModifierForStateItem(name: string, item: any): string;
-
     protected abstract getSecondaryModifierForStateItem(name: string, item: any): string;
+    protected abstract getBadgeValue(name:string, item:any): string;
 
     protected abstract updateView(name: string, newState: any): void;
 
@@ -62,7 +58,7 @@ export default abstract class AbstractView implements StateChangeListener {
         event.dataTransfer.setData(this.applicationView.state.ui.draggable.draggableDataKeyId, data);
     }
 
-    protected createResultForItem(name: string, item: any, dataSource:any = null,deleteHandler:any = null): HTMLElement {
+    protected createResultForItem(name: string, item: any, dataSource:any = null): HTMLElement {
         avLogger('Abstract View : creating Result');
         avLogger(item);
         const domConfig = this.uiConfig.dom;
@@ -76,6 +72,7 @@ export default abstract class AbstractView implements StateChangeListener {
 
         let childEl:HTMLElement = this.document.createElement(domConfig.resultsElementType);
         browserUtil.addRemoveClasses(childEl, domConfig.resultsClasses);
+        browserUtil.addAttributes(childEl, domConfig.resultsElementAttributes);
         // the content may be structured
         let textEl = childEl;
         if (domConfig.resultContentDivClasses) {
@@ -93,6 +90,18 @@ export default abstract class AbstractView implements StateChangeListener {
             textEl.setAttribute(domConfig.resultDataSourceId, dataSource);
 
             contentEl.appendChild(textEl);
+
+            if (domConfig.hasBadge) {
+                let badgeEl:HTMLElement = this.document.createElement(domConfig.badgeElementType);
+                browserUtil.addRemoveClasses(badgeEl,domConfig.badgeClasses);
+                badgeEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+                badgeEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+                badgeEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+                contentEl.appendChild(badgeEl);
+                badgeEl.innerHTML = "&nbsp;&nbsp;&nbsp;" + this.getBadgeValue(name,item) + "&nbsp;&nbsp;&nbsp;";
+                browserUtil.addAttributes(badgeEl,domConfig.badgeElementAttributes);
+            }
+
             if (domConfig.isDeleteable) {
                 let deleteButtonEl:HTMLElement = this.document.createElement('button');
                 deleteButtonEl.setAttribute('type','button');
@@ -113,12 +122,7 @@ export default abstract class AbstractView implements StateChangeListener {
                 deleteButtonEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
                 deleteButtonEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
                 deleteButtonEl.setAttribute(domConfig.resultDataSourceId, dataSource);
-                if (deleteHandler) {
-                    deleteButtonEl.addEventListener('click',deleteHandler);
-                }
-                else {
-                    deleteButtonEl.addEventListener('click',this.eventDeleteClickItem);
-                }
+                deleteButtonEl.addEventListener('click',this.eventDeleteClickItem);
                 contentEl.appendChild(deleteButtonEl);
             }
             childEl.appendChild(contentEl);
@@ -169,7 +173,7 @@ export default abstract class AbstractView implements StateChangeListener {
                 }
                 switch (secondModifier) {
                     case 'warning': {
-                        browserUtil.addRemoveClasses(childEl, domConfig.modifierClassNormal, false);
+                        browserUtil.addRemoveClasses(childEl, domConfig.modifierClassActive, false);
                         browserUtil.addRemoveClasses(childEl, domConfig.modifierClassWarning, true);
                         if (domConfig.iconWarning !== '') {
                             textEl.innerHTML += '  ' + domConfig.iconWarning;
@@ -193,6 +197,8 @@ export default abstract class AbstractView implements StateChangeListener {
                 switch (secondModifier) {
                     case 'warning': {
                         if (domConfig.iconWarning !== '') {
+                            browserUtil.addRemoveClasses(childEl, domConfig.modifierClassInactive, false);
+                            browserUtil.addRemoveClasses(childEl, domConfig.modifierClassWarning, true);
                             textEl.innerHTML += '  ' + domConfig.iconWarning;
                         }
                         break;

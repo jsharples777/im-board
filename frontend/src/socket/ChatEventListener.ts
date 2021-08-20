@@ -2,6 +2,7 @@ import {ChatLog} from "./ChatManager";
 
 export interface ChatEventListener {
     handleChatLogUpdated(log:ChatLog):void;
+    handleChatLogsUpdated():void;
 
 }
 

@@ -40,6 +40,15 @@ class BrowserUtil {
         }
     });
   }
+
+  addAttributes(element:HTMLElement, attributes:any[]|undefined) {
+     if (attributes) {
+       attributes.forEach((attribute:any) => {
+          element.setAttribute(attribute[0],attribute[1]);
+       });
+     }
+  }
+
 }
 
 const browserUtil = new BrowserUtil();

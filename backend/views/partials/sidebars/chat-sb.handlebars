@@ -1,0 +1,36 @@
+<div id="chatSideBar" class="sidebar-right bg-info">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 pb-3 align-items-end">
+                <button type="button" class="close text-white" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div style="height:50%" class="col-12">
+                <div class="card">
+                    <div style="font-size: 10pt" class="card-header">Chat Logs</div>
+                    <div class="card-body scroll-chatlogs">
+                        <div id="chatLogs" style="font-size: 12pt" class="list-group list-group-flush">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="height:50%" class="col-12 mt-4">
+                <div class="card">
+                    <!--<div style="font-size: 10pt" class="card-header">Chat Logs</div>-->
+                    <div class="card-body scroll-chat">
+                        <div id="chatLog" style="font-size: 8pt" class="list-group list-group-flush">
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <form class="form-inline" id="newMessage">
+                            <input type="text" class="form-control form-control-sm" id="message"
+                                   placeholder="Enter message">&nbsp;&nbsp;
+                            <button type="submit" class="btn btn-primary btn-round btn-sm" id="submitMessage"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -19,10 +19,13 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
     protected favUsersDiv:HTMLElement;
     // @ts-ignore
     protected favUsersDropZone:HTMLElement;
+    // @ts-ignore
+    protected blockedUsersDiv:HTMLElement;
+    // @ts-ignore
+    protected blockedUsersDropZone:HTMLElement;
 
     constructor(applicationView: any, htmlDocument: HTMLDocument, stateManager: StateManager) {
         super(applicationView, htmlDocument, applicationView.state.ui.userSearchSideBar, applicationView.state.uiPrefs.userSearchSideBar, stateManager);
-
 
         this.config = applicationView.state;
         this.loggedInUsers = [];
@@ -39,14 +42,13 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         this.handleLoggedInUsersUpdated = this.handleLoggedInUsersUpdated.bind(this);
 
         this.handleFavouriteUserDrop = this.handleFavouriteUserDrop.bind(this);
-        this.eventClickItemFavouriteUser = this.eventClickItemFavouriteUser.bind(this);
+        this.handleBlockedUserDrop = this.handleBlockedUserDrop.bind(this);
 
         // register state change listening
         stateManager.addChangeListenerForName(this.config.stateNames.users, this);
         this.localisedSM = new BrowserStorageStateManager(true);
         this.localisedSM.addChangeListenerForName(this.config.stateNames.recentUserSearches, this);
         NotificationController.getInstance().addUserListener(this);
-        //ChatManager.getInstance().addChatUserEventHandler(this);
 
         vLogger(this.localisedSM.getStateByName(this.config.stateNames.recentUserSearches));
 
@@ -74,10 +76,34 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
                     break;
                 }
             }
-
         }
-
     }
+
+    handleBlockedUserDrop(event:Event) {
+        vLogger('drop event on blocked users');
+        // @ts-ignore
+        const draggedObjectJSON = event.dataTransfer.getData(this.config.ui.draggable.draggableDataKeyId);
+        const draggedObject = JSON.parse(draggedObjectJSON);
+        vLogger(draggedObject);
+
+        if (draggedObject[this.config.ui.draggable.draggedType] === this.config.ui.draggable.draggedTypeUser) {
+            switch (draggedObject[this.config.ui.draggable.draggedFrom]) {
+                case this.config.ui.draggable.draggedFromUserSearch: {
+                    // we know we have dragged a user from the user search to our blocked users and dropped it
+                    // is this user already in the favourites?
+                    if (ChatManager.getInstance().isUserInBlockedList(draggedObject.username)) {
+                        vLogger(`${draggedObject.username} already in blocked list, ignoring`);
+                        return;
+                    }
+                    // ok, so we have a new user to add to the favourite list
+                    // add the user to the Chat Manager and we should get an event about it
+                    ChatManager.getInstance().addUserToBlockedList(draggedObject.username);
+                    break;
+                }
+            }
+        }
+    }
+
 
     handleLoggedInUsersUpdated(usernames: string[]): void {
         vLogger(`Received new list of users who are logged in `);
@@ -114,13 +140,28 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
             // find the user in the state manager
             let user:any = this.stateManager.findItemInState(this.config.stateNames.users, {username}, isSameUsername);
             if (user) {
-                let childElement = this.createResultForItem(this.config.stateNames.users,user,this.uiConfig.dom.resultDataSourceFavUsers,this.eventClickItemFavouriteUser);
+                let childElement = this.createResultForItem(this.config.stateNames.users,user,this.uiConfig.dom.resultDataSourceFavUsers);
+                childElement.addEventListener('click', this.eventClickItem);
+
                 this.favUsersDiv.appendChild(childElement);
             }
         });
-
-
     }
+
+    private renderBlockedUsers() {
+        const usernames: string[] = ChatManager.getInstance().getBlockedUserList();
+        if (this.blockedUsersDiv) browserUtil.removeAllChildren(this.blockedUsersDiv);
+
+        usernames.forEach((username) => {
+            // find the user in the state manager
+            let user:any = this.stateManager.findItemInState(this.config.stateNames.users, {username}, isSameUsername);
+            if (user) {
+                let childElement = this.createResultForItem(this.config.stateNames.users,user,this.uiConfig.dom.resultDataSourceBlockedUsers);
+                this.blockedUsersDiv.appendChild(childElement);
+            }
+        });
+    }
+
 
     onDocumentLoaded() {
         super.onDocumentLoaded();
@@ -137,7 +178,17 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         // @ts-ignore
         this.favUsersDiv = document.getElementById(this.uiConfig.dom.favouriteUsersId);
 
+        // ok lets add the favourite users area and event handling for that now
+        // @ts-ignore
+        this.blockedUsersDropZone = document.getElementById(this.uiConfig.dom.blockedUsersDropZone);
+        this.blockedUsersDropZone.addEventListener('dragover', (event) => {vLogger('Dragged over'); event.preventDefault();});
+        this.blockedUsersDropZone.addEventListener('drop', this.handleBlockedUserDrop);
+
+        // @ts-ignore
+        this.blockedUsersDiv = document.getElementById(this.uiConfig.dom.blockedUsersId);
+
         this.renderFavouriteUsers();
+        this.renderBlockedUsers();
 
 
     }
@@ -186,25 +237,20 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         // @ts-ignore
         const userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
         // @ts-ignore
-        vLogger(`User ${event.target.innerText} with id ${userId} clicked`);
+        const dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId);
+
+        if (dataSource === this.uiConfig.dom.resultDataSourceBlockedUsers) {
+            vLoggerDetail(`Blocked user clicked - not activating`);
+            return;
+        }
+        // @ts-ignore
+        vLoggerDetail(`User ${event.target} with id ${userId} clicked from ${dataSource}`);
 
         let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: parseInt(userId)}, isSame);
         vLogger(user);
         NotificationController.getInstance().startChatWithUser(user.username);
     }
 
-    eventClickItemFavouriteUser(event: MouseEvent) {
-        event.preventDefault();
-        console.log(event.target);
-        // @ts-ignore
-        const userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
-        // @ts-ignore
-        vLogger(`Favourite user ${event.target.innerText} with id ${userId} clicked - removing`);
-
-        let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: parseInt(userId)}, isSame);
-        vLogger(user);
-        ChatManager.getInstance().removeUserFromFavouriteList(user.username);
-    }
 
     eventUserSelected(event: Event, ui: any) {
         event.preventDefault();
@@ -233,6 +279,7 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
     reRenderView() {
         this.updateView(this.config.stateNames.recentUserSearches, this.localisedSM.getStateByName(this.config.stateNames.recentUserSearches));
         this.renderFavouriteUsers();
+        this.renderBlockedUsers();
     }
 
     updateView(name: string, newState: any) {
@@ -276,7 +323,59 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
     }
 
     protected eventDeleteClickItem(event: MouseEvent): void {
+        event.preventDefault();
+        // @ts-ignore
+        const userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
+        // @ts-ignore
+        const dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId)
+        // @ts-ignore
+        vLoggerDetail(`User ${event.target} with id ${userId} delete clicked from ${dataSource}`);
+
+        let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: parseInt(userId)}, isSame);
+        vLogger(user);
+        if (user) {
+
+
+            switch (dataSource) {
+                case (this.uiConfig.dom.resultDataSourceFavUsers) : {
+                    this.deleteFavouriteUser(user);
+                    break;
+                }
+                case (this.uiConfig.dom.resultDataSourceBlockedUsers) : {
+                    this.deleteBlockedUser(user);
+                    break;
+                }
+                case (this.uiConfig.dom.resultDataSourceValue) : {
+                    this.deleteRecentSearchUser(user);
+                    break;
+                }
+            }
+        }
     }
+
+    deleteFavouriteUser(user:any) {
+        // @ts-ignore
+        vLogger(`Favourite user ${user.username} with id ${user.id} deleted - removing`);
+        ChatManager.getInstance().removeUserFromFavouriteList(user.username);
+    }
+
+    deleteBlockedUser(user:any) {
+        // @ts-ignore
+        vLogger(`Blocked user ${user.username} with id ${user.id} deleted - removing`);
+        ChatManager.getInstance().removeUserFromBlockedList(user.username);
+    }
+
+    deleteRecentSearchUser(user:any) {
+        // @ts-ignore
+        vLogger(`Recent search user ${user.username} with id ${user.id} deleted - removing`);
+        this.localisedSM.removeItemFromState(this.config.stateNames.recentUserSearches,user,isSame,true);
+    }
+
+    protected getBadgeValue(name: string, item: any): string {
+        return "";
+    }
+
+
 }
 
 export default UserSearchSidebarView;

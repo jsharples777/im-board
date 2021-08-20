@@ -1,4 +1,4 @@
-import {ChatMessage, ChatUser, InviteMessage, QueuedMessages} from "./SocketTypes";
+import {ChatMessage, InviteMessage, QueuedMessages} from "./SocketTypes";
 import debug from 'debug';
 
 const mqLogger = debug('message-queue');
@@ -40,14 +40,24 @@ export default class MessageQueueManager {
             mqLogger(`User ${username} has logged back in, messages in queue`);
             let queue: UserQueue = this.messageQueue[index];
             queue.status = Status.LoggedIn;
+            mqLogger(queue);
             queueItems = {
                 invites: [...queue.invites],
                 messages: [...queue.messages]
             }
             mqLogger(queueItems);
             // remove the queued items from memory
-            this.messageQueue.splice(index,1);
-
+            queue.invites = [];
+            queue.messages = [];
+        }
+        else {
+            let queue:UserQueue = {
+                username: username,
+                status: Status.LoggedIn,
+                invites: [],
+                messages: []
+            }
+            this.messageQueue.push(queue);
         }
         return queueItems;
     }
@@ -96,44 +106,46 @@ export default class MessageQueueManager {
         return result;
     }
 
-    public queueInviteForUser(receiver:ChatUser,message:InviteMessage) {
-        let index = this.messageQueue.findIndex((queue) => queue.username === receiver.username);
+    public queueInviteForUser(username:string,message:InviteMessage) {
+        let index = this.messageQueue.findIndex((queue) => queue.username === username);
         let queue: UserQueue;
         if (index >= 0) {
             queue = this.messageQueue[index];
             if (queue.status === Status.LoggedIn) return;
+            queue.invites.push(message);
         }
         else {
             queue = {
-                username: receiver.username,
+                username: username,
                 status: Status.LoggedOut,
-                invites: [],
+                invites: [message],
                 messages: []
             }
             this.messageQueue.push(queue);
         }
-        mqLogger(`Queuing invite from ${message.from} to room ${message.room} to user ${receiver.username}`);
+        mqLogger(`Queuing invite from ${message.from} to room ${message.room} to user ${username}`);
         queue.invites.push(message);
 
     }
 
-    public queueMessageForUser(receiver:ChatUser,message:ChatMessage) {
-        let index = this.messageQueue.findIndex((queue) => queue.username === receiver.username);
+    public queueMessageForUser(username:string,message:ChatMessage) {
+        let index = this.messageQueue.findIndex((queue) => queue.username === username);
         let queue: UserQueue;
         if (index >= 0) {
             queue = this.messageQueue[index];
             if (queue.status === Status.LoggedIn) return;
+            queue.messages.push(message);
         }
         else {
             queue = {
-                username: receiver.username,
+                username: username,
                 status: Status.LoggedOut,
                 invites: [],
-                messages: []
+                messages: [message]
             }
             this.messageQueue.push(queue);
         }
-        mqLogger(`Queuing message from ${message.user} to room ${message.room} to user ${receiver.username}`);
+        mqLogger(`Queuing message from ${message.user} to room ${message.room} to user ${username}`);
         queue.messages.push(message);
 
     }

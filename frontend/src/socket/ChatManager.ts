@@ -182,6 +182,9 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             this.favouriteList = favouriteList;
         }
 
+        this.chatListeners.forEach((listener) => listener.handleChatLogsUpdated());
+
+
     }
 
     public getCurrentUser():string {
@@ -208,6 +211,34 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         return log;
     }
 
+    private ensureChatLogExistsWithUser(username:string):ChatLog {
+        let foundLog:ChatLog|null = null;
+        let index = 0;
+        while (index < this.chatLogs.length) {
+            let log = this.chatLogs[index];
+            if (log.users.length === 2) {
+                // is the username in the two of this room?
+                if (log.users.findIndex((value) => value === username) >= 0) {
+                    foundLog = log;
+                    index = this.chatLogs.length;
+                }
+            }
+            index++;
+        }
+        if (!foundLog) {
+            foundLog = {
+                roomName: uuid.getUniqueId(),
+                users: [this.getCurrentUser(),username],
+                messages: [],
+                lastViewed: parseInt(moment().format('YYYYMMDDHHmmss')),
+                numOfNewMessages: 0
+            }
+            this.chatLogs.push(foundLog);
+            this.saveLogs();
+        }
+        return foundLog;
+    }
+
 
     receiveJoinedRoom(users: JoinLeft): void {
         // we get this for all changes to a room, if the username is us can safely ignore
@@ -232,7 +263,10 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     receiveInvitation(invite: Invitation): void {
         //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
         if (!this.isUserInBlockedList(invite.from)) {
-            this.ensureChatLogExists(invite.room);
+            let chatLog:ChatLog = this.ensureChatLogExists(invite.room);
+            // add the inviter to the user list for the room
+            chatLog.users.push(invite.from);
+            this.saveLogs();
             cmLogger(`Joining chat ${invite.room}`);
             cmLogger(invite);
             socketManager.joinChat(this.getCurrentUser(),invite.room)
@@ -288,6 +322,10 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         chatLog.numOfNewMessages = 0;
         chatLog.lastViewed = parseInt(moment().format('YYYYMMDDHHmmss'));
         this.saveLogs();
+    }
+
+    public getChatLog(room:string):ChatLog {
+        return this.ensureChatLogExists(room);
     }
 
     receiveMessage(message: Message): void {
@@ -373,7 +411,14 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         return this.chatLogs;
     }
 
-    public startChatWithUser(username:string) {
 
+    public startChatWithUser(username:string) {
+        cmLogger(`Starting chat with ${username}`);
+        // first thing, do we have a chat log with this user (and just this user) already?
+        let chatLog:ChatLog = this.ensureChatLogExistsWithUser(username);
+        // invite the other user
+        socketManager.sendInvite(this.getCurrentUser(),username,chatLog.roomName);
+        // ok, lets connect to the server
+        socketManager.joinChat(this.getCurrentUser(),chatLog.roomName);
     }
 }

@@ -11,6 +11,7 @@ import BlogEntryView from "./component/BlogEntryView";
 import {isSame} from "./util/EqualityFunctions";
 import DetailsSidebarView from "./component/DetailsSidebarView";
 import UserSearchSidebarView from "./component/UserSearchSidebarView";
+import ChatSidebarView from "./component/ChatSidebarView";
 
 
 const logger = debug('app');
@@ -26,6 +27,8 @@ class Root extends React.Component{
 
     // @ts-ignore
     private userSearchView: UserSearchSidebarView;
+    // @ts-ignore
+    private chatView: ChatSidebarView;
 
     // @ts-ignore
     private cancelBtnEl: HTMLElement | null;
@@ -80,7 +83,8 @@ class Root extends React.Component{
                 navigation: {
                     showMyFavourites: 'navigationItemShowMyFavourites',
                     boardGameSearchId: 'navigationItemBoardGameSearch',
-                    userSearchId: 'navigationItemUserSearch'
+                    userSearchId: 'navigationItemUserSearch',
+                    chatId: 'navigationItemChat'
                 },
                 blogEntry: {},
                 entryDetailsSideBar: {
@@ -95,31 +99,42 @@ class Root extends React.Component{
                         isClickable: true,
                     },
                 },
-                commentSideBar: {
+                chatSideBar: {
                     dom: {
-                        sideBarId: 'commentSideBar',
-                        headerId: 'commentHeader',
-                        resultsId: 'comments',
-                        resultsElementType: 'button',
+                        sideBarId: 'chatSideBar',
+                        resultsId: 'chatLogs',
+                        resultsElementType: 'a',
                         resultsElementAttributes: [
-                            ['type', 'button'],
+                            ['href', '#'],
                         ],
                         resultsClasses: 'list-group-item my-list-item truncate-comment list-group-item-action',
-                        resultDataKeyId: 'id',
-                        resultLegacyDataKeyId: 'id',
-                        modifierClassNormal: 'float-right list-group-item-primary text-right',
-                        modifierClassInactive: 'float-left list-group-item-dark text-left',
+                        resultDataKeyId: 'room',
+                        resultLegacyDataKeyId: 'room',
+                        resultDataSourceId: 'chatLogs',
+                        modifierClassNormal: '',
+                        modifierClassInactive: 'list-group-item-dark',
                         modifierClassActive: 'list-group-item-primary',
-                        modifierClassWarning: 'list-group-item-warning',
-                        iconNormal: '<i class="fas fa-trash-alt"></i>',
+                        modifierClassWarning: '',
+                        iconNormal: '',
                         iconInactive: '',
                         iconActive: '',
                         iconWarning: '',
                         isDraggable: false,
                         isClickable: true,
-                        newFormId: "newComment",
-                        commentId: "comment",
-                        submitCommentId: "submitComment",
+                        isDeleteable: false,
+                        hasBadge: true,
+                        resultContentDivClasses: 'd-flex w-100 justify-content-between',
+                        resultContentTextElementType: 'span',
+                        resultContentTextClasses: 'mb-1',
+                        badgeElementType: 'span',
+                        badgeElementAttributes: [
+                            ['style', 'font-size:12pt'],
+                        ],
+                        badgeClasses: 'badge badge-pill badge-primary',
+                        newFormId: "newMessage",
+                        commentId: "message",
+                        submitCommentId: "submitMessage",
+                        chatLogId: 'chatLog',
                     },
                 },
                 userSearchSideBar: {
@@ -144,7 +159,7 @@ class Root extends React.Component{
                         modifierClassNormal: 'list-group-item-primary',
                         modifierClassInactive: 'list-group-item-light',
                         modifierClassActive: 'list-group-item-info',
-                        modifierClassWarning: 'list-group-item-warning',
+                        modifierClassWarning: 'list-group-item-danger',
                         iconNormal: '   <i class="fas fa-comment"></i>',
                         iconInactive: '   <i class="fas fa-comment"></i>',
                         iconActive: '   <i class="fas fa-heart"></i>',
@@ -173,7 +188,7 @@ class Root extends React.Component{
                         expandedSize: '35%',
                     },
                 },
-                commentSideBar: {
+                chatSideBar: {
                     view: {
                         location: 'right',
                         expandedSize: '50%',
@@ -213,6 +228,7 @@ class Root extends React.Component{
 
 
         this.handleShowUserSearch = this.handleShowUserSearch.bind(this);
+        this.handleShowChat = this.handleShowChat.bind(this);
 
         controller.connectToApplication(this, window.localStorage);
     }
@@ -297,8 +313,11 @@ class Root extends React.Component{
         logger('component Did Mount');
 
         // add the additional views and configure them
-        this.commentView = new CommentSidebarView(this, document,controller.getStateManager());
-        this.commentView.onDocumentLoaded(); // reset the view state
+        //this.commentView = new CommentSidebarView(this, document,controller.getStateManager());
+        //this.commentView.onDocumentLoaded(); // reset the view state
+
+        this.chatView = new ChatSidebarView(this,document,controller.getStateManager());
+        this.chatView.onDocumentLoaded();
 
         this.detailsView = new DetailsSidebarView(this,document,controller.getStateManager());
         this.detailsView.onDocumentLoaded();
@@ -315,6 +334,8 @@ class Root extends React.Component{
             document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', () => {});
             // @ts-ignore
             document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch);
+            // @ts-ignore
+            document.getElementById(this.state.ui.navigation.chatId).addEventListener('click', this.handleShowChat);
         }
 
         // alert modal dialog setup
@@ -341,8 +362,8 @@ class Root extends React.Component{
     }
 
     hideAllSideBars() {
-        this.commentView.eventHide(null);
-        this.detailsView.eventHide(null);
+        //this.commentView.eventHide(null);
+        //this.detailsView.eventHide(null);
     }
 
     handleShowMyEntries(event:Event) {
@@ -373,7 +394,19 @@ class Root extends React.Component{
             return;
         }
         this.userSearchView.eventShow(event);
+    }
 
+    handleShowChat(event:Event) {
+        logger('Handling Show Chat');
+        event.preventDefault();
+        this.hideAllSideBars();
+        // prevent anything from happening if we are not logged in
+        if (!controller.isLoggedIn()) {
+            // @ts-ignore
+            window.location.href = this.state.apis.login;
+            return;
+        }
+        this.chatView.eventShow(event);
     }
 
     handleAddEntry(event:Event) {
@@ -530,8 +563,8 @@ class Root extends React.Component{
 }
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
-//localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
-localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager user-search-sidebar user-search-sidebar:detail';
+//localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
+localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

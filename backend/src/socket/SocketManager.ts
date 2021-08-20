@@ -1,4 +1,4 @@
-import debug = require('debug');
+       import debug = require('debug');
 import {Server}  from 'socket.io';
 import {Server as httpServer} from 'http';
 import {ChatMessage, ChatRoom, ChatUser, DataMessage, InviteMessage, QueuedMessages} from "./SocketTypes";
@@ -88,14 +88,18 @@ class SocketManager {
 
     protected inviteUserToRoom(inviteFrom:string, inviteTo:string, roomName:string) {
         let receivingUser = this.findUser(inviteTo);
+        let inviteMessage:InviteMessage = {
+            from: inviteFrom,
+            message: `You have been invited to the chat room ${roomName} by ${inviteFrom}`,
+            room: roomName,
+            created: parseInt(moment().format('YYYMMDDHHmmss'))
+        }
         if (receivingUser) {
-            let inviteMessage:InviteMessage = {
-                from: inviteFrom,
-                message: `You have been invited to the chat room ${roomName} by ${inviteFrom}`,
-                room: roomName,
-                created: parseInt(moment().format('YYYMMDDHHmmss'))
-            }
             this.sendInviteMessageToUser(receivingUser, inviteMessage);
+        }
+        else {
+            MessageQueueManager.getInstance().queueInviteForUser(inviteTo,inviteMessage);
+
         }
     }
 
@@ -105,7 +109,7 @@ class SocketManager {
             if (this.io) this.io.to(receiver.socketId).emit('invite', JSON.stringify(message));
         }
         else {
-            MessageQueueManager.getInstance().queueInviteForUser(receiver,message);
+            MessageQueueManager.getInstance().queueInviteForUser(receiver.username,message);
         }
     }
 
@@ -234,10 +238,7 @@ class SocketManager {
         let room = this.findOrCreateRoom(message.room);
         room.users.forEach((user) => {
             if (!MessageQueueManager.getInstance().isUserLoggedIn(user.username)) {
-                let chatUser:ChatUser|undefined = this.findUser(user.username);
-                if (chatUser) {
-                    MessageQueueManager.getInstance().queueMessageForUser(chatUser,message);
-                }
+                MessageQueueManager.getInstance().queueMessageForUser(user.username,message);
             }
         });
     }

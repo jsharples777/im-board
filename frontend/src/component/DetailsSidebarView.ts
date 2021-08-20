@@ -93,6 +93,10 @@ class DetailsSidebarView extends SidebarView{
   protected eventDeleteClickItem(event: MouseEvent): void {
   }
 
+  protected getBadgeValue(name: string, item: any): string {
+    return "";
+  }
+
 }
 
 export default DetailsSidebarView;

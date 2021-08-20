@@ -115,6 +115,10 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
     protected eventDeleteClickItem(event: MouseEvent): void {
     }
 
+    protected getBadgeValue(name: string, item: any): string {
+        return "";
+    }
+
 }
 
 export default CommentSidebarView;

@@ -73,6 +73,10 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
         return this.chatManager.isUserInBlockedList(username);
     }
 
+    handleChatLogsUpdated() {
+        this.chatListeners.forEach((listener) => listener.handleChatLogsUpdated());
+    }
+
     handleChatLogUpdated(log: ChatLog): void {
         notLogger(`Handle chat log updated`);
         notLogger(log);

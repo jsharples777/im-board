@@ -203,7 +203,7 @@ class SocketManager {
     }
 
     public sendInvite(from:string, to:string, room:string) {
-        this.socket.emit('exitroom', {from,to,room});
+        this.socket.emit('invite', {from,to,room});
     }
 
     public sendMessage(from:string, room:string, message:string,created:number) {
