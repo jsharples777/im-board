@@ -606,23 +606,36 @@ var Root = /*#__PURE__*/function (_React$Component) {
           dom: {
             sideBarId: 'userSearchSideBar',
             resultsId: 'recentUserSearches',
-            resultsElementType: 'button',
-            resultsElementAttributes: [['type', 'button']],
+            favouriteUsersId: 'favouriteUsers',
+            blockedUsersId: 'blockedUsers',
+            favouriteUsersDropZone: 'favouriteUsersDropZone',
+            blockedUsersDropZone: 'blockedUsersDropZone',
+            resultsElementType: 'a',
+            resultsElementAttributes: [['href', '#']],
             resultsClasses: 'list-group-item my-list-item truncate-notification list-group-item-action',
             resultDataKeyId: 'user-id',
             resultLegacyDataKeyId: 'legacy-user-id',
             resultDataSourceId: 'data-source',
             resultDataSourceValue: 'recentUserSearches',
-            modifierClassNormal: 'list-group-item-light',
-            modifierClassInactive: 'list-group-item-dark',
-            modifierClassActive: 'list-group-item-primary',
+            resultDataSourceFavUsers: 'favouriteUsers',
+            resultDataSourceBlockedUsers: 'blockedUsers',
+            modifierClassNormal: 'list-group-item-primary',
+            modifierClassInactive: 'list-group-item-light',
+            modifierClassActive: 'list-group-item-info',
             modifierClassWarning: 'list-group-item-warning',
-            iconNormal: '<i class="fas fa-comment"></i>',
-            iconInactive: '',
-            iconActive: '<i class="fas fa-heart"></i>',
-            iconWarning: '<i class="fas fa-exclamation-circle"></i>',
+            iconNormal: '   <i class="fas fa-comment"></i>',
+            iconInactive: '   <i class="fas fa-comment"></i>',
+            iconActive: '   <i class="fas fa-heart"></i>',
+            iconWarning: '  <i class="fas fa-exclamation-circle"></i>',
+            resultContentDivClasses: 'd-flex w-100 justify-content-between',
+            resultContentTextElementType: 'span',
+            resultContentTextClasses: 'mb-1',
             isDraggable: true,
             isClickable: true,
+            isDeleteable: true,
+            deleteButtonClasses: 'btn btn-circle btn-xsm',
+            deleteButtonText: '',
+            deleteButtonIconClasses: 'fas fa-trash-alt',
             extra: {
               fastSearchInputId: 'fastSearchUserNames'
             }
@@ -1034,7 +1047,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 
 
-localStorage.debug = 'app controller-ts controller-ts-detail socket-ts socket-listener chat-manager view-ts view:user-search-sidebar';
+localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager user-search-sidebar user-search-sidebar:detail';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -1062,10 +1075,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./state/AsyncStateManagerWrapper */ "./src/state/AsyncStateManagerWrapper.ts");
 /* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
 /* harmony import */ var _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./SocketListenerDelegate */ "./src/SocketListenerDelegate.ts");
-/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
-/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./socket/ChatManager */ "./src/socket/ChatManager.ts");
-/* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./socket/NotificationController */ "./src/socket/NotificationController.ts");
-
+/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./socket/ChatManager */ "./src/socket/ChatManager.ts");
+/* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./socket/NotificationController */ "./src/socket/NotificationController.ts");
 
 
 
@@ -1125,8 +1136,8 @@ var Controller = /*#__PURE__*/function () {
     var aggregateSM = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__["AggregateStateManager"].getInstance();
     var memorySM = _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_1__["default"].getInstance();
     var asyncSM = new _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__["default"](aggregateSM, apiStateManager);
-    aggregateSM.addStateManager(memorySM, [], false);
-    aggregateSM.addStateManager(_state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_8__["default"].getInstance(), [], false); //aggregateSM.addStateManager(indexedDBSM,[this.config.stateNames.selectedEntry],false );
+    aggregateSM.addStateManager(memorySM, [], false); //aggregateSM.addStateManager(new BrowserStorageStateManager(true), [], false);
+    //aggregateSM.addStateManager(indexedDBSM,[this.config.stateNames.selectedEntry],false );
 
     aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry, this.config.stateNames.recentUserSearches], false);
     this.stateManager = aggregateSM; // state listener
@@ -1154,10 +1165,10 @@ var Controller = /*#__PURE__*/function () {
 
     if (this.getLoggedInUserId() > 0) {
       // setup the chat system
-      var chatManager = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_9__["ChatManager"].getInstance(); // this connects the manager to the socket system
+      var chatManager = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_8__["ChatManager"].getInstance(); // this connects the manager to the socket system
       // setup the chat notification system
 
-      var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_10__["NotificationController"].getInstance();
+      var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_9__["NotificationController"].getInstance();
       chatManager.setCurrentUser(this.getLoggedInUsername());
       chatManager.login();
     } // load the entries
@@ -1167,7 +1178,9 @@ var Controller = /*#__PURE__*/function () {
 
     this.getStateManager().getStateByName(this.config.stateNames.users); // load the comments
 
-    this.getStateManager().getStateByName(this.config.stateNames.comments);
+    this.getStateManager().getStateByName(this.config.stateNames.comments); // load the recent user searches
+
+    this.getStateManager().getStateByName(this.config.stateNames.recentUserSearches);
   };
 
   _proto.getStateManager = function getStateManager() {
@@ -1681,6 +1694,7 @@ var AbstractView = /*#__PURE__*/function () {
 
     this.eventStartDrag = this.eventStartDrag.bind(this);
     this.eventClickItem = this.eventClickItem.bind(this);
+    this.eventDeleteClickItem = this.eventDeleteClickItem.bind(this);
   }
 
   var _proto = AbstractView.prototype;
@@ -1691,6 +1705,198 @@ var AbstractView = /*#__PURE__*/function () {
     avLogger(data, 10); // @ts-ignore
 
     event.dataTransfer.setData(this.applicationView.state.ui.draggable.draggableDataKeyId, data);
+  };
+
+  _proto.createResultForItem = function createResultForItem(name, item, dataSource, deleteHandler) {
+    if (dataSource === void 0) {
+      dataSource = null;
+    }
+
+    if (deleteHandler === void 0) {
+      deleteHandler = null;
+    }
+
+    avLogger('Abstract View : creating Result');
+    avLogger(item);
+    var domConfig = this.uiConfig.dom;
+    var resultDataKeyId = this.getIdForStateItem(name, item);
+    var legacyDataKeyId = this.getLegacyIdForStateItem(name, item);
+
+    if (!dataSource) {
+      dataSource = domConfig.resultDataSourceValue;
+    }
+
+    var childEl = this.document.createElement(domConfig.resultsElementType);
+    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.resultsClasses); // the content may be structured
+
+    var textEl = childEl;
+
+    if (domConfig.resultContentDivClasses) {
+      var contentEl = this.document.createElement('div');
+      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(contentEl, domConfig.resultContentDivClasses);
+      contentEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+      contentEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+      contentEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+      textEl = this.document.createElement(domConfig.resultContentTextElementType);
+      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(textEl, domConfig.resultContentTextClasses);
+      textEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+      textEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+      textEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+      contentEl.appendChild(textEl);
+
+      if (domConfig.isDeleteable) {
+        var deleteButtonEl = this.document.createElement('button');
+        deleteButtonEl.setAttribute('type', 'button');
+        _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(deleteButtonEl, domConfig.deleteButtonClasses);
+
+        if (domConfig.deleteButtonText) {
+          if (domConfig.deleteButtonText.trim().length() > 0) {
+            domConfig.innerText = domConfig.deleteButtonText;
+          }
+        }
+
+        if (domConfig.deleteButtonIconClasses) {
+          var iconEl = document.createElement('i');
+          _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(iconEl, domConfig.deleteButtonIconClasses);
+          iconEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+          iconEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+          iconEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+          deleteButtonEl.appendChild(iconEl);
+        }
+
+        deleteButtonEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+        deleteButtonEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+        deleteButtonEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+
+        if (deleteHandler) {
+          deleteButtonEl.addEventListener('click', deleteHandler);
+        } else {
+          deleteButtonEl.addEventListener('click', this.eventDeleteClickItem);
+        }
+
+        contentEl.appendChild(deleteButtonEl);
+      }
+
+      childEl.appendChild(contentEl);
+    } // add the key ids for selection
+
+
+    childEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+    childEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+    childEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+    var displayText = this.getDisplayValueForStateItem(name, item); // add modifiers for patient state
+
+    var modifier = this.getModifierForStateItem(name, item);
+    var secondModifier = this.getSecondaryModifierForStateItem(name, item);
+
+    switch (modifier) {
+      case 'normal':
+        {
+          avLogger('Abstract View: normal item');
+          _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal);
+
+          if (domConfig.iconNormal !== '') {
+            textEl.innerHTML = displayText + '  ' + domConfig.iconNormal;
+          } else {
+            textEl.innerText = displayText;
+          }
+
+          switch (secondModifier) {
+            case 'warning':
+              {
+                _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal, false);
+                _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassWarning, true);
+
+                if (domConfig.iconWarning !== '') {
+                  textEl.innerHTML += '  ' + domConfig.iconWarning;
+                }
+
+                break;
+              }
+
+            case 'normal':
+              {
+                break;
+              }
+          }
+
+          break;
+        }
+
+      case 'active':
+        {
+          avLogger('Abstract View: active item', 10);
+          _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassActive);
+
+          if (domConfig.iconActive !== '') {
+            textEl.innerHTML = displayText + '  ' + domConfig.iconActive;
+          } else {
+            textEl.innerText = displayText;
+          }
+
+          switch (secondModifier) {
+            case 'warning':
+              {
+                _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal, false);
+                _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassWarning, true);
+
+                if (domConfig.iconWarning !== '') {
+                  textEl.innerHTML += '  ' + domConfig.iconWarning;
+                }
+
+                break;
+              }
+
+            case 'normal':
+              {
+                break;
+              }
+          }
+
+          break;
+        }
+
+      case 'inactive':
+        {
+          avLogger('Abstract View: inactive item', 10);
+          _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassInactive);
+
+          if (domConfig.iconInactive !== '') {
+            textEl.innerHTML = displayText + '  ' + domConfig.iconInactive;
+          } else {
+            textEl.innerText = displayText;
+          }
+
+          switch (secondModifier) {
+            case 'warning':
+              {
+                if (domConfig.iconWarning !== '') {
+                  textEl.innerHTML += '  ' + domConfig.iconWarning;
+                }
+
+                break;
+              }
+
+            case 'normal':
+              {
+                break;
+              }
+
+            case 'active':
+              {
+                if (domConfig.iconActive !== '') {
+                  textEl.innerHTML += '  ' + domConfig.iconActive;
+                }
+
+                break;
+              }
+          }
+
+          break;
+        }
+    }
+
+    return childEl;
   };
 
   _proto.createResultsForState = function createResultsForState(name, newState) {
@@ -1704,112 +1910,7 @@ var AbstractView = /*#__PURE__*/function () {
     if (viewEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].removeAllChildren(viewEl); // add the new children
 
     newState.map(function (item, index) {
-      var childEl = _this.document.createElement(domConfig.resultsElementType);
-
-      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.resultsClasses); // add the key ids for selection
-
-      childEl.setAttribute(domConfig.resultDataKeyId, _this.getIdForStateItem(name, item));
-      childEl.setAttribute(domConfig.resultLegacyDataKeyId, _this.getLegacyIdForStateItem(name, item));
-      childEl.setAttribute(domConfig.resultDataSourceId, domConfig.resultDataSourceValue);
-
-      var displayText = _this.getDisplayValueForStateItem(name, item); // add modifiers for patient state
-
-
-      var modifier = _this.getModifierForStateItem(name, item);
-
-      var secondModifier = _this.getSecondaryModifierForStateItem(name, item);
-
-      switch (modifier) {
-        case 'normal':
-          {
-            avLogger('Abstract View: normal item', 10);
-            _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal);
-
-            if (domConfig.iconNormal !== '') {
-              childEl.innerHTML = displayText + domConfig.iconNormal;
-            } else {
-              childEl.innerText = displayText;
-            }
-
-            switch (secondModifier) {
-              case 'warning':
-                {
-                  _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal, false);
-                  _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassWarning, true);
-
-                  if (domConfig.iconWarning !== '') {
-                    childEl.innerHTML += domConfig.iconWarning;
-                  }
-
-                  break;
-                }
-
-              case 'normal':
-                {}
-            }
-
-            break;
-          }
-
-        case 'active':
-          {
-            avLogger('Abstract View: active item', 10);
-            _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassActive);
-
-            if (domConfig.iconActive !== '') {
-              childEl.innerHTML = displayText + domConfig.iconActive;
-            } else {
-              childEl.innerText = displayText;
-            }
-
-            switch (secondModifier) {
-              case 'warning':
-                {
-                  _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassNormal, false);
-                  _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassWarning, true);
-
-                  if (domConfig.iconWarning !== '') {
-                    childEl.innerHTML += domConfig.iconWarning;
-                  }
-
-                  break;
-                }
-
-              case 'normal':
-                {}
-            }
-
-            break;
-          }
-
-        case 'inactive':
-          {
-            avLogger('Abstract View: inactive item', 10);
-            _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(childEl, domConfig.modifierClassInactive);
-
-            if (domConfig.iconInactive !== '') {
-              childEl.innerHTML = displayText + domConfig.iconInactive;
-            } else {
-              childEl.innerText = displayText;
-            }
-
-            switch (secondModifier) {
-              case 'warning':
-                {
-                  if (domConfig.iconWarning !== '') {
-                    childEl.innerHTML += domConfig.iconWarning;
-                  }
-
-                  break;
-                }
-
-              case 'normal':
-                {}
-            }
-
-            break;
-          }
-      } // add draggable actions
+      var childEl = _this.createResultForItem(name, item); // add draggable actions
 
 
       if (domConfig.isDraggable) {
@@ -2108,6 +2209,8 @@ var CommentSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.getDragData = function getDragData(event) {};
 
+  _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {};
+
   return CommentSidebarView;
 }(_SidebarView__WEBPACK_IMPORTED_MODULE_4__["default"]);
 
@@ -2239,6 +2342,8 @@ var DetailsSidebarView = /*#__PURE__*/function (_SidebarView) {
   _proto.getSecondaryModifierForStateItem = function getSecondaryModifierForStateItem(name, item) {
     return "";
   };
+
+  _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {};
 
   return DetailsSidebarView;
 }(_SidebarView__WEBPACK_IMPORTED_MODULE_2__["default"]);
@@ -2374,6 +2479,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
 /* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../socket/NotificationController */ "./src/socket/NotificationController.ts");
 /* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../socket/ChatManager */ "./src/socket/ChatManager.ts");
+/* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../util/BrowserUtil */ "./src/util/BrowserUtil.ts");
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -2403,10 +2511,16 @@ function _setPrototypeOf(o, p) {
 
 
 
-var vLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('view:user-search-sidebar');
+
+
+
+var vLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('user-search-sidebar');
+var vLoggerDetail = debug__WEBPACK_IMPORTED_MODULE_0___default()('user-search-sidebar:detail');
 
 var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
-  _inheritsLoose(UserSearchSidebarView, _SidebarView);
+  _inheritsLoose(UserSearchSidebarView, _SidebarView); // @ts-ignore
+  // @ts-ignore
+
 
   function UserSearchSidebarView(applicationView, htmlDocument, stateManager) {
     var _this;
@@ -2418,35 +2532,99 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     _this.updateView = _this.updateView.bind(_assertThisInitialized(_this));
     _this.eventClickItem = _this.eventClickItem.bind(_assertThisInitialized(_this));
     _this.eventUserSelected = _this.eventUserSelected.bind(_assertThisInitialized(_this));
-    _this.handleLoggedInUsersUpdated = _this.handleBlockedUsersChanged.bind(_assertThisInitialized(_this)); // register state change listening
+    _this.handleLoggedInUsersUpdated = _this.handleLoggedInUsersUpdated.bind(_assertThisInitialized(_this));
+    _this.handleFavouriteUserLoggedIn = _this.handleFavouriteUserLoggedIn.bind(_assertThisInitialized(_this));
+    _this.handleFavouriteUserLoggedOut = _this.handleFavouriteUserLoggedOut.bind(_assertThisInitialized(_this));
+    _this.handleFavouriteUsersChanged = _this.handleFavouriteUsersChanged.bind(_assertThisInitialized(_this));
+    _this.handleBlockedUsersChanged = _this.handleBlockedUsersChanged.bind(_assertThisInitialized(_this));
+    _this.handleLoggedInUsersUpdated = _this.handleLoggedInUsersUpdated.bind(_assertThisInitialized(_this));
+    _this.handleFavouriteUserDrop = _this.handleFavouriteUserDrop.bind(_assertThisInitialized(_this));
+    _this.eventClickItemFavouriteUser = _this.eventClickItemFavouriteUser.bind(_assertThisInitialized(_this)); // register state change listening
 
     stateManager.addChangeListenerForName(_this.config.stateNames.users, _assertThisInitialized(_this));
-    stateManager.addChangeListenerForName(_this.config.stateNames.recentUserSearches, _assertThisInitialized(_this));
-    _socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().addUserListener(_assertThisInitialized(_this));
+    _this.localisedSM = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_5__["default"](true);
+
+    _this.localisedSM.addChangeListenerForName(_this.config.stateNames.recentUserSearches, _assertThisInitialized(_this));
+
+    _socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().addUserListener(_assertThisInitialized(_this)); //ChatManager.getInstance().addChatUserEventHandler(this);
+
+    vLogger(_this.localisedSM.getStateByName(_this.config.stateNames.recentUserSearches));
     return _this;
   }
 
   var _proto = UserSearchSidebarView.prototype;
 
+  _proto.handleFavouriteUserDrop = function handleFavouriteUserDrop(event) {
+    vLogger('drop event on favourites'); // @ts-ignore
+
+    var draggedObjectJSON = event.dataTransfer.getData(this.config.ui.draggable.draggableDataKeyId);
+    var draggedObject = JSON.parse(draggedObjectJSON);
+    vLogger(draggedObject);
+
+    if (draggedObject[this.config.ui.draggable.draggedType] === this.config.ui.draggable.draggedTypeUser) {
+      switch (draggedObject[this.config.ui.draggable.draggedFrom]) {
+        case this.config.ui.draggable.draggedFromUserSearch:
+          {
+            // we know we have dragged a user from the user search to our favorites and dropped it
+            // is this user already in the favourites?
+            if (_socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__["ChatManager"].getInstance().isUserInFavouriteList(draggedObject.username)) {
+              vLogger(draggedObject.username + " already in favourite list, ignoring");
+              return;
+            } // ok, so we have a new user to add to the favourite list
+            // add the user to the Chat Manager and we should get an event about it
+
+
+            _socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__["ChatManager"].getInstance().addUserToFavouriteList(draggedObject.username);
+            break;
+          }
+      }
+    }
+  };
+
   _proto.handleLoggedInUsersUpdated = function handleLoggedInUsersUpdated(usernames) {
+    vLogger("Received new list of users who are logged in ");
+    vLogger(usernames);
     this.loggedInUsers = usernames;
     this.reRenderView();
   };
 
   _proto.handleFavouriteUserLoggedIn = function handleFavouriteUserLoggedIn(username) {
+    vLogger("Handle Favourite User " + username + " logged in");
     this.reRenderView();
   };
 
   _proto.handleFavouriteUserLoggedOut = function handleFavouriteUserLoggedOut(username) {
+    vLogger("Handle Favourite User " + username + " logged in");
     this.reRenderView();
   };
 
   _proto.handleFavouriteUsersChanged = function handleFavouriteUsersChanged(usernames) {
+    vLogger("Handle Favourite Users changed to " + usernames);
     this.reRenderView();
   };
 
   _proto.handleBlockedUsersChanged = function handleBlockedUsersChanged(usernames) {
+    vLogger("Handle Blocked Users changed to " + usernames);
     this.reRenderView();
+  };
+
+  _proto.renderFavouriteUsers = function renderFavouriteUsers() {
+    var _this2 = this;
+
+    var usernames = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__["ChatManager"].getInstance().getFavouriteUserList();
+    if (this.favUsersDiv) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_7__["default"].removeAllChildren(this.favUsersDiv);
+    usernames.forEach(function (username) {
+      // find the user in the state manager
+      var user = _this2.stateManager.findItemInState(_this2.config.stateNames.users, {
+        username: username
+      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSameUsername"]);
+
+      if (user) {
+        var childElement = _this2.createResultForItem(_this2.config.stateNames.users, user, _this2.uiConfig.dom.resultDataSourceFavUsers, _this2.eventClickItemFavouriteUser);
+
+        _this2.favUsersDiv.appendChild(childElement);
+      }
+    });
   };
 
   _proto.onDocumentLoaded = function onDocumentLoaded() {
@@ -2454,7 +2632,18 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
 
     var fastSearchEl = $("#" + this.uiConfig.dom.extra.fastSearchInputId);
-    fastSearchEl.on('autocompleteselect', this.eventUserSelected);
+    fastSearchEl.on('autocompleteselect', this.eventUserSelected); // ok lets add the favourite users area and event handling for that now
+    // @ts-ignore
+
+    this.favUsersDropZone = document.getElementById(this.uiConfig.dom.favouriteUsersDropZone);
+    this.favUsersDropZone.addEventListener('dragover', function (event) {
+      vLogger('Dragged over');
+      event.preventDefault();
+    });
+    this.favUsersDropZone.addEventListener('drop', this.handleFavouriteUserDrop); // @ts-ignore
+
+    this.favUsersDiv = document.getElementById(this.uiConfig.dom.favouriteUsersId);
+    this.renderFavouriteUsers();
   };
 
   _proto.getIdForStateItem = function getIdForStateItem(name, item) {
@@ -2470,11 +2659,11 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.getModifierForStateItem = function getModifierForStateItem(name, item) {
-    var result = 'normal'; // if the user is currently logged out make the item inactive
+    var result = 'normal';
+    vLoggerDetail("Checking for item modifiers");
+    vLoggerDetail(item); // if the user is currently logged out make the item inactive
 
-    if (this.loggedInUsers.findIndex(function (user) {
-      return user === item.username;
-    }) < 0) {
+    if (!_socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__["ChatManager"].getInstance().isUserLoggedIn(item.username)) {
       result = 'inactive';
     }
 
@@ -2482,13 +2671,16 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.getSecondaryModifierForStateItem = function getSecondaryModifierForStateItem(name, item) {
-    var result = 'normal'; // if the user is in the black list then show warning and a favourite user is highlighted
+    var result = 'normal';
+    vLoggerDetail("Checking for item secondary modifiers " + item.username); // if the user is in the black list then show warning and a favourite user is highlighted
 
     if (_socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().isFavouriteUser(item.username)) {
+      vLoggerDetail("is favourite");
       result = 'active';
     }
 
     if (_socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().isBlockedUser(item.username)) {
+      vLoggerDetail("is blocked");
       result = 'warning';
     }
 
@@ -2503,10 +2695,24 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
     vLogger("User " + event.target.innerText + " with id " + userId + " clicked");
     var user = this.stateManager.findItemInState(this.config.stateNames.users, {
-      id: userId
+      id: parseInt(userId)
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
     vLogger(user);
     _socket_NotificationController__WEBPACK_IMPORTED_MODULE_3__["NotificationController"].getInstance().startChatWithUser(user.username);
+  };
+
+  _proto.eventClickItemFavouriteUser = function eventClickItemFavouriteUser(event) {
+    event.preventDefault();
+    console.log(event.target); // @ts-ignore
+
+    var userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
+
+    vLogger("Favourite user " + event.target.innerText + " with id " + userId + " clicked - removing");
+    var user = this.stateManager.findItemInState(this.config.stateNames.users, {
+      id: parseInt(userId)
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    vLogger(user);
+    _socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__["ChatManager"].getInstance().removeUserFromFavouriteList(user.username);
   };
 
   _proto.eventUserSelected = function eventUserSelected(event, ui) {
@@ -2515,32 +2721,36 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
     event.target.innerText = ''; // add the selected user to the recent user searches
 
-    if (this.stateManager.isItemInState(this.config.stateNames.recentUserSearches, {
+    if (this.localisedSM.isItemInState(this.config.stateNames.recentUserSearches, {
       id: ui.item.value
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"])) return;
-    var recentUserSearches = this.stateManager.getStateByName(this.config.stateNames.recentUserSearches);
-    vLogger("saved searches too long? " + recentUserSearches.length);
+    var recentUserSearches = this.localisedSM.getStateByName(this.config.stateNames.recentUserSearches);
+    vLogger("saved searches too long? " + this.config.controller.dataLimit.recentUserSearches);
 
     if (recentUserSearches.length >= this.config.controller.dataLimit.recentUserSearches) {
       vLogger('saved searches too long - removing first'); // remove the first item from recent searches
 
       var item = recentUserSearches.shift();
-      this.stateManager.removeItemFromState(this.config.stateNames.recentUserSearches, item, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], true);
+      this.localisedSM.removeItemFromState(this.config.stateNames.recentUserSearches, item, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], true);
     } // save the searches
 
 
-    this.stateManager.addNewItemToState(this.config.stateNames.recentUserSearches, {
+    this.localisedSM.addNewItemToState(this.config.stateNames.recentUserSearches, {
       id: ui.item.value,
       username: ui.item.label
     }, true);
   };
 
   _proto.reRenderView = function reRenderView() {
-    this.updateView(this.config.stateNames.recentUserSearches, this.stateManager.getStateByName(this.config.stateNames.recentUserSearches));
+    this.updateView(this.config.stateNames.recentUserSearches, this.localisedSM.getStateByName(this.config.stateNames.recentUserSearches));
+    this.renderFavouriteUsers();
   };
 
   _proto.updateView = function updateView(name, newState) {
     if (name === this.config.stateNames.recentUserSearches) {
+      vLogger("Updating for recent searches");
+      newState = this.localisedSM.getStateByName(this.config.stateNames.recentUserSearches);
+      vLogger(newState);
       this.createResultsForState(name, newState);
     }
 
@@ -2574,14 +2784,17 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     // @ts-ignore
     var userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
 
-    vLogger("User " + event.target.innerText + " with id " + userId + " dragging");
+    vLoggerDetail("User " + event.target.innerText + " with id " + userId + " dragging");
     var user = this.stateManager.findItemInState(this.config.stateNames.users, {
-      id: userId
+      id: parseInt(userId)
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    vLoggerDetail(user);
     user[this.config.ui.draggable.draggedType] = this.config.ui.draggable.draggedTypeUser;
     user[this.config.ui.draggable.draggedFrom] = this.config.ui.draggable.draggedFromUserSearch;
     return user;
   };
+
+  _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {};
 
   return UserSearchSidebarView;
 }(_SidebarView__WEBPACK_IMPORTED_MODULE_1__["default"]);
@@ -3383,8 +3596,17 @@ var ChatManager = /*#__PURE__*/function () {
     this.receivedLeftRoom = this.receivedLeftRoom.bind(this);
   }
 
+  _proto.isUserLoggedIn = function isUserLoggedIn(username) {
+    return this.loggedInUsers.findIndex(function (name) {
+      return name === username;
+    }) >= 0;
+  };
+
   _proto.receiveUserList = function receiveUserList(users) {
     this.loggedInUsers = users;
+    this.chatUserListeners.forEach(function (listener) {
+      return listener.handleLoggedInUsersUpdated(users);
+    });
   };
 
   _proto.saveLogs = function saveLogs() {
@@ -3470,9 +3692,17 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.isUserInFavouriteList = function isUserInFavouriteList(username) {
-    return this.favouriteList.findIndex(function (blocked) {
-      return blocked === username;
+    return this.favouriteList.findIndex(function (user) {
+      return user === username;
     }) >= 0;
+  };
+
+  _proto.getFavouriteUserList = function getFavouriteUserList() {
+    return [].concat(this.favouriteList);
+  };
+
+  _proto.getBlockedUserList = function getBlockedUserList() {
+    return [].concat(this.blockedList);
   };
 
   _proto.setCurrentUser = function setCurrentUser(username) {
@@ -3563,13 +3793,15 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.receiveLogin = function receiveLogin(username) {
-    var _this5 = this; // keep track of the logged in users
+    var _this5 = this;
 
+    cmLogger("Handle login received for " + username); // keep track of the logged in users
 
     var index = this.loggedInUsers.findIndex(function (user) {
       return user === username;
     });
     if (index < 0) this.loggedInUsers.push(username);
+    cmLogger(this.loggedInUsers);
     this.chatUserListeners.forEach(function (listener) {
       return listener.handleLoggedInUsersUpdated(_this5.loggedInUsers);
     }); // if the user in in favourites and not in blocked list passing this on to the listener
@@ -3735,8 +3967,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NotificationController", function() { return NotificationController; });
 /* harmony import */ var _ChatManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ChatManager */ "./src/socket/ChatManager.ts");
 /* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../notification/NotificationManager */ "./src/notification/NotificationManager.ts");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
 
 
+
+var notLogger = debug__WEBPACK_IMPORTED_MODULE_2___default()('notification-controller');
 var NotificationController = /*#__PURE__*/function () {
   NotificationController.getInstance = function getInstance() {
     if (!NotificationController._instance) {
@@ -3812,7 +4048,9 @@ var NotificationController = /*#__PURE__*/function () {
   };
 
   _proto.handleChatLogUpdated = function handleChatLogUpdated(log) {
-    // avoid no actual messages
+    notLogger("Handle chat log updated");
+    notLogger(log); // avoid no actual messages
+
     if (log.messages.length === 0) return; // pass on the changes
 
     this.chatListeners.forEach(function (listener) {
@@ -3826,14 +4064,17 @@ var NotificationController = /*#__PURE__*/function () {
   };
 
   _proto.handleLoggedInUsersUpdated = function handleLoggedInUsersUpdated(usernames) {
-    // allow the view to change the user statuses
+    notLogger("Handle logged in users updated");
+    notLogger(usernames); // allow the view to change the user statuses
+
     this.chatUserListeners.forEach(function (listener) {
       return listener.handleLoggedInUsersUpdated(usernames);
     });
   };
 
   _proto.handleFavouriteUserLoggedIn = function handleFavouriteUserLoggedIn(username) {
-    // allow the view to change the user statuses
+    notLogger("Handle favourite user " + username + " logged in"); // allow the view to change the user statuses
+
     this.chatUserListeners.forEach(function (listener) {
       return listener.handleFavouriteUserLoggedIn(username);
     }); // provide visual notifications if do not disturb is not on
@@ -3843,7 +4084,8 @@ var NotificationController = /*#__PURE__*/function () {
   };
 
   _proto.handleFavouriteUserLoggedOut = function handleFavouriteUserLoggedOut(username) {
-    // allow the view to change the user statuses
+    notLogger("Handle favourite user " + username + " logged out"); // allow the view to change the user statuses
+
     this.chatUserListeners.forEach(function (listener) {
       return listener.handleFavouriteUserLoggedOut(username);
     }); // provide visual notifications if do not disturb is not on
@@ -3853,12 +4095,14 @@ var NotificationController = /*#__PURE__*/function () {
   };
 
   _proto.handleBlockedUsersChanged = function handleBlockedUsersChanged(usernames) {
+    notLogger("Handle blocked users changed to " + usernames);
     this.chatUserListeners.forEach(function (listener) {
       return listener.handleBlockedUsersChanged(usernames);
     });
   };
 
   _proto.handleFavouriteUsersChanged = function handleFavouriteUsersChanged(usernames) {
+    notLogger("Handle favourite users changed to " + usernames);
     this.chatUserListeners.forEach(function (listener) {
       return listener.handleFavouriteUsersChanged(usernames);
     });
@@ -4704,6 +4948,7 @@ var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     }
 
     _this = _AbstractStateManager.call(this, 'browser') || this;
+    _this.configuration = [];
     _this.storage = window.sessionStorage;
     if (useLocalStorage) _this.storage = window.localStorage;
     _this.forceSaves = true;
@@ -4802,6 +5047,21 @@ var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
     }
 
     this._replaceNamedStateInStorage(state);
+  };
+
+  _proto.forceResetForGet = function forceResetForGet(stateName) {};
+
+  _proto.getConfiguredStateNames = function getConfiguredStateNames() {
+    return this.configuration;
+  };
+
+  _proto.hasCompletedRun = function hasCompletedRun(stateName) {
+    return false;
+  } // @ts-ignore
+  ;
+
+  _proto.initialise = function initialise(config) {
+    this.configuration = config;
   };
 
   return BrowserStorageStateManager;
@@ -5527,14 +5787,18 @@ var browserUtil = new BrowserUtil();
 /*!***************************************!*\
   !*** ./src/util/EqualityFunctions.ts ***!
   \***************************************/
-/*! exports provided: isSame */
+/*! exports provided: isSame, isSameUsername */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSame", function() { return isSame; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSameUsername", function() { return isSameUsername; });
 function isSame(item1, item2) {
   return item1.id === item2.id;
+}
+function isSameUsername(item1, item2) {
+  return item1.username === item2.username;
 }
 
 /***/ }),

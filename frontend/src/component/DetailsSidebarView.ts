@@ -90,6 +90,9 @@ class DetailsSidebarView extends SidebarView{
     return "";
   }
 
+  protected eventDeleteClickItem(event: MouseEvent): void {
+  }
+
 }
 
 export default DetailsSidebarView;

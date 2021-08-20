@@ -1,6 +1,9 @@
 import {ChatLog, ChatManager} from "./ChatManager";
 import {ChatEventListener, ChatUserEventListener} from "./ChatEventListener";
 import notifier from "../notification/NotificationManager";
+import debug from 'debug';
+
+const notLogger = debug('notification-controller');
 
 export class NotificationController implements ChatEventListener,ChatUserEventListener {
     private static _instance: NotificationController;
@@ -71,6 +74,8 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
     }
 
     handleChatLogUpdated(log: ChatLog): void {
+        notLogger(`Handle chat log updated`);
+        notLogger(log);
         // avoid no actual messages
         if (log.messages.length === 0) return;
 
@@ -86,11 +91,15 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
     }
 
     handleLoggedInUsersUpdated(usernames: string[]): void {
+        notLogger(`Handle logged in users updated`);
+        notLogger(usernames);
+
         // allow the view to change the user statuses
         this.chatUserListeners.forEach((listener) => listener.handleLoggedInUsersUpdated(usernames));
     }
 
     handleFavouriteUserLoggedIn(username: string): void {
+        notLogger(`Handle favourite user ${username} logged in`);
         // allow the view to change the user statuses
         this.chatUserListeners.forEach((listener) => listener.handleFavouriteUserLoggedIn(username));
 
@@ -100,6 +109,7 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
     }
 
     handleFavouriteUserLoggedOut(username: string): void {
+        notLogger(`Handle favourite user ${username} logged out`);
         // allow the view to change the user statuses
         this.chatUserListeners.forEach((listener) => listener.handleFavouriteUserLoggedOut(username));
 
@@ -110,10 +120,12 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
     }
 
     handleBlockedUsersChanged(usernames: string[]): void {
+        notLogger(`Handle blocked users changed to ${usernames}`);
         this.chatUserListeners.forEach((listener) => listener.handleBlockedUsersChanged(usernames));
     }
 
     handleFavouriteUsersChanged(usernames: string[]): void {
+        notLogger(`Handle favourite users changed to ${usernames}`);
         this.chatUserListeners.forEach((listener) => listener.handleFavouriteUsersChanged(usernames));
     }
 

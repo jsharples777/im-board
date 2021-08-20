@@ -3,3 +3,7 @@ export type equalityFunction = (item1:any, item2:any) => boolean;
 export function isSame(item1:any, item2:any):boolean {
   return (item1.id === item2.id);
 }
+
+export function isSameUsername(item1:any, item2:any):boolean {
+  return (item1.username === item2.username);
+}

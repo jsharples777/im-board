@@ -74,7 +74,7 @@ class Controller implements StateChangeListener {
         let asyncSM = new AsyncStateManagerWrapper(aggregateSM, apiStateManager);
 
         aggregateSM.addStateManager(memorySM, [], false);
-        aggregateSM.addStateManager(BrowserStorageStateManager.getInstance(), [], false);
+        //aggregateSM.addStateManager(new BrowserStorageStateManager(true), [], false);
         //aggregateSM.addStateManager(indexedDBSM,[this.config.stateNames.selectedEntry],false );
         aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry,this.config.stateNames.recentUserSearches], false);
 
@@ -121,6 +121,9 @@ class Controller implements StateChangeListener {
         this.getStateManager().getStateByName(this.config.stateNames.users);
         // load the comments
         this.getStateManager().getStateByName(this.config.stateNames.comments);
+        // load the recent user searches
+        this.getStateManager().getStateByName(this.config.stateNames.recentUserSearches);
+
     }
 
     public getStateManager(): StateManager {

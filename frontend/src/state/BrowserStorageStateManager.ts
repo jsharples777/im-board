@@ -3,10 +3,11 @@ import debug from 'debug';
 import {AbstractStateManager} from "./AbstractStateManager";
 import {equalityFunction} from '../util/EqualityFunctions';
 import {stateValue} from "./StateManager";
+import AsynchronousStateManager from "./AsynchronousStateManager";
 
 const lsLogger = debug('local-storage');
 
-export default class BrowserStorageStateManager extends AbstractStateManager {
+export default class BrowserStorageStateManager extends AbstractStateManager implements AsynchronousStateManager{
   protected storage:Storage;
   private static _instance:BrowserStorageStateManager;
 
@@ -88,6 +89,24 @@ export default class BrowserStorageStateManager extends AbstractStateManager {
       lsLogger(stateObj);
     }
     this._replaceNamedStateInStorage(state);
+  }
+
+  forceResetForGet(stateName: string): void {
+  }
+
+  getConfiguredStateNames(): string[] {
+    return this.configuration;
+  }
+
+  hasCompletedRun(stateName: string): boolean {
+    return false;
+  }
+
+  // @ts-ignore
+  private configuration:string[] = [];
+
+  public initialise(config:string[]) {
+    this.configuration = config;
   }
 
 }

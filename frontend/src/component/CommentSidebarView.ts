@@ -112,6 +112,9 @@ class CommentSidebarView extends SidebarView implements StateChangeListener{
 
     getDragData(event:DragEvent) {}
 
+    protected eventDeleteClickItem(event: MouseEvent): void {
+    }
+
 }
 
 export default CommentSidebarView;

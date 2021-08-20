@@ -126,25 +126,38 @@ class Root extends React.Component{
                     dom: {
                         sideBarId: 'userSearchSideBar',
                         resultsId: 'recentUserSearches',
-                        resultsElementType: 'button',
+                        favouriteUsersId: 'favouriteUsers',
+                        blockedUsersId: 'blockedUsers',
+                        favouriteUsersDropZone: 'favouriteUsersDropZone',
+                        blockedUsersDropZone: 'blockedUsersDropZone',
+                        resultsElementType: 'a',
                         resultsElementAttributes: [
-                            ['type', 'button'],
+                            ['href', '#'],
                         ],
                         resultsClasses: 'list-group-item my-list-item truncate-notification list-group-item-action',
                         resultDataKeyId: 'user-id',
                         resultLegacyDataKeyId: 'legacy-user-id',
                         resultDataSourceId: 'data-source',
                         resultDataSourceValue: 'recentUserSearches',
-                        modifierClassNormal: 'list-group-item-light',
-                        modifierClassInactive: 'list-group-item-dark',
-                        modifierClassActive: 'list-group-item-primary',
+                        resultDataSourceFavUsers: 'favouriteUsers',
+                        resultDataSourceBlockedUsers: 'blockedUsers',
+                        modifierClassNormal: 'list-group-item-primary',
+                        modifierClassInactive: 'list-group-item-light',
+                        modifierClassActive: 'list-group-item-info',
                         modifierClassWarning: 'list-group-item-warning',
-                        iconNormal: '<i class="fas fa-comment"></i>',
-                        iconInactive: '',
-                        iconActive: '<i class="fas fa-heart"></i>',
-                        iconWarning: '<i class="fas fa-exclamation-circle"></i>',
+                        iconNormal: '   <i class="fas fa-comment"></i>',
+                        iconInactive: '   <i class="fas fa-comment"></i>',
+                        iconActive: '   <i class="fas fa-heart"></i>',
+                        iconWarning: '  <i class="fas fa-exclamation-circle"></i>',
+                        resultContentDivClasses: 'd-flex w-100 justify-content-between',
+                        resultContentTextElementType: 'span',
+                        resultContentTextClasses: 'mb-1',
                         isDraggable: true,
                         isClickable: true,
+                        isDeleteable: true,
+                        deleteButtonClasses: 'btn btn-circle btn-xsm',
+                        deleteButtonText: '',
+                        deleteButtonIconClasses:'fas fa-trash-alt',
                         extra: {
                             fastSearchInputId: 'fastSearchUserNames',
                         },
@@ -518,7 +531,7 @@ class Root extends React.Component{
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
-localStorage.debug = 'app controller-ts controller-ts-detail socket-ts socket-listener chat-manager view-ts view:user-search-sidebar';
+localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager user-search-sidebar user-search-sidebar:detail';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

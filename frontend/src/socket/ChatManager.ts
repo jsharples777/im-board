@@ -81,8 +81,13 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         this.receivedLeftRoom = this.receivedLeftRoom.bind(this);
     }
 
+    public isUserLoggedIn(username:string) {
+        return (this.loggedInUsers.findIndex((name) => name === username) >= 0);
+    }
+
     receiveUserList(users: string[]): void {
         this.loggedInUsers = users;
+        this.chatUserListeners.forEach((listener) => listener.handleLoggedInUsersUpdated(users));
     }
 
     private saveLogs():void {
@@ -141,7 +146,15 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     }
 
     public isUserInFavouriteList(username:string):boolean {
-        return (this.favouriteList.findIndex((blocked) => blocked === username) >= 0);
+        return (this.favouriteList.findIndex((user) => user === username) >= 0);
+    }
+
+    public getFavouriteUserList():string[] {
+        return [...this.favouriteList];
+    }
+
+    public getBlockedUserList():string[] {
+        return [...this.blockedList];
     }
 
 
@@ -231,9 +244,11 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
 
     receiveLogin(username: string): void {
+        cmLogger(`Handle login received for ${username}`);
         // keep track of the logged in users
         let index = this.loggedInUsers.findIndex((user) => user === username);
         if (index < 0) this.loggedInUsers.push(username);
+        cmLogger(this.loggedInUsers);
 
         this.chatUserListeners.forEach((listener) => listener.handleLoggedInUsersUpdated(this.loggedInUsers));
 
