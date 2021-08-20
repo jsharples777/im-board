@@ -2405,10 +2405,10 @@ function _setPrototypeOf(o, p) {
 
 var vLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('view:user-search-sidebar');
 
-var PatientSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
-  _inheritsLoose(PatientSearchSidebarView, _SidebarView);
+var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
+  _inheritsLoose(UserSearchSidebarView, _SidebarView);
 
-  function PatientSearchSidebarView(applicationView, htmlDocument, stateManager) {
+  function UserSearchSidebarView(applicationView, htmlDocument, stateManager) {
     var _this;
 
     _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.userSearchSideBar, applicationView.state.uiPrefs.userSearchSideBar, stateManager) || this;
@@ -2426,19 +2426,28 @@ var PatientSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     return _this;
   }
 
-  var _proto = PatientSearchSidebarView.prototype;
+  var _proto = UserSearchSidebarView.prototype;
 
   _proto.handleLoggedInUsersUpdated = function handleLoggedInUsersUpdated(usernames) {
     this.loggedInUsers = usernames;
+    this.reRenderView();
   };
 
-  _proto.handleFavouriteUserLoggedIn = function handleFavouriteUserLoggedIn(username) {};
+  _proto.handleFavouriteUserLoggedIn = function handleFavouriteUserLoggedIn(username) {
+    this.reRenderView();
+  };
 
-  _proto.handleFavouriteUserLoggedOut = function handleFavouriteUserLoggedOut(username) {};
+  _proto.handleFavouriteUserLoggedOut = function handleFavouriteUserLoggedOut(username) {
+    this.reRenderView();
+  };
 
-  _proto.handleFavouriteUsersChanged = function handleFavouriteUsersChanged(usernames) {};
+  _proto.handleFavouriteUsersChanged = function handleFavouriteUsersChanged(usernames) {
+    this.reRenderView();
+  };
 
-  _proto.handleBlockedUsersChanged = function handleBlockedUsersChanged(usernames) {};
+  _proto.handleBlockedUsersChanged = function handleBlockedUsersChanged(usernames) {
+    this.reRenderView();
+  };
 
   _proto.onDocumentLoaded = function onDocumentLoaded() {
     _SidebarView.prototype.onDocumentLoaded.call(this); // @ts-ignore
@@ -2526,6 +2535,10 @@ var PatientSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     }, true);
   };
 
+  _proto.reRenderView = function reRenderView() {
+    this.updateView(this.config.stateNames.recentUserSearches, this.stateManager.getStateByName(this.config.stateNames.recentUserSearches));
+  };
+
   _proto.updateView = function updateView(name, newState) {
     if (name === this.config.stateNames.recentUserSearches) {
       this.createResultsForState(name, newState);
@@ -2570,10 +2583,10 @@ var PatientSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     return user;
   };
 
-  return PatientSearchSidebarView;
+  return UserSearchSidebarView;
 }(_SidebarView__WEBPACK_IMPORTED_MODULE_1__["default"]);
 
-/* harmony default export */ __webpack_exports__["default"] = (PatientSearchSidebarView);
+/* harmony default export */ __webpack_exports__["default"] = (UserSearchSidebarView);
 
 /***/ }),
 

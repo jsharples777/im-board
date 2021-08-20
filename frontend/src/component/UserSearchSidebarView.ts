@@ -8,8 +8,8 @@ import controller from "../Controller";
 
 const vLogger = debug('view:user-search-sidebar');
 
-class PatientSearchSidebarView extends SidebarView implements ChatUserEventListener {
-    protected loggedInUsers:string[];
+class UserSearchSidebarView extends SidebarView implements ChatUserEventListener {
+    protected loggedInUsers: string[];
 
     constructor(applicationView: any, htmlDocument: HTMLDocument, stateManager: StateManager) {
         super(applicationView, htmlDocument, applicationView.state.ui.userSearchSideBar, applicationView.state.uiPrefs.userSearchSideBar, stateManager);
@@ -32,12 +32,24 @@ class PatientSearchSidebarView extends SidebarView implements ChatUserEventListe
 
     handleLoggedInUsersUpdated(usernames: string[]): void {
         this.loggedInUsers = usernames;
+        this.reRenderView();
     }
 
-    handleFavouriteUserLoggedIn(username: string): void {}
-    handleFavouriteUserLoggedOut(username: string): void {}
-    handleFavouriteUsersChanged(usernames: string[]): void {}
-    handleBlockedUsersChanged(usernames: string[]): void {}
+    handleFavouriteUserLoggedIn(username: string): void {
+        this.reRenderView();
+    }
+
+    handleFavouriteUserLoggedOut(username: string): void {
+        this.reRenderView();
+    }
+
+    handleFavouriteUsersChanged(usernames: string[]): void {
+        this.reRenderView();
+    }
+
+    handleBlockedUsersChanged(usernames: string[]): void {
+        this.reRenderView();
+    }
 
     onDocumentLoaded() {
         super.onDocumentLoaded();
@@ -79,7 +91,7 @@ class PatientSearchSidebarView extends SidebarView implements ChatUserEventListe
         return result;
     }
 
-    eventClickItem(event:MouseEvent) {
+    eventClickItem(event: MouseEvent) {
         event.preventDefault();
         console.log(event.target);
         // @ts-ignore
@@ -87,7 +99,7 @@ class PatientSearchSidebarView extends SidebarView implements ChatUserEventListe
         // @ts-ignore
         vLogger(`User ${event.target.innerText} with id ${userId} clicked`);
 
-        let user:any = this.stateManager.findItemInState(this.config.stateNames.users, {id:userId}, isSame);
+        let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: userId}, isSame);
         vLogger(user);
         NotificationController.getInstance().startChatWithUser(user.username);
     }
@@ -107,14 +119,20 @@ class PatientSearchSidebarView extends SidebarView implements ChatUserEventListe
             vLogger('saved searches too long - removing first');
             // remove the first item from recent searches
             const item = recentUserSearches.shift();
-            this.stateManager.removeItemFromState(this.config.stateNames.recentUserSearches, item, isSame,true);
+            this.stateManager.removeItemFromState(this.config.stateNames.recentUserSearches, item, isSame, true);
         }
         // save the searches
-        this.stateManager.addNewItemToState(this.config.stateNames.recentUserSearches, {id:ui.item.value,username:ui.item.label},true);
+        this.stateManager.addNewItemToState(this.config.stateNames.recentUserSearches, {
+            id: ui.item.value,
+            username: ui.item.label
+        }, true);
     }
 
+    reRenderView() {
+        this.updateView(this.config.stateNames.recentUserSearches, this.stateManager.getStateByName(this.config.stateNames.recentUserSearches))
+    }
 
-  updateView(name:string, newState:any) {
+    updateView(name: string, newState: any) {
         if (name === this.config.stateNames.recentUserSearches) {
             this.createResultsForState(name, newState);
         }
@@ -125,8 +143,8 @@ class PatientSearchSidebarView extends SidebarView implements ChatUserEventListe
             // @ts-ignore
             const fastSearchEl = $(`#${this.uiConfig.dom.extra.fastSearchInputId}`);
             // for each name, construct the patient details to display and the id referenced
-            const fastSearchValues:any = [];
-            newState.forEach((item:any) => {
+            const fastSearchValues: any = [];
+            newState.forEach((item: any) => {
                 const searchValue = {
                     label: item.username,
                     value: item.id,
@@ -138,17 +156,17 @@ class PatientSearchSidebarView extends SidebarView implements ChatUserEventListe
         }
     }
 
-    getDragData(event:DragEvent) {
+    getDragData(event: DragEvent) {
         // use the actual id to pass the user to the droppable target
         // @ts-ignore
         const userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
         // @ts-ignore
         vLogger(`User ${event.target.innerText} with id ${userId} dragging`);
-        let user = this.stateManager.findItemInState(this.config.stateNames.users, {id:userId}, isSame);
+        let user = this.stateManager.findItemInState(this.config.stateNames.users, {id: userId}, isSame);
         user[this.config.ui.draggable.draggedType] = this.config.ui.draggable.draggedTypeUser;
         user[this.config.ui.draggable.draggedFrom] = this.config.ui.draggable.draggedFromUserSearch;
         return user;
     }
 }
 
-export default PatientSearchSidebarView;
+export default UserSearchSidebarView;
