@@ -27,6 +27,20 @@ class SocketManager {
     public connectToServer(httpServer:httpServer):void {
         socketDebug('Connecting up to the HTTP server');
         this.io = new Server(httpServer);
+        let resultObj = MessageQueueManager.getInstance().initialise();
+        if (resultObj) {
+            this.rooms = resultObj.rooms;
+        }
+        // setup a timer for periodically saving to file
+        socketDebug(`Setting up queue persistence`);
+        let interval = 60000;
+        if (process.env.MQ_INTERVAL) {
+            interval = parseInt(process.env.MQ_INTERVAL);
+        }
+        setInterval(() => {
+            MessageQueueManager.getInstance().persistQueueAndRooms(this.rooms);
+        },interval);
+
     }
 
     protected findUser(username:string):ChatUser|undefined {
@@ -117,7 +131,7 @@ class SocketManager {
         if (this.io) this.io.to(user.socketId).emit('queue',JSON.stringify(queuedItems));
     }
 
-    protected createMessageForRoom(author:string, roomName:string, message:string,created:number):ChatMessage|null {
+    protected createMessageForRoom(author:string, roomName:string, message:string,created:number,priority:number = 0):ChatMessage|null {
         let sender = this.findUser(author);
         let chatMessage:ChatMessage|null = null;
         if (sender) {
@@ -125,7 +139,8 @@ class SocketManager {
                 from:author,
                 room: roomName,
                 message: message,
-                created: created
+                created: created,
+                priority: priority
             };
         }
         return chatMessage;
@@ -151,9 +166,19 @@ class SocketManager {
     }
 
     protected removeUserFromRoom(user:ChatUser, room:ChatRoom): void {
-        let index = room.users.findIndex((value) => value.username === user.username);
+        if (room.users) {
+            let index = room.users.findIndex((value) => value.username === user.username);
+            if (index >= 0) {
+                room.users.splice(index, 1);
+            }
+        }
+    }
+
+    protected removeRoom(room:ChatRoom): void {
+        let index = this.rooms.findIndex((value) => value.name === room.name);
         if (index >= 0) {
-            room.users.splice(index,1);
+            this.rooms.splice(index,1);
+            MessageQueueManager.getInstance().removeAllQueuedItemsForRoom(room.name);
         }
     }
 
@@ -212,23 +237,27 @@ class SocketManager {
                 this.addUserToRoom(socket.id,username,room);
                 socket.join(room);
                 let userList:string[] = this.getUserListForRoom(room);
-                if (this.io) this.io.to(room).emit('joinroom',JSON.stringify({username:username,room: room,userList:userList}));
+                socket.to(room).emit('joinroom',JSON.stringify({username:username,room: room,userList:userList}));
             });
             socket.on('exitroom', ({username,room}) => {
                 socketDebug(`${username} exiting room ${room} `);
                 this.removeUserFromRoom(username,room);
                 socket.leave(room);
                 let userList:string[] = this.getUserListForRoom(room);
-                if (this.io) this.io.to(room).emit('exitroom',JSON.stringify({username:username,room: room,userList:userList}));
+                if (userList.length == 0) {
+                    socketDebug(`No users left in room ${room} removing from server cache`);
+                    this.removeRoom(room);
+                }
+                socket.to(room).emit('exitroom',JSON.stringify({username:username,room: room,userList:userList}));
             });
             socket.on('invite', ({from, to, room}) => {
                 socketDebug(`${from} has sent an invitation to join room ${room} to ${to}`);
                 this.inviteUserToRoom(from, to, room);
             });
-            socket.on('chat', ({from, room, message,created}) => {
+            socket.on('chat', ({from, room, message,created,priority}) => {
                 socketDebug(`${from} has sent a message to room ${room}: ${message}`);
                 // send the message to the rest of the room
-                let cMessage = this.createMessageForRoom(from, room, message,created);
+                let cMessage = this.createMessageForRoom(from, room, message,created,priority);
                 if (cMessage) {
                     socketDebug(`Sending message ${cMessage.message} to room ${cMessage.room}`);
                     socket.to(room).emit('chat',JSON.stringify(cMessage));

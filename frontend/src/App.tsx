@@ -121,7 +121,10 @@ class Root extends React.Component{
                         iconWarning: '',
                         isDraggable: false,
                         isClickable: true,
-                        isDeleteable: false,
+                        isDeleteable: true,
+                        deleteButtonClasses: 'btn btn-circle btn-xsm',
+                        deleteButtonText: '',
+                        deleteButtonIconClasses:'fas fa-trash-alt',
                         hasBadge: true,
                         resultContentDivClasses: 'd-flex w-100 justify-content-between',
                         resultContentTextElementType: 'span',
@@ -135,7 +138,8 @@ class Root extends React.Component{
                         commentId: "message",
                         submitCommentId: "submitMessage",
                         chatLogId: 'chatLog',
-                        chatLogRoomId: 'chatLogRoom'
+                        chatLogRoomId: 'chatLogRoom',
+                        leaveChatId: 'leaveChat'
                     },
                 },
                 userSearchSideBar: {

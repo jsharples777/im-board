@@ -89,8 +89,10 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
 
         if (!wasOffline) {
             // get the last message added, it won't be from ourselves (the chat manager takes care of that)
-            const displayMessage = log.messages[log.messages.length - 1];
-            notifier.show(displayMessage.from,displayMessage.message,'message',3000);
+            if (log.messages.length > 0) {
+                const displayMessage = log.messages[log.messages.length - 1];
+                notifier.show(displayMessage.from,displayMessage.message,'message',3000);
+            }
         }
     }
 

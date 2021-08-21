@@ -23,6 +23,8 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
     protected commentEl: HTMLElement;
     // @ts-ignore
     protected sendMessageButton: HTMLElement;
+    // @ts-ignore
+    protected leaveChatButton: HTMLElement;
 
     protected selectedChatLog: ChatLog | null = null;
 
@@ -39,8 +41,19 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         this.handleChatLogUpdated = this.handleChatLogUpdated.bind(this);
         this.handleChatStarted = this.handleChatStarted.bind(this);
         this.handleUserDrop = this.handleUserDrop.bind(this);
+        this.leaveChat = this.leaveChat.bind(this);
 
         NotificationController.getInstance().addListener(this);
+    }
+
+    private leaveChat() {
+        if (this.selectedChatLog) {
+            ChatManager.getInstance().leaveChat(this.selectedChatLog.roomName);
+            this.selectedChatLog = null;
+            this.clearChatLog();
+            this.checkCanComment();
+        }
+        this.updateView('',{});
     }
 
     handleUserDrop(event:Event) {
@@ -92,9 +105,11 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         if (this.selectedChatLog) {
             if (this.commentEl) this.commentEl.removeAttribute("readonly");
             if (this.sendMessageButton) this.sendMessageButton.removeAttribute("disabled");
+            if (this.leaveChatButton) this.sendMessageButton.removeAttribute("disabled");
         } else {
             if (this.commentEl) this.commentEl.setAttribute("readonly", "true");
             if (this.sendMessageButton) this.sendMessageButton.setAttribute("disabled", "true");
+            if (this.leaveChatButton) this.leaveChatButton.setAttribute("disabled", "true");
         }
 
     }
@@ -111,6 +126,8 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         // @ts-ignore
         this.sendMessageButton = document.getElementById(this.uiConfig.dom.submitCommentId);
         // @ts-ignore
+        this.leaveChatButton = document.getElementById(this.uiConfig.dom.leaveChatId);
+        // @ts-ignore
         this.chatRoomDiv = document.getElementById(this.uiConfig.dom.chatLogRoomId);
 
         this.chatRoomDiv.addEventListener('dragover', (event) => {csLoggerDetail('Dragged over'); if (this.selectedChatLog) event.preventDefault();});
@@ -118,6 +135,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
 
 
         this.chatForm.addEventListener('submit', this.handleAddMessage);
+        this.leaveChatButton.addEventListener('click',this.leaveChat);
 
         this.checkCanComment();
 
@@ -158,28 +176,40 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
     addChatMessage(message: Message): HTMLElement {
         let chatMessageEl = document.createElement('div');
         browserUtil.addRemoveClasses(chatMessageEl, "message");
-        if (message.from === ChatManager.getInstance().getCurrentUser()) {
-            browserUtil.addRemoveClasses(chatMessageEl, "my-message");
-        }
-        else {
+        // are we dealing with an "join"/"exit" message?
+        if (message.from.trim().length === 0) {
             let messageSenderEl = document.createElement('div');
             browserUtil.addRemoveClasses(messageSenderEl, 'message-sender');
-            messageSenderEl.innerText = message.from + '   ' + moment(message.created, 'YYYYMMDDHHmmss').format('DD/MM/YYYY ');
+            messageSenderEl.innerText = message.message;
             chatMessageEl.appendChild(messageSenderEl);
         }
-
-        let contentEl = document.createElement('div');
-        if (message.from === ChatManager.getInstance().getCurrentUser()) {
-            browserUtil.addRemoveClasses(contentEl, "my-message-content");
-        }
         else {
-            browserUtil.addRemoveClasses(contentEl, 'message-content');
+
+            if (message.from === ChatManager.getInstance().getCurrentUser()) {
+                browserUtil.addRemoveClasses(chatMessageEl, "my-message");
+            } else {
+                let messageSenderEl = document.createElement('div');
+                browserUtil.addRemoveClasses(messageSenderEl, 'message-sender');
+                messageSenderEl.innerText = message.from + '   ' + moment(message.created, 'YYYYMMDDHHmmss').format('DD/MM/YYYY ');
+                chatMessageEl.appendChild(messageSenderEl);
+            }
+
+            let contentEl = document.createElement('div');
+            if (message.from === ChatManager.getInstance().getCurrentUser()) {
+                browserUtil.addRemoveClasses(contentEl, "my-message-content");
+            } else {
+                browserUtil.addRemoveClasses(contentEl, 'message-content');
+            }
+            contentEl.innerText = message.message;
+            chatMessageEl.appendChild(contentEl);
         }
-        contentEl.innerText = message.message;
-        chatMessageEl.appendChild(contentEl);
 
         this.chatLogDiv.appendChild(chatMessageEl);
         return chatMessageEl;
+    }
+
+    private clearChatLog() {
+        browserUtil.removeAllChildren(this.chatLogDiv);
     }
 
     reRenderChatMessages(chatLog: ChatLog) {
@@ -231,7 +261,30 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
     }
 
     getDragData(event: DragEvent) {}
-    protected eventDeleteClickItem(event: MouseEvent): void {}
+    protected eventDeleteClickItem(event: MouseEvent): void {
+        event.preventDefault();
+        console.log(event.target);
+        // @ts-ignore
+        const room = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
+        // @ts-ignore
+        const dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId);
+
+        // @ts-ignore
+        csLoggerDetail(`Chat Log ${event.target} with id ${room} deleted from ${dataSource}`);
+
+        if (room) {
+            let log: ChatLog = ChatManager.getInstance().getChatLog(room);
+            ChatManager.getInstance().leaveChat(room);
+            if (this.selectedChatLog && (this.selectedChatLog.roomName === room)) {
+                this.selectedChatLog = null;
+                this.clearChatLog();
+                this.checkCanComment();
+            }
+            this.updateView('',{});
+        }
+
+
+    }
 
     handleChatLogsUpdated(): void {
         if (this.selectedChatLog) {

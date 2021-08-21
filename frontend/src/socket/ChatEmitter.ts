@@ -5,6 +5,6 @@ export interface ChatEmitter {
     joinChat(room:string):void;
     leaveChat(room:string):void;
 
-    sendMessage(room:string, message:string):void;
+    sendMessage(room:string, message:string, priority:number):void;
     sendInvite(to:string, room:string):void;
 }

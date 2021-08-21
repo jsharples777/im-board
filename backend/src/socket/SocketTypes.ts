@@ -9,7 +9,8 @@ export type ChatMessage = {
     room: string,
     message: string,
     from: string,
-    created: number
+    created: number,
+    priority: number
 }
 
 export type InviteMessage = {

@@ -599,7 +599,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
             iconWarning: '',
             isDraggable: false,
             isClickable: true,
-            isDeleteable: false,
+            isDeleteable: true,
+            deleteButtonClasses: 'btn btn-circle btn-xsm',
+            deleteButtonText: '',
+            deleteButtonIconClasses: 'fas fa-trash-alt',
             hasBadge: true,
             resultContentDivClasses: 'd-flex w-100 justify-content-between',
             resultContentTextElementType: 'span',
@@ -611,7 +614,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
             commentId: "message",
             submitCommentId: "submitMessage",
             chatLogId: 'chatLog',
-            chatLogRoomId: 'chatLogRoom'
+            chatLogRoomId: 'chatLogRoom',
+            leaveChatId: 'leaveChat'
           }
         },
         userSearchSideBar: {
@@ -2145,6 +2149,7 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
+  // @ts-ignore
 
 
   function ChatSidebarView(applicationView, htmlDocument, stateManager) {
@@ -2161,11 +2166,23 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
     _this.handleChatLogUpdated = _this.handleChatLogUpdated.bind(_assertThisInitialized(_this));
     _this.handleChatStarted = _this.handleChatStarted.bind(_assertThisInitialized(_this));
     _this.handleUserDrop = _this.handleUserDrop.bind(_assertThisInitialized(_this));
+    _this.leaveChat = _this.leaveChat.bind(_assertThisInitialized(_this));
     _socket_NotificationController__WEBPACK_IMPORTED_MODULE_2__["NotificationController"].getInstance().addListener(_assertThisInitialized(_this));
     return _this;
   }
 
   var _proto = ChatSidebarView.prototype;
+
+  _proto.leaveChat = function leaveChat() {
+    if (this.selectedChatLog) {
+      _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().leaveChat(this.selectedChatLog.roomName);
+      this.selectedChatLog = null;
+      this.clearChatLog();
+      this.checkCanComment();
+    }
+
+    this.updateView('', {});
+  };
 
   _proto.handleUserDrop = function handleUserDrop(event) {
     csLogger('drop event on current chat room');
@@ -2216,9 +2233,11 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
     if (this.selectedChatLog) {
       if (this.commentEl) this.commentEl.removeAttribute("readonly");
       if (this.sendMessageButton) this.sendMessageButton.removeAttribute("disabled");
+      if (this.leaveChatButton) this.sendMessageButton.removeAttribute("disabled");
     } else {
       if (this.commentEl) this.commentEl.setAttribute("readonly", "true");
       if (this.sendMessageButton) this.sendMessageButton.setAttribute("disabled", "true");
+      if (this.leaveChatButton) this.leaveChatButton.setAttribute("disabled", "true");
     }
   };
 
@@ -2236,6 +2255,8 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
     this.sendMessageButton = document.getElementById(this.uiConfig.dom.submitCommentId); // @ts-ignore
 
+    this.leaveChatButton = document.getElementById(this.uiConfig.dom.leaveChatId); // @ts-ignore
+
     this.chatRoomDiv = document.getElementById(this.uiConfig.dom.chatLogRoomId);
     this.chatRoomDiv.addEventListener('dragover', function (event) {
       csLoggerDetail('Dragged over');
@@ -2243,6 +2264,7 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
     });
     this.chatRoomDiv.addEventListener('drop', this.handleUserDrop);
     this.chatForm.addEventListener('submit', this.handleAddMessage);
+    this.leaveChatButton.addEventListener('click', this.leaveChat);
     this.checkCanComment();
     this.updateView('', {});
   };
@@ -2281,29 +2303,42 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.addChatMessage = function addChatMessage(message) {
     var chatMessageEl = document.createElement('div');
-    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(chatMessageEl, "message");
+    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(chatMessageEl, "message"); // are we dealing with an "join"/"exit" message?
 
-    if (message.from === _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().getCurrentUser()) {
-      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(chatMessageEl, "my-message");
-    } else {
+    if (message.from.trim().length === 0) {
       var messageSenderEl = document.createElement('div');
       _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(messageSenderEl, 'message-sender');
-      messageSenderEl.innerText = message.from + '   ' + moment__WEBPACK_IMPORTED_MODULE_5___default()(message.created, 'YYYYMMDDHHmmss').format('DD/MM/YYYY ');
+      messageSenderEl.innerText = message.message;
       chatMessageEl.appendChild(messageSenderEl);
-    }
-
-    var contentEl = document.createElement('div');
-
-    if (message.from === _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().getCurrentUser()) {
-      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(contentEl, "my-message-content");
     } else {
-      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(contentEl, 'message-content');
+      if (message.from === _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().getCurrentUser()) {
+        _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(chatMessageEl, "my-message");
+      } else {
+        var _messageSenderEl = document.createElement('div');
+
+        _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(_messageSenderEl, 'message-sender');
+        _messageSenderEl.innerText = message.from + '   ' + moment__WEBPACK_IMPORTED_MODULE_5___default()(message.created, 'YYYYMMDDHHmmss').format('DD/MM/YYYY ');
+        chatMessageEl.appendChild(_messageSenderEl);
+      }
+
+      var contentEl = document.createElement('div');
+
+      if (message.from === _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().getCurrentUser()) {
+        _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(contentEl, "my-message-content");
+      } else {
+        _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].addRemoveClasses(contentEl, 'message-content');
+      }
+
+      contentEl.innerText = message.message;
+      chatMessageEl.appendChild(contentEl);
     }
 
-    contentEl.innerText = message.message;
-    chatMessageEl.appendChild(contentEl);
     this.chatLogDiv.appendChild(chatMessageEl);
     return chatMessageEl;
+  };
+
+  _proto.clearChatLog = function clearChatLog() {
+    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__["default"].removeAllChildren(this.chatLogDiv);
   };
 
   _proto.reRenderChatMessages = function reRenderChatMessages(chatLog) {
@@ -2357,7 +2392,29 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.getDragData = function getDragData(event) {};
 
-  _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {};
+  _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {
+    event.preventDefault();
+    console.log(event.target); // @ts-ignore
+
+    var room = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
+
+    var dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId); // @ts-ignore
+
+    csLoggerDetail("Chat Log " + event.target + " with id " + room + " deleted from " + dataSource);
+
+    if (room) {
+      var log = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().getChatLog(room);
+      _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().leaveChat(room);
+
+      if (this.selectedChatLog && this.selectedChatLog.roomName === room) {
+        this.selectedChatLog = null;
+        this.clearChatLog();
+        this.checkCanComment();
+      }
+
+      this.updateView('', {});
+    }
+  };
 
   _proto.handleChatLogsUpdated = function handleChatLogsUpdated() {
     if (this.selectedChatLog) {
@@ -4088,24 +4145,46 @@ var ChatManager = /*#__PURE__*/function () {
     // we get this for all changes to a room, if the username is us can safely ignore
     if (users.username === this.currentUsername) return;
     var log = this.ensureChatLogExists(users.room);
-    var index = this.chatLogs.findIndex(function (log) {
-      return log.roomName === users.room;
-    });
+    cmLogger("User list for room " + users.room + " - " + users.userList.join(','));
+    log.users = users.userList; // add a "message" for joined user
 
-    if (index >= 0) {
-      cmLogger("User list for room " + users.room + " - " + users.userList.join(','));
-      var _log = this.chatLogs[index];
-      _log.users = users.userList;
-      this.saveLogs();
-    }
-
+    var created = parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss'));
+    var joinDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()().format('DD/MM/YYYY HH:mm');
+    var message = {
+      from: '',
+      created: created,
+      room: users.room,
+      priority: 0,
+      message: users.username + " joined the chat on " + joinDateTime
+    };
+    log.messages.push(message);
+    this.saveLogs();
     this.chatListeners.forEach(function (listener) {
       return listener.handleChatLogUpdated(log, false);
     });
   };
 
   _proto.receivedLeftRoom = function receivedLeftRoom(users) {
-    this.receiveJoinedRoom(users);
+    // we get this for all changes to a room, if the username is us can safely ignore
+    if (users.username === this.currentUsername) return;
+    var log = this.ensureChatLogExists(users.room);
+    cmLogger("User list for room " + users.room + " - " + users.userList.join(','));
+    log.users = users.userList; // add a "message" for joined user
+
+    var created = parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss'));
+    var joinDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()().format('DD/MM/YYYY HH:mm');
+    var message = {
+      from: '',
+      created: created,
+      room: users.room,
+      priority: 0,
+      message: users.username + " left the chat on " + joinDateTime
+    };
+    log.messages.push(message);
+    this.saveLogs();
+    this.chatListeners.forEach(function (listener) {
+      return listener.handleChatLogUpdated(log, false);
+    });
   };
 
   _proto.receiveInvitation = function receiveInvitation(invite) {
@@ -4241,10 +4320,23 @@ var ChatManager = /*#__PURE__*/function () {
     _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(this.getCurrentUser(), room);
   };
 
+  _proto.removeChatLog = function removeChatLog(room) {
+    var index = this.chatLogs.findIndex(function (log) {
+      return log.roomName === room;
+    });
+
+    if (index >= 0) {
+      cmLogger("Removing Chat log for room " + room);
+      var result = this.chatLogs.splice(index, 1);
+      cmLogger(result.length);
+      this.saveLogs();
+    }
+  };
+
   _proto.leaveChat = function leaveChat(room) {
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
-    // this.removeChatLog(room);  // leave the chat log for now (essentially history)
 
+    this.removeChatLog(room);
     _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].leaveChat(this.getCurrentUser(), room);
   };
 
@@ -4283,7 +4375,11 @@ var ChatManager = /*#__PURE__*/function () {
     }
   };
 
-  _proto.sendMessage = function sendMessage(room, content) {
+  _proto.sendMessage = function sendMessage(room, content, priority) {
+    if (priority === void 0) {
+      priority = 0;
+    }
+
     if (this.getCurrentUser().trim().length === 0) return null; // we are not logged in
 
     var log = this.ensureChatLogExists(room); // send the message
@@ -4295,7 +4391,8 @@ var ChatManager = /*#__PURE__*/function () {
       from: this.getCurrentUser(),
       room: room,
       message: content,
-      created: created
+      created: created,
+      priority: priority
     };
     this.addMessageToChatLog(log, sent);
     return sent;
@@ -4442,8 +4539,10 @@ var NotificationController = /*#__PURE__*/function () {
 
     if (!wasOffline) {
       // get the last message added, it won't be from ourselves (the chat manager takes care of that)
-      var displayMessage = log.messages[log.messages.length - 1];
-      _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show(displayMessage.from, displayMessage.message, 'message', 3000);
+      if (log.messages.length > 0) {
+        var displayMessage = log.messages[log.messages.length - 1];
+        _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show(displayMessage.from, displayMessage.message, 'message', 3000);
+      }
     }
   };
 

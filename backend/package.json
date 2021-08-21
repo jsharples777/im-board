@@ -5,15 +5,15 @@
   "main": "./dist/server.js",
   "scripts": {
     "compile": "tsc-watch",
-    "start.dev": "nodemon  -w src  -e ts,tsx,json,env,graphql -w src -w config -w .env --exec 'ts-node ./src/server.ts'",
+    "start.dev": "nodemon  -w src  -e ts,tsx,env,graphql -w src -w config -w .env --exec 'ts-node ./src/server.ts'",
     "build.dev": "webpack --mode development",
     "build": "tsc",
-    "start.bundle": "nodemon -e js,json,env -w . -w .env  -w dist dist/js/server.bundle.js",
-    "start": "nodemon -e js,json,env -w . -w .env  -w dist dist/js/server.js",
+    "start.bundle": "nodemon -e js,env -w . -w .env  -w dist dist/js/server.bundle.js",
+    "start": "nodemon -e js,env -w . -w .env  -w dist dist/js/server.js",
     "tsc": "tsc",
     "lint": "eslint --ignore-pattern src --fix .",
     "watch.dev_old": "webpack --mode development --watch",
-    "start.dev_old": "nodemon -e js,json,graphql,env -w . -w .env  -w dist -w server.js dist/js/server.js"
+    "start.dev_old": "nodemon -e js,graphql,env -w . -w .env  -w dist -w server.js dist/js/server.js"
   },
   "dependencies": {
     "apollo-server-express": "^2.25.2",

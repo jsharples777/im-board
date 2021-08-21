@@ -9,7 +9,8 @@ export type Message = {
     from: string,
     room: string,
     message: string,
-    created: number
+    created: number,
+    priority: number
 }
 
 export type JoinLeft = {

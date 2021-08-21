@@ -1,5 +1,7 @@
-import {ChatMessage, InviteMessage, QueuedMessages} from "./SocketTypes";
+import {ChatMessage, ChatRoom, InviteMessage, QueuedMessages} from "./SocketTypes";
 import debug from 'debug';
+import fs from "fs";
+import socketManager from "./SocketManager";
 
 const mqLogger = debug('message-queue');
 
@@ -146,5 +148,59 @@ export default class MessageQueueManager {
             this.messageQueue.push(queue);
         }
         mqLogger(`Queuing message from ${message.from} to room ${message.room} to user ${username}`);
+    }
+
+    public removeAllQueuedItemsForRoom(name:string):void {
+        mqLogger(`Removing queued items for room ${name}`);
+        this.messageQueue.forEach((queue) => {
+            let index = queue.invites.length;
+            while (index > 0) {
+                if (queue.invites[index - 1].room === name) {
+                    mqLogger(`Removing invite to user ${queue.username}`);
+                    queue.invites.splice(index - 1, 1);
+                }
+                index--;
+            }
+            index = queue.messages.length;
+            while (index > 0) {
+                if (queue.messages[index - 1].room === name) {
+                    mqLogger(`Removing message to user ${queue.username}`);
+                    queue.messages.splice(index - 1, 1);
+                }
+                index--;
+            }
+        });
+    }
+
+    public persistQueueAndRooms(rooms:ChatRoom[]) {
+        let data = {
+            rooms: rooms,
+            queues: this.messageQueue
+        }
+        let json = JSON.stringify(data);
+        const fileName = process.env.MQ_FILE || './config/queue.json';
+        fs.writeFile(fileName, json,{},(result) => {
+           if (result) {
+               mqLogger(result);
+           }
+        });
+    }
+
+    public initialise():any|null{
+        mqLogger(`Attempting to load stored queue and rooms`);
+        const fileName = process.env.MQ_FILE || './db/queue.json';
+        let dataObj:any|null = null;
+        try {
+            let buffer:Buffer = fs.readFileSync(fileName);
+            dataObj = JSON.parse(buffer.toString());
+            mqLogger(dataObj);
+            this.messageQueue = dataObj.queues;
+
+        }
+        catch (error) {
+            mqLogger(error);
+            mqLogger(`Invalid format - no queue or rooms restored`);
+        }
+        return dataObj;
     }
 }
