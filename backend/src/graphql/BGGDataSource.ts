@@ -94,6 +94,7 @@ class BGGDataSource {
         let publisher = '';
         let designersString = '';
         let artistsString = '';
+        let categoriesString = '';
         if (item.link) {
             let publishers:string[] = [];
             let designers:string[] = [];
@@ -122,6 +123,9 @@ class BGGDataSource {
                 if (artists.length > 0) {
                     artistsString = artists.join(', ');
                 }
+                if (categories.length > 0) {
+                    categoriesString = categories.join(', ');
+                }
             });
 
 
@@ -144,7 +148,7 @@ class BGGDataSource {
             designers: designersString,
             artists: artistsString,
             publisher: publisher,
-            categories: categories,
+            categories: categoriesString,
             numOfRaters: numOfRaters,
             averageScore: averageScore,
             rank: rank
@@ -167,22 +171,27 @@ class BGGDataSource {
                 let results:any[] = [];
 
                 if (error) reject(error.message);
+                try {
 
-                let parser = new Parser();
-                parser.parseString(body, (err:any, parsedResults:any) => {
-                    if (err) reject("xml parsing error");
-                    if (parsedResults.items) {
-                        if (parsedResults.items.item) {
-                            let parsedResultItems:any[] = parsedResults.items.item;
-                            parsedResultItems.forEach((item:any) => {
-                                let boardGame:any = BGGDataSource.convertToBoardGame(item);
-                                bggLogger(boardGame);
-                                results.push(boardGame);
-                            });
+                    let parser = new Parser();
+                    parser.parseString(body, (err: any, parsedResults: any) => {
+                        if (err) reject("xml parsing error");
+                        if (parsedResults.items) {
+                            if (parsedResults.items.item) {
+                                let parsedResultItems: any[] = parsedResults.items.item;
+                                parsedResultItems.forEach((item: any) => {
+                                    let boardGame: any = BGGDataSource.convertToBoardGame(item);
+                                    bggLogger(boardGame);
+                                    results.push(boardGame);
+                                });
+                            }
                         }
-                    }
-                });
-                resolve(results);
+                    });
+                    resolve(results);
+                }
+                catch (error) {
+                    reject(error);
+                }
             });
 
         });

@@ -22,7 +22,7 @@ type BoardGameDetail {
     numOfRaters: Int
     averageScore: Float
     rank: Int
-    categories: [String!]
+    categories: String
 }
 
 ##### top level declarations

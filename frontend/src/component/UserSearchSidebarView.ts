@@ -142,6 +142,9 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
             if (user) {
                 let childElement = this.createResultForItem(this.config.stateNames.users,user,this.uiConfig.dom.resultDataSourceFavUsers);
                 childElement.addEventListener('click', this.eventClickItem);
+                childElement.setAttribute('draggable', 'true');
+                childElement.addEventListener('dragstart', this.eventStartDrag);
+
 
                 this.favUsersDiv.appendChild(childElement);
             }
@@ -157,6 +160,8 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
             let user:any = this.stateManager.findItemInState(this.config.stateNames.users, {username}, isSameUsername);
             if (user) {
                 let childElement = this.createResultForItem(this.config.stateNames.users,user,this.uiConfig.dom.resultDataSourceBlockedUsers);
+                childElement.setAttribute('draggable', 'false');
+                childElement.addEventListener('dragstart', (event) => {event.preventDefault();});
                 this.blockedUsersDiv.appendChild(childElement);
             }
         });

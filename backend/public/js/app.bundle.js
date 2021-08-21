@@ -472,14 +472,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Controller */ "./src/Controller.ts");
-/* harmony import */ var _component_BlogEntryView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./component/BlogEntryView */ "./src/component/BlogEntryView.tsx");
-/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
-/* harmony import */ var _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./component/DetailsSidebarView */ "./src/component/DetailsSidebarView.ts");
-/* harmony import */ var _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./component/UserSearchSidebarView */ "./src/component/UserSearchSidebarView.ts");
-/* harmony import */ var _component_ChatSidebarView__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./component/ChatSidebarView */ "./src/component/ChatSidebarView.ts");
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Controller */ "./src/Controller.ts");
+/* harmony import */ var _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./component/UserSearchSidebarView */ "./src/component/UserSearchSidebarView.ts");
+/* harmony import */ var _component_ChatSidebarView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./component/ChatSidebarView */ "./src/component/ChatSidebarView.ts");
+/* harmony import */ var _component_BoardGameSerachSidebarView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./component/BoardGameSerachSidebarView */ "./src/component/BoardGameSerachSidebarView.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -500,14 +496,12 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
-
-
-
 var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('app');
 
 var Root = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(Root, _React$Component);
 
+  // @ts-ignore
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
@@ -531,14 +525,18 @@ var Root = /*#__PURE__*/function (_React$Component) {
         entries: 'entries',
         comments: 'comments',
         selectedEntry: 'selectedEntry',
-        recentUserSearches: 'recentUserSearches'
+        recentUserSearches: 'recentUserSearches',
+        bggSearchResults: 'bggSearchResults'
       },
       apis: {
         users: '/users',
         entries: '/blog',
         entry: '/blog',
         comments: '/comment',
-        login: '/login'
+        login: '/login',
+        bggSearch: '/graphql',
+        bggSearchCall: 'query {\n' + '  findBoardGames(query: "@") {\n' + '    id, name, year\n' + '  }\n' + '} ',
+        bggSearchCallById: 'query {\n' + '  getBoardGameDetails(id:@) {\n' + '    id,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' + '  }\n' + '}'
       },
       ui: {
         draggable: {
@@ -565,19 +563,6 @@ var Root = /*#__PURE__*/function (_React$Component) {
           boardGameSearchId: 'navigationItemBoardGameSearch',
           userSearchId: 'navigationItemUserSearch',
           chatId: 'navigationItemChat'
-        },
-        blogEntry: {},
-        entryDetailsSideBar: {
-          dom: {
-            sideBarId: 'detailsSideBar',
-            formId: 'details',
-            titleId: 'title',
-            contentId: 'content',
-            changedOnId: 'changedOn',
-            resultDataKeyId: 'id',
-            isDraggable: false,
-            isClickable: true
-          }
         },
         chatSideBar: {
           dom: {
@@ -656,6 +641,39 @@ var Root = /*#__PURE__*/function (_React$Component) {
               fastSearchInputId: 'fastSearchUserNames'
             }
           }
+        },
+        boardGameSearchSideBar: {
+          dom: {
+            sideBarId: 'boardGameSearchSidebar',
+            resultsId: 'bggSearchResults',
+            resultsElementType: 'a',
+            resultsElementAttributes: [['href', '#']],
+            resultsClasses: 'list-group-item my-list-item truncate-notification list-group-item-action',
+            resultDataKeyId: 'bgg-id',
+            resultLegacyDataKeyId: 'bgg-id',
+            resultDataSourceId: 'data-source',
+            resultDataSourceValue: 'bggSearch',
+            modifierClassNormal: 'list-group-item-primary',
+            modifierClassInactive: 'list-group-item-light',
+            modifierClassActive: 'list-group-item-info',
+            modifierClassWarning: 'list-group-item-danger',
+            iconNormal: '   <i class="fas fa-dice"></i>',
+            iconInactive: '   <i class="fas fa-dice"></i>',
+            iconActive: '   <i class="fas fa-dice"></i>',
+            iconWarning: '  <i class="fas fa-dice"></i>',
+            resultContentDivClasses: 'd-flex w-100 justify-content-between',
+            resultContentTextElementType: 'span',
+            resultContentTextClasses: 'mb-1',
+            isDraggable: true,
+            isClickable: true,
+            isDeleteable: true,
+            deleteButtonClasses: 'btn btn-circle btn-xsm',
+            deleteButtonText: '',
+            deleteButtonIconClasses: 'fas fa-trash-alt',
+            formId: 'bggSearch',
+            queryId: 'queryText',
+            buttonId: 'bggSearchButton'
+          }
         }
       },
       uiPrefs: {
@@ -667,16 +685,16 @@ var Root = /*#__PURE__*/function (_React$Component) {
             expandedSize: '35%'
           }
         },
+        boardGameSearchSideBar: {
+          view: {
+            location: 'left',
+            expandedSize: '35%'
+          }
+        },
         chatSideBar: {
           view: {
             location: 'right',
             expandedSize: '50%'
-          }
-        },
-        entryDetailsSideBar: {
-          view: {
-            location: 'left',
-            expandedSize: '35%'
           }
         }
       },
@@ -694,24 +712,17 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
     _this.cancelDelete = _this.cancelDelete.bind(_assertThisInitialized(_this));
     _this.confirmDelete = _this.confirmDelete.bind(_assertThisInitialized(_this));
-    _this.handleShowMyEntries = _this.handleShowMyEntries.bind(_assertThisInitialized(_this));
-    _this.handleSelectEntryComments = _this.handleSelectEntryComments.bind(_assertThisInitialized(_this));
-    _this.handleShowEditEntry = _this.handleShowEditEntry.bind(_assertThisInitialized(_this));
-    _this.handleUpdateEntry = _this.handleUpdateEntry.bind(_assertThisInitialized(_this));
-    _this.handleAddEntry = _this.handleAddEntry.bind(_assertThisInitialized(_this));
-    _this.handleAddComment = _this.handleAddComment.bind(_assertThisInitialized(_this));
-    _this.handleDeleteEntry = _this.handleDeleteEntry.bind(_assertThisInitialized(_this));
-    _this.handleDeleteComment = _this.handleDeleteComment.bind(_assertThisInitialized(_this));
     _this.handleShowUserSearch = _this.handleShowUserSearch.bind(_assertThisInitialized(_this));
     _this.handleShowChat = _this.handleShowChat.bind(_assertThisInitialized(_this));
-    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].connectToApplication(_assertThisInitialized(_this), window.localStorage);
+    _this.handleShowBGGSearch = _this.handleShowBGGSearch.bind(_assertThisInitialized(_this));
+    _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].connectToApplication(_assertThisInitialized(_this), window.localStorage);
     return _this;
   }
 
   var _proto = Root.prototype;
 
   _proto.getCurrentUser = function getCurrentUser() {
-    return _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId();
+    return _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getLoggedInUserId();
   };
 
   _proto.alert = function alert(title, content) {
@@ -724,35 +735,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
   };
 
   _proto.render = function render() {
-    var _this2 = this;
-
-    logger("Rendering App"); // @ts-ignore
-
-    logger(this.state.entries); // @ts-ignore
-
-    logger("User filter " + this.state.applyUserFilter); // @ts-ignore
-
-    var entriesToDisplay = this.state.entries; // @ts-ignore
-
-    if (this.state.applyUserFilter && _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn() && _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId() > 0) {
-      logger("fitlering entries");
-      entriesToDisplay = entriesToDisplay.filter(function (entry) {
-        return entry.createdBy === _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId();
-      });
-    }
-
-    var blog = entriesToDisplay.map(function (entry, index) {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_component_BlogEntryView__WEBPACK_IMPORTED_MODULE_5__["default"], {
-        key: index,
-        entry: entry,
-        showCommentsHandler: _this2.handleSelectEntryComments,
-        editEntryHandler: _this2.handleShowEditEntry,
-        deleteEntryHandler: _this2.handleDeleteEntry
-      });
-    });
+    logger("Rendering App");
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       className: "Root row ml-1"
-    }, blog);
+    });
   };
 
   _proto.cancelDelete = function cancelDelete(event) {
@@ -770,24 +756,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
     this.modalEl.classList.add(this.state.ui.alert.hideClass);
     event.preventDefault(); // @ts-ignore
 
-    var entryId = this.modalEl.getAttribute(this.state.controller.events.entry.eventDataKeyId);
-    logger("Handling Delete Entry " + entryId);
-
-    if (entryId) {
-      // find the entry from the state manager
-      entryId = parseInt(entryId); // @ts-ignore
-
-      var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.entries, {
-        id: entryId
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_6__["isSame"]);
-
-      if (entry) {
-        // delete the entry using the controller and remove the state manager
-        _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].deleteEntry(entry); // @ts-ignore
-
-        _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().removeItemFromState(this.state.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_6__["isSame"]);
-      }
-    }
+    var id = this.modalEl.getAttribute(this.state.controller.events.entry.eventDataKeyId);
+    logger("Handling Delete with id " + id);
   };
 
   _proto.componentDidMount = /*#__PURE__*/function () {
@@ -796,22 +766,19 @@ var Root = /*#__PURE__*/function (_React$Component) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              logger('component Did Mount'); // add the additional views and configure them
-              //this.commentView = new CommentSidebarView(this, document,controller.getStateManager());
-              //this.commentView.onDocumentLoaded(); // reset the view state
-
-              this.chatView = new _component_ChatSidebarView__WEBPACK_IMPORTED_MODULE_9__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager());
+              logger('component Did Mount');
+              this.chatView = new _component_ChatSidebarView__WEBPACK_IMPORTED_MODULE_5__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getStateManager());
               this.chatView.onDocumentLoaded();
-              this.detailsView = new _component_DetailsSidebarView__WEBPACK_IMPORTED_MODULE_7__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager());
-              this.detailsView.onDocumentLoaded();
-              this.userSearchView = new _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_8__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager());
-              this.userSearchView.onDocumentLoaded(); // navigation item handlers
+              this.userSearchView = new _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_4__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getStateManager());
+              this.userSearchView.onDocumentLoaded();
+              this.bggSearchView = new _component_BoardGameSerachSidebarView__WEBPACK_IMPORTED_MODULE_6__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getStateManager());
+              this.bggSearchView.onDocumentLoaded(); // navigation item handlers
 
               if (document) {
                 // @ts-ignore
                 document.getElementById(this.state.ui.navigation.showMyFavourites).addEventListener('click', function () {}); // @ts-ignore
 
-                document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', function () {}); // @ts-ignore
+                document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', this.handleShowBGGSearch); // @ts-ignore
 
                 document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch); // @ts-ignore
 
@@ -836,7 +803,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
               if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click', this.confirmDelete);
               if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete); // ok lets try get things done
 
-              _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].initialise();
+              _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].initialise();
 
             case 18:
             case "end":
@@ -853,31 +820,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
     return componentDidMount;
   }();
 
-  _proto.hideAllSideBars = function hideAllSideBars() {//this.commentView.eventHide(null);
-    //this.detailsView.eventHide(null);
-  };
-
-  _proto.handleShowMyEntries = function handleShowMyEntries(event) {
-    logger('Handling Show My Entries');
-    this.hideAllSideBars();
-
-    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
-      // @ts-ignore
-      window.location.href = this.state.apis.login;
-      return;
-    }
-
-    this.setState({
-      applyUserFilter: true
-    });
-  };
-
-  _proto.handleAllEntries = function handleAllEntries(event) {
-    logger('Handling Show All Entries');
-    this.setState({
-      applyUserFilter: false
-    });
-    this.hideAllSideBars();
+  _proto.hideAllSideBars = function hideAllSideBars() {
+    this.chatView.eventHide(null);
+    this.userSearchView.eventHide(null);
+    this.bggSearchView.eventHide(null);
   };
 
   _proto.handleShowUserSearch = function handleShowUserSearch(event) {
@@ -885,7 +831,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
     event.preventDefault();
     this.hideAllSideBars(); // prevent anything from happening if we are not logged in
 
-    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
+    if (!_Controller__WEBPACK_IMPORTED_MODULE_3__["default"].isLoggedIn()) {
       // @ts-ignore
       window.location.href = this.state.apis.login;
       return;
@@ -899,7 +845,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
     event.preventDefault();
     this.hideAllSideBars(); // prevent anything from happening if we are not logged in
 
-    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
+    if (!_Controller__WEBPACK_IMPORTED_MODULE_3__["default"].isLoggedIn()) {
       // @ts-ignore
       window.location.href = this.state.apis.login;
       return;
@@ -908,179 +854,27 @@ var Root = /*#__PURE__*/function (_React$Component) {
     this.chatView.eventShow(event);
   };
 
-  _proto.handleAddEntry = function handleAddEntry(event) {
-    logger('Handling Add Entry');
+  _proto.handleShowBGGSearch = function handleShowBGGSearch(event) {
+    logger('Handling Show BGG Search View');
     event.preventDefault();
     this.hideAllSideBars(); // prevent anything from happening if we are not logged in
 
-    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
+    if (!_Controller__WEBPACK_IMPORTED_MODULE_3__["default"].isLoggedIn()) {
       // @ts-ignore
       window.location.href = this.state.apis.login;
       return;
-    } // find the current user
-    // @ts-ignore
-
-
-    var creator = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.users, {
-      id: _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_6__["isSame"]);
-    logger(creator); // create an empty entry
-
-    var entry = {
-      title: '',
-      content: '',
-      createdBy: creator.id,
-      changedOn: parseInt(moment__WEBPACK_IMPORTED_MODULE_3___default()().format('YYYYMMDDHHmmss')),
-      Comments: [],
-      User: {
-        id: creator.id,
-        username: creator.username
-      }
-    };
-    logger(entry);
-    this.setState({
-      selectedEntry: entry
-    }); // @ts-ignore
-
-    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().setStateByName(this.state.stateNames.selectedEntry, entry);
-    this.detailsView.eventShow(event);
-  };
-
-  _proto.handleAddComment = function handleAddComment(event) {
-    logger('Handling Add Comment');
-    event.preventDefault();
-    logger('entry comments'); // @ts-ignore
-
-    var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().getStateByName(this.state.stateNames.selectedEntry);
-    logger(entry.comments.length); // get the comment element
-    // @ts-ignore
-
-    var commentEl = document.getElementById(this.state.ui.commentSideBar.dom.commentId);
-    if (commentEl && commentEl.value.trim().length === 0) return; // prevent anything from happening if we are not logged in
-
-    if (!_Controller__WEBPACK_IMPORTED_MODULE_4__["default"].isLoggedIn()) {
-      // @ts-ignore
-      window.location.href = this.state.apis.login;
-      return;
-    } // find the current user
-    // @ts-ignore
-
-
-    var creator = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.users, {
-      id: _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getLoggedInUserId()
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_6__["isSame"]);
-    logger('user');
-    logger(creator); // find the selected entry
-
-    if (entry && commentEl) {
-      // create an empty comment
-      // @ts-ignore
-      var comment = {
-        createdBy: creator.id,
-        commentOn: entry.id,
-        changedOn: parseInt(moment__WEBPACK_IMPORTED_MODULE_3___default()().format('YYYYMMDDHHmmss')),
-        content: commentEl.value.trim()
-      };
-      commentEl.value = '';
-      logger('comment');
-      logger(comment);
-      _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].addComment(comment);
     }
-  };
 
-  _proto.handleSelectEntryComments = function handleSelectEntryComments(event) {
-    logger('Handling Select Entry Comments');
-    event.preventDefault();
-    this.hideAllSideBars(); // @ts-ignore
-
-    var entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
-    logger("Handling Show Edit Entry " + entryId);
-
-    if (entryId) {
-      // find the entry from the state manager
-      entryId = parseInt(entryId); // @ts-ignore
-
-      var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.entries, {
-        id: entryId
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_6__["isSame"]);
-      logger(entry);
-
-      if (entry) {
-        // select the entry and open the details sidebar
-        this.setState({
-          selectedEntry: entry
-        }); // @ts-ignore
-
-        _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().setStateByName(this.state.stateNames.selectedEntry, entry);
-        this.commentView.eventShow(event);
-      }
-    }
-  };
-
-  _proto.handleShowEditEntry = function handleShowEditEntry(event) {
-    event.preventDefault();
-    this.hideAllSideBars(); // @ts-ignore
-
-    var entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
-    logger("Handling Show Edit Entry " + entryId);
-
-    if (entryId) {
-      // find the entry from the state manager
-      entryId = parseInt(entryId); // @ts-ignore
-
-      var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.entries, {
-        id: entryId
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_6__["isSame"]);
-      logger(entry);
-
-      if (entry) {
-        // select the entry and open the details sidebar
-        this.setState({
-          selectedEntry: entry
-        }); // @ts-ignore
-
-        _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().setStateByName(this.state.stateNames.selectedEntry, entry);
-        this.detailsView.eventShow(event);
-      }
-    }
-  };
-
-  _proto.handleDeleteEntry = function handleDeleteEntry(event) {
-    event.preventDefault();
-    this.hideAllSideBars(); // @ts-ignore
-
-    var entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
-    logger("Handling Delete Entry " + entryId);
-
-    if (entryId) {
-      // @ts-ignore
-      this.modalEl.setAttribute(this.state.controller.events.entry.eventDataKeyId, entryId); // find the entry from the state manager
-
-      entryId = parseInt(entryId); // @ts-ignore
-
-      var entry = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].getStateManager().findItemInState(this.state.stateNames.entries, {
-        id: entryId
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_6__["isSame"]);
-      this.alert(entry.title, "Are you sure you want to delete this blog entry?");
-    }
-  };
-
-  _proto.handleDeleteComment = function handleDeleteComment(id) {
-    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].deleteComment(id);
-  } // @ts-ignore
-  ;
-
-  _proto.handleUpdateEntry = function handleUpdateEntry(entry) {
-    this.hideAllSideBars();
-    _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].updateEntry(entry);
+    this.bggSearchView.eventShow(event);
   };
 
   return Root;
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component); //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
+//localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
 
 
-localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
+localStorage.debug = 'app controller-ts api-ts board-game-search-sidebar board-game-search-sidebar:detail';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -1102,15 +896,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state/MemoryBufferStateManager */ "./src/state/MemoryBufferStateManager.ts");
-/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
-/* harmony import */ var _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./state/RESTApiStateManager */ "./src/state/RESTApiStateManager.ts");
-/* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./socket/SocketManager */ "./src/socket/SocketManager.ts");
-/* harmony import */ var _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./state/AsyncStateManagerWrapper */ "./src/state/AsyncStateManagerWrapper.ts");
-/* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
-/* harmony import */ var _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./SocketListenerDelegate */ "./src/SocketListenerDelegate.ts");
-/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./socket/ChatManager */ "./src/socket/ChatManager.ts");
-/* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./socket/NotificationController */ "./src/socket/NotificationController.ts");
-
+/* harmony import */ var _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state/RESTApiStateManager */ "./src/state/RESTApiStateManager.ts");
+/* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./socket/SocketManager */ "./src/socket/SocketManager.ts");
+/* harmony import */ var _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./state/AsyncStateManagerWrapper */ "./src/state/AsyncStateManagerWrapper.ts");
+/* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
+/* harmony import */ var _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./SocketListenerDelegate */ "./src/SocketListenerDelegate.ts");
+/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./socket/ChatManager */ "./src/socket/ChatManager.ts");
+/* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./socket/NotificationController */ "./src/socket/NotificationController.ts");
 
 
 
@@ -1134,7 +926,7 @@ var Controller = /*#__PURE__*/function () {
     this.clientSideStorage = clientSideStorage;
     this.config = this.applicationView.state; // setup the API calls
 
-    var apiStateManager = _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_3__["RESTApiStateManager"].getInstance();
+    var apiStateManager = _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_2__["RESTApiStateManager"].getInstance();
     apiStateManager.initialise([{
       stateName: this.config.stateNames.users,
       serverURL: this.getServerAPIURL(),
@@ -1150,28 +942,11 @@ var Controller = /*#__PURE__*/function () {
       serverURL: this.getServerAPIURL(),
       api: this.config.apis.comments,
       isActive: true
-    }]); // let indexedDBSM = IndexedDBStateManager.getInstance();
-    // indexedDBSM.initialise([
-    //     {
-    //         name:this.config.stateNames.users,
-    //         keyField:"id"
-    //     },
-    //     {
-    //         name:this.config.stateNames.entries,
-    //         keyField:"id"
-    //     },
-    //     {
-    //         name:this.config.stateNames.comments,
-    //         keyField:"id"
-    //     }
-    // ]);
-
-    var aggregateSM = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__["AggregateStateManager"].getInstance();
+    }]);
+    var aggregateSM = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_5__["AggregateStateManager"].getInstance();
     var memorySM = _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_1__["default"].getInstance();
-    var asyncSM = new _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__["default"](aggregateSM, apiStateManager);
-    aggregateSM.addStateManager(memorySM, [], false); //aggregateSM.addStateManager(new BrowserStorageStateManager(true), [], false);
-    //aggregateSM.addStateManager(indexedDBSM,[this.config.stateNames.selectedEntry],false );
-
+    var asyncSM = new _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_4__["default"](aggregateSM, apiStateManager);
+    aggregateSM.addStateManager(memorySM, [], false);
     aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry, this.config.stateNames.recentUserSearches], false);
     this.stateManager = aggregateSM; // state listener
 
@@ -1179,8 +954,6 @@ var Controller = /*#__PURE__*/function () {
     this.stateChangedItemAdded = this.stateChangedItemAdded.bind(this);
     this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
     this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
-    this.getStateManager().addChangeListenerForName(this.config.stateNames.entries, this);
-    this.getStateManager().addChangeListenerForName(this.config.stateNames.comments, this);
     return this;
   }
   /*
@@ -1191,29 +964,23 @@ var Controller = /*#__PURE__*/function () {
   _proto.initialise = function initialise() {
     cLogger('Initialising data state'); // listen for socket events
 
-    var socketListerDelegate = new _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_7__["default"](this.config);
-    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_4__["default"].setListener(socketListerDelegate); // now that we have all the user we can setup the chat system but only if we are logged in
+    var socketListerDelegate = new _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_6__["default"](this.config);
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].setListener(socketListerDelegate); // now that we have all the user we can setup the chat system but only if we are logged in
 
     cLogger("Setting up chat system for user " + this.getLoggedInUserId() + ": " + this.getLoggedInUsername());
 
     if (this.getLoggedInUserId() > 0) {
       // setup the chat system
-      var chatManager = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_8__["ChatManager"].getInstance(); // this connects the manager to the socket system
+      var chatManager = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_7__["ChatManager"].getInstance(); // this connects the manager to the socket system
       // setup the chat notification system
 
-      var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_9__["NotificationController"].getInstance();
+      var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_8__["NotificationController"].getInstance();
       chatManager.setCurrentUser(this.getLoggedInUsername());
       chatManager.login();
-    } // load the entries
+    } // load the users
 
 
-    this.getStateManager().getStateByName(this.config.stateNames.entries); // load the users
-
-    this.getStateManager().getStateByName(this.config.stateNames.users); // load the comments
-
-    this.getStateManager().getStateByName(this.config.stateNames.comments); // load the recent user searches
-
-    this.getStateManager().getStateByName(this.config.stateNames.recentUserSearches);
+    this.getStateManager().getStateByName(this.config.stateNames.users);
   };
 
   _proto.getStateManager = function getStateManager() {
@@ -1278,55 +1045,6 @@ var Controller = /*#__PURE__*/function () {
 
     cLoggerDetail("Logged in user is " + result);
     return result;
-  } // Lets delete a comment
-  ;
-
-  _proto.deleteComment = function deleteComment(id) {
-    var entry = this.getStateManager().getStateByName(this.config.stateNames.selectedEntry);
-
-    if (entry) {
-      cLogger("Handling delete comment for " + entry.id + " and comment " + id);
-      this.getStateManager().removeItemFromState(this.config.stateNames.comments, {
-        id: id
-      }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], false); // send the api call
-      //this.asyncSM.removeItemFromState(this.config.stateNames.comments,{id:id},isSame);
-    }
-  };
-
-  _proto.deleteEntry = function deleteEntry(entry) {
-    if (entry) {
-      cLogger("Handling delete entry for " + entry.id); // update the state manager
-
-      this.getStateManager().removeItemFromState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], false); // send the api call
-      //this.asyncSM.removeItemFromState(this.config.stateNames.entries,{id:entry.id},isSame);
-    }
-  };
-
-  _proto.updateEntry = function updateEntry(entry) {
-    if (entry) {
-      cLogger(entry);
-
-      if (entry.id) {
-        cLogger("Handling update for entry " + entry.id); // update the state manager
-
-        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], false);
-        this.getStateManager().updateItemInState(this.config.stateNames.entries, entry, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], false); // send the api call
-        //this.asyncSM.updateItemInState(this.config.stateNames.entries,entry,isSame);
-      } else {
-        cLogger("Handling create for entry"); // send the api call and let the completed entry with id come back asynchronously
-
-        this.getStateManager().addNewItemToState(this.config.stateNames.entries, entry, false); //this.asyncSM.addNewItemToState(this.config.stateNames.entries,entry, false);
-      }
-    }
-  };
-
-  _proto.addComment = function addComment(comment) {
-    if (comment) {
-      cLogger(comment);
-      cLogger("Handling create for comment"); // send the api call and let the completed entry with id come back asynchronously
-
-      this.getStateManager().addNewItemToState(this.config.stateNames.comments, comment, false); //this.asyncSM.addNewItemToState(this.config.stateNames.comments,comment, false);
-    }
   }
   /*
   *  sockets -
@@ -1341,37 +1059,6 @@ var Controller = /*#__PURE__*/function () {
 
   _proto.getCurrentUser = function getCurrentUser() {
     return this.getLoggedInUserId();
-  }
-  /* Compositing Blod Entries from the state functions */
-  ;
-
-  _proto.composeBlogEntry = function composeBlogEntry(entry) {
-    if (!entry) return; // find the user for the entry
-
-    var user = controller.getStateManager().findItemInState(this.config.stateNames.users, {
-      id: entry.createdBy
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
-    if (!user) user = {
-      id: -1,
-      username: 'unknown'
-    };
-    var allComments = controller.getStateManager().getStateByName(this.config.stateNames.comments); // get the comments for the entry
-
-    var comments = allComments.filter(function (comment) {
-      return comment.commentOn === entry.id;
-    });
-    if (!comments) comments = [];
-    entry.user = user;
-    entry.comments = comments;
-  };
-
-  _proto.composeAllBlogEntries = function composeAllBlogEntries() {
-    var _this = this;
-
-    var entries = this.getStateManager().getStateByName(this.config.stateNames.entries);
-    entries.forEach(function (entry) {
-      _this.composeBlogEntry(entry);
-    });
   } //  State Management listening
   ;
 
@@ -1384,40 +1071,10 @@ var Controller = /*#__PURE__*/function () {
       case 'memory':
         {
           cLogger("received state from " + managerName + " for state " + name + " - updating application view");
-          var selectedEntry = this.applicationView.state.selectedEntry;
 
           switch (name) {
             case this.config.stateNames.entries:
               {
-                this.composeBlogEntry(itemAdded);
-                this.applicationView.setState({
-                  isLoggedIn: this.isLoggedIn(),
-                  loggedInUserId: this.getLoggedInUserId(),
-                  selectedEntry: selectedEntry,
-                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
-                });
-                break;
-              }
-
-            case this.config.stateNames.comments:
-              {
-                var updatedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, {
-                  id: itemAdded.commentOn
-                }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
-                cLogger("updating comments for entry " + updatedEntry.id + " = " + updatedEntry.comments.length);
-                cLogger(updatedEntry);
-                this.composeBlogEntry(updatedEntry);
-                cLogger("updating comments for entry " + updatedEntry.id + " = " + updatedEntry.comments.length);
-                cLogger(updatedEntry);
-                this.composeBlogEntry(selectedEntry);
-                cLogger("updating comments for entry " + updatedEntry.id + " = " + updatedEntry.comments.length);
-                this.applicationView.setState({
-                  isLoggedIn: this.isLoggedIn(),
-                  loggedInUserId: this.getLoggedInUserId(),
-                  selectedEntry: selectedEntry,
-                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
-                });
-                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry, true);
                 break;
               }
           }
@@ -1436,42 +1093,10 @@ var Controller = /*#__PURE__*/function () {
       case 'memory':
         {
           cLogger("received state from " + managerName + " for state " + name + " - updating application view");
-          var selectedEntry = this.applicationView.state.selectedEntry;
 
           switch (name) {
-            case this.config.stateNames.entries:
-              {
-                if (selectedEntry) {
-                  if (Object(_util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"])(selectedEntry, itemRemoved)) {
-                    selectedEntry = {};
-                    this.applicationView.hideAllSideBars();
-                  }
-                }
-
-                this.applicationView.setState({
-                  isLoggedIn: this.isLoggedIn(),
-                  loggedInUserId: this.getLoggedInUserId(),
-                  selectedEntry: selectedEntry,
-                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
-                });
-                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry, true);
-                break;
-              }
-
             case this.config.stateNames.comments:
               {
-                var updatedEntry = this.getStateManager().findItemInState(this.config.stateNames.entries, {
-                  id: itemRemoved.commentOn
-                }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
-                this.composeBlogEntry(updatedEntry);
-                this.composeBlogEntry(selectedEntry);
-                this.applicationView.setState({
-                  isLoggedIn: this.isLoggedIn(),
-                  loggedInUserId: this.getLoggedInUserId(),
-                  selectedEntry: selectedEntry,
-                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
-                });
-                this.getStateManager().setStateByName(this.config.stateNames.selectedEntry, selectedEntry, true);
                 break;
               }
           }
@@ -1490,19 +1115,10 @@ var Controller = /*#__PURE__*/function () {
       case 'memory':
         {
           cLogger("received state from " + managerName + " for state " + name + " - updating application view");
-          var selectedEntry = this.applicationView.state.selectedEntry;
 
           switch (name) {
             case this.config.stateNames.entries:
               {
-                this.composeBlogEntry(itemNewValue);
-                this.composeBlogEntry(selectedEntry);
-                this.applicationView.setState({
-                  isLoggedIn: this.isLoggedIn(),
-                  loggedInUserId: this.getLoggedInUserId(),
-                  selectedEntry: selectedEntry,
-                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
-                });
                 break;
               }
           }
@@ -1525,20 +1141,11 @@ var Controller = /*#__PURE__*/function () {
           switch (name) {
             case this.config.stateNames.entries:
               {
-                this.composeAllBlogEntries();
                 break;
               }
 
             case this.config.stateNames.comments:
               {
-                this.composeAllBlogEntries();
-                cLogger(this.getStateManager().getStateByName(this.config.stateNames.entries));
-                this.applicationView.setState({
-                  isLoggedIn: this.isLoggedIn(),
-                  loggedInUserId: this.getLoggedInUserId(),
-                  selectedEntry: {},
-                  entries: this.getStateManager().getStateByName(this.config.stateNames.entries)
-                });
                 break;
               }
 
@@ -1992,104 +1599,232 @@ var AbstractView = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./src/component/BlogEntryView.tsx":
-/*!*****************************************!*\
-  !*** ./src/component/BlogEntryView.tsx ***!
-  \*****************************************/
+/***/ "./src/component/BoardGameSerachSidebarView.ts":
+/*!*****************************************************!*\
+  !*** ./src/component/BoardGameSerachSidebarView.ts ***!
+  \*****************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BlogEntryView; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+/* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/BrowserUtil */ "./src/util/BrowserUtil.ts");
+/* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../network/DownloadManager */ "./src/network/DownloadManager.ts");
+/* harmony import */ var _network_Types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../network/Types */ "./src/network/Types.ts");
+/* harmony import */ var _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../state/MemoryBufferStateManager */ "./src/state/MemoryBufferStateManager.ts");
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+
+  _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
 
 
 
 
-var beLogger = debug__WEBPACK_IMPORTED_MODULE_2___default()('view-ts:blogentry'); // @ts-ignore
 
-function BlogEntryView(_ref) {
-  var entry = _ref.entry,
-      showCommentsHandler = _ref.showCommentsHandler,
-      editEntryHandler = _ref.editEntryHandler,
-      deleteEntryHandler = _ref.deleteEntryHandler;
 
-  if (entry) {
-    beLogger("Entry " + entry.createdBy + " === " + _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getLoggedInUserId());
-    var editButton;
-    var deleteButton;
 
-    if (entry.user.id === _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getLoggedInUserId()) {
-      editButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        type: "button",
-        className: "btn-primary btn-sm rounded p-1 mr-2",
-        "entry-id": entry.id,
-        onClick: editEntryHandler
-      }, "\xA0\xA0Edit \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
-        className: "fas fa-edit"
-      }), "\xA0\xA0");
-      deleteButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        type: "button",
-        className: "btn-warning btn-sm rounded p-1 mr-2",
-        "entry-id": entry.id,
-        onClick: deleteEntryHandler
-      }, "\xA0\xA0Delete \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
-        className: "fas fa-trash-alt"
-      }), "\xA0\xA0");
-    } else {
-      editButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        type: "button",
-        className: "btn-outline-secondary btn-sm rounded p-1 mr-2 ",
-        disabled: true
-      }, "\xA0\xA0Edit \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
-        className: "fas fa-edit"
-      }), "\xA0\xA0");
-      deleteButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        type: "button",
-        className: "btn-outline-secondary btn-sm rounded p-1 mr-2",
-        disabled: true
-      }, "\xA0\xA0Delete \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
-        className: "fas fa-trash-alt"
-      }), "\xA0\xA0");
+
+var vLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('board-game-search-sidebar');
+var vLoggerDetail = debug__WEBPACK_IMPORTED_MODULE_0___default()('board-game-search-sidebar:detail');
+
+var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
+  _inheritsLoose(BoardGameSearchSidebarView, _SidebarView);
+
+  function BoardGameSearchSidebarView(applicationView, htmlDocument, stateManager) {
+    var _this;
+
+    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.boardGameSearchSideBar, applicationView.state.uiPrefs.boardGameSearchSideBar, stateManager) || this;
+    _this.config = applicationView.state; // handler binding
+
+    _this.updateView = _this.updateView.bind(_assertThisInitialized(_this));
+    _this.eventClickItem = _this.eventClickItem.bind(_assertThisInitialized(_this));
+    _this.handleSearch = _this.handleSearch.bind(_assertThisInitialized(_this));
+    _this.handleSearchResultsCB = _this.handleSearchResultsCB.bind(_assertThisInitialized(_this)); // register state change listening
+
+    _this.localisedSM = new _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_6__["default"]();
+
+    _this.localisedSM.addChangeListenerForName(_this.config.stateNames.bggSearchResults, _assertThisInitialized(_this));
+
+    vLogger(_this.localisedSM.getStateByName(_this.config.stateNames.bggSearchResults));
+    return _this;
+  } // @ts-ignore
+
+
+  var _proto = BoardGameSearchSidebarView.prototype;
+
+  _proto.changeSearchButton = function changeSearchButton(enable) {
+    if (enable === void 0) {
+      enable = false;
     }
 
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: "col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: "card",
-      style: {
-        width: "350px"
-      }
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: "card-header"
-    }, entry.title, "\xA0\xA0\xA0\xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
-      className: "text-decoration-none"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
-      className: "fas fa-comments text-secondary",
-      "entry-id": entry.id,
-      onClick: showCommentsHandler
-    }), "\xA0\xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
-      className: "badge badge-pill badge-primary text-right",
-      "entry-id": entry.id,
-      onClick: showCommentsHandler
-    }, "\xA0", entry.comments.length, "\xA0"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: "card-body"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
-      className: "card-text"
-    }, entry.content), editButton, deleteButton), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: "card-footer text-right text-muted"
-    }, entry.user.username, " on ", moment__WEBPACK_IMPORTED_MODULE_1___default()(entry.changedOn, 'YYYYMMDDHHmmss').format('DD/MM/YYYY'))));
-  } else {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null);
-  }
-}
+    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_3__["default"].removeAllChildren(this.buttonEl);
+
+    if (enable) {
+      if (this.buttonEl) this.buttonEl.removeAttribute("disabled");
+      if (this.buttonEl) this.buttonEl.innerHTML = 'Search';
+    } else {
+      if (this.buttonEl) this.buttonEl.setAttribute("disabled", "true");
+      if (this.buttonEl) this.buttonEl.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...';
+    }
+  };
+
+  _proto.handleSearch = function handleSearch(event) {
+    vLogger("Handling search");
+    event.preventDefault(); // do we have anything to search for?
+
+    var queryText = this.queryEl.value.trim();
+    if (queryText.length == 0) return; // ok, have a search term, lets start a search
+
+    this.changeSearchButton(false); // get the query string from state obj
+
+    var query = this.config.apis.bggSearchCall;
+    vLoggerDetail("query string is now " + query); // replace the @ symbol with the query
+
+    var regex = /@/;
+    query = query.replace(regex, queryText);
+    vLoggerDetail("query string is now " + query);
+    var request = {
+      url: this.config.apis.bggSearch,
+      type: _network_Types__WEBPACK_IMPORTED_MODULE_5__["RequestType"].POST,
+      params: {
+        query: query
+      },
+      callback: this.handleSearchResultsCB,
+      associatedStateName: this.config.stateNames.bggSearchResults
+    };
+    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_4__["default"].addApiRequest(request, true);
+  };
+
+  _proto.handleSearchResultsCB = function handleSearchResultsCB(data, status, associatedStateName) {
+    this.changeSearchButton(true);
+    vLogger("callback for bgg search " + associatedStateName + " with status " + status + " - ");
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      vLoggerDetail(data);
+      vLoggerDetail(data.data['findBoardGames']);
+      this.localisedSM.setStateByName(this.config.stateNames.bggSearchResults, data.data['findBoardGames'], true);
+    }
+  };
+
+  _proto.onDocumentLoaded = function onDocumentLoaded() {
+    _SidebarView.prototype.onDocumentLoaded.call(this); // get a link to the search button and search field and form
+    // @ts-ignore
+
+
+    this.formEl = this.document.getElementById(this.uiConfig.dom.formId); // @ts-ignore
+
+    this.buttonEl = this.document.getElementById(this.uiConfig.dom.buttonId); // @ts-ignore
+
+    this.queryEl = this.document.getElementById(this.uiConfig.dom.queryId);
+    this.formEl.addEventListener('submit', this.handleSearch);
+  };
+
+  _proto.getIdForStateItem = function getIdForStateItem(name, item) {
+    return item.id;
+  };
+
+  _proto.getLegacyIdForStateItem = function getLegacyIdForStateItem(name, item) {
+    return item.id;
+  };
+
+  _proto.getDisplayValueForStateItem = function getDisplayValueForStateItem(name, item) {
+    return item.name + " (" + item.year + ")     ";
+  };
+
+  _proto.getModifierForStateItem = function getModifierForStateItem(name, item) {
+    return 'normal';
+  };
+
+  _proto.getSecondaryModifierForStateItem = function getSecondaryModifierForStateItem(name, item) {
+    return 'normal';
+  };
+
+  _proto.eventClickItem = function eventClickItem(event) {
+    event.preventDefault();
+    console.log(event.target); // @ts-ignore
+
+    var boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
+
+    var dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId); // @ts-ignore
+
+    vLoggerDetail("Board Game " + event.target + " with id " + boardGameId + " clicked from " + dataSource);
+    alert("Implement board game search item clicked");
+  };
+
+  _proto.updateView = function updateView(name, newState) {
+    if (name === this.config.stateNames.bggSearchResults) {
+      vLogger("Updating for recent searches");
+      newState = this.localisedSM.getStateByName(this.config.stateNames.bggSearchResults);
+      vLogger(newState);
+      this.createResultsForState(name, newState);
+    }
+  };
+
+  _proto.getDragData = function getDragData(event) {
+    // use the actual id to pass the user to the droppable target
+    // @ts-ignore
+    var boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
+
+    vLoggerDetail("Board Game " + event.target.innerText + " with id " + boardGameId + " dragging");
+    var boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {
+      id: parseInt(boardGameId)
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    vLoggerDetail(boardGame);
+    boardGame[this.config.ui.draggable.draggedType] = this.config.ui.draggable.draggedTypeBoardGame;
+    boardGame[this.config.ui.draggable.draggedFrom] = this.config.ui.draggable.draggedFromBoardGameSearch;
+    return boardGame;
+  };
+
+  _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {
+    event.preventDefault(); // @ts-ignore
+
+    var boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
+
+    var dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId); // @ts-ignore
+
+    vLoggerDetail("Board Game " + event.target + " with id " + boardGameId + " delete clicked from " + dataSource);
+    var boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {
+      id: parseInt(boardGameId)
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    vLogger(boardGameId);
+
+    if (boardGameId) {
+      this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], true);
+    }
+  };
+
+  _proto.getBadgeValue = function getBadgeValue(name, item) {
+    return 0;
+  };
+
+  return BoardGameSearchSidebarView;
+}(_SidebarView__WEBPACK_IMPORTED_MODULE_1__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (BoardGameSearchSidebarView);
 
 /***/ }),
 
@@ -2450,144 +2185,6 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
 /***/ }),
 
-/***/ "./src/component/DetailsSidebarView.ts":
-/*!*********************************************!*\
-  !*** ./src/component/DetailsSidebarView.ts ***!
-  \*********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
-/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-
-  _setPrototypeOf(subClass, superClass);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-
-
-
-var viewLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('view-ts:details');
-
-var DetailsSidebarView = /*#__PURE__*/function (_SidebarView) {
-  _inheritsLoose(DetailsSidebarView, _SidebarView);
-
-  function DetailsSidebarView(applicationView, htmlDocument, stateManager) {
-    var _this;
-
-    _this = _SidebarView.call(this, applicationView, htmlDocument, applicationView.state.ui.entryDetailsSideBar, applicationView.state.uiPrefs.entryDetailsSideBar, stateManager) || this; // handler binding
-
-    _this.updateView = _this.updateView.bind(_assertThisInitialized(_this));
-    _this.eventClickItem = _this.eventClickItem.bind(_assertThisInitialized(_this)); // field and form elements
-
-    _this.formEl = document.getElementById(_this.uiConfig.dom.formId);
-    _this.titleEl = document.getElementById(_this.uiConfig.dom.titleId);
-    _this.contentEl = document.getElementById(_this.uiConfig.dom.contentId);
-    _this.changeOnEl = document.getElementById(_this.uiConfig.dom.changedOnId); // register state change listening
-
-    stateManager.addChangeListenerForName(_this.config.stateNames.selectedEntry, _assertThisInitialized(_this)); // listen for form submissions
-
-    if (_this.formEl) {
-      // @ts-ignore
-      _this.formEl.addEventListener('submit', _this.eventClickItem);
-    }
-
-    return _this;
-  }
-
-  var _proto = DetailsSidebarView.prototype;
-
-  _proto.getIdForStateItem = function getIdForStateItem(name, item) {
-    return item.id;
-  };
-
-  _proto.getLegacyIdForStateItem = function getLegacyIdForStateItem(name, item) {
-    return item.id;
-  };
-
-  _proto.eventClickItem = function eventClickItem(event) {
-    event.preventDefault();
-    viewLogger('Handling submit Details Sidebar View');
-    viewLogger(event.target);
-    var entry = this.stateManager.getStateByName(this.config.stateNames.selectedEntry);
-    viewLogger(entry);
-    entry.title = this.titleEl ? this.titleEl.value.trim() : '';
-    entry.content = this.contentEl ? this.contentEl.value.trim() : '';
-    entry.changedOn = parseInt(moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYYMMDDHHmmss'));
-    viewLogger(entry);
-    if (this.titleEl) this.titleEl.value = '';
-    if (this.contentEl) this.contentEl.value = '';
-    if (this.changeOnEl) this.changeOnEl.innerText = 'Last Changed On:';
-    this.applicationView.handleUpdateEntry(entry);
-  };
-
-  _proto.updateView = function updateView(name, newState) {
-    viewLogger('Handling update of Details Sidebar View');
-    viewLogger(newState);
-    var entry = newState;
-
-    if (entry && entry.title) {
-      if (this.titleEl) this.titleEl.value = entry.title;
-      if (this.contentEl) this.contentEl.value = entry.content;
-      if (this.changeOnEl) this.changeOnEl.innerText = "Last Changed On: " + moment__WEBPACK_IMPORTED_MODULE_0___default()(entry.changedOn, 'YYYYMMDDHHmmss').format('DD/MM/YYYY');
-    } else {
-      if (this.titleEl) this.titleEl.value = '';
-      if (this.contentEl) this.contentEl.value = '';
-      if (this.changeOnEl) this.changeOnEl.innerText = "Last Changed On: ";
-    }
-  };
-
-  _proto.getDisplayValueForStateItem = function getDisplayValueForStateItem(name, item) {
-    return "";
-  };
-
-  _proto.getDragData = function getDragData(event) {};
-
-  _proto.getModifierForStateItem = function getModifierForStateItem(name, item) {
-    return "";
-  };
-
-  _proto.getSecondaryModifierForStateItem = function getSecondaryModifierForStateItem(name, item) {
-    return "";
-  };
-
-  _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {};
-
-  _proto.getBadgeValue = function getBadgeValue(name, item) {
-    return 0;
-  };
-
-  return DetailsSidebarView;
-}(_SidebarView__WEBPACK_IMPORTED_MODULE_2__["default"]);
-
-/* harmony default export */ __webpack_exports__["default"] = (DetailsSidebarView);
-
-/***/ }),
-
 /***/ "./src/component/SidebarView.ts":
 /*!**************************************!*\
   !*** ./src/component/SidebarView.ts ***!
@@ -2887,6 +2484,8 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
         var childElement = _this2.createResultForItem(_this2.config.stateNames.users, user, _this2.uiConfig.dom.resultDataSourceFavUsers);
 
         childElement.addEventListener('click', _this2.eventClickItem);
+        childElement.setAttribute('draggable', 'true');
+        childElement.addEventListener('dragstart', _this2.eventStartDrag);
 
         _this2.favUsersDiv.appendChild(childElement);
       }
@@ -2906,6 +2505,11 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
       if (user) {
         var childElement = _this3.createResultForItem(_this3.config.stateNames.users, user, _this3.uiConfig.dom.resultDataSourceBlockedUsers);
+
+        childElement.setAttribute('draggable', 'false');
+        childElement.addEventListener('dragstart', function (event) {
+          event.preventDefault();
+        });
 
         _this3.blockedUsersDiv.appendChild(childElement);
       }
@@ -3180,6 +2784,42 @@ function _extends() {
   return _extends.apply(this, arguments);
 }
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
 
 var apiLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('api-ts');
 
@@ -3187,6 +2827,44 @@ var ApiUtil = /*#__PURE__*/function () {
   function ApiUtil() {}
 
   var _proto = ApiUtil.prototype;
+
+  _proto.postFetchJSON = /*#__PURE__*/function () {
+    var _postFetchJSON = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url, query) {
+      var postParameters, response;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              postParameters = {
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  query: query
+                })
+              };
+              _context.next = 3;
+              return fetch(url, postParameters);
+
+            case 3:
+              response = _context.sent;
+              return _context.abrupt("return", response.json());
+
+            case 5:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    function postFetchJSON(_x, _x2) {
+      return _postFetchJSON.apply(this, arguments);
+    }
+
+    return postFetchJSON;
+  }();
 
   _proto.fetchJSON = function fetchJSON(url, parameters, callback, queueType, requestId) {
     fetch(url, parameters).then(function (response) {

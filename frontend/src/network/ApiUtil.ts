@@ -6,6 +6,18 @@ const apiLogger = debug('api-ts');
 
 
 class ApiUtil {
+
+  public async postFetchJSON(url:string,query:any) {
+      const postParameters = {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({query})
+      };
+
+      const response = await fetch(url, postParameters);
+      return response.json();
+  }
+
   private fetchJSON(url:string, parameters:any,callback:ManagerCallbackFunction,queueType:queueType,requestId:string) {
     fetch(url, parameters)
       .then((response) => {

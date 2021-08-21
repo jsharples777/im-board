@@ -3,15 +3,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import debug from 'debug';
-import moment from 'moment';
 
 import controller from './Controller';
-import CommentSidebarView from "./component/CommentSidebarView";
-import BlogEntryView from "./component/BlogEntryView";
-import {isSame} from "./util/EqualityFunctions";
-import DetailsSidebarView from "./component/DetailsSidebarView";
 import UserSearchSidebarView from "./component/UserSearchSidebarView";
 import ChatSidebarView from "./component/ChatSidebarView";
+import BoardGameSearchSidebarView from "./component/BoardGameSerachSidebarView";
 
 
 const logger = debug('app');
@@ -27,6 +23,8 @@ class Root extends React.Component{
 
     // @ts-ignore
     private userSearchView: UserSearchSidebarView;
+    // @ts-ignore
+    private bggSearchView: BoardGameSearchSidebarView;
     // @ts-ignore
     private chatView: ChatSidebarView;
 
@@ -52,6 +50,7 @@ class Root extends React.Component{
                 comments: 'comments',
                 selectedEntry: 'selectedEntry',
                 recentUserSearches: 'recentUserSearches',
+                bggSearchResults: 'bggSearchResults'
             },
             apis: {
                 users: '/users',
@@ -59,6 +58,17 @@ class Root extends React.Component{
                 entry: '/blog',
                 comments: '/comment',
                 login: '/login',
+                bggSearch: '/graphql',
+                bggSearchCall: 'query {\n' +
+                    '  findBoardGames(query: "@") {\n' +
+                    '    id, name, year\n' +
+                    '  }\n' +
+                    '} ',
+                bggSearchCallById: 'query {\n' +
+                    '  getBoardGameDetails(id:@) {\n' +
+                    '    id,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' +
+                    '  }\n' +
+                    '}',
             },
             ui: {
                 draggable: {
@@ -85,19 +95,6 @@ class Root extends React.Component{
                     boardGameSearchId: 'navigationItemBoardGameSearch',
                     userSearchId: 'navigationItemUserSearch',
                     chatId: 'navigationItemChat'
-                },
-                blogEntry: {},
-                entryDetailsSideBar: {
-                    dom: {
-                        sideBarId: 'detailsSideBar',
-                        formId: 'details',
-                        titleId: 'title',
-                        contentId: 'content',
-                        changedOnId: 'changedOn',
-                        resultDataKeyId: 'id',
-                        isDraggable: false,
-                        isClickable: true,
-                    },
                 },
                 chatSideBar: {
                     dom: {
@@ -183,11 +180,52 @@ class Root extends React.Component{
                         },
                     },
                 },
+                boardGameSearchSideBar: {
+                    dom: {
+                        sideBarId: 'boardGameSearchSidebar',
+                        resultsId: 'bggSearchResults',
+                        resultsElementType: 'a',
+                        resultsElementAttributes: [
+                            ['href', '#'],
+                        ],
+                        resultsClasses: 'list-group-item my-list-item truncate-notification list-group-item-action',
+                        resultDataKeyId: 'bgg-id',
+                        resultLegacyDataKeyId: 'bgg-id',
+                        resultDataSourceId: 'data-source',
+                        resultDataSourceValue: 'bggSearch',
+                        modifierClassNormal: 'list-group-item-primary',
+                        modifierClassInactive: 'list-group-item-light',
+                        modifierClassActive: 'list-group-item-info',
+                        modifierClassWarning: 'list-group-item-danger',
+                        iconNormal: '   <i class="fas fa-dice"></i>',
+                        iconInactive: '   <i class="fas fa-dice"></i>',
+                        iconActive: '   <i class="fas fa-dice"></i>',
+                        iconWarning: '  <i class="fas fa-dice"></i>',
+                        resultContentDivClasses: 'd-flex w-100 justify-content-between',
+                        resultContentTextElementType: 'span',
+                        resultContentTextClasses: 'mb-1',
+                        isDraggable: true,
+                        isClickable: true,
+                        isDeleteable: true,
+                        deleteButtonClasses: 'btn btn-circle btn-xsm',
+                        deleteButtonText: '',
+                        deleteButtonIconClasses:'fas fa-trash-alt',
+                        formId: 'bggSearch',
+                        queryId: 'queryText',
+                        buttonId: 'bggSearchButton'
+                    },
+                },
             },
             uiPrefs: {
                 navigation: {},
                 blogEntry: {},
                 userSearchSideBar: {
+                    view: {
+                        location: 'left',
+                        expandedSize: '35%',
+                    },
+                },
+                boardGameSearchSideBar: {
                     view: {
                         location: 'left',
                         expandedSize: '35%',
@@ -199,12 +237,6 @@ class Root extends React.Component{
                         expandedSize: '50%',
                     },
                 },
-                entryDetailsSideBar: {
-                    view: {
-                        location: 'left',
-                        expandedSize: '35%',
-                    },
-                }
             },
             controller: {
                 events: {
@@ -221,19 +253,9 @@ class Root extends React.Component{
         this.cancelDelete = this.cancelDelete.bind(this);
         this.confirmDelete = this.confirmDelete.bind(this);
 
-        this.handleShowMyEntries = this.handleShowMyEntries.bind(this);
-        this.handleSelectEntryComments = this.handleSelectEntryComments.bind(this);
-        this.handleShowEditEntry = this.handleShowEditEntry.bind(this);
-        this.handleUpdateEntry = this.handleUpdateEntry.bind(this);
-        this.handleAddEntry = this.handleAddEntry.bind(this);
-        this.handleAddComment = this.handleAddComment.bind(this);
-        this.handleDeleteEntry = this.handleDeleteEntry.bind(this);
-        this.handleDeleteComment = this.handleDeleteComment.bind(this);
-
-
-
         this.handleShowUserSearch = this.handleShowUserSearch.bind(this);
         this.handleShowChat = this.handleShowChat.bind(this);
+        this.handleShowBGGSearch = this.handleShowBGGSearch.bind(this);
 
         controller.connectToApplication(this, window.localStorage);
     }
@@ -253,32 +275,8 @@ class Root extends React.Component{
 
     render() {
         logger("Rendering App");
-        // @ts-ignore
-        logger(this.state.entries);
-        // @ts-ignore
-        logger(`User filter ${this.state.applyUserFilter}`);
-
-        // @ts-ignore
-        let entriesToDisplay = this.state.entries;
-        // @ts-ignore
-        if (this.state.applyUserFilter && controller.isLoggedIn() && (controller.getLoggedInUserId() > 0)) {
-            logger(`fitlering entries`);
-            entriesToDisplay = entriesToDisplay.filter((entry:any) => {
-                return (entry.createdBy === controller.getLoggedInUserId());
-            });
-        }
-        const blog = entriesToDisplay.map((entry:any, index:number) =>
-            <BlogEntryView
-                key={index}
-                entry={entry}
-                showCommentsHandler={this.handleSelectEntryComments}
-                editEntryHandler={this.handleShowEditEntry}
-                deleteEntryHandler={this.handleDeleteEntry}
-            />
-        );
         return (
             <div className="Root row ml-1">
-                {blog}
             </div>
         );
     }
@@ -298,45 +296,30 @@ class Root extends React.Component{
         this.modalEl.classList.add(this.state.ui.alert.hideClass);
         event.preventDefault();
         // @ts-ignore
-        let entryId = this.modalEl.getAttribute(this.state.controller.events.entry.eventDataKeyId);
-        logger(`Handling Delete Entry ${entryId}`);
-        if (entryId) {
-            // find the entry from the state manager
-            entryId = parseInt(entryId);
-            // @ts-ignore
-            const entry = controller.getStateManager().findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
-            if (entry) {
-                // delete the entry using the controller and remove the state manager
-                controller.deleteEntry(entry);
-                // @ts-ignore
-                controller.getStateManager().removeItemFromState(this.state.stateNames.entries,entry,isSame);
-            }
-        }
+        let id = this.modalEl.getAttribute(this.state.controller.events.entry.eventDataKeyId);
+        logger(`Handling Delete with id ${id}`);
     }
 
     async componentDidMount() {
         logger('component Did Mount');
 
-        // add the additional views and configure them
-        //this.commentView = new CommentSidebarView(this, document,controller.getStateManager());
-        //this.commentView.onDocumentLoaded(); // reset the view state
 
         this.chatView = new ChatSidebarView(this,document,controller.getStateManager());
         this.chatView.onDocumentLoaded();
 
-        this.detailsView = new DetailsSidebarView(this,document,controller.getStateManager());
-        this.detailsView.onDocumentLoaded();
-
-
         this.userSearchView = new UserSearchSidebarView(this,document,controller.getStateManager());
         this.userSearchView.onDocumentLoaded();
+
+
+        this.bggSearchView = new BoardGameSearchSidebarView(this,document,controller.getStateManager());
+        this.bggSearchView.onDocumentLoaded();
 
         // navigation item handlers
         if (document) {
             // @ts-ignore
             document.getElementById(this.state.ui.navigation.showMyFavourites).addEventListener('click', () => {});
             // @ts-ignore
-            document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', () => {});
+            document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', this.handleShowBGGSearch);
             // @ts-ignore
             document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch);
             // @ts-ignore
@@ -367,25 +350,9 @@ class Root extends React.Component{
     }
 
     hideAllSideBars() {
-        //this.commentView.eventHide(null);
-        //this.detailsView.eventHide(null);
-    }
-
-    handleShowMyEntries(event:Event) {
-        logger('Handling Show My Entries');
-        this.hideAllSideBars();
-        if (!controller.isLoggedIn()) {
-            // @ts-ignore
-            window.location.href = this.state.apis.login;
-            return;
-        }
-        this.setState({applyUserFilter:true});
-    }
-
-    handleAllEntries(event:Event) {
-        logger('Handling Show All Entries');
-        this.setState({applyUserFilter:false});
-        this.hideAllSideBars();
+        this.chatView.eventHide(null);
+        this.userSearchView.eventHide(null);
+        this.bggSearchView.eventHide(null);
     }
 
     handleShowUserSearch(event:Event) {
@@ -414,8 +381,8 @@ class Root extends React.Component{
         this.chatView.eventShow(event);
     }
 
-    handleAddEntry(event:Event) {
-        logger('Handling Add Entry');
+    handleShowBGGSearch(event:Event) {
+        logger('Handling Show BGG Search View');
         event.preventDefault();
         this.hideAllSideBars();
         // prevent anything from happening if we are not logged in
@@ -424,152 +391,15 @@ class Root extends React.Component{
             window.location.href = this.state.apis.login;
             return;
         }
-        // find the current user
-        // @ts-ignore
-        let creator = controller.getStateManager().findItemInState(this.state.stateNames.users,
-            {id: controller.getLoggedInUserId()},
-             isSame);
-        logger(creator);
-        // create an empty entry
-        let entry = {
-            title: '',
-            content: '',
-            createdBy: creator.id,
-            changedOn: parseInt(moment().format('YYYYMMDDHHmmss')),
-            Comments: [],
-            User: {
-                id: creator.id,
-                username: creator.username
-            }
-        }
-        logger(entry);
-        this.setState({selectedEntry:entry});
-        // @ts-ignore
-        controller.getStateManager().setStateByName(this.state.stateNames.selectedEntry,entry);
-        this.detailsView.eventShow(event);
+        this.bggSearchView.eventShow(event);
     }
 
-    handleAddComment(event:Event) {
-        logger('Handling Add Comment');
-        event.preventDefault();
-        logger('entry comments');
-        // @ts-ignore
-        let entry = controller.getStateManager().getStateByName(this.state.stateNames.selectedEntry);
-        logger(entry.comments.length);
-
-        // get the comment element
-        // @ts-ignore
-        let commentEl:HTMLInputElement = document.getElementById(this.state.ui.commentSideBar.dom.commentId);
-        if (commentEl && commentEl.value.trim().length === 0) return;
-
-        // prevent anything from happening if we are not logged in
-        if (!controller.isLoggedIn()) {
-            // @ts-ignore
-            window.location.href = this.state.apis.login;
-            return;
-        }
-        // find the current user
-        // @ts-ignore
-        let creator = controller.getStateManager().findItemInState(this.state.stateNames.users,
-            {id: controller.getLoggedInUserId()},
-                  isSame);
-        logger('user');
-        logger(creator);
-        // find the selected entry
-        if (entry && commentEl) {
-            // create an empty comment
-            // @ts-ignore
-
-            let comment = {
-                createdBy: creator.id,
-                commentOn: entry.id,
-                changedOn: parseInt(moment().format('YYYYMMDDHHmmss')),
-                content: commentEl.value.trim()
-            }
-            commentEl.value = '';
-            logger('comment');
-            logger(comment);
-            controller.addComment(comment);
-
-        }
-    }
-
-    handleSelectEntryComments(event:MouseEvent) {
-        logger('Handling Select Entry Comments');
-        event.preventDefault();
-        this.hideAllSideBars();
-        // @ts-ignore
-        let entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
-        logger(`Handling Show Edit Entry ${entryId}`);
-        if (entryId) {
-            // find the entry from the state manager
-            entryId = parseInt(entryId);
-            // @ts-ignore
-            const entry = controller.getStateManager().findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
-            logger(entry);
-            if (entry) {
-                // select the entry and open the details sidebar
-                this.setState({selectedEntry:entry});
-                // @ts-ignore
-                controller.getStateManager().setStateByName(this.state.stateNames.selectedEntry,entry);
-                this.commentView.eventShow(event);
-            }
-        }
-    }
-
-    handleShowEditEntry(event:Event) {
-        event.preventDefault();
-        this.hideAllSideBars();
-        // @ts-ignore
-        let entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
-        logger(`Handling Show Edit Entry ${entryId}`);
-        if (entryId) {
-            // find the entry from the state manager
-            entryId = parseInt(entryId);
-            // @ts-ignore
-            const entry = controller.getStateManager().findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
-            logger(entry);
-            if (entry) {
-                // select the entry and open the details sidebar
-                this.setState({selectedEntry:entry});
-                // @ts-ignore
-                controller.getStateManager().setStateByName(this.state.stateNames.selectedEntry,entry);
-                this.detailsView.eventShow(event);
-            }
-        }
-    }
-
-    handleDeleteEntry(event:Event) {
-        event.preventDefault();
-        this.hideAllSideBars();
-        // @ts-ignore
-        let entryId = event.target.getAttribute(this.state.controller.events.entry.eventDataKeyId);
-        logger(`Handling Delete Entry ${entryId}`);
-        if (entryId) {
-            // @ts-ignore
-            this.modalEl.setAttribute(this.state.controller.events.entry.eventDataKeyId,entryId);
-            // find the entry from the state manager
-            entryId = parseInt(entryId);
-            // @ts-ignore
-            const entry = controller.getStateManager().findItemInState(this.state.stateNames.entries,{id:entryId},isSame);
-            this.alert(entry.title,"Are you sure you want to delete this blog entry?")
-        }
-    }
-
-    handleDeleteComment(id:number):void {
-        controller.deleteComment(id);
-    }
-
-    // @ts-ignore
-    handleUpdateEntry(entry:any) {
-        this.hideAllSideBars();
-        controller.updateEntry(entry);
-    }
 }
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
-localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
+//localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
+localStorage.debug = 'app controller-ts api-ts board-game-search-sidebar board-game-search-sidebar:detail';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

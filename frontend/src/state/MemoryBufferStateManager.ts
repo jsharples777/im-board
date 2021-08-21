@@ -20,7 +20,7 @@ class MemoryBufferStateManager extends AbstractStateManager {
 
   protected applicationState:stateValue[];
 
-  protected constructor() {
+  public constructor() {
     super('memory');
     this.applicationState = [];
     this.forceSaves = true;
