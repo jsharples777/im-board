@@ -45,7 +45,7 @@ export default abstract class AbstractView implements StateChangeListener {
     protected abstract getDisplayValueForStateItem(name: string, item: any): string;
     protected abstract getModifierForStateItem(name: string, item: any): string;
     protected abstract getSecondaryModifierForStateItem(name: string, item: any): string;
-    protected abstract getBadgeValue(name:string, item:any): string;
+    protected abstract getBadgeValue(name:string, item:any): number;
 
     protected abstract updateView(name: string, newState: any): void;
 
@@ -92,14 +92,17 @@ export default abstract class AbstractView implements StateChangeListener {
             contentEl.appendChild(textEl);
 
             if (domConfig.hasBadge) {
-                let badgeEl:HTMLElement = this.document.createElement(domConfig.badgeElementType);
-                browserUtil.addRemoveClasses(badgeEl,domConfig.badgeClasses);
-                badgeEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
-                badgeEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
-                badgeEl.setAttribute(domConfig.resultDataSourceId, dataSource);
-                contentEl.appendChild(badgeEl);
-                badgeEl.innerHTML = "&nbsp;&nbsp;&nbsp;" + this.getBadgeValue(name,item) + "&nbsp;&nbsp;&nbsp;";
-                browserUtil.addAttributes(badgeEl,domConfig.badgeElementAttributes);
+                const badgeValue = this.getBadgeValue(name,item);
+                if (badgeValue > 0) {
+                    let badgeEl: HTMLElement = this.document.createElement(domConfig.badgeElementType);
+                    browserUtil.addRemoveClasses(badgeEl, domConfig.badgeClasses);
+                    badgeEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+                    badgeEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+                    badgeEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+                    contentEl.appendChild(badgeEl);
+                    badgeEl.innerHTML = `&nbsp;&nbsp;&nbsp;${badgeValue}&nbsp;&nbsp;&nbsp;`;
+                    browserUtil.addAttributes(badgeEl, domConfig.badgeElementAttributes);
+                }
             }
 
             if (domConfig.isDeleteable) {

@@ -244,7 +244,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         // we get this for all changes to a room, if the username is us can safely ignore
         if (users.username === this.currentUsername) return;
 
-        this.ensureChatLogExists(users.room);
+        let log:ChatLog = this.ensureChatLogExists(users.room);
 
         let index = this.chatLogs.findIndex((log) => log.roomName === users.room);
         if (index >= 0) {
@@ -252,8 +252,8 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             let log = this.chatLogs[index];
             log.users = users.userList;
             this.saveLogs();
-
         }
+        this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(log,false));
     }
 
     receivedLeftRoom(users: JoinLeft): void {
@@ -264,12 +264,15 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
         if (!this.isUserInBlockedList(invite.from)) {
             let chatLog:ChatLog = this.ensureChatLogExists(invite.room);
-            // add the inviter to the user list for the room
-            chatLog.users.push(invite.from);
+            // add the inviter to the user list for the room, if not already added
+            if ((chatLog.users.findIndex((user) => user === invite.from)) < 0) chatLog.users.push(invite.from);
+
             this.saveLogs();
             cmLogger(`Joining chat ${invite.room}`);
             cmLogger(invite);
-            socketManager.joinChat(this.getCurrentUser(),invite.room)
+            socketManager.joinChat(this.getCurrentUser(),invite.room);
+            this.chatListeners.forEach((listener) => listener.handleChatLogsUpdated());
+
         }
         else {
             cmLogger(`User ${invite.from} blocked`);
@@ -328,17 +331,24 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         return this.ensureChatLogExists(room);
     }
 
-    receiveMessage(message: Message): void {
+    receiveMessage(message: Message,wasOffline:boolean = false): void {
         // double check the message is not from us somehow
         if (message.from === this.getCurrentUser()) return;
+        // don't receive messages from the blocked users
+        if (!this.isUserInBlockedList(message.from)) {
 
-        // ok, so we need to add the message to the chat log, increase the new message count, save the logs and pass it on
-        let chatLog = this.ensureChatLogExists(message.room);
-        this.addMessageToChatLog(chatLog,message);
-        cmLogger(`Message received`);
-        cmLogger(message);
+            // ok, so we need to add the message to the chat log, increase the new message count, save the logs and pass it on
+            let chatLog = this.ensureChatLogExists(message.room);
+            this.addMessageToChatLog(chatLog, message);
+            cmLogger(`Message received`);
+            cmLogger(message);
 
-        this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(chatLog));
+            this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(chatLog,wasOffline));
+        }
+        else {
+            cmLogger(`Message received from user ${message.from} - is in blocked list, not passed on.`)
+        }
+
     }
 
     receiveQueuedInvites(invites: any): void {
@@ -351,8 +361,9 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     receiveQueuedMessages(messages: any): void {
         // just loop through a process each message
         messages.forEach((message:Message) => {
-           this.receiveMessage(message)
+           this.receiveMessage(message,true)
         });
+        this.chatListeners.forEach((listener) => listener.handleOfflineMessagesReceived(messages));
     }
 
     joinChat(room: string): void {
@@ -387,11 +398,15 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         if (this.getCurrentUser().trim().length === 0) return;  // we are not logged in
         // can't accidentally send an invite to blacklisted
         if (this.isUserInBlockedList(to)) return;
-        socketManager.sendInvite(this.getCurrentUser(),to, room);
+        // only send an invite if the user isn't already in the room
+        const log:ChatLog = this.ensureChatLogExists(room);
+        if (log.users.findIndex((user) =>  user === to) < 0) {
+            socketManager.sendInvite(this.getCurrentUser(),to, room);
+        }
     }
 
-    sendMessage(room: string, content: string): void {
-        if (this.getCurrentUser().trim().length === 0) return;  // we are not logged in
+    sendMessage(room: string, content: string): Message|null {
+        if (this.getCurrentUser().trim().length === 0) return null;  // we are not logged in
         let log = this.ensureChatLogExists(room);
         // send the message
         let created = parseInt(moment().format('YYYYMMDDHHmmss'));
@@ -405,6 +420,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             created: created
         }
         this.addMessageToChatLog(log, sent);
+        return sent;
     }
 
     public getChatLogs():ChatLog[] {
@@ -413,12 +429,17 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
 
     public startChatWithUser(username:string) {
-        cmLogger(`Starting chat with ${username}`);
-        // first thing, do we have a chat log with this user (and just this user) already?
-        let chatLog:ChatLog = this.ensureChatLogExistsWithUser(username);
-        // invite the other user
-        socketManager.sendInvite(this.getCurrentUser(),username,chatLog.roomName);
-        // ok, lets connect to the server
-        socketManager.joinChat(this.getCurrentUser(),chatLog.roomName);
+        if (username) {
+            cmLogger(`Starting chat with ${username}`);
+            // first thing, do we have a chat log with this user (and just this user) already?
+            let chatLog: ChatLog = this.ensureChatLogExistsWithUser(username);
+            this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(chatLog,false));
+
+
+            // invite the other user
+            socketManager.sendInvite(this.getCurrentUser(), username, chatLog.roomName);
+            // ok, lets connect to the server
+            socketManager.joinChat(this.getCurrentUser(), chatLog.roomName);
+        }
     }
 }

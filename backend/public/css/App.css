@@ -161,7 +161,7 @@ small-heading {
     height: 50px;
     padding: 7px 10px;
     border-radius: 25px;
-    font-size: 10px;
+    font-size: 14px;
     text-align: center;
 }
 .btn-circle.btn-xl {
@@ -172,3 +172,57 @@ small-heading {
     font-size: 12px;
     text-align: center;
 }
+
+.room {
+    background: #EAEAEA;
+    padding:0.5em;
+}
+.messages {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    width: auto !important;
+    overflow:auto;
+    min-height:400px;
+    max-height:400px;
+}
+
+.message{
+    width: 75%;
+    margin: 0.5em;
+}
+
+.my-message {
+    align-self: flex-end;
+}
+
+.message-sender{
+    font-size: x-small;
+    opacity: 0.7;
+    margin-left:5px;
+}
+
+.message-content {
+    font-size: small;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    color: rgba(0,0,0,.7);
+    background: white;
+}
+
+
+.my-message-content {
+    font-size: small;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    color: white;
+    background: #408EEA;
+}
+
+
+@media(max-width : 30em){
+    .room.messages{
+        flex: 1;
+    }
+}
+

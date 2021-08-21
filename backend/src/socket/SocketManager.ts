@@ -1,4 +1,4 @@
-       import debug = require('debug');
+import debug = require('debug');
 import {Server}  from 'socket.io';
 import {Server as httpServer} from 'http';
 import {ChatMessage, ChatRoom, ChatUser, DataMessage, InviteMessage, QueuedMessages} from "./SocketTypes";
@@ -55,7 +55,7 @@ class SocketManager {
     protected login(socketId:any, username:string) {
         // remove all instances of the user from the memory
         let chatUser:ChatUser = {socketId, username};
-        this.removeUserFromAllRooms(chatUser);
+        //this.removeUserFromAllRooms(chatUser);
         this.removeUser(username);
 
         this.users.push(chatUser);
@@ -122,7 +122,7 @@ class SocketManager {
         let chatMessage:ChatMessage|null = null;
         if (sender) {
             chatMessage = {
-                user:author,
+                from:author,
                 room: roomName,
                 message: message,
                 created: created
@@ -133,12 +133,20 @@ class SocketManager {
 
 
 
-    protected addUserToRoom (username:string, roomName:string) {
+    protected addUserToRoom (socketId:string, username:string, roomName:string) {
         let user = this.findUser(username);
         if (user) {
             // find the room, create if not already existing
             let room = this.findOrCreateRoom(roomName);
-            room.users.push(user);
+            // the user may be in the room with an old id
+            let index = room.users.findIndex((value) => value.username === username);
+            if (index >= 0) {
+                // update the socket id
+                room.users[index].socketId = socketId;
+            }
+            else {
+                room.users.push(user);
+            }
         }
     }
 
@@ -160,9 +168,9 @@ class SocketManager {
         let user = this.findUserBySocket(socketId);
         if (user) {
             socketDebug(`logging out user ${user.username} - tidying up users and rooms`);
-            // remove the user from any rooms they are currently in
+            // remove the user but leave their rooms
             this.removeUserBySocket(socketId);
-            this.removeUserFromAllRooms(user);
+
             if (this.io) this.io.emit('logout',user.username);
         }
         return user;
@@ -201,15 +209,17 @@ class SocketManager {
             });
             socket.on('joinroom', ({username,room}) => {
                 socketDebug(`${username} joining room ${room} `);
-                this.addUserToRoom(username,room);
+                this.addUserToRoom(socket.id,username,room);
+                socket.join(room);
                 let userList:string[] = this.getUserListForRoom(room);
-                if (this.io) this.io.to(room).emit(JSON.stringify({username:username,room: room,userList:userList}));
+                if (this.io) this.io.to(room).emit('joinroom',JSON.stringify({username:username,room: room,userList:userList}));
             });
             socket.on('exitroom', ({username,room}) => {
-                socketDebug(`${username} joining room ${room} `);
+                socketDebug(`${username} exiting room ${room} `);
                 this.removeUserFromRoom(username,room);
+                socket.leave(room);
                 let userList:string[] = this.getUserListForRoom(room);
-                if (this.io) this.io.to(JSON.stringify({username:username,room: room,userList:userList}));
+                if (this.io) this.io.to(room).emit('exitroom',JSON.stringify({username:username,room: room,userList:userList}));
             });
             socket.on('invite', ({from, to, room}) => {
                 socketDebug(`${from} has sent an invitation to join room ${room} to ${to}`);
@@ -220,6 +230,7 @@ class SocketManager {
                 // send the message to the rest of the room
                 let cMessage = this.createMessageForRoom(from, room, message,created);
                 if (cMessage) {
+                    socketDebug(`Sending message ${cMessage.message} to room ${cMessage.room}`);
                     socket.to(room).emit('chat',JSON.stringify(cMessage));
                     // check for offline users and queue their messages
                     this.queueMessagesForOfflineRoomUsers(cMessage);

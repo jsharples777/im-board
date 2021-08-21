@@ -135,6 +135,7 @@ class Root extends React.Component{
                         commentId: "message",
                         submitCommentId: "submitMessage",
                         chatLogId: 'chatLog',
+                        chatLogRoomId: 'chatLogRoom'
                     },
                 },
                 userSearchSideBar: {

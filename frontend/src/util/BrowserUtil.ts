@@ -12,10 +12,31 @@ class BrowserUtil {
     }
   }
 
+  scrollToBottomNow (element:HTMLElement):void {
+    if (element) {
+      element.scrollTop = element.scrollHeight - element.clientHeight;
+    }
+  }
+
+  scrollToBottomSmooth (element:HTMLElement):void {
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+      });
+      element.scrollTop = element.scrollHeight - element.clientHeight;
+    }
+  }
+
   scrollSmoothTo(element:HTMLElement):void {
     element.scrollIntoView({
       block: 'start',
       behavior: 'smooth',
+    });
+  }
+
+  scrollTo(element:HTMLElement):void {
+    element.scrollIntoView({
+      block: 'start',
     });
   }
 

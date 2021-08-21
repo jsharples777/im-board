@@ -249,6 +249,7 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: parseInt(userId)}, isSame);
         vLogger(user);
         NotificationController.getInstance().startChatWithUser(user.username);
+        this.applicationView.handleShowChat(event);
     }
 
 
@@ -371,8 +372,8 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         this.localisedSM.removeItemFromState(this.config.stateNames.recentUserSearches,user,isSame,true);
     }
 
-    protected getBadgeValue(name: string, item: any): string {
-        return "";
+    protected getBadgeValue(name: string, item: any): number {
+        return 0;
     }
 
 

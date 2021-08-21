@@ -1,8 +1,11 @@
 import {ChatLog} from "./ChatManager";
+import {Message} from "./ChatReceiver";
 
 export interface ChatEventListener {
-    handleChatLogUpdated(log:ChatLog):void;
+    handleChatLogUpdated(log:ChatLog,wasOffline:boolean):void;
     handleChatLogsUpdated():void;
+    handleChatStarted(log:ChatLog):void;
+    handleOfflineMessagesReceived(messages:Message[]):void;
 
 }
 

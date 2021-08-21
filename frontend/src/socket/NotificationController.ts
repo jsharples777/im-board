@@ -2,6 +2,7 @@ import {ChatLog, ChatManager} from "./ChatManager";
 import {ChatEventListener, ChatUserEventListener} from "./ChatEventListener";
 import notifier from "../notification/NotificationManager";
 import debug from 'debug';
+import {Message} from "./ChatReceiver";
 
 const notLogger = debug('notification-controller');
 
@@ -77,21 +78,20 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
         this.chatListeners.forEach((listener) => listener.handleChatLogsUpdated());
     }
 
-    handleChatLogUpdated(log: ChatLog): void {
+    handleChatLogUpdated(log: ChatLog,wasOffline = false): void {
         notLogger(`Handle chat log updated`);
         notLogger(log);
-        // avoid no actual messages
-        if (log.messages.length === 0) return;
-
         // pass on the changes
-        this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(log));
+        this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(log, wasOffline));
 
         // provide visual notifications if do not disturb is not on
         if (this.doNotDisturb) return;
 
-        // get the last message added, it won't be from ourselves (the chat manager takes care of that)
-        const displayMessage = log.messages[log.messages.length - 1];
-        notifier.show(displayMessage.from,displayMessage.message,'message',3000);
+        if (!wasOffline) {
+            // get the last message added, it won't be from ourselves (the chat manager takes care of that)
+            const displayMessage = log.messages[log.messages.length - 1];
+            notifier.show(displayMessage.from,displayMessage.message,'message',3000);
+        }
     }
 
     handleLoggedInUsersUpdated(usernames: string[]): void {
@@ -135,6 +135,18 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
 
     public startChatWithUser(username:string) {
         ChatManager.getInstance().startChatWithUser(username);
+    }
+
+    handleChatStarted(log: ChatLog): void {
+        this.chatListeners.forEach((listener) => listener.handleChatStarted(log));
+    }
+
+    handleOfflineMessagesReceived(messages: Message[]): void {
+        // provide visual notifications if do not disturb is not on
+        if (this.doNotDisturb) return;
+        if (messages.length === 0) return;
+
+        notifier.show("Offline messages received",`You have received ${messages.length} messages since you last logged out.`);
     }
 
 

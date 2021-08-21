@@ -145,8 +145,6 @@ export default class MessageQueueManager {
             }
             this.messageQueue.push(queue);
         }
-        mqLogger(`Queuing message from ${message.user} to room ${message.room} to user ${username}`);
-        queue.messages.push(message);
-
+        mqLogger(`Queuing message from ${message.from} to room ${message.room} to user ${username}`);
     }
 }

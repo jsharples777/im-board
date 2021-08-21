@@ -128,7 +128,7 @@ class SocketManager {
                 this.chatReceiver.receiveQueuedInvites(dataObj.invites);
             }
             if (dataObj.messages && (dataObj.messages.length > 0)) {
-                this.chatReceiver.receiveQueuedInvites(dataObj.invites);
+                this.chatReceiver.receiveQueuedMessages(dataObj.messages);
             }
         }
         catch (err) {

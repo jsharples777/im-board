@@ -8,7 +8,7 @@ export type DataMessage = {
 export type ChatMessage = {
     room: string,
     message: string,
-    user: string,
+    from: string,
     created: number
 }
 
