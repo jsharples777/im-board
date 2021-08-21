@@ -46,7 +46,8 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         NotificationController.getInstance().addListener(this);
     }
 
-    private leaveChat() {
+    private leaveChat(event:Event) {
+        event.preventDefault();
         if (this.selectedChatLog) {
             ChatManager.getInstance().leaveChat(this.selectedChatLog.roomName);
             this.selectedChatLog = null;
@@ -247,8 +248,10 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         // @ts-ignore
         csLoggerDetail(`Chat Log ${event.target} with id ${room} clicked from ${dataSource}`);
         this.selectedChatLog = ChatManager.getInstance().getChatLog(room);
-        this.checkCanComment();
-        this.renderChatLog(this.selectedChatLog);
+        if (this.selectedChatLog) {
+            this.checkCanComment();
+            this.renderChatLog(this.selectedChatLog);
+        }
     }
 
 
@@ -273,14 +276,16 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         csLoggerDetail(`Chat Log ${event.target} with id ${room} deleted from ${dataSource}`);
 
         if (room) {
-            let log: ChatLog = ChatManager.getInstance().getChatLog(room);
-            ChatManager.getInstance().leaveChat(room);
-            if (this.selectedChatLog && (this.selectedChatLog.roomName === room)) {
-                this.selectedChatLog = null;
-                this.clearChatLog();
-                this.checkCanComment();
+            let log: ChatLog|null = ChatManager.getInstance().getChatLog(room);
+            if (log) {
+                ChatManager.getInstance().leaveChat(room);
+                if (this.selectedChatLog && (this.selectedChatLog.roomName === room)) {
+                    this.selectedChatLog = null;
+                    this.clearChatLog();
+                    this.checkCanComment();
+                }
+                this.updateView('', {});
             }
-            this.updateView('',{});
         }
 
 

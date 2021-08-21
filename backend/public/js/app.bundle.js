@@ -2173,7 +2173,9 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   var _proto = ChatSidebarView.prototype;
 
-  _proto.leaveChat = function leaveChat() {
+  _proto.leaveChat = function leaveChat(event) {
+    event.preventDefault();
+
     if (this.selectedChatLog) {
       _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().leaveChat(this.selectedChatLog.roomName);
       this.selectedChatLog = null;
@@ -2378,8 +2380,11 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
     csLoggerDetail("Chat Log " + event.target + " with id " + room + " clicked from " + dataSource);
     this.selectedChatLog = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().getChatLog(room);
-    this.checkCanComment();
-    this.renderChatLog(this.selectedChatLog);
+
+    if (this.selectedChatLog) {
+      this.checkCanComment();
+      this.renderChatLog(this.selectedChatLog);
+    }
   };
 
   _proto.updateView = function updateView(name, newState) {
@@ -2404,15 +2409,18 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
     if (room) {
       var log = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().getChatLog(room);
-      _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().leaveChat(room);
 
-      if (this.selectedChatLog && this.selectedChatLog.roomName === room) {
-        this.selectedChatLog = null;
-        this.clearChatLog();
-        this.checkCanComment();
+      if (log) {
+        _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().leaveChat(room);
+
+        if (this.selectedChatLog && this.selectedChatLog.roomName === room) {
+          this.selectedChatLog = null;
+          this.clearChatLog();
+          this.checkCanComment();
+        }
+
+        this.updateView('', {});
       }
-
-      this.updateView('', {});
     }
   };
 
@@ -4267,7 +4275,12 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.getChatLog = function getChatLog(room) {
-    return this.ensureChatLogExists(room);
+    var log = null;
+    var index = this.chatLogs.findIndex(function (log) {
+      return log.roomName === room;
+    });
+    if (index >= 0) log = this.chatLogs[index];
+    return log;
   };
 
   _proto.receiveMessage = function receiveMessage(message, wasOffline) {
@@ -4399,7 +4412,7 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.getChatLogs = function getChatLogs() {
-    return this.chatLogs;
+    return [].concat(this.chatLogs);
   };
 
   _proto.startChatWithUser = function startChatWithUser(username) {

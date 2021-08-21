@@ -355,8 +355,11 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         this.saveLogs();
     }
 
-    public getChatLog(room:string):ChatLog {
-        return this.ensureChatLogExists(room);
+    public getChatLog(room:string):ChatLog|null {
+        let log:ChatLog|null = null;
+        let index = this.chatLogs.findIndex((log) => log.roomName === room);
+        if (index >= 0) log = this.chatLogs[index];
+        return log;
     }
 
     receiveMessage(message: Message,wasOffline:boolean = false): void {
@@ -463,7 +466,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     }
 
     public getChatLogs():ChatLog[] {
-        return this.chatLogs;
+        return [...this.chatLogs];
     }
 
 
