@@ -276,7 +276,7 @@ class Root extends React.Component{
     render() {
         logger("Rendering App");
         return (
-            <div className="Root row ml-1">
+            <div className="root container-fluid">
             </div>
         );
     }

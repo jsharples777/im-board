@@ -88,8 +88,8 @@ class BoardGameSearchSidebarView extends SidebarView {
         vLogger(`callback for bgg search ${associatedStateName} with status ${status} - `);
         if (status >= 200 && status <= 299) { // do we have any data?
             vLoggerDetail(data);
-            vLoggerDetail(data.data.['findBoardGames']);
-            this.localisedSM.setStateByName(this.config.stateNames.bggSearchResults,data.data.['findBoardGames'],true);
+            vLoggerDetail(data.data.findBoardGames);
+            this.localisedSM.setStateByName(this.config.stateNames.bggSearchResults,data.data.findBoardGames,true);
         }
     }
 

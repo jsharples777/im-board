@@ -737,7 +737,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
   _proto.render = function render() {
     logger("Rendering App");
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: "Root row ml-1"
+      className: "root container-fluid"
     });
   };
 
@@ -1725,8 +1725,8 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     if (status >= 200 && status <= 299) {
       // do we have any data?
       vLoggerDetail(data);
-      vLoggerDetail(data.data['findBoardGames']);
-      this.localisedSM.setStateByName(this.config.stateNames.bggSearchResults, data.data['findBoardGames'], true);
+      vLoggerDetail(data.data.findBoardGames);
+      this.localisedSM.setStateByName(this.config.stateNames.bggSearchResults, data.data.findBoardGames, true);
     }
   };
 
@@ -2287,7 +2287,20 @@ var SidebarView = /*#__PURE__*/function (_AbstractView) {
   };
 
   _proto.eventShow = function eventShow(event) {
-    this.showHide(this.uiPrefs.view.expandedSize);
+    //414,768,1024
+    var size = this.uiPrefs.view.expandedSize;
+    console.log(window.innerWidth);
+
+    if (window.innerWidth < 769) {
+      size = '50%';
+    }
+
+    if (window.innerWidth < 415) {
+      size = '100%';
+    }
+
+    console.log(size);
+    this.showHide(size);
   };
 
   return SidebarView;

@@ -52,8 +52,17 @@ abstract class SidebarView extends AbstractView {
     this.showHide('0%');
   }
 
-  eventShow(event:Event|null) {
-    this.showHide(this.uiPrefs.view.expandedSize);
+  eventShow(event:Event|null) {//414,768,1024
+    let size = this.uiPrefs.view.expandedSize;
+    console.log(window.innerWidth);
+    if (window.innerWidth < 769) {
+      size = '50%';
+    }
+    if (window.innerWidth < 415) {
+      size = '100%';
+    }
+    console.log(size);
+    this.showHide(size);
   }
 }
 

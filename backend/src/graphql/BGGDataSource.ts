@@ -198,9 +198,10 @@ class BGGDataSource {
     }
 
     // @ts-ignore
-    getBoardGameDetails(_:any,{id}) {
-        let url = process.env.URL_FindById + id;
-        bggLogger(`Looking for board game details for id ${id}`);
+    getBoardGameDetails(_:any,data:any) {
+        bggLogger(data);
+        let url = process.env.URL_FindById + data.id.id;
+        bggLogger(`Looking for board game details for id ${data.id.id}`);
 
         return new Promise((resolve, reject) => {
 

@@ -232,6 +232,12 @@ small-heading {
     }
 }
 
+h1 {
+    font-family: 'Special Elite', cursive;
+    font-weight: bold;
+    font-size: 32px;
+}
+
 @media(max-width: 500px) {
     .btn-circle.btn-md {
         width: 30px;
@@ -243,3 +249,10 @@ small-heading {
     }
 }
 
+.root {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../img/splash.jpg');
+    background-size: cover;
+    padding-top: 110px;
+}
