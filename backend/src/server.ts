@@ -1,6 +1,6 @@
 // Configuration and Logging handlers
 /* eslint-disable import/first */
-import BGGDataSource from "./graphql/BGGDataSource";
+import BGGDataSource from "./graphql/DataSource";
 
 require('dotenv').config();
 import morgan from 'morgan';
@@ -118,7 +118,9 @@ if (isDevelopment) {
     /* log call requests with body */
     app.use((request, response, next) => {
         serverDebug(`Received request for ${request.url} with/without body`);
-        //if (request.body) console.log(request.body);
+        if (request.body) {
+            if (process.env.SHOW_BODY) console.log(request.body);
+        }
         next();
     });
 } else {
@@ -142,11 +144,7 @@ setupPassport(passport, Account);
 // route for the env.js file being served to the client
 serverDebug('Setting the environment variables for the browser to access');
 const port = process.env.PORT || 3000;
-const LOCAL_HOST_API_DEVELOPMENT = `http://localhost:${port}/api`;
-const LOCAL_HOST_API_PRODUCTION = `https://localhost:${port}/api`;
-let localhostAPIURL = LOCAL_HOST_API_DEVELOPMENT;
-if (!isDevelopment) localhostAPIURL = LOCAL_HOST_API_PRODUCTION;
-const API_SERVER_URL = process.env.API_SERVER_URL || localhostAPIURL;
+const API_SERVER_URL = process.env.API_SERVER_URL || '';
 let env:any = {serverURL: API_SERVER_URL};
 
 app.get('/js/env.js', (req, res) => {

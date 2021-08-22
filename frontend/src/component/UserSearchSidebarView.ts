@@ -238,6 +238,7 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
 
     eventClickItem(event: MouseEvent) {
         event.preventDefault();
+        event.stopPropagation();
         console.log(event.target);
         // @ts-ignore
         const userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
@@ -260,6 +261,7 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
 
     eventUserSelected(event: Event, ui: any) {
         event.preventDefault();
+        event.stopPropagation();
         vLogger(`User ${ui.item.label} with id ${ui.item.value} selected`);
         // @ts-ignore
         event.target.innerText = '';
@@ -330,6 +332,7 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
 
     protected eventDeleteClickItem(event: MouseEvent): void {
         event.preventDefault();
+        event.stopPropagation();
         // @ts-ignore
         const userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
         // @ts-ignore

@@ -476,6 +476,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./component/UserSearchSidebarView */ "./src/component/UserSearchSidebarView.ts");
 /* harmony import */ var _component_ChatSidebarView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./component/ChatSidebarView */ "./src/component/ChatSidebarView.ts");
 /* harmony import */ var _component_BoardGameSerachSidebarView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./component/BoardGameSerachSidebarView */ "./src/component/BoardGameSerachSidebarView.ts");
+/* harmony import */ var _component_BoardGameView__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./component/BoardGameView */ "./src/component/BoardGameView.tsx");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -496,11 +497,13 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('app');
 
 var Root = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(Root, _React$Component);
 
+  // @ts-ignore
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
@@ -517,26 +520,28 @@ var Root = /*#__PURE__*/function (_React$Component) {
     _this.state = {
       isLoggedIn: false,
       loggedInUserId: -1,
-      entries: [],
+      boardGames: [],
       selectedEntry: {},
-      applyUserFilter: false,
       stateNames: {
         users: 'users',
-        entries: 'entries',
-        comments: 'comments',
+        boardGames: 'boardGames',
+        scores: 'scores',
         selectedEntry: 'selectedEntry',
         recentUserSearches: 'recentUserSearches',
         bggSearchResults: 'bggSearchResults'
       },
       apis: {
-        users: '/users',
-        entries: '/blog',
-        entry: '/blog',
-        comments: '/comment',
-        login: '/login',
-        bggSearch: '/graphql',
+        login: '/api/login',
+        graphQL: '/graphql',
         bggSearchCall: 'query {\n' + '  findBoardGames(query: "@") {\n' + '    id, name, year\n' + '  }\n' + '} ',
-        bggSearchCallById: 'query {\n' + '  getBoardGameDetails(id:@) {\n' + '    id,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' + '  }\n' + '}'
+        bggSearchCallById: {
+          queryString: 'query {\n' + '  getBoardGameDetails(id: {id:@}) {\n' + '    id,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' + '  }\n' + '}',
+          resultName: 'getBoardGameDetails'
+        },
+        findUsers: {
+          queryString: 'query {\n  findUsers {\n    id, username\n  }\n}',
+          resultName: 'findUsers'
+        }
       },
       ui: {
         draggable: {
@@ -715,11 +720,34 @@ var Root = /*#__PURE__*/function (_React$Component) {
     _this.handleShowUserSearch = _this.handleShowUserSearch.bind(_assertThisInitialized(_this));
     _this.handleShowChat = _this.handleShowChat.bind(_assertThisInitialized(_this));
     _this.handleShowBGGSearch = _this.handleShowBGGSearch.bind(_assertThisInitialized(_this));
+    _this.handleDragOver = _this.handleDragOver.bind(_assertThisInitialized(_this));
+    _this.handleDrop = _this.handleDrop.bind(_assertThisInitialized(_this));
     _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].connectToApplication(_assertThisInitialized(_this), window.localStorage);
     return _this;
   }
 
   var _proto = Root.prototype;
+
+  _proto.handleDragOver = function handleDragOver(event) {
+    event.preventDefault();
+  };
+
+  _proto.handleDrop = function handleDrop(event) {
+    // @ts-ignore
+    var draggedObjectJSON = event.dataTransfer.getData(this.state.ui.draggable.draggableDataKeyId);
+    logger(draggedObjectJSON);
+    var draggedObject = JSON.parse(draggedObjectJSON);
+    logger(draggedObject); // @ts-ignore
+
+    if (draggedObject[this.state.ui.draggable.draggedType] === this.state.ui.draggable.draggedTypeBoardGame) {
+      this.addBoardGame(draggedObject);
+    }
+  };
+
+  _proto.addBoardGame = function addBoardGame(draggedObject) {
+    // ok, we are just the dumb view, pass this onto the controller to work out the logic for us
+    _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].addBoardGame(draggedObject);
+  };
 
   _proto.getCurrentUser = function getCurrentUser() {
     return _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getLoggedInUserId();
@@ -735,10 +763,23 @@ var Root = /*#__PURE__*/function (_React$Component) {
   };
 
   _proto.render = function render() {
-    logger("Rendering App");
+    logger("Rendering App"); // @ts-ignore
+
+    var boardGames = this.state.boardGames;
+    logger(boardGames);
+    var games = boardGames.map(function (entry, index) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_component_BoardGameView__WEBPACK_IMPORTED_MODULE_7__["default"], {
+        key: index,
+        boardGame: entry,
+        deleteEntryHandler: function deleteEntryHandler() {},
+        showScoresHandler: function showScoresHandler() {}
+      });
+    });
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
       className: "root container-fluid"
-    });
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card-group"
+    }, games));
   };
 
   _proto.cancelDelete = function cancelDelete(event) {
@@ -801,11 +842,20 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
               if (this.cancelBtnEl) this.cancelBtnEl.addEventListener('click', this.cancelDelete);
               if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click', this.confirmDelete);
-              if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete); // ok lets try get things done
+              if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete); // a reference to the div containing ourselves
+              // @ts-ignore
+
+              this.thisEl = document.getElementById('root');
+
+              if (this.thisEl) {
+                this.thisEl.addEventListener('dragover', this.handleDragOver);
+                this.thisEl.addEventListener('drop', this.handleDrop);
+              } // ok lets try get things done
+
 
               _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].initialise();
 
-            case 18:
+            case 20:
             case "end":
               return _context.stop();
           }
@@ -874,13 +924,32 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
 
 
-localStorage.debug = 'app controller-ts api-ts board-game-search-sidebar board-game-search-sidebar:detail';
+localStorage.debug = 'app controller-ts api-ts board-game-search-sidebar board-game-search-sidebar:detail view-ts:boardgameview';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
   className: "container-fluid justify-content-around"
 });
 react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(element, document.getElementById('root'));
+
+/***/ }),
+
+/***/ "./src/AppTypes.ts":
+/*!*************************!*\
+  !*** ./src/AppTypes.ts ***!
+  \*************************/
+/*! exports provided: Decorator */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Decorator", function() { return Decorator; });
+var Decorator;
+
+(function (Decorator) {
+  Decorator[Decorator["Incomplete"] = 0] = "Incomplete";
+  Decorator[Decorator["Complete"] = 1] = "Complete";
+})(Decorator || (Decorator = {}));
 
 /***/ }),
 
@@ -896,13 +965,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state/MemoryBufferStateManager */ "./src/state/MemoryBufferStateManager.ts");
-/* harmony import */ var _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state/RESTApiStateManager */ "./src/state/RESTApiStateManager.ts");
-/* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./socket/SocketManager */ "./src/socket/SocketManager.ts");
-/* harmony import */ var _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./state/AsyncStateManagerWrapper */ "./src/state/AsyncStateManagerWrapper.ts");
-/* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
-/* harmony import */ var _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./SocketListenerDelegate */ "./src/SocketListenerDelegate.ts");
-/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./socket/ChatManager */ "./src/socket/ChatManager.ts");
-/* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./socket/NotificationController */ "./src/socket/NotificationController.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+/* harmony import */ var _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./state/RESTApiStateManager */ "./src/state/RESTApiStateManager.ts");
+/* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./socket/SocketManager */ "./src/socket/SocketManager.ts");
+/* harmony import */ var _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./state/AsyncStateManagerWrapper */ "./src/state/AsyncStateManagerWrapper.ts");
+/* harmony import */ var _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./state/AggregateStateManager */ "./src/state/AggregateStateManager.ts");
+/* harmony import */ var _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./SocketListenerDelegate */ "./src/SocketListenerDelegate.ts");
+/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./socket/ChatManager */ "./src/socket/ChatManager.ts");
+/* harmony import */ var _socket_NotificationController__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./socket/NotificationController */ "./src/socket/NotificationController.ts");
+/* harmony import */ var _state_GraphQLApiStateManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./state/GraphQLApiStateManager */ "./src/state/GraphQLApiStateManager.ts");
+/* harmony import */ var _AppTypes__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./AppTypes */ "./src/AppTypes.ts");
+/* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./network/DownloadManager */ "./src/network/DownloadManager.ts");
+
+
+
+
 
 
 
@@ -917,6 +994,7 @@ var cLoggerDetail = debug__WEBPACK_IMPORTED_MODULE_0___default()('controller-ts-
 
 var Controller = /*#__PURE__*/function () {
   // @ts-ignore
+  // @ts-ignore
   function Controller() {}
 
   var _proto = Controller.prototype;
@@ -926,34 +1004,53 @@ var Controller = /*#__PURE__*/function () {
     this.clientSideStorage = clientSideStorage;
     this.config = this.applicationView.state; // setup the API calls
 
-    var apiStateManager = _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_2__["RESTApiStateManager"].getInstance();
+    var apiStateManager = _state_RESTApiStateManager__WEBPACK_IMPORTED_MODULE_3__["RESTApiStateManager"].getInstance();
     apiStateManager.initialise([{
-      stateName: this.config.stateNames.users,
-      serverURL: this.getServerAPIURL(),
-      api: this.config.apis.users,
-      isActive: true
-    }, {
-      stateName: this.config.stateNames.entries,
+      stateName: this.config.stateNames.boardGames,
       serverURL: this.getServerAPIURL(),
       api: this.config.apis.entries,
       isActive: true
     }, {
-      stateName: this.config.stateNames.comments,
+      stateName: this.config.stateNames.scores,
       serverURL: this.getServerAPIURL(),
       api: this.config.apis.comments,
       isActive: true
     }]);
-    var aggregateSM = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_5__["AggregateStateManager"].getInstance();
+    var graphSM = new _state_GraphQLApiStateManager__WEBPACK_IMPORTED_MODULE_10__["GraphQLApiStateManager"]();
+    graphSM.initialise([{
+      stateName: this.config.stateNames.users,
+      apiURL: this.getServerAPIURL() + this.config.apis.graphQL,
+      apis: {
+        find: '',
+        create: '',
+        destroy: '',
+        update: '',
+        findAll: this.config.apis.findUsers.queryString
+      },
+      data: {
+        find: '',
+        create: '',
+        destroy: '',
+        update: '',
+        findAll: this.config.apis.findUsers.resultName
+      },
+      isActive: true
+    }]);
+    var aggregateSM = _state_AggregateStateManager__WEBPACK_IMPORTED_MODULE_6__["AggregateStateManager"].getInstance();
     var memorySM = _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_1__["default"].getInstance();
-    var asyncSM = new _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_4__["default"](aggregateSM, apiStateManager);
+    var asyncDBSM = new _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__["default"](aggregateSM, apiStateManager);
+    var asyncQLSM = new _state_AsyncStateManagerWrapper__WEBPACK_IMPORTED_MODULE_5__["default"](aggregateSM, graphSM);
     aggregateSM.addStateManager(memorySM, [], false);
-    aggregateSM.addStateManager(asyncSM, [this.config.stateNames.selectedEntry, this.config.stateNames.recentUserSearches], false);
+    aggregateSM.addStateManager(asyncQLSM, [this.config.stateNames.selectedEntry, this.config.stateNames.recentUserSearches, this.config.stateNames.boardGames, this.config.stateNames.scores], false);
+    aggregateSM.addStateManager(asyncDBSM, [this.config.stateNames.users, this.config.stateNames.boardGames, this.config.stateNames.scores, this.config.stateNames.selectedEntry, this.config.stateNames.recentUserSearches], false);
     this.stateManager = aggregateSM; // state listener
 
     this.stateChanged = this.stateChanged.bind(this);
     this.stateChangedItemAdded = this.stateChangedItemAdded.bind(this);
     this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
-    this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this);
+    this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this); // call backs
+
+    this.callbackBoardGameDetails = this.callbackBoardGameDetails.bind(this);
     return this;
   }
   /*
@@ -964,23 +1061,23 @@ var Controller = /*#__PURE__*/function () {
   _proto.initialise = function initialise() {
     cLogger('Initialising data state'); // listen for socket events
 
-    var socketListerDelegate = new _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_6__["default"](this.config);
-    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].setListener(socketListerDelegate); // now that we have all the user we can setup the chat system but only if we are logged in
+    var socketListerDelegate = new _SocketListenerDelegate__WEBPACK_IMPORTED_MODULE_7__["default"](this.config);
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_4__["default"].setListener(socketListerDelegate); // now that we have all the user we can setup the chat system but only if we are logged in
 
     cLogger("Setting up chat system for user " + this.getLoggedInUserId() + ": " + this.getLoggedInUsername());
 
     if (this.getLoggedInUserId() > 0) {
       // setup the chat system
-      var chatManager = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_7__["ChatManager"].getInstance(); // this connects the manager to the socket system
+      var chatManager = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_8__["ChatManager"].getInstance(); // this connects the manager to the socket system
       // setup the chat notification system
 
-      var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_8__["NotificationController"].getInstance();
+      var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_9__["NotificationController"].getInstance();
       chatManager.setCurrentUser(this.getLoggedInUsername());
       chatManager.login();
     } // load the users
 
 
-    this.getStateManager().getStateByName(this.config.stateNames.users);
+    this.userStateManager.getStateByName(this.config.stateNames.users); //downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.findUsers, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
   };
 
   _proto.getStateManager = function getStateManager() {
@@ -994,7 +1091,7 @@ var Controller = /*#__PURE__*/function () {
   ;
 
   _proto.getServerAPIURL = function getServerAPIURL() {
-    var result = "/api"; // @ts-ignore
+    var result = ""; // @ts-ignore
 
     if (window.ENV && window.ENV.serverURL) {
       // @ts-ignore
@@ -1157,6 +1254,60 @@ var Controller = /*#__PURE__*/function () {
 
           break;
         }
+    }
+  } // Data logic
+  ;
+
+  _proto.addBoardGame = function addBoardGame(boardGame) {
+    // this will just the basics of a board game from the search then click/dragged over
+    cLogger("Handling addition of board game");
+    cLogger(boardGame); // don't add if already in the users collection
+
+    if (this.getStateManager().isItemInState(this.config.stateNames.boardGames, boardGame, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"])) {
+      cLogger("Board game in collection already");
+      return;
+    } // start with what we have and let the main view know, but mark it incomplete for partial rendering with user information
+
+
+    var currentListOfGames = this.applicationView.state.boardGames;
+    boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_11__["Decorator"].Incomplete;
+    currentListOfGames.push(boardGame);
+    cLogger("Adding received board game to application");
+    cLogger(boardGame);
+    this.applicationView.setState({
+      boardGames: currentListOfGames
+    }); // now we need an API call to fill in the details
+
+    var query = this.config.apis.bggSearchCallById.queryString;
+    query = query.replace(/@/, boardGame.id);
+    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_12__["default"].addQLApiRequest(this.config.apis.graphQL, query, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
+  };
+
+  _proto.callbackBoardGameDetails = function callbackBoardGameDetails(data, status, associatedStateName) {
+    cLogger("callback for bgg search for single board game " + associatedStateName + " with status " + status);
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      cLogger(data);
+      var boardGameDetails = data.data[this.config.apis.bggSearchCallById.resultName];
+      cLogger(boardGameDetails); //this.getStateManager().addNewItemToState(this.config.stateNames.boardGames,data.data[this.config.apis.bggSearchCallById.resultName],true);
+
+      var currentListOfGames = this.applicationView.state.boardGames;
+      var index = currentListOfGames.findIndex(function (value) {
+        return value.id === boardGameDetails.id;
+      });
+
+      if (index >= 0) {
+        cLogger("Updating application state");
+        currentListOfGames.splice(index, 1, boardGameDetails);
+        cLogger(currentListOfGames);
+        boardGameDetails.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_11__["Decorator"].Complete;
+        this.applicationView.setState({
+          boardGames: currentListOfGames
+        });
+      } else {
+        cLogger("Board game " + boardGameDetails.id + " not found in current state");
+      }
     }
   };
 
@@ -1348,6 +1499,8 @@ var AbstractView = /*#__PURE__*/function () {
   };
 
   _proto.createResultForItem = function createResultForItem(name, item, dataSource) {
+    var _this = this;
+
     if (dataSource === void 0) {
       dataSource = null;
     }
@@ -1419,7 +1572,12 @@ var AbstractView = /*#__PURE__*/function () {
         deleteButtonEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
         deleteButtonEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
         deleteButtonEl.setAttribute(domConfig.resultDataSourceId, dataSource);
-        deleteButtonEl.addEventListener('click', this.eventDeleteClickItem);
+        deleteButtonEl.addEventListener('click', function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          _this.eventDeleteClickItem(event);
+        });
         contentEl.appendChild(deleteButtonEl);
       }
 
@@ -1548,7 +1706,7 @@ var AbstractView = /*#__PURE__*/function () {
   };
 
   _proto.createResultsForState = function createResultsForState(name, newState) {
-    var _this = this;
+    var _this2 = this;
 
     avLogger('Abstract View : creating Results', 10);
     avLogger(newState);
@@ -1558,17 +1716,17 @@ var AbstractView = /*#__PURE__*/function () {
     if (viewEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].removeAllChildren(viewEl); // add the new children
 
     newState.map(function (item, index) {
-      var childEl = _this.createResultForItem(name, item); // add draggable actions
+      var childEl = _this2.createResultForItem(name, item); // add draggable actions
 
 
       if (domConfig.isDraggable) {
         childEl.setAttribute('draggable', 'true');
-        childEl.addEventListener('dragstart', _this.eventStartDrag);
+        childEl.addEventListener('dragstart', _this2.eventStartDrag);
       } // add selection actions
 
 
       if (domConfig.isClickable) {
-        childEl.addEventListener('click', _this.eventClickItem);
+        childEl.addEventListener('click', _this2.eventClickItem);
       }
 
       avLogger("Abstract View: Adding child " + item.id);
@@ -1614,8 +1772,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
 /* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/BrowserUtil */ "./src/util/BrowserUtil.ts");
 /* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../network/DownloadManager */ "./src/network/DownloadManager.ts");
-/* harmony import */ var _network_Types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../network/Types */ "./src/network/Types.ts");
-/* harmony import */ var _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../state/MemoryBufferStateManager */ "./src/state/MemoryBufferStateManager.ts");
+/* harmony import */ var _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../state/MemoryBufferStateManager */ "./src/state/MemoryBufferStateManager.ts");
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -1646,7 +1803,6 @@ function _setPrototypeOf(o, p) {
 
 
 
-
 var vLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('board-game-search-sidebar');
 var vLoggerDetail = debug__WEBPACK_IMPORTED_MODULE_0___default()('board-game-search-sidebar:detail');
 
@@ -1664,7 +1820,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     _this.handleSearch = _this.handleSearch.bind(_assertThisInitialized(_this));
     _this.handleSearchResultsCB = _this.handleSearchResultsCB.bind(_assertThisInitialized(_this)); // register state change listening
 
-    _this.localisedSM = new _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_6__["default"]();
+    _this.localisedSM = new _state_MemoryBufferStateManager__WEBPACK_IMPORTED_MODULE_5__["default"]();
 
     _this.localisedSM.addChangeListenerForName(_this.config.stateNames.bggSearchResults, _assertThisInitialized(_this));
 
@@ -1693,7 +1849,8 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.handleSearch = function handleSearch(event) {
     vLogger("Handling search");
-    event.preventDefault(); // do we have anything to search for?
+    event.preventDefault();
+    event.stopPropagation(); // do we have anything to search for?
 
     var queryText = this.queryEl.value.trim();
     if (queryText.length == 0) return; // ok, have a search term, lets start a search
@@ -1706,16 +1863,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     var regex = /@/;
     query = query.replace(regex, queryText);
     vLoggerDetail("query string is now " + query);
-    var request = {
-      url: this.config.apis.bggSearch,
-      type: _network_Types__WEBPACK_IMPORTED_MODULE_5__["RequestType"].POST,
-      params: {
-        query: query
-      },
-      callback: this.handleSearchResultsCB,
-      associatedStateName: this.config.stateNames.bggSearchResults
-    };
-    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_4__["default"].addApiRequest(request, true);
+    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_4__["default"].addQLApiRequest(this.config.apis.graphQL, query, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
   };
 
   _proto.handleSearchResultsCB = function handleSearchResultsCB(data, status, associatedStateName) {
@@ -1765,6 +1913,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.eventClickItem = function eventClickItem(event) {
     event.preventDefault();
+    event.stopPropagation();
     console.log(event.target); // @ts-ignore
 
     var boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
@@ -1772,7 +1921,15 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     var dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId); // @ts-ignore
 
     vLoggerDetail("Board Game " + event.target + " with id " + boardGameId + " clicked from " + dataSource);
-    alert("Implement board game search item clicked");
+    var boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {
+      id: parseInt(boardGameId)
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+
+    if (boardGame) {
+      this.applicationView.addBoardGame(boardGame);
+    }
+
+    this.eventHide(null);
   };
 
   _proto.updateView = function updateView(name, newState) {
@@ -1800,8 +1957,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {
-    event.preventDefault(); // @ts-ignore
-
+    // @ts-ignore
     var boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
 
     var dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId); // @ts-ignore
@@ -1812,7 +1968,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
     vLogger(boardGameId);
 
-    if (boardGameId) {
+    if (boardGame) {
       this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], true);
     }
   };
@@ -1825,6 +1981,98 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 }(_SidebarView__WEBPACK_IMPORTED_MODULE_1__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (BoardGameSearchSidebarView);
+
+/***/ }),
+
+/***/ "./src/component/BoardGameView.tsx":
+/*!*****************************************!*\
+  !*** ./src/component/BoardGameView.tsx ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BoardGameView; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _AppTypes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../AppTypes */ "./src/AppTypes.ts");
+
+
+
+var beLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('view-ts:boardgameview'); // @ts-ignore
+
+function BoardGameView(_ref) {
+  var boardGame = _ref.boardGame,
+      showScoresHandler = _ref.showScoresHandler,
+      deleteEntryHandler = _ref.deleteEntryHandler;
+
+  if (boardGame) {
+    beLogger("Board Game " + boardGame.id);
+    var deleteButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      type: "button",
+      className: "btn-warning btn-sm rounded p-1 mr-2",
+      "entry-id": boardGame.id,
+      onClick: deleteEntryHandler
+    }, "\xA0\xA0Delete \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+      className: "fas fa-trash-alt"
+    }), "\xA0\xA0");
+
+    if (boardGame.decorator && boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_2__["Decorator"].Complete) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+        className: "card-img-top",
+        src: boardGame.image,
+        alt: "Card image cap"
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-body"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", {
+        className: "card-title"
+      }, boardGame.name, " (", boardGame.year, ")"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+        className: "card-text"
+      }, boardGame.description), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+        className: "card-text"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("small", {
+        className: "text-muted"
+      }, "Play Time: $", boardGame.minPlayTime, " - $", boardGame.maxPlayTime, " min", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), "Players: $", boardGame.minPlayers, " - $", boardGame.maxPlayers, " Min Age: $", boardGame.minAge, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), "Categories: $", boardGame.categories)), deleteButton), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-footer text-right text-muted"
+      }, "Rank: ", boardGame.rank, " Score: ", boardGame.averageScore, " from ", boardGame.numOfRaters, " raters")));
+    } else {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+        className: "card-img-top",
+        src: "/img/spinner.gif",
+        alt: "Card image cap"
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-body"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", {
+        className: "card-title"
+      }, boardGame.name, " (", boardGame.year, ")"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+        className: "card-text"
+      }, "Loading..."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+        className: "card-text"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("small", {
+        className: "text-muted"
+      }, "Loading..."))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-footer text-right text-muted"
+      }, "Loading...")));
+    }
+  } else {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      className: "card"
+    }));
+  }
+}
 
 /***/ }),
 
@@ -1910,6 +2158,7 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.leaveChat = function leaveChat(event) {
     event.preventDefault();
+    event.stopPropagation();
 
     if (this.selectedChatLog) {
       _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().leaveChat(this.selectedChatLog.roomName);
@@ -1946,6 +2195,7 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.handleAddMessage = function handleAddMessage(event) {
     event.preventDefault();
+    event.stopPropagation();
     csLogger("Handling message event");
 
     if (this.selectedChatLog) {
@@ -2107,6 +2357,7 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.eventClickItem = function eventClickItem(event) {
     event.preventDefault();
+    event.stopPropagation();
     console.log(event.target); // @ts-ignore
 
     var room = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
@@ -2134,6 +2385,7 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {
     event.preventDefault();
+    event.stopPropagation();
     console.log(event.target); // @ts-ignore
 
     var room = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
@@ -2602,6 +2854,7 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.eventClickItem = function eventClickItem(event) {
     event.preventDefault();
+    event.stopPropagation();
     console.log(event.target); // @ts-ignore
 
     var userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
@@ -2625,6 +2878,7 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.eventUserSelected = function eventUserSelected(event, ui) {
     event.preventDefault();
+    event.stopPropagation();
     vLogger("User " + ui.item.label + " with id " + ui.item.value + " selected"); // @ts-ignore
 
     event.target.innerText = ''; // add the selected user to the recent user searches
@@ -2704,7 +2958,8 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {
-    event.preventDefault(); // @ts-ignore
+    event.preventDefault();
+    event.stopPropagation(); // @ts-ignore
 
     var userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
 
@@ -3060,6 +3315,23 @@ var DownloadManager = /*#__PURE__*/function () {
 
   _proto.getBackgroundQueueCount = function getBackgroundQueueCount() {
     return this.backgroundQueue.length;
+  };
+
+  _proto.addQLApiRequest = function addQLApiRequest(url, query, callback, state, isPriority) {
+    if (isPriority === void 0) {
+      isPriority = false;
+    }
+
+    var request = {
+      url: url,
+      type: _Types__WEBPACK_IMPORTED_MODULE_2__["RequestType"].POST,
+      params: {
+        query: query
+      },
+      callback: callback,
+      associatedStateName: state
+    };
+    downloader.addApiRequest(request, isPriority);
   };
 
   _proto.addApiRequest = function addApiRequest(jsonRequest, isPriority) {
@@ -5268,6 +5540,349 @@ var BrowserStorageStateManager = /*#__PURE__*/function (_AbstractStateManager) {
 }(_AbstractStateManager__WEBPACK_IMPORTED_MODULE_1__["AbstractStateManager"]);
 
 
+
+/***/ }),
+
+/***/ "./src/state/GraphQLApiStateManager.ts":
+/*!*********************************************!*\
+  !*** ./src/state/GraphQLApiStateManager.ts ***!
+  \*********************************************/
+/*! exports provided: GraphQLApiStateManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GraphQLApiStateManager", function() { return GraphQLApiStateManager; });
+/* harmony import */ var _StateManager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./StateManager */ "./src/state/StateManager.ts");
+/* harmony import */ var _network_Types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../network/Types */ "./src/network/Types.ts");
+/* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../network/DownloadManager */ "./src/network/DownloadManager.ts");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _StateChangedDelegate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./StateChangedDelegate */ "./src/state/StateChangedDelegate.ts");
+
+
+
+
+
+/*
+*
+*   WORK IN PROGRESS
+*
+ */
+
+var graphSMLogger = debug__WEBPACK_IMPORTED_MODULE_3___default()('state-manager-graphql');
+var GraphQLApiStateManager = /*#__PURE__*/function () {
+  function GraphQLApiStateManager() {
+    this.configuration = [];
+    this.delegate = new _StateChangedDelegate__WEBPACK_IMPORTED_MODULE_4__["default"]('graphql');
+    this.emitEvents();
+    this.bHasCompletedRun = [];
+    this.callbackForAddItem = this.callbackForAddItem.bind(this);
+    this.callbackForRemoveItem = this.callbackForRemoveItem.bind(this);
+    this.callbackForUpdateItem = this.callbackForUpdateItem.bind(this);
+    this.callbackForGetItems = this.callbackForGetItems.bind(this);
+  }
+
+  var _proto = GraphQLApiStateManager.prototype;
+
+  _proto.getConfiguredStateNames = function getConfiguredStateNames() {
+    var results = [];
+    this.configuration.forEach(function (config) {
+      results.push(config.stateName);
+    });
+    return results;
+  };
+
+  _proto.hasCompletedRun = function hasCompletedRun(stateName) {
+    var result = false;
+    var foundIndex = this.configuration.findIndex(function (config) {
+      return config.stateName === stateName;
+    });
+
+    if (foundIndex >= 0) {
+      result = this.bHasCompletedRun[foundIndex];
+    }
+
+    return result;
+  };
+
+  _proto.setCompletedRun = function setCompletedRun(stateName) {
+    var foundIndex = this.configuration.findIndex(function (config) {
+      return config.stateName === stateName;
+    });
+
+    if (foundIndex >= 0) {
+      this.bHasCompletedRun[foundIndex] = true;
+    }
+  };
+
+  _proto.forceResetForGet = function forceResetForGet(stateName) {
+    var foundIndex = this.configuration.findIndex(function (config) {
+      return config.stateName === stateName;
+    });
+
+    if (foundIndex >= 0) {
+      this.bHasCompletedRun[foundIndex] = false;
+    }
+  };
+
+  _proto.initialise = function initialise(config) {
+    this.configuration = config;
+    var runsComplete = [];
+    this.configuration.forEach(function (configItem) {
+      runsComplete.push(false);
+    });
+    this.bHasCompletedRun = runsComplete;
+  };
+
+  _proto.getConfigurationForStateName = function getConfigurationForStateName(name) {
+    var config = {
+      stateName: name,
+      apiURL: '/graphql',
+      apis: {
+        findAll: '',
+        create: '',
+        destroy: '',
+        update: '',
+        find: ''
+      },
+      data: {
+        findAll: '',
+        create: '',
+        destroy: '',
+        update: '',
+        find: ''
+      },
+      isActive: false
+    };
+    var foundIndex = this.configuration.findIndex(function (config) {
+      return config.stateName === name;
+    });
+
+    if (foundIndex >= 0) {
+      config = this.configuration[foundIndex];
+    }
+
+    return config;
+  };
+
+  _proto.callbackForRemoveItem = function callbackForRemoveItem(data, status, associatedStateName) {
+    graphSMLogger("callback for remove item for state " + associatedStateName + " with status " + status + " - not forwarded");
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      graphSMLogger(data);
+    }
+  };
+
+  _proto.callbackForUpdateItem = function callbackForUpdateItem(data, status, associatedStateName) {
+    graphSMLogger("callback for update item for state " + associatedStateName + " with status " + status + " - not forwarded");
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      graphSMLogger(data);
+    }
+  };
+
+  _proto.callbackForGetItems = function callbackForGetItems(data, status, associatedStateName) {
+    graphSMLogger("callback for get items for state " + associatedStateName + " with status " + status + " - FORWARDING");
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      graphSMLogger(data);
+      var config = this.getConfigurationForStateName(associatedStateName);
+      var dataAttribute = config.data.findAll;
+      this.setCompletedRun(associatedStateName);
+      this.delegate.informChangeListenersForStateWithName(associatedStateName, data.data[dataAttribute], _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].StateChanged, null);
+    }
+  };
+
+  _proto.callbackForAddItem = function callbackForAddItem(data, status, associatedStateName) {
+    graphSMLogger("callback for add item for state " + associatedStateName + " with status " + status + " - FORWARDING");
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      graphSMLogger(data);
+      this.delegate.informChangeListenersForStateWithName(associatedStateName, data, _StateManager__WEBPACK_IMPORTED_MODULE_0__["stateEventType"].ItemAdded, null);
+    }
+  };
+
+  _proto._addNewNamedStateToStorage = function _addNewNamedStateToStorage(state) {
+    /* assume model on the other end exists */
+  };
+
+  _proto._getState = function _getState(name) {
+    graphSMLogger("Getting All " + name);
+
+    if (this.hasCompletedRun(name)) {
+      graphSMLogger("Getting All " + name + " - not done - previously retrieved");
+    } else {
+      var config = this.getConfigurationForStateName(name);
+
+      if (config.isActive) {
+        var query = config.apis.findAll;
+        var jsonRequest = {
+          url: config.apiURL,
+          type: _network_Types__WEBPACK_IMPORTED_MODULE_1__["RequestType"].POST,
+          params: {
+            query: query
+          },
+          callback: this.callbackForGetItems,
+          associatedStateName: name
+        };
+        graphSMLogger("Getting All " + name + " with query \"" + query + "\"");
+        _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__["default"].addApiRequest(jsonRequest, true);
+      } else {
+        graphSMLogger("No configuration for state " + name);
+      }
+    }
+
+    var state = {
+      name: name,
+      value: []
+    };
+    return state;
+  };
+
+  _proto._ensureStatePresent = function _ensureStatePresent(name) {
+    /* assume state exists */
+  };
+
+  _proto._replaceNamedStateInStorage = function _replaceNamedStateInStorage(state) {
+    /* not going to replace all state */
+  };
+
+  _proto._saveState = function _saveState(name, stateObj) {
+    /* not going to replace all state */
+  };
+
+  _proto._addItemToState = function _addItemToState(name, stateObj, isPersisted) {
+    if (isPersisted === void 0) {
+      isPersisted = false;
+    }
+
+    if (isPersisted) return; // dont add complete objects to the state - they are already processed
+
+    graphSMLogger("Adding item to " + name);
+    graphSMLogger(stateObj);
+    var config = this.getConfigurationForStateName(name);
+
+    if (config.isActive) {
+      var mutation = {};
+      mutation[config.apis.create] = {};
+      var jsonRequest = {
+        url: config.apiURL,
+        type: _network_Types__WEBPACK_IMPORTED_MODULE_1__["RequestType"].POST,
+        params: {
+          mutation: mutation
+        },
+        callback: this.callbackForAddItem,
+        associatedStateName: name
+      };
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__["default"].addApiRequest(jsonRequest, true);
+    } else {
+      graphSMLogger("No configuration for state " + name);
+    }
+  };
+
+  _proto._removeItemFromState = function _removeItemFromState(name, stateObj, testForEqualityFunction, isPersisted) {
+    if (isPersisted) return; // dont remove complete objects to the state - they are already processed
+
+    graphSMLogger("Removing item to " + name);
+    graphSMLogger(stateObj);
+    var config = this.getConfigurationForStateName(name);
+
+    if (config.isActive) {
+      var mutation = {};
+      mutation[config.apis.destroy] = {};
+      var jsonRequest = {
+        url: config.apiURL,
+        type: _network_Types__WEBPACK_IMPORTED_MODULE_1__["RequestType"].POST,
+        params: {
+          mutation: mutation
+        },
+        callback: this.callbackForRemoveItem,
+        associatedStateName: name
+      };
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__["default"].addApiRequest(jsonRequest, true);
+    } else {
+      graphSMLogger("No configuration for state " + name);
+    }
+  };
+
+  _proto._updateItemInState = function _updateItemInState(name, stateObj, testForEqualityFunction, isPersisted) {
+    if (isPersisted) return; // dont update complete objects to the state - they are already processed
+
+    graphSMLogger("Updating item in " + name);
+    graphSMLogger(stateObj);
+    var config = this.getConfigurationForStateName(name);
+
+    if (config.isActive) {
+      var mutation = {};
+      mutation[config.apis.destroy] = {};
+      var jsonRequest = {
+        url: config.apiURL,
+        type: _network_Types__WEBPACK_IMPORTED_MODULE_1__["RequestType"].POST,
+        params: {
+          mutation: mutation
+        },
+        callback: this.callbackForUpdateItem,
+        associatedStateName: name
+      };
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_2__["default"].addApiRequest(jsonRequest, true);
+    } else {
+      graphSMLogger("No configuration for state " + name);
+    }
+  };
+
+  _proto.addChangeListenerForName = function addChangeListenerForName(name, listener) {
+    this.delegate.addChangeListenerForName(name, listener);
+  };
+
+  _proto.addNewItemToState = function addNewItemToState(name, item, isPersisted) {
+    this._addItemToState(name, item, isPersisted);
+  };
+
+  _proto.emitEvents = function emitEvents() {
+    this.delegate.emitEvents();
+  };
+
+  _proto.findItemInState = function findItemInState(name, item, testForEqualityFunction) {
+    throw Error("not implemented");
+  };
+
+  _proto.getStateByName = function getStateByName(name) {
+    this._getState(name);
+  };
+
+  _proto.informChangeListenersForStateWithName = function informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue) {
+    this.delegate.informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue);
+  };
+
+  _proto.isItemInState = function isItemInState(name, item, testForEqualityFunction) {
+    return true;
+  };
+
+  _proto.removeItemFromState = function removeItemFromState(name, item, testForEqualityFunction, isPersisted) {
+    this._removeItemFromState(name, item, testForEqualityFunction, isPersisted);
+
+    return true;
+  };
+
+  _proto.setStateByName = function setStateByName(name, stateObjectForName, informListeners) {};
+
+  _proto.suppressEvents = function suppressEvents() {
+    this.delegate.suppressEvents();
+  };
+
+  _proto.updateItemInState = function updateItemInState(name, item, testForEqualityFunction, isPersisted) {
+    this._updateItemInState(name, item, testForEqualityFunction, isPersisted);
+
+    return true;
+  };
+
+  return GraphQLApiStateManager;
+}();
 
 /***/ }),
 

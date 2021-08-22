@@ -48,6 +48,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
 
     private leaveChat(event:Event) {
         event.preventDefault();
+        event.stopPropagation();
         if (this.selectedChatLog) {
             ChatManager.getInstance().leaveChat(this.selectedChatLog.roomName);
             this.selectedChatLog = null;
@@ -83,6 +84,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
 
     handleAddMessage(event: Event): void {
         event.preventDefault();
+        event.stopPropagation();
         csLogger(`Handling message event`);
         if (this.selectedChatLog) {
             // @ts-ignore
@@ -239,6 +241,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
 
     eventClickItem(event: MouseEvent) {
         event.preventDefault();
+        event.stopPropagation();
         console.log(event.target);
         // @ts-ignore
         const room = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
@@ -266,6 +269,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
     getDragData(event: DragEvent) {}
     protected eventDeleteClickItem(event: MouseEvent): void {
         event.preventDefault();
+        event.stopPropagation();
         console.log(event.target);
         // @ts-ignore
         const room = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);

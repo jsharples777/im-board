@@ -1,7 +1,7 @@
 import apiUtil from './ApiUtil';
 import uuid from '../util/UUID';
 import QueueListener from "./QueueListener";
-import {managerRequest, jsonRequest, queueType, RequestType} from "./Types";
+import {managerRequest, jsonRequest, queueType, RequestType, RequestCallBackFunction} from "./Types";
 
 import debug from 'debug';
 
@@ -38,6 +38,18 @@ class DownloadManager {
 
   public getBackgroundQueueCount() {
     return this.backgroundQueue.length;
+  }
+
+  public addQLApiRequest(url:string, query:string, callback: RequestCallBackFunction, state:string, isPriority = false) {
+    let request:jsonRequest = {
+      url: url,
+      type: RequestType.POST,
+      params: {query},
+      callback: callback,
+      associatedStateName: state
+    }
+
+    downloader.addApiRequest(request,isPriority);
   }
 
   public addApiRequest(jsonRequest:jsonRequest, isPriority = false) {

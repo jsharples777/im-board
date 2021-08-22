@@ -8,6 +8,7 @@ import controller from './Controller';
 import UserSearchSidebarView from "./component/UserSearchSidebarView";
 import ChatSidebarView from "./component/ChatSidebarView";
 import BoardGameSearchSidebarView from "./component/BoardGameSerachSidebarView";
+import BoardGameView from "./component/BoardGameView";
 
 
 const logger = debug('app');
@@ -35,40 +36,47 @@ class Root extends React.Component{
     // @ts-ignore
     private closeBtnEl: HTMLElement | null;
 
+    // @ts-ignore
+    private thisEl: HTMLDivElement | null;
+
     constructor() {
         // @ts-ignore
         super();
         this.state = {
             isLoggedIn: false,
             loggedInUserId: -1,
-            entries: [],
+            boardGames: [],
             selectedEntry: {},
-            applyUserFilter:false,
             stateNames: {
                 users: 'users',
-                entries: 'entries',
-                comments: 'comments',
+                boardGames: 'boardGames',
+                scores: 'scores',
                 selectedEntry: 'selectedEntry',
                 recentUserSearches: 'recentUserSearches',
                 bggSearchResults: 'bggSearchResults'
             },
             apis: {
-                users: '/users',
-                entries: '/blog',
-                entry: '/blog',
-                comments: '/comment',
-                login: '/login',
-                bggSearch: '/graphql',
+                login: '/api/login',
+                graphQL: '/graphql',
                 bggSearchCall: 'query {\n' +
                     '  findBoardGames(query: "@") {\n' +
                     '    id, name, year\n' +
                     '  }\n' +
                     '} ',
-                bggSearchCallById: 'query {\n' +
-                    '  getBoardGameDetails(id:@) {\n' +
-                    '    id,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' +
-                    '  }\n' +
-                    '}',
+                bggSearchCallById: {
+                    queryString: 'query {\n' +
+                            '  getBoardGameDetails(id: {id:@}) {\n' +
+                        '    id,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' +
+                        '  }\n' +
+                        '}',
+                    resultName:'getBoardGameDetails',
+                },
+                findUsers: {
+                    queryString: 'query {\n  findUsers {\n    id, username\n  }\n}',
+                    resultName: 'findUsers',
+                },
+
+
             },
             ui: {
                 draggable: {
@@ -257,7 +265,32 @@ class Root extends React.Component{
         this.handleShowChat = this.handleShowChat.bind(this);
         this.handleShowBGGSearch = this.handleShowBGGSearch.bind(this);
 
+        this.handleDragOver = this.handleDragOver.bind(this);
+        this.handleDrop = this.handleDrop.bind(this);
+
         controller.connectToApplication(this, window.localStorage);
+    }
+
+    private handleDragOver(event:DragEvent) {
+        event.preventDefault();
+    }
+
+    private handleDrop(event:Event) {
+        // @ts-ignore
+        const draggedObjectJSON = event.dataTransfer.getData(this.state.ui.draggable.draggableDataKeyId);
+        logger(draggedObjectJSON);
+        const draggedObject = JSON.parse(draggedObjectJSON);
+        logger(draggedObject);
+        // @ts-ignore
+        if (draggedObject[this.state.ui.draggable.draggedType] === this.state.ui.draggable.draggedTypeBoardGame) {
+            this.addBoardGame(draggedObject);
+        }
+
+    }
+
+    public addBoardGame(draggedObject:any) {
+        // ok, we are just the dumb view, pass this onto the controller to work out the logic for us
+        controller.addBoardGame(draggedObject);
     }
 
     getCurrentUser() {
@@ -275,8 +308,24 @@ class Root extends React.Component{
 
     render() {
         logger("Rendering App");
+        // @ts-ignore
+        let boardGames:any[] = this.state.boardGames;
+        logger(boardGames);
+
+        const games = boardGames.map((entry, index:number) =>
+            <BoardGameView
+                key={index}
+                boardGame={entry}
+                deleteEntryHandler={() => {}}
+                showScoresHandler={() => {}}
+            />
+        );
+
         return (
             <div className="root container-fluid">
+                <div className="card-group">
+                    {games}
+                </div>
             </div>
         );
     }
@@ -345,6 +394,14 @@ class Root extends React.Component{
         if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click',this.confirmDelete);
         if (this.closeBtnEl) this.closeBtnEl.addEventListener('click',this.cancelDelete);
 
+        // a reference to the div containing ourselves
+        // @ts-ignore
+        this.thisEl = document.getElementById('root');
+        if (this.thisEl) {
+            this.thisEl.addEventListener('dragover', this.handleDragOver);
+            this.thisEl.addEventListener('drop', this.handleDrop);
+        }
+
         // ok lets try get things done
         controller.initialise();
     }
@@ -399,7 +456,7 @@ class Root extends React.Component{
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 //localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
-localStorage.debug = 'app controller-ts api-ts board-game-search-sidebar board-game-search-sidebar:detail';
+localStorage.debug = 'app controller-ts api-ts board-game-search-sidebar board-game-search-sidebar:detail view-ts:boardgameview';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

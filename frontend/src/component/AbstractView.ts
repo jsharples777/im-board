@@ -125,7 +125,11 @@ export default abstract class AbstractView implements StateChangeListener {
                 deleteButtonEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
                 deleteButtonEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
                 deleteButtonEl.setAttribute(domConfig.resultDataSourceId, dataSource);
-                deleteButtonEl.addEventListener('click',this.eventDeleteClickItem);
+                deleteButtonEl.addEventListener('click',(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.eventDeleteClickItem(event);
+                });
                 contentEl.appendChild(deleteButtonEl);
             }
             childEl.appendChild(contentEl);

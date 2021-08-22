@@ -29,8 +29,14 @@ type BoardGameDetail {
     categories: String
 }
 
+type User {
+    id: Int!,
+    username: String!
+}
+
 ##### top level declarations
 type Query {
     findBoardGames(query:String!): [BoardGame]
     getBoardGameDetails(id:IdInput!): BoardGameDetail
+    findUsers: [User]
 }

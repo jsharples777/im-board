@@ -1,38 +1,11 @@
-require('dotenv').config();
-import debug from 'debug';
-import fs  from 'fs';
-import {ApolloServer} from 'apollo-server-express';
-import {Express} from 'express';
-import request, {Response} from 'request';
-import {Parser} from 'xml2js';
+import request, {Response} from "request";
+import {Parser} from "xml2js";
+import debug from "debug";
 
 const bggLogger = debug('bgg');
 
-class BGGDataSource {
-    private apolloServer:ApolloServer;
+class BGGDataSourceDelegate {
 
-    constructor(serverApp:Express) {
-
-        let resolvers = {
-            Query: {
-                findBoardGames: this.findBoardGames,
-                getBoardGameDetails: this.getBoardGameDetails
-            },
-        };
-
-        // @ts-ignore
-        const typeDefBuffer:Buffer = fs.readFileSync(process.env.QL_SCHEMA, "utf-8");
-        bggLogger(typeDefBuffer);
-        const isDevelopment = (process.env.MODE === 'Development');
-
-        this.apolloServer = new ApolloServer({
-            playground: isDevelopment,
-            typeDefs: typeDefBuffer.toString(),
-            resolvers: resolvers
-        });
-        this.apolloServer.applyMiddleware({app: serverApp, path: "/graphql"});
-
-    }
 
     private static convertToBoardGame(item:any):any {
         bggLogger(item.name);
@@ -180,7 +153,7 @@ class BGGDataSource {
                             if (parsedResults.items.item) {
                                 let parsedResultItems: any[] = parsedResults.items.item;
                                 parsedResultItems.forEach((item: any) => {
-                                    let boardGame: any = BGGDataSource.convertToBoardGame(item);
+                                    let boardGame: any = BGGDataSourceDelegate.convertToBoardGame(item);
                                     bggLogger(boardGame);
                                     results.push(boardGame);
                                 });
@@ -217,12 +190,12 @@ class BGGDataSource {
                 let parser = new Parser();
                 parser.parseString(body, (err:any, parsedResults:any) => {
                     if (err) reject("xml parsing error");
-                     if (parsedResults.items) {
-                         if (parsedResults.items.item) {
-                             let item:any = parsedResults.items.item[0];
-                             result = BGGDataSource.convertToDetails(item);
-                         }
-                     }
+                    if (parsedResults.items) {
+                        if (parsedResults.items.item) {
+                            let item:any = parsedResults.items.item[0];
+                            result = BGGDataSourceDelegate.convertToDetails(item);
+                        }
+                    }
 
                 });
                 resolve(result);
@@ -234,4 +207,4 @@ class BGGDataSource {
 
 }
 
-export = BGGDataSource;
+export = BGGDataSourceDelegate;

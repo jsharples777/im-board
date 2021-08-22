@@ -55,6 +55,7 @@ class BoardGameSearchSidebarView extends SidebarView {
     private handleSearch(event:Event) {
         vLogger(`Handling search`);
         event.preventDefault();
+        event.stopPropagation();
         // do we have anything to search for?
         let queryText = this.queryEl.value.trim();
         if (queryText.length == 0) return;
@@ -72,15 +73,7 @@ class BoardGameSearchSidebarView extends SidebarView {
         query = query.replace(regex,queryText);
         vLoggerDetail(`query string is now ${query}`);
 
-        let request:jsonRequest = {
-            url: this.config.apis.bggSearch,
-            type: RequestType.POST,
-            params: {query},
-            callback: this.handleSearchResultsCB,
-            associatedStateName: this.config.stateNames.bggSearchResults
-        }
-
-        downloader.addApiRequest(request,true);
+        downloader.addQLApiRequest(this.config.apis.graphQL, query, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
     }
 
     public handleSearchResultsCB(data:any,status:number,associatedStateName:string):void {
@@ -129,6 +122,7 @@ class BoardGameSearchSidebarView extends SidebarView {
 
     eventClickItem(event: MouseEvent) {
         event.preventDefault();
+        event.stopPropagation();
         console.log(event.target);
         // @ts-ignore
         const boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
@@ -138,7 +132,12 @@ class BoardGameSearchSidebarView extends SidebarView {
         // @ts-ignore
         vLoggerDetail(`Board Game ${event.target} with id ${boardGameId} clicked from ${dataSource}`);
 
-        alert("Implement board game search item clicked");
+        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults,{id:parseInt(boardGameId)},isSame);
+        if (boardGame) {
+            this.applicationView.addBoardGame(boardGame);
+        }
+        this.eventHide(null);
+
     }
 
 
@@ -167,7 +166,6 @@ class BoardGameSearchSidebarView extends SidebarView {
     }
 
     protected eventDeleteClickItem(event: MouseEvent): void {
-        event.preventDefault();
         // @ts-ignore
         const boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
         // @ts-ignore
@@ -177,7 +175,7 @@ class BoardGameSearchSidebarView extends SidebarView {
 
         let boardGame:any = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {id: parseInt(boardGameId)}, isSame);
         vLogger(boardGameId);
-        if (boardGameId) {
+        if (boardGame) {
             this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, isSame,true);
         }
     }
