@@ -9,6 +9,7 @@ import UserSearchSidebarView from "./component/UserSearchSidebarView";
 import ChatSidebarView from "./component/ChatSidebarView";
 import BoardGameSearchSidebarView from "./component/BoardGameSerachSidebarView";
 import BoardGameView from "./component/BoardGameView";
+import {Decorator} from "./AppTypes";
 
 
 const logger = debug('app');
@@ -248,8 +249,8 @@ class Root extends React.Component{
             },
             controller: {
                 events: {
-                    entry: {
-                        eventDataKeyId: 'entry-id',
+                    boardGames: {
+                        eventDataKeyId: 'board-game-id',
                     },
                 },
                 dataLimit: {
@@ -283,14 +284,14 @@ class Root extends React.Component{
         logger(draggedObject);
         // @ts-ignore
         if (draggedObject[this.state.ui.draggable.draggedType] === this.state.ui.draggable.draggedTypeBoardGame) {
-            this.addBoardGame(draggedObject);
+            this.addBoardGameToDisplay(draggedObject);
         }
 
     }
 
-    public addBoardGame(draggedObject:any) {
+    public addBoardGameToDisplay(draggedObject:any) {
         // ok, we are just the dumb view, pass this onto the controller to work out the logic for us
-        controller.addBoardGame(draggedObject);
+        controller.addBoardGameToDisplay(draggedObject);
     }
 
     getCurrentUser() {
@@ -316,8 +317,10 @@ class Root extends React.Component{
             <BoardGameView
                 key={index}
                 boardGame={entry}
-                deleteEntryHandler={() => {}}
+                removeFromDisplayHandler={controller.removeBoardGameFromDisplay}
                 showScoresHandler={() => {}}
+                addToCollectionHandler={controller.addBoardGameToCollection}
+                removeFromCollectionHandler={this.handleDeleteBoardGame}
             />
         );
 
@@ -330,7 +333,7 @@ class Root extends React.Component{
         );
     }
 
-    cancelDelete(event:Event) {
+    cancelDelete(event:MouseEvent) {
         // @ts-ignore
         this.modalEl.classList.remove(this.state.ui.alert.showClass);
         // @ts-ignore
@@ -338,16 +341,45 @@ class Root extends React.Component{
         event.preventDefault();
     }
 
-    confirmDelete(event:Event) {
+    confirmDelete(event:MouseEvent) {
         // @ts-ignore
         this.modalEl.classList.remove(this.state.ui.alert.showClass);
         // @ts-ignore
         this.modalEl.classList.add(this.state.ui.alert.hideClass);
         event.preventDefault();
         // @ts-ignore
-        let id = this.modalEl.getAttribute(this.state.controller.events.entry.eventDataKeyId);
+        let id = this.modalEl.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
         logger(`Handling Delete with id ${id}`);
+        controller.removeBoardGameFromCollection(event);
     }
+
+    handleDeleteBoardGame(event:MouseEvent) {
+        event.preventDefault();
+        this.hideAllSideBars();
+        // @ts-ignore
+        let id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
+        logger(`Handling Delete Board Game ${id}`);
+        if (id) {
+            // @ts-ignore
+            this.modalEl.setAttribute(this.state.controller.events.entry.eventDataKeyId,id);
+            // find the entry from the state manager
+            id = parseInt(id);
+            // @ts-ignore
+            const currentBoardGamesOnDisplay = this.state.boardGames;
+            let index = currentBoardGamesOnDisplay.findIndex((game:any) => game.id === id);
+            if (index >= 0) {
+                const boardGame = currentBoardGamesOnDisplay[index];
+                if (boardGame.decorator && (boardGame.decorator === Decorator.Persisted)) {
+                    this.alert(`${boardGame.name} (${boardGame.year})`, "Are you sure you want to delete this board game from your collection?");
+                }
+                else {
+                    // not persisted yet, let the controller manage this one
+                    controller.removeBoardGameFromDisplay(event);
+                }
+            }
+        }
+    }
+
 
     async componentDidMount() {
         logger('component Did Mount');

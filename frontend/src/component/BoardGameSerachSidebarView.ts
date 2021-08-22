@@ -134,7 +134,7 @@ class BoardGameSearchSidebarView extends SidebarView {
 
         let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults,{id:parseInt(boardGameId)},isSame);
         if (boardGame) {
-            this.applicationView.addBoardGame(boardGame);
+            this.applicationView.addBoardGameToDisplay(boardGame);
         }
         this.eventHide(null);
 

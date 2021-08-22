@@ -1,4 +1,5 @@
 export enum Decorator  {
     Incomplete,
-    Complete
+    Complete,
+    Persisted
 }
