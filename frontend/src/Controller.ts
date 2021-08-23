@@ -102,6 +102,7 @@ class Controller implements StateChangeListener {
 
         // call backs
         this.callbackBoardGameDetails = this.callbackBoardGameDetails.bind(this);
+        this.callbackAddToCollection = this.callbackAddToCollection.bind(this);
 
         //event handlers
         this.addBoardGameToCollection = this.addBoardGameToCollection.bind(this);
@@ -312,7 +313,7 @@ class Controller implements StateChangeListener {
 
         // don't add if already in the users display
         let currentListOfGames: any[] = this.applicationView.state.boardGames;
-        let index = currentListOfGames.findIndex((value) => value.id === boardGame.id);
+        let index = currentListOfGames.findIndex((value) => value.gameId === boardGame.gameId);
         if (index >= 0) {
             cLogger(`Board game in display already`);
             return;
@@ -329,7 +330,7 @@ class Controller implements StateChangeListener {
 
         // now we need an API call to fill in the details
         let query = this.config.apis.bggSearchCallById.queryString;
-        query = query.replace(/@/, boardGame.id);
+        query = query.replace(/@/, boardGame.gameId);
         downloader.addQLApiRequest(this.config.apis.graphQL, query, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
 
 
@@ -355,7 +356,7 @@ class Controller implements StateChangeListener {
 
             //this.getStateManager().addNewItemToState(this.config.stateNames.boardGames,data.data[this.config.apis.bggSearchCallById.resultName],true);
             let currentListOfGames: any[] = this.applicationView.state.boardGames;
-            let index = currentListOfGames.findIndex((value) => value.id === boardGameDetails.id);
+            let index = currentListOfGames.findIndex((value) => value.gameId === boardGameDetails.gameId);
             if (index >= 0) {
                 cLogger(`Updating application state`);
                 currentListOfGames.splice(index, 1, boardGameDetails);
@@ -373,7 +374,7 @@ class Controller implements StateChangeListener {
 
     private removeBoardGameFromState(boardGame:any) {
         const currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
-        let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.id === boardGame.id);
+        let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === boardGame.gameId);
         if (index >= 0) {
             currentBoardGamesOnDisplay.splice(index,1);
             this.applicationView.setState({boardGames:currentBoardGamesOnDisplay});
@@ -391,7 +392,7 @@ class Controller implements StateChangeListener {
             id = parseInt(id);
             // @ts-ignore
             const currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
-            let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.id === id);
+            let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
             if (index >= 0) {
                 boardGame = currentBoardGamesOnDisplay[index];
             }
@@ -413,6 +414,19 @@ class Controller implements StateChangeListener {
         return result;
     }
 
+
+    public callbackAddToCollection(data: any, status: number, associatedStateName: string): void {
+        cLogger(`callback for bgg search for single board game ${associatedStateName} with status ${status}`);
+        if (status >= 200 && status <= 299) { // do we have any data?
+            cLogger(data);
+            const id = data.data[this.config.apis.addToMyCollection.resultName];
+            cLogger(id);
+
+            XXX
+        }
+    }
+
+
     addBoardGameToCollection(event: MouseEvent) {
         cLogger(`Handling Add Board Game to collection`);
         const boardGame: any | null = this.findBoardGameInStateFromEvent(event);
@@ -430,7 +444,13 @@ class Controller implements StateChangeListener {
                     case (Decorator.Complete): {
                         // loaded and ready to save
                         this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames,boardGame,true);
-                        alert("Implement persist the board game");
+                        // add the board game to my collection
+                        // now we need an API call to fill in the details
+                        let query = this.config.apis.addToMyCollection.queryString;
+                        query = query.replace(/@/, ''+this.getLoggedInUserId());
+                        query = query.replace(/@/, boardGame.gameId);
+                        downloader.addQLApiRequest(this.config.apis.graphQL, query, this.callbackAddToCollection, this.config.stateNames.boardGames, true);
+
                         break;
                     }
                 }

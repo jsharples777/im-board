@@ -1,15 +1,15 @@
 type BoardGame {
-    id: Int!
+    gameId: Int!
     name:String!
     year: Int
 }
 
-input IdInput {
+type Id {
     id:Int!
 }
 
 input BoardGameDetailInput {
-    id: Int!
+    gameId: Int!
     thumb: String!
     image: String!
     name: String!
@@ -30,7 +30,7 @@ input BoardGameDetailInput {
 }
 
 type BoardGameDetail {
-    id: Int!
+    gameId: Int!
     thumb: String!
     image: String!
     name: String!
@@ -69,16 +69,21 @@ type User {
     username: String!
 }
 
+type IdGameId {
+    id: Int!,
+    gameId: Int!
+}
+
 ##### top level declarations
 type Query {
     findBoardGames(query:String!): [BoardGame]
-    getBoardGameDetails(id:IdInput!): BoardGameDetail
+    getBoardGameDetails(gameId:Int!): BoardGameDetail
     findUsers: [User]
     getMyBoardGameCollection(userId: Int): [BoardGameDetail]
 }
 
 type Mutation {
-    addToMyCollection(userId: Int, boardGame: BoardGameDetailInput): Boolean
-    removeFromMyCollection(userId: Int, boardGameId: Int):Boolean
-    addScoreSheetToBoardGame(userId: Int, boardGameId: Int, sheet: ScoreSheetInput): Boolean
+    addToMyCollection(userId: Int, boardGame: BoardGameDetailInput): IdGameId
+    removeFromMyCollection(userId: Int, boardGameId: Int):IdGameId
+    addScoreSheetToBoardGame(userId: Int, boardGameId: Int, sheet: ScoreSheetInput): IdGameId
 }

@@ -67,13 +67,13 @@ class Root extends React.Component{
                 graphQL: '/graphql',
                 bggSearchCall: 'query {\n' +
                     '  findBoardGames(query: "@") {\n' +
-                    '    id, name, year\n' +
+                    '    gameId, name, year\n' +
                     '  }\n' +
                     '} ',
                 bggSearchCallById: {
                     queryString: 'query {\n' +
-                            '  getBoardGameDetails(id: {id:@}) {\n' +
-                        '    id,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' +
+                            '  getBoardGameDetails(gameId: @) {\n' +
+                        '    gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' +
                         '  }\n' +
                         '}',
                     resultName:'getBoardGameDetails',
@@ -82,6 +82,10 @@ class Root extends React.Component{
                     queryString: 'query {\n  findUsers {\n    id, username\n  }\n}',
                     resultName: 'findUsers',
                 },
+                addToMyCollection: {
+                    queryString: 'mutation {\n  addToMyCollection(userId: @, boardGame: @) {\n    id  }\n}',
+                    resultName: 'addToMyCollection',
+                }
 
 
             },
@@ -492,7 +496,7 @@ class Root extends React.Component{
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
-localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager';
+localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

@@ -8,6 +8,7 @@ import MySQLDataSourceDelegate from "./MySQLDataSourceDelegate";
 
 const dsLogger = debug('data-source');
 
+
 class DataSource {
     protected apolloServer: ApolloServer;
     protected bggDelegate: BGGDataSourceDelegate;
@@ -22,8 +23,14 @@ class DataSource {
             Query: {
                 findBoardGames: this.bggDelegate.findBoardGames,
                 getBoardGameDetails: this.bggDelegate.getBoardGameDetails,
-                findUsers: this.mysqlDelegate.getUsers
+                findUsers: this.mysqlDelegate.getUsers,
+                getMyBoardGameCollection: this.mysqlDelegate.getMyBoardGameCollection
             },
+            Mutation: {
+                addToMyCollection: this.mysqlDelegate.addToMyCollection,
+                removeFromMyCollection: this.mysqlDelegate.removeFromMyCollection,
+                addScoreSheetToBoardGame: this.mysqlDelegate.addScoreSheetToBoardGame
+            }
         };
 
         // @ts-ignore
@@ -41,6 +48,94 @@ class DataSource {
     }
 
 }
+
+/*
+type BoardGame {
+    id: Int!
+    name:String!
+    year: Int
+}
+
+input IdInput {
+    id:Int!
+}
+
+input BoardGameDetailInput {
+    id: Int!
+    thumb: String!
+    image: String!
+    name: String!
+    description: String!
+    year: Int
+    minPlayers: Int
+    maxPlayers: Int
+    minPlayTime: Int
+    maxPlayTime: Int
+    minAge: Int
+    designers: String
+    artists: String
+    publisher: String
+    numOfRaters: Int
+    averageScore: Float
+    rank: Int
+    categories: String
+}
+
+type BoardGameDetail {
+    id: Int!
+    thumb: String!
+    image: String!
+    name: String!
+    description: String!
+    year: Int
+    minPlayers: Int
+    maxPlayers: Int
+    minPlayTime: Int
+    maxPlayTime: Int
+    minAge: Int
+    designers: String
+    artists: String
+    publisher: String
+    numOfRaters: Int
+    averageScore: Float
+    rank: Int
+    categories: String
+    scores: [ScoreSheet]
+}
+
+type ScoreSheet {
+    id:Int!
+    players: [String],
+    scores: [Int],
+    jsonData: String
+}
+
+input ScoreSheetInput {
+    players: [String],
+    scores: [Int],
+    jsonData: String
+}
+
+type User {
+    id: Int!,
+    username: String!
+}
+
+##### top level declarations
+type Query {
+    findBoardGames(query:String!): [BoardGame]
+    getBoardGameDetails(id:IdInput!): BoardGameDetail
+    findUsers: [User]
+    getMyBoardGameCollection(userId: Int): [BoardGameDetail]
+}
+
+type Mutation {
+    addToMyCollection(userId: Int, boardGame: BoardGameDetailInput): Boolean
+    removeFromMyCollection(userId: Int, boardGameId: Int):Boolean
+    addScoreSheetToBoardGame(userId: Int, boardGameId: Int, sheet: ScoreSheetInput): Boolean
+}
+
+ */
 
 
 export = DataSource;

@@ -6,8 +6,11 @@ class BoardGame extends Model {}
 
 BoardGame.init({
     id: {
-        autoIncrement: false,
+        autoIncrement: true,
         primaryKey: true,
+        type: DataTypes.INTEGER
+    },
+    gameId: {
         type: DataTypes.INTEGER
     },
 

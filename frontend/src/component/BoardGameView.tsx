@@ -12,26 +12,26 @@ const beLogger = debug('view-ts:boardgameview');
 // @ts-ignore
 export default function BoardGameView({boardGame, showScoresHandler, removeFromDisplayHandler,addToCollectionHandler, removeFromCollectionHandler}) {
     if (boardGame) {
-        beLogger(`Board Game ${boardGame.id}`);
+        beLogger(`Board Game ${boardGame.gameId}`);
 
         let removeButton =
                 <button type="button"
                         className="btn-info btn-sm rounded p-1 mr-2"
-                        board-game-id={boardGame.id} onClick={removeFromDisplayHandler}>
+                        board-game-id={boardGame.gameId} onClick={removeFromDisplayHandler}>
                     &nbsp;&nbsp;Remove &nbsp;
                     <i className="fas fa-trash-alt"></i>&nbsp;&nbsp;
                 </button>
         let addButton =
             <button type="button"
                     className="btn-primary btn-sm rounded p-1 mr-2"
-                    board-game-id={boardGame.id} onClick={addToCollectionHandler}>
+                    board-game-id={boardGame.gameId} onClick={addToCollectionHandler}>
                 &nbsp;&nbsp;Add to Collection &nbsp;
                 <i className="fas fa-star"></i>&nbsp;&nbsp;
             </button>
         let deleteButton =
             <button type="button"
                     className="btn-warning btn-sm rounded p-1 mr-2"
-                    board-game-id={boardGame.id} onClick={removeFromCollectionHandler}>
+                    board-game-id={boardGame.gameId} onClick={removeFromCollectionHandler}>
                 &nbsp;&nbsp;Remove from collection &nbsp;
                 <i className="far fa-star"></i>&nbsp;&nbsp;
             </button>

@@ -14,7 +14,7 @@ class BGGDataSourceDelegate {
             year = parseInt(item.yearpublished[0].$.value);
         }
         let boardGame = {
-            id: parseInt(item.$.id),
+            gameId: parseInt(item.$.id),
             name: item.name[0].$.value,
             year: year
         }
@@ -107,7 +107,7 @@ class BGGDataSourceDelegate {
 
 
         let boardGame = {
-            id: parseInt(item.$.id),
+            gameId: parseInt(item.$.id),
             thumb: thumb,
             image: image,
             name: item.name[0].$.value,
@@ -160,6 +160,7 @@ class BGGDataSourceDelegate {
                             }
                         }
                     });
+                    bggLogger(results);
                     resolve(results);
                 }
                 catch (error) {
@@ -173,8 +174,8 @@ class BGGDataSourceDelegate {
     // @ts-ignore
     getBoardGameDetails(_:any,data:any) {
         bggLogger(data);
-        let url = process.env.URL_FindById + data.id.id;
-        bggLogger(`Looking for board game details for id ${data.id.id}`);
+        let url = process.env.URL_FindById + data.gameId;
+        bggLogger(`Looking for board game details for id ${data.gameId}`);
 
         return new Promise((resolve, reject) => {
 
@@ -198,6 +199,7 @@ class BGGDataSourceDelegate {
                     }
 
                 });
+                bggLogger(result);
                 resolve(result);
             });
 

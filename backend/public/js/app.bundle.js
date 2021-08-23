@@ -541,14 +541,18 @@ var Root = /*#__PURE__*/function (_React$Component) {
       apis: {
         login: '/api/login',
         graphQL: '/graphql',
-        bggSearchCall: 'query {\n' + '  findBoardGames(query: "@") {\n' + '    id, name, year\n' + '  }\n' + '} ',
+        bggSearchCall: 'query {\n' + '  findBoardGames(query: "@") {\n' + '    gameId, name, year\n' + '  }\n' + '} ',
         bggSearchCallById: {
-          queryString: 'query {\n' + '  getBoardGameDetails(id: {id:@}) {\n' + '    id,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' + '  }\n' + '}',
+          queryString: 'query {\n' + '  getBoardGameDetails(gameId: @) {\n' + '    gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' + '  }\n' + '}',
           resultName: 'getBoardGameDetails'
         },
         findUsers: {
           queryString: 'query {\n  findUsers {\n    id, username\n  }\n}',
           resultName: 'findUsers'
+        },
+        addToMyCollection: {
+          queryString: 'mutation {\n  addToMyCollection(userId: @, boardGame: @) {\n    id  }\n}',
+          resultName: 'addToMyCollection'
         }
       },
       ui: {
@@ -966,7 +970,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
 
 
-localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager';
+localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -1095,7 +1099,8 @@ var Controller = /*#__PURE__*/function () {
     this.stateChangedItemRemoved = this.stateChangedItemRemoved.bind(this);
     this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this); // call backs
 
-    this.callbackBoardGameDetails = this.callbackBoardGameDetails.bind(this); //event handlers
+    this.callbackBoardGameDetails = this.callbackBoardGameDetails.bind(this);
+    this.callbackAddToCollection = this.callbackAddToCollection.bind(this); //event handlers
 
     this.addBoardGameToCollection = this.addBoardGameToCollection.bind(this);
     this.removeBoardGameFromCollection = this.removeBoardGameFromCollection.bind(this);
@@ -1329,7 +1334,7 @@ var Controller = /*#__PURE__*/function () {
 
     var currentListOfGames = this.applicationView.state.boardGames;
     var index = currentListOfGames.findIndex(function (value) {
-      return value.id === boardGame.id;
+      return value.gameId === boardGame.gameId;
     });
 
     if (index >= 0) {
@@ -1348,7 +1353,7 @@ var Controller = /*#__PURE__*/function () {
     }); // now we need an API call to fill in the details
 
     var query = this.config.apis.bggSearchCallById.queryString;
-    query = query.replace(/@/, boardGame.id);
+    query = query.replace(/@/, boardGame.gameId);
     _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, query, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
   };
 
@@ -1373,7 +1378,7 @@ var Controller = /*#__PURE__*/function () {
 
       var currentListOfGames = this.applicationView.state.boardGames;
       var index = currentListOfGames.findIndex(function (value) {
-        return value.id === boardGameDetails.id;
+        return value.gameId === boardGameDetails.gameId;
       });
 
       if (index >= 0) {
@@ -1394,7 +1399,7 @@ var Controller = /*#__PURE__*/function () {
   _proto.removeBoardGameFromState = function removeBoardGameFromState(boardGame) {
     var currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
     var index = currentBoardGamesOnDisplay.findIndex(function (game) {
-      return game.id === boardGame.id;
+      return game.gameId === boardGame.gameId;
     });
 
     if (index >= 0) {
@@ -1419,7 +1424,7 @@ var Controller = /*#__PURE__*/function () {
 
       var currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
       var index = currentBoardGamesOnDisplay.findIndex(function (game) {
-        return game.id === id;
+        return game.gameId === id;
       });
 
       if (index >= 0) {
@@ -1444,6 +1449,18 @@ var Controller = /*#__PURE__*/function () {
     return result;
   };
 
+  _proto.callbackAddToCollection = function callbackAddToCollection(data, status, associatedStateName) {
+    cLogger("callback for bgg search for single board game " + associatedStateName + " with status " + status);
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      cLogger(data);
+      var id = data.data[this.config.apis.addToMyCollection.resultName];
+      cLogger(id);
+      XXX;
+    }
+  };
+
   _proto.addBoardGameToCollection = function addBoardGameToCollection(event) {
     cLogger("Handling Add Board Game to collection");
     var boardGame = this.findBoardGameInStateFromEvent(event);
@@ -1466,8 +1483,13 @@ var Controller = /*#__PURE__*/function () {
           case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete:
             {
               // loaded and ready to save
-              this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames, boardGame, true);
-              alert("Implement persist the board game");
+              this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames, boardGame, true); // add the board game to my collection
+              // now we need an API call to fill in the details
+
+              var query = this.config.apis.addToMyCollection.queryString;
+              query = query.replace(/@/, '' + this.getLoggedInUserId());
+              query = query.replace(/@/, boardGame.gameId);
+              _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, query, this.callbackAddToCollection, this.config.stateNames.boardGames, true);
               break;
             }
         }
@@ -2124,11 +2146,11 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.getIdForStateItem = function getIdForStateItem(name, item) {
-    return item.id;
+    return item.gameId;
   };
 
   _proto.getLegacyIdForStateItem = function getLegacyIdForStateItem(name, item) {
-    return item.id;
+    return item.gameId;
   };
 
   _proto.getDisplayValueForStateItem = function getDisplayValueForStateItem(name, item) {
@@ -2154,7 +2176,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
     vLoggerDetail("Board Game " + event.target + " with id " + boardGameId + " clicked from " + dataSource);
     var boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {
-      id: parseInt(boardGameId)
+      gameId: parseInt(boardGameId)
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
 
     if (boardGame) {
@@ -2180,7 +2202,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
     vLoggerDetail("Board Game " + event.target.innerText + " with id " + boardGameId + " dragging");
     var boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {
-      id: parseInt(boardGameId)
+      gameId: parseInt(boardGameId)
     }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
     vLoggerDetail(boardGame);
     boardGame[this.config.ui.draggable.draggedType] = this.config.ui.draggable.draggedTypeBoardGame;
@@ -2244,11 +2266,11 @@ function BoardGameView(_ref) {
       removeFromCollectionHandler = _ref.removeFromCollectionHandler;
 
   if (boardGame) {
-    beLogger("Board Game " + boardGame.id);
+    beLogger("Board Game " + boardGame.gameId);
     var removeButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
       type: "button",
       className: "btn-info btn-sm rounded p-1 mr-2",
-      "board-game-id": boardGame.id,
+      "board-game-id": boardGame.gameId,
       onClick: removeFromDisplayHandler
     }, "\xA0\xA0Remove \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
       className: "fas fa-trash-alt"
@@ -2256,7 +2278,7 @@ function BoardGameView(_ref) {
     var addButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
       type: "button",
       className: "btn-primary btn-sm rounded p-1 mr-2",
-      "board-game-id": boardGame.id,
+      "board-game-id": boardGame.gameId,
       onClick: addToCollectionHandler
     }, "\xA0\xA0Add to Collection \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
       className: "fas fa-star"
@@ -2264,7 +2286,7 @@ function BoardGameView(_ref) {
     var deleteButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
       type: "button",
       className: "btn-warning btn-sm rounded p-1 mr-2",
-      "board-game-id": boardGame.id,
+      "board-game-id": boardGame.gameId,
       onClick: removeFromCollectionHandler
     }, "\xA0\xA0Remove from collection \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
       className: "far fa-star"

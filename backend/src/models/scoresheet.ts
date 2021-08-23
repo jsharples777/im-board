@@ -53,6 +53,9 @@ ScoreSheet.init({
         score7: {
             type: DataTypes.INTEGER
         },
+        jsonData: {
+            type: DataTypes.TEXT
+        },
 
         scoreFor: {
             type: DataTypes.INTEGER,

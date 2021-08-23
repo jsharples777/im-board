@@ -101,11 +101,11 @@ class BoardGameSearchSidebarView extends SidebarView {
     }
 
     getIdForStateItem(name: string, item: any) {
-        return item.id;
+        return item.gameId;
     }
 
     getLegacyIdForStateItem(name: string, item: any) {
-        return item.id;
+        return item.gameId;
     }
 
     getDisplayValueForStateItem(name: string, item: any) {
@@ -132,7 +132,7 @@ class BoardGameSearchSidebarView extends SidebarView {
         // @ts-ignore
         vLoggerDetail(`Board Game ${event.target} with id ${boardGameId} clicked from ${dataSource}`);
 
-        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults,{id:parseInt(boardGameId)},isSame);
+        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults,{gameId:parseInt(boardGameId)},isSame);
         if (boardGame) {
             this.applicationView.addBoardGameToDisplay(boardGame);
         }
@@ -158,7 +158,7 @@ class BoardGameSearchSidebarView extends SidebarView {
         const boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
         // @ts-ignore
         vLoggerDetail(`Board Game ${event.target.innerText} with id ${boardGameId} dragging`);
-        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {id: parseInt(boardGameId)}, isSame);
+        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {gameId: parseInt(boardGameId)}, isSame);
         vLoggerDetail(boardGame);
         boardGame[this.config.ui.draggable.draggedType] = this.config.ui.draggable.draggedTypeBoardGame;
         boardGame[this.config.ui.draggable.draggedFrom] = this.config.ui.draggable.draggedFromBoardGameSearch;
