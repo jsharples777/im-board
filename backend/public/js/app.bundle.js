@@ -523,7 +523,13 @@ var Root = /*#__PURE__*/function (_React$Component) {
       isLoggedIn: false,
       loggedInUserId: -1,
       boardGames: [],
-      selectedEntry: {},
+      scoreSheet: {
+        room: '',
+        boardGameName: '',
+        sheetLayoutOptions: {},
+        timer: 0,
+        sheetData: {}
+      },
       stateNames: {
         users: 'users',
         boardGames: 'boardGames',
@@ -957,10 +963,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
   return Root;
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component); //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
-//localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
+//localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
 
 
-localStorage.debug = 'app controller-ts api-ts board-game-search-sidebar board-game-search-sidebar:detail view-ts:boardgameview';
+localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -1013,6 +1019,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AppTypes__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./AppTypes */ "./src/AppTypes.ts");
 /* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./network/DownloadManager */ "./src/network/DownloadManager.ts");
 /* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+/* harmony import */ var _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./component/ScoreSheetController */ "./src/component/ScoreSheetController.ts");
+
 
 
 
@@ -1420,6 +1428,20 @@ var Controller = /*#__PURE__*/function () {
     }
 
     return boardGame;
+  };
+
+  _proto.startScoreSheet = function startScoreSheet(invite) {
+    _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_13__["ScoreSheetController"].getInstance().setupScoreSheet(this.applicationView, invite);
+  };
+
+  _proto.askUserAboutInvitation = function askUserAboutInvitation(invite) {
+    var result = confirm("You have been invited by user " + invite.from + " to joint a chat room for the board game " + invite.subject + " score sheet"); // let the application know to setup for a new scoresheet
+
+    if (result) {
+      this.startScoreSheet(invite);
+    }
+
+    return result;
   };
 
   _proto.addBoardGameToCollection = function addBoardGameToCollection(event) {
@@ -2326,6 +2348,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/BrowserUtil */ "./src/util/BrowserUtil.ts");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _socket_Types__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../socket/Types */ "./src/socket/Types.ts");
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -2349,6 +2372,7 @@ function _setPrototypeOf(o, p) {
 
   return _setPrototypeOf(o, p);
 }
+
 
 
 
@@ -2442,7 +2466,7 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
       var messageContent = this.commentEl.value.trim(); // @ts-ignore
 
       this.commentEl.value = '';
-      var sentMessage = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().sendMessage(this.selectedChatLog.roomName, messageContent);
+      var sentMessage = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_3__["ChatManager"].getInstance().sendMessage(this.selectedChatLog.roomName, messageContent, _socket_Types__WEBPACK_IMPORTED_MODULE_6__["Priority"].Normal, {});
 
       if (sentMessage) {
         // add the message to our display
@@ -2457,7 +2481,7 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
     if (this.selectedChatLog) {
       if (this.commentEl) this.commentEl.removeAttribute("readonly");
       if (this.sendMessageButton) this.sendMessageButton.removeAttribute("disabled");
-      if (this.leaveChatButton) this.sendMessageButton.removeAttribute("disabled");
+      if (this.leaveChatButton) this.leaveChatButton.removeAttribute("disabled");
     } else {
       if (this.commentEl) this.commentEl.setAttribute("readonly", "true");
       if (this.sendMessageButton) this.sendMessageButton.setAttribute("disabled", "true");
@@ -2671,6 +2695,75 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
 }(_SidebarView__WEBPACK_IMPORTED_MODULE_1__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (ChatSidebarView);
+
+/***/ }),
+
+/***/ "./src/component/ScoreSheetController.ts":
+/*!***********************************************!*\
+  !*** ./src/component/ScoreSheetController.ts ***!
+  \***********************************************/
+/*! exports provided: ScoreSheetController */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ScoreSheetController", function() { return ScoreSheetController; });
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../socket/ChatManager */ "./src/socket/ChatManager.ts");
+
+
+var sscLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('score-sheet-controller');
+var ScoreSheetController = /*#__PURE__*/function () {
+  ScoreSheetController.getInstance = function getInstance() {
+    if (!ScoreSheetController._instance) {
+      ScoreSheetController._instance = new ScoreSheetController();
+    }
+
+    return ScoreSheetController._instance;
+  };
+
+  function ScoreSheetController() {
+    this.applicationView = null;
+    this.invitation = null;
+  }
+
+  var _proto = ScoreSheetController.prototype;
+
+  _proto.setupScoreSheet = function setupScoreSheet(appView, invitation) {
+    this.applicationView = appView;
+    this.invitation = invitation;
+    _socket_ChatManager__WEBPACK_IMPORTED_MODULE_1__["ChatManager"].getInstance().addMessageListener(this);
+  };
+
+  _proto.endScoreSheet = function endScoreSheet() {
+    alert('Implement end score sheet');
+    _socket_ChatManager__WEBPACK_IMPORTED_MODULE_1__["ChatManager"].getInstance().removeMessageListener(this);
+  };
+
+  _proto.receiveMessage = function receiveMessage(message) {
+    // the attachment should have all the data we need to display the scoresheet
+
+    /*scoreSheet: {
+          room: ''
+            boardGameName: '',
+            sheetLayoutOptions: {},
+        timer: 0,
+            sheetData: {}
+    }*/
+    // are we scoring the right sheet?
+    sscLogger("Received message for score sheet " + message.room);
+    sscLogger(message);
+
+    if (message.attachment && this.invitation) {
+      if (message.room === this.invitation.room) {
+        alert('TO DO scoresheet');
+      }
+    }
+  };
+
+  return ScoreSheetController;
+}();
 
 /***/ }),
 
@@ -4087,9 +4180,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
-/* harmony import */ var _SocketManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SocketManager */ "./src/socket/SocketManager.ts");
-/* harmony import */ var _util_UUID__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/UUID */ "./src/util/UUID.ts");
+/* harmony import */ var _SocketManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SocketManager */ "./src/socket/SocketManager.ts");
+/* harmony import */ var _Types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Types */ "./src/socket/Types.ts");
+/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+/* harmony import */ var _util_UUID__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../util/UUID */ "./src/util/UUID.ts");
+
 
 
 
@@ -4115,6 +4210,17 @@ var ChatManager = /*#__PURE__*/function () {
 
   var _proto = ChatManager.prototype;
 
+  _proto.addMessageListener = function addMessageListener(listener) {
+    this.messageListeners.push(listener);
+  };
+
+  _proto.removeMessageListener = function removeMessageListener(removeListener) {
+    var index = this.messageListeners.findIndex(function (listener) {
+      return listener == removeListener;
+    });
+    if (index >= 0) this.messageListeners.splice(index, 1);
+  };
+
   _proto.addChatEventHandler = function addChatEventHandler(receiver) {
     this.chatListeners.push(receiver);
   };
@@ -4132,9 +4238,10 @@ var ChatManager = /*#__PURE__*/function () {
     this.chatLogs = [];
     this.chatListeners = [];
     this.chatUserListeners = [];
-    this.localStorage = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_2__["default"](true); // connect to the socket manager
+    this.messageListeners = [];
+    this.localStorage = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_4__["default"](true); // connect to the socket manager
 
-    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].setChatReceiver(this); // bind the receiver methods
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].setChatReceiver(this); // bind the receiver methods
 
     this.receiveLogin = this.receiveLogin.bind(this);
     this.receiveLogout = this.receiveLogout.bind(this);
@@ -4336,7 +4443,7 @@ var ChatManager = /*#__PURE__*/function () {
 
     if (!foundLog) {
       foundLog = {
-        roomName: _util_UUID__WEBPACK_IMPORTED_MODULE_4__["default"].getUniqueId(),
+        roomName: _util_UUID__WEBPACK_IMPORTED_MODULE_5__["default"].getUniqueId(),
         users: [this.getCurrentUser(), username],
         messages: [],
         lastViewed: parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss')),
@@ -4351,7 +4458,7 @@ var ChatManager = /*#__PURE__*/function () {
 
   _proto.receiveJoinedRoom = function receiveJoinedRoom(users) {
     // we get this for all changes to a room, if the username is us can safely ignore
-    if (users.username === this.currentUsername) return;
+    //if (users.username === this.currentUsername) return;
     var log = this.ensureChatLogExists(users.room);
     cmLogger("User list for room " + users.room + " - " + users.userList.join(','));
     log.users = users.userList; // add a "message" for joined user
@@ -4377,7 +4484,7 @@ var ChatManager = /*#__PURE__*/function () {
     if (users.username === this.currentUsername) return;
     var log = this.ensureChatLogExists(users.room);
     cmLogger("User list for room " + users.room + " - " + users.userList.join(','));
-    log.users = users.userList; // add a "message" for joined user
+    log.users = users.userList; // add a "message" for leaving user
 
     var created = parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss'));
     var joinDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()().format('DD/MM/YYYY HH:mm');
@@ -4405,22 +4512,41 @@ var ChatManager = /*#__PURE__*/function () {
   _proto.receiveInvitation = function receiveInvitation(invite) {
     //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
     if (!this.isUserInBlockedList(invite.from)) {
+      cmLogger("Invited to chat " + invite.room);
       var didChatAlreadyExist = this.doesChatRoomExist(invite.room);
-      var chatLog = this.ensureChatLogExists(invite.room); // add the inviter to the user list for the room, if not already added
-
-      if (chatLog.users.findIndex(function (user) {
-        return user === invite.from;
-      }) < 0) chatLog.users.push(invite.from);
-      this.saveLogs();
-      cmLogger("Joining chat " + invite.room);
       cmLogger(invite);
-      _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(this.getCurrentUser(), invite.room);
-      if (!didChatAlreadyExist) this.chatListeners.forEach(function (listener) {
-        return listener.handleNewInviteReceived(invite);
-      });
-      this.chatListeners.forEach(function (listener) {
-        return listener.handleChatLogsUpdated();
-      });
+      cmLogger("Letting the listeners know, if they are all happy to accept then we will join the room");
+      var happyToProceed = true;
+
+      if (!didChatAlreadyExist) {
+        this.chatListeners.forEach(function (listener) {
+          if (!listener.handleNewInviteReceived(invite)) {
+            happyToProceed = false;
+          }
+        });
+      }
+
+      if (happyToProceed) {
+        var chatLog = this.ensureChatLogExists(invite.room); // add the users in the invitation user list for the room, if not already added
+
+        if (invite.userList) {
+          invite.userList.forEach(function (username) {
+            if (chatLog.users.findIndex(function (user) {
+              return user === username;
+            }) < 0) chatLog.users.push(invite.from);
+          });
+        }
+
+        if (chatLog.users.findIndex(function (user) {
+          return user === invite.from;
+        }) < 0) chatLog.users.push(invite.from);
+        this.saveLogs();
+        cmLogger("Joining chat " + invite.room);
+        _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), invite.room);
+        this.chatListeners.forEach(function (listener) {
+          return listener.handleChatLogUpdated(chatLog, false);
+        });
+      }
     } else {
       cmLogger("User " + invite.from + " blocked");
     }
@@ -4519,6 +4645,9 @@ var ChatManager = /*#__PURE__*/function () {
       this.addMessageToChatLog(chatLog, message);
       cmLogger("Message received");
       cmLogger(message);
+      this.messageListeners.forEach(function (listener) {
+        return listener.receiveMessage(message);
+      });
       this.chatListeners.forEach(function (listener) {
         return listener.handleChatLogUpdated(chatLog, wasOffline);
       });
@@ -4552,7 +4681,7 @@ var ChatManager = /*#__PURE__*/function () {
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
     this.ensureChatLogExists(room);
-    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(this.getCurrentUser(), room);
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), room);
   };
 
   _proto.removeChatLog = function removeChatLog(room) {
@@ -4572,7 +4701,7 @@ var ChatManager = /*#__PURE__*/function () {
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
     this.removeChatLog(room);
-    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].leaveChat(this.getCurrentUser(), room);
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].leaveChat(this.getCurrentUser(), room);
   };
 
   _proto.login = function login() {
@@ -4580,19 +4709,19 @@ var ChatManager = /*#__PURE__*/function () {
 
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
-    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].login(this.getCurrentUser()); // get the current user list
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].login(this.getCurrentUser()); // get the current user list
 
-    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].getUserList(); // connect to the chat rooms already in logs
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].getUserList(); // connect to the chat rooms already in logs
 
     this.chatLogs.forEach(function (log) {
-      _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(_this9.currentUsername, log.roomName);
+      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(_this9.currentUsername, log.roomName);
     });
   };
 
   _proto.logout = function logout() {
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
-    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].logout(this.getCurrentUser());
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].logout(this.getCurrentUser());
   };
 
   _proto.sendInvite = function sendInvite(to, room) {
@@ -4606,13 +4735,13 @@ var ChatManager = /*#__PURE__*/function () {
     if (log.users.findIndex(function (user) {
       return user === to;
     }) < 0) {
-      _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].sendInvite(this.getCurrentUser(), to, room);
+      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendInvite(this.getCurrentUser(), to, room);
     }
   };
 
-  _proto.sendMessage = function sendMessage(room, content, priority) {
+  _proto.sendMessage = function sendMessage(room, content, priority, attachment) {
     if (priority === void 0) {
-      priority = 0;
+      priority = _Types__WEBPACK_IMPORTED_MODULE_3__["Priority"].Normal;
     }
 
     if (this.getCurrentUser().trim().length === 0) return null; // we are not logged in
@@ -4620,14 +4749,16 @@ var ChatManager = /*#__PURE__*/function () {
     var log = this.ensureChatLogExists(room); // send the message
 
     var created = parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss'));
-    _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].sendMessage(this.getCurrentUser(), room, content, created); // add the message to the chat log
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendMessage(this.getCurrentUser(), room, content, created); // add the message to the chat log
 
+    if (!attachment) attachment = {};
     var sent = {
       from: this.getCurrentUser(),
       room: room,
       message: content,
       created: created,
-      priority: priority
+      priority: priority,
+      attachment: attachment
     };
     this.addMessageToChatLog(log, sent);
     return sent;
@@ -4646,9 +4777,9 @@ var ChatManager = /*#__PURE__*/function () {
         return listener.handleChatLogUpdated(chatLog, false);
       }); // invite the other user
 
-      _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].sendInvite(this.getCurrentUser(), username, chatLog.roomName); // ok, lets connect to the server
+      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendInvite(this.getCurrentUser(), username, chatLog.roomName); // ok, lets connect to the server
 
-      _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(this.getCurrentUser(), chatLog.roomName);
+      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), chatLog.roomName);
     }
   };
 
@@ -4674,6 +4805,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../notification/NotificationManager */ "./src/notification/NotificationManager.ts");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+
 
 
 
@@ -4705,11 +4838,17 @@ var NotificationController = /*#__PURE__*/function () {
   var _proto = NotificationController.prototype;
 
   _proto.handleNewInviteReceived = function handleNewInviteReceived(invite) {
-    var result = true; // TO- DO some sort of accept/reject functionality
+    var result = true;
+    if (this.doNotDisturb && !invite.requiresAcceptDecline) return result;
 
-    if (this.doNotDisturb) return result; // notify the user of the new chat
+    if (invite.requiresAcceptDecline) {
+      // notify the user of the invitation
+      result = _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].askUserAboutInvitation(invite);
+    } else {
+      // notify the user of the new chat
+      _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show('Chat Room', "User " + invite.from + " has invited you.", 'info', 7000);
+    }
 
-    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show('Chat Room', "User " + invite.from + " has started a new chat room with you.", 'info', 7000);
     return result;
   };
 
@@ -4868,6 +5007,8 @@ var NotificationController = /*#__PURE__*/function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Types */ "./src/socket/Types.ts");
+
 
 var sDebug = debug__WEBPACK_IMPORTED_MODULE_0___default()('socket-ts');
 
@@ -5074,21 +5215,48 @@ var SocketManager = /*#__PURE__*/function () {
     });
   };
 
-  _proto.sendInvite = function sendInvite(from, to, room) {
-    this.socket.emit('invite', {
+  _proto.sendInvite = function sendInvite(from, to, room, type, requiresAcceptDecline, subject) {
+    if (type === void 0) {
+      type = _Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ChatRoom;
+    }
+
+    if (requiresAcceptDecline === void 0) {
+      requiresAcceptDecline = false;
+    }
+
+    if (subject === void 0) {
+      subject = '';
+    }
+
+    var inviteObj = {
       from: from,
       to: to,
-      room: room
-    });
+      room: room,
+      type: type,
+      requiresAcceptDecline: requiresAcceptDecline,
+      subject: subject
+    };
+    this.socket.emit('invite', inviteObj);
   };
 
-  _proto.sendMessage = function sendMessage(from, room, message, created) {
-    this.socket.emit('chat', {
+  _proto.sendMessage = function sendMessage(from, room, message, created, priority, attachment) {
+    if (priority === void 0) {
+      priority = _Types__WEBPACK_IMPORTED_MODULE_1__["Priority"].Normal;
+    }
+
+    if (attachment === void 0) {
+      attachment = {};
+    }
+
+    var messageObj = {
       from: from,
       room: room,
       message: message,
-      created: created
-    });
+      created: created,
+      priority: priority,
+      attachment: attachment
+    };
+    this.socket.emit('chat', messageObj);
   };
 
   _proto.getUserList = function getUserList() {
@@ -5100,6 +5268,34 @@ var SocketManager = /*#__PURE__*/function () {
 
 var socketManager = new SocketManager();
 /* harmony default export */ __webpack_exports__["default"] = (socketManager);
+
+/***/ }),
+
+/***/ "./src/socket/Types.ts":
+/*!*****************************!*\
+  !*** ./src/socket/Types.ts ***!
+  \*****************************/
+/*! exports provided: Priority, InviteType */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Priority", function() { return Priority; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "InviteType", function() { return InviteType; });
+var Priority;
+
+(function (Priority) {
+  Priority[Priority["Normal"] = 0] = "Normal";
+  Priority[Priority["High"] = 1] = "High";
+  Priority[Priority["Urgent"] = 2] = "Urgent";
+})(Priority || (Priority = {}));
+
+var InviteType;
+
+(function (InviteType) {
+  InviteType[InviteType["ChatRoom"] = 0] = "ChatRoom";
+  InviteType[InviteType["ScoreSheet"] = 1] = "ScoreSheet";
+})(InviteType || (InviteType = {}));
 
 /***/ }),
 

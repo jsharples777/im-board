@@ -1,23 +1,5 @@
-export type Invitation = {
-    from:string,
-    room:string,
-    message:string,
-    created:number
-}
+import {Invitation, JoinLeft, Message} from "./Types";
 
-export type Message = {
-    from: string,
-    room: string,
-    message: string,
-    created: number,
-    priority: number
-}
-
-export type JoinLeft = {
-    username: string,
-    room: string,
-    userList: string[]
-}
 
 export interface ChatReceiver {
     receiveLogin(username:string):void;

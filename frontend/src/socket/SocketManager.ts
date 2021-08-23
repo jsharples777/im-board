@@ -1,6 +1,7 @@
 import debug from 'debug';
 import SocketListener from "./SocketListener";
 import {ChatReceiver} from "./ChatReceiver";
+import {Invitation, InviteType, Message, Priority} from "./Types";
 
 const sDebug = debug('socket-ts');
 
@@ -202,12 +203,28 @@ class SocketManager {
         this.socket.emit('exitroom', {username,room});
     }
 
-    public sendInvite(from:string, to:string, room:string) {
-        this.socket.emit('invite', {from,to,room});
+    public sendInvite(from:string, to:string, room:string, type:InviteType = InviteType.ChatRoom, requiresAcceptDecline:boolean = false,subject:string = '') {
+        let inviteObj:any = {
+            from:from,
+            to:to,
+            room: room,
+            type: type,
+            requiresAcceptDecline: requiresAcceptDecline,
+            subject:subject
+        }
+        this.socket.emit('invite', inviteObj);
     }
 
-    public sendMessage(from:string, room:string, message:string,created:number) {
-        this.socket.emit('chat',{from, room, message,created});
+    public sendMessage(from:string, room:string, message:string,created:number,priority: Priority = Priority.Normal, attachment:any = {}) {
+        let messageObj:Message = {
+            from: from,
+            room: room,
+            message:message,
+            created:created,
+            priority:priority,
+            attachment: attachment
+        }
+        this.socket.emit('chat',messageObj);
     }
 
     public getUserList() {

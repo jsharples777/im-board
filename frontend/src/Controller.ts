@@ -13,6 +13,9 @@ import {GraphQLApiStateManager} from "./state/GraphQLApiStateManager";
 import {Decorator} from "./AppTypes";
 import downloader from "./network/DownloadManager";
 import BrowserStorageStateManager from "./state/BrowserStorageStateManager";
+import {Invitation, Message} from "./socket/Types";
+import {MessageEventListener} from "./socket/ChatEventListener";
+import {ScoreSheetController} from "./component/ScoreSheetController";
 
 const cLogger = debug('controller-ts');
 const cLoggerDetail = debug('controller-ts-detail');
@@ -396,6 +399,20 @@ class Controller implements StateChangeListener {
         return boardGame;
     }
 
+    private startScoreSheet(invite:Invitation):void {
+        ScoreSheetController.getInstance().setupScoreSheet(this.applicationView, invite);
+    }
+
+
+    askUserAboutInvitation(invite:Invitation):boolean {
+        const result = confirm(`You have been invited by user ${invite.from} to joint a chat room for the board game ${invite.subject} score sheet`);
+        // let the application know to setup for a new scoresheet
+        if (result) {
+            this.startScoreSheet(invite);
+        }
+        return result;
+    }
+
     addBoardGameToCollection(event: MouseEvent) {
         cLogger(`Handling Add Board Game to collection`);
         const boardGame: any | null = this.findBoardGameInStateFromEvent(event);
@@ -469,6 +486,7 @@ class Controller implements StateChangeListener {
             }
         }
     }
+
 
 }
 

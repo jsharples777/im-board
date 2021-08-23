@@ -1,3 +1,6 @@
+import {Priority} from "./Types";
+
+
 export interface ChatEmitter {
     login():void;
     logout():void;
@@ -5,6 +8,6 @@ export interface ChatEmitter {
     joinChat(room:string):void;
     leaveChat(room:string):void;
 
-    sendMessage(room:string, message:string, priority:number):void;
+    sendMessage(room:string, message:string, priority?:Priority, attachment?:any):void;
     sendInvite(to:string, room:string):void;
 }

@@ -1,8 +1,10 @@
-import {ChatLog, ChatManager} from "./ChatManager";
-import {ChatEventListener, ChatUserEventListener} from "./ChatEventListener";
+import {ChatManager} from "./ChatManager";
+import {ChatEventListener, MessageEventListener} from "./ChatEventListener";
 import notifier from "../notification/NotificationManager";
 import debug from 'debug';
-import {Invitation, Message} from "./ChatReceiver";
+import {ChatLog, Invitation, Message} from "./Types";
+import {ChatUserEventListener} from "./ChatUserEventListener";
+import controller from "../Controller";
 
 const notLogger = debug('notification-controller');
 
@@ -27,6 +29,7 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         this.chatListeners = [];
         this.chatUserListeners = [];
 
+
         //bind the methods
         this.handleChatLogUpdated = this.handleChatLogUpdated.bind(this);
         this.handleLoggedInUsersUpdated = this.handleLoggedInUsersUpdated.bind(this);
@@ -37,14 +40,22 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         this.chatManager.addChatUserEventHandler(this);
     }
 
+
     handleNewInviteReceived(invite: Invitation): boolean {
         let result = true;
 
-        // TO- DO some sort of accept/reject functionality
-        if (this.doNotDisturb) return result;
+        if ((this.doNotDisturb) && (!invite.requiresAcceptDecline)) return result;
 
-        // notify the user of the new chat
-        notifier.show('Chat Room',`User ${invite.from} has started a new chat room with you.`,'info',7000);
+        if (invite.requiresAcceptDecline) {
+            // notify the user of the invitation
+            result = controller.askUserAboutInvitation(invite);
+
+        }
+        else {
+            // notify the user of the new chat
+            notifier.show('Chat Room',`User ${invite.from} has invited you.`,'info',7000);
+        }
+
         return result;
     }
 

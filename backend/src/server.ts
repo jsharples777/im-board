@@ -32,7 +32,7 @@ import {Account} from './models';
 
 // routes
 import routes from './routes';
-import apiRoutes from './routes/api';
+//import apiRoutes from './routes/api';
 
 const serverDebug = debug('server');
 
@@ -132,7 +132,7 @@ if (isDevelopment) {
 
 serverDebug('Installing routes');
 app.use('/', routes);// add the middleware path routing
-app.use('/api',apiRoutes);// add the api path routing
+//app.use('/api',apiRoutes);// add the api path routing
 // setup the QL server for the Board Game Geek Data retrieval (just for fun, don't need Graph QL, but good practise)
 serverDebug('Setting up Board Game Geek API interface via Graph QL');
 

@@ -10,15 +10,27 @@ export type ChatMessage = {
     message: string,
     from: string,
     created: number,
-    priority: number
+    priority: number,
+    attachment: any
 }
+
 
 export type InviteMessage = {
     from: string,
     message: string,
     room:string,
-    created: number
+    created: number,
+    requiresAcceptDecline: boolean,
+    userList: string[],
+    type: InviteType,
+    subject:string
 }
+
+export enum InviteType {
+    ChatRoom,
+    ScoreSheet
+}
+
 
 export type ChatUser = {
     socketId: any,

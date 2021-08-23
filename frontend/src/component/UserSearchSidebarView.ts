@@ -2,7 +2,7 @@ import debug from 'debug';
 import SidebarView from './SidebarView';
 import {StateManager} from '../state/StateManager';
 import {isSame, isSameUsername} from '../util/EqualityFunctions';
-import {ChatUserEventListener} from "../socket/ChatEventListener";
+import {ChatUserEventListener} from "../socket/ChatUserEventListener";
 import {NotificationController} from "../socket/NotificationController";
 import controller from "../Controller";
 import BrowserStorageStateManager from "../state/BrowserStorageStateManager";

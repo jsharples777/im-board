@@ -1,22 +1,17 @@
 import debug from 'debug';
 import moment from "moment";
+import socketManager from "./SocketManager";
 
-import {ChatReceiver, Invitation, JoinLeft, Message} from "./ChatReceiver";
+import {Priority, Invitation, JoinLeft, Message, ChatLog} from "./Types";
 import {ChatEmitter} from "./ChatEmitter";
+import {ChatReceiver} from "./ChatReceiver";
+import {ChatEventListener, MessageEventListener} from "./ChatEventListener";
+
 import {StateManager} from "../state/StateManager";
 import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
-import socketManager from "./SocketManager";
-import {ChatEventListener, ChatUserEventListener} from "./ChatEventListener";
 import uuid from "../util/UUID";
-import notifier from "../notification/NotificationManager";
+import {ChatUserEventListener} from "./ChatUserEventListener";
 
-export type ChatLog = {
-    roomName: string,
-    users: string[],
-    messages: Message[],
-    lastViewed: number,
-    numOfNewMessages: number
-}
 
 enum UserStatus {
     LoggedOut,
@@ -51,6 +46,16 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
     protected chatListeners:ChatEventListener[];
     protected chatUserListeners:ChatUserEventListener[];
+    private messageListeners: MessageEventListener[];
+
+    public addMessageListener(listener:MessageEventListener):void  {
+        this.messageListeners.push(listener);
+    }
+
+    public removeMessageListener(removeListener:MessageEventListener):void {
+        let index = (this.messageListeners.findIndex((listener) => listener == removeListener));
+        if (index >= 0) this.messageListeners.splice(index,1);
+    }
 
     public addChatEventHandler(receiver:ChatEventListener):void {
         this.chatListeners.push(receiver);
@@ -66,6 +71,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         this.chatLogs = [];
         this.chatListeners = [];
         this.chatUserListeners = [];
+        this.messageListeners = [];
         this.localStorage = new BrowserStorageStateManager(true);
 
         // connect to the socket manager
@@ -243,7 +249,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
     receiveJoinedRoom(users: JoinLeft): void {
         // we get this for all changes to a room, if the username is us can safely ignore
-        if (users.username === this.currentUsername) return;
+        //if (users.username === this.currentUsername) return;
 
         let log:ChatLog = this.ensureChatLogExists(users.room);
 
@@ -273,7 +279,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
         cmLogger(`User list for room ${users.room} - ${users.userList.join(',')}`);
         log.users = users.userList;
-        // add a "message" for joined user
+        // add a "message" for leaving user
         let created = parseInt(moment().format('YYYYMMDDHHmmss'));
         const joinDateTime = moment().format('DD/MM/YYYY HH:mm');
         let message:Message = {
@@ -297,19 +303,37 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     receiveInvitation(invite: Invitation): void {
         //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
         if (!this.isUserInBlockedList(invite.from)) {
+            cmLogger(`Invited to chat ${invite.room}`);
             const didChatAlreadyExist = this.doesChatRoomExist(invite.room);
-
-            let chatLog:ChatLog = this.ensureChatLogExists(invite.room);
-            // add the inviter to the user list for the room, if not already added
-            if ((chatLog.users.findIndex((user) => user === invite.from)) < 0) chatLog.users.push(invite.from);
-
-            this.saveLogs();
-            cmLogger(`Joining chat ${invite.room}`);
             cmLogger(invite);
-            socketManager.joinChat(this.getCurrentUser(),invite.room);
+            cmLogger(`Letting the listeners know, if they are all happy to accept then we will join the room`);
 
-            if (!didChatAlreadyExist) this.chatListeners.forEach((listener) => listener.handleNewInviteReceived(invite));
-            this.chatListeners.forEach((listener) => listener.handleChatLogsUpdated());
+            let happyToProceed = true;
+
+            if (!didChatAlreadyExist) {
+                this.chatListeners.forEach((listener) => {
+                    if (!listener.handleNewInviteReceived(invite)) {
+                        happyToProceed = false;
+                    }
+                });
+            }
+            if (happyToProceed) {
+
+                let chatLog: ChatLog = this.ensureChatLogExists(invite.room);
+                // add the users in the invitation user list for the room, if not already added
+                if (invite.userList) {
+                    invite.userList.forEach((username: string) => {
+                        if ((chatLog.users.findIndex((user) => user === username)) < 0) chatLog.users.push(invite.from);
+                    });
+                }
+
+                if ((chatLog.users.findIndex((user) => user === invite.from)) < 0) chatLog.users.push(invite.from);
+
+                this.saveLogs();
+                cmLogger(`Joining chat ${invite.room}`);
+                socketManager.joinChat(this.getCurrentUser(), invite.room);
+                this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(chatLog, false));
+            }
 
         }
         else {
@@ -392,6 +416,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             cmLogger(`Message received`);
             cmLogger(message);
 
+            this.messageListeners.forEach((listener) => listener.receiveMessage(message));
             this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(chatLog,wasOffline));
         }
         else {
@@ -464,7 +489,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         }
     }
 
-    sendMessage(room: string, content: string, priority:number = 0): Message|null {
+    sendMessage(room: string, content: string, priority:Priority = Priority.Normal, attachment:any|undefined): Message|null {
         if (this.getCurrentUser().trim().length === 0) return null;  // we are not logged in
         let log = this.ensureChatLogExists(room);
         // send the message
@@ -472,12 +497,14 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         socketManager.sendMessage(this.getCurrentUser(),room, content, created);
 
         // add the message to the chat log
+        if (!attachment) attachment = {};
         let sent:Message = {
             from:this.getCurrentUser(),
             room: room,
             message: content,
             created: created,
-            priority: priority
+            priority: priority,
+            attachment: attachment
         }
         this.addMessageToChatLog(log, sent);
         return sent;

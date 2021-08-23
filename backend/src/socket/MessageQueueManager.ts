@@ -1,7 +1,6 @@
 import {ChatMessage, ChatRoom, InviteMessage, QueuedMessages} from "./SocketTypes";
 import debug from 'debug';
 import fs from "fs";
-import socketManager from "./SocketManager";
 
 const mqLogger = debug('message-queue');
 

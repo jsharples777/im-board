@@ -16,6 +16,7 @@
     right: 10px;
     z-index: 999;
     transition: all 500ms ease-in-out;
+    width: 30vw
 }
 
 .badge:hover {
@@ -247,6 +248,27 @@ h1 {
         font-size: 8px;
         text-align: center;
     }
+}
+
+@media screen and (max-width: 414px) {
+    .notifications .notification {
+        width: 90vw
+    }
+
+}
+@media screen and (max-width: 768px) {
+    .notifications .notification {
+        width: 50vw
+    }
+
+}
+
+
+@media screen and (max-width: 467px) {
+    .notifications .notification {
+        width: 80vw
+    }
+
 }
 
 .root {

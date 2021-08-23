@@ -1,11 +1,19 @@
 import Account = require('./account');
-import BlogEntry = require('./blogentry');
-import Comment = require('./comment');
+import BoardGame = require('./boardgame');
+import ScoreSheet = require('./scoresheet');
 
-Account.hasMany(BlogEntry,{foreignKey: 'createdBy'});
-Account.hasMany(Comment,{foreignKey: 'createdBy'});
-BlogEntry.hasMany(Comment, {foreignKey: 'commentOn', onDelete:'cascade'});
+//import BlogEntry = require('./blogentry');
+//import Comment = require('./comment');
 
-BlogEntry.belongsTo(Account,{foreignKey: 'createdBy'})
+// Account.hasMany(BlogEntry,{foreignKey: 'createdBy'});
+// Account.hasMany(Comment,{foreignKey: 'createdBy'});
+// BlogEntry.hasMany(Comment, {foreignKey: 'commentOn', onDelete:'cascade'});
+//
+// BlogEntry.belongsTo(Account,{foreignKey: 'createdBy'})
 
-export {Account,BlogEntry,Comment};
+Account.hasMany(BoardGame,{foreignKey: 'createdBy'});
+BoardGame.hasMany(ScoreSheet, {foreignKey: 'scoreFor', onDelete:'cascade'});
+//
+BoardGame.belongsTo(Account,{foreignKey: 'createdBy'})
+
+export {Account,BoardGame,ScoreSheet};

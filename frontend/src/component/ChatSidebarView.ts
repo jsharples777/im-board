@@ -3,10 +3,10 @@ import SidebarView from './SidebarView';
 import {StateManager} from '../state/StateManager';
 import {ChatEventListener} from "../socket/ChatEventListener";
 import {NotificationController} from "../socket/NotificationController";
-import {ChatLog, ChatManager} from "../socket/ChatManager";
-import {Invitation, Message} from "../socket/ChatReceiver";
+import {ChatManager} from "../socket/ChatManager";
 import browserUtil from "../util/BrowserUtil";
 import moment from "moment";
+import {ChatLog, Invitation, Message, Priority} from "../socket/Types";
 
 
 const csLogger = debug('chat-sidebar');
@@ -98,7 +98,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
             // @ts-ignore
             this.commentEl.value = '';
 
-            let sentMessage:Message|null = ChatManager.getInstance().sendMessage(this.selectedChatLog.roomName, messageContent);
+            let sentMessage:Message|null = ChatManager.getInstance().sendMessage(this.selectedChatLog.roomName, messageContent,Priority.Normal, {});
             if (sentMessage) {
                 // add the message to our display
                 let messageEl = this.addChatMessage(sentMessage);
@@ -112,7 +112,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         if (this.selectedChatLog) {
             if (this.commentEl) this.commentEl.removeAttribute("readonly");
             if (this.sendMessageButton) this.sendMessageButton.removeAttribute("disabled");
-            if (this.leaveChatButton) this.sendMessageButton.removeAttribute("disabled");
+            if (this.leaveChatButton) this.leaveChatButton.removeAttribute("disabled");
         } else {
             if (this.commentEl) this.commentEl.setAttribute("readonly", "true");
             if (this.sendMessageButton) this.sendMessageButton.setAttribute("disabled", "true");

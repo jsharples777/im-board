@@ -47,7 +47,13 @@ class Root extends React.Component{
             isLoggedIn: false,
             loggedInUserId: -1,
             boardGames: [],
-            selectedEntry: {},
+            scoreSheet: {
+                room: '',
+                boardGameName: '',
+                sheetLayoutOptions: {},
+                timer: 0,
+                sheetData: {}
+            },
             stateNames: {
                 users: 'users',
                 boardGames: 'boardGames',
@@ -485,8 +491,8 @@ class Root extends React.Component{
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
-//localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager chat-sidebar chat-sidebar:detail';
-localStorage.debug = 'app controller-ts api-ts board-game-search-sidebar board-game-search-sidebar:detail view-ts:boardgameview';
+//localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
+localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

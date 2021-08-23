@@ -8,7 +8,7 @@ input IdInput {
     id:Int!
 }
 
-type BoardGameDetail {
+input BoardGameDetailInput {
     id: Int!
     thumb: String!
     image: String!
@@ -29,6 +29,41 @@ type BoardGameDetail {
     categories: String
 }
 
+type BoardGameDetail {
+    id: Int!
+    thumb: String!
+    image: String!
+    name: String!
+    description: String!
+    year: Int
+    minPlayers: Int
+    maxPlayers: Int
+    minPlayTime: Int
+    maxPlayTime: Int
+    minAge: Int
+    designers: String
+    artists: String
+    publisher: String
+    numOfRaters: Int
+    averageScore: Float
+    rank: Int
+    categories: String
+    scores: [ScoreSheet]
+}
+
+type ScoreSheet {
+    id:Int!
+    players: [String],
+    scores: [Int],
+    jsonData: String
+}
+
+input ScoreSheetInput {
+    players: [String],
+    scores: [Int],
+    jsonData: String
+}
+
 type User {
     id: Int!,
     username: String!
@@ -39,4 +74,11 @@ type Query {
     findBoardGames(query:String!): [BoardGame]
     getBoardGameDetails(id:IdInput!): BoardGameDetail
     findUsers: [User]
+    getMyBoardGameCollection(userId: Int): [BoardGameDetail]
+}
+
+type Mutation {
+    addToMyCollection(userId: Int, boardGame: BoardGameDetailInput): Boolean
+    removeFromMyCollection(userId: Int, boardGameId: Int):Boolean
+    addScoreSheetToBoardGame(userId: Int, boardGameId: Int, sheet: ScoreSheetInput): Boolean
 }
