@@ -809,8 +809,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
   };
 
   _proto.handleDeleteBoardGame = function handleDeleteBoardGame(event) {
-    event.preventDefault();
-    this.hideAllSideBars(); // @ts-ignore
+    event.preventDefault(); //this.hideAllSideBars();
+    // @ts-ignore
 
     var id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
     logger("Handling Delete Board Game " + id);
@@ -855,8 +855,6 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
               if (document) {
                 // @ts-ignore
-                document.getElementById(this.state.ui.navigation.showMyFavourites).addEventListener('click', function () {}); // @ts-ignore
-
                 document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', this.handleShowBGGSearch); // @ts-ignore
 
                 document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch); // @ts-ignore
@@ -916,8 +914,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
   _proto.handleShowUserSearch = function handleShowUserSearch(event) {
     logger('Handling Show User Search');
-    event.preventDefault();
-    this.hideAllSideBars(); // prevent anything from happening if we are not logged in
+    event.preventDefault(); //this.hideAllSideBars();
+    // prevent anything from happening if we are not logged in
 
     if (!_Controller__WEBPACK_IMPORTED_MODULE_3__["default"].isLoggedIn()) {
       // @ts-ignore
@@ -930,8 +928,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
   _proto.handleShowChat = function handleShowChat(event) {
     logger('Handling Show Chat');
-    event.preventDefault();
-    this.hideAllSideBars(); // prevent anything from happening if we are not logged in
+    event.preventDefault(); //this.hideAllSideBars();
+    // prevent anything from happening if we are not logged in
 
     if (!_Controller__WEBPACK_IMPORTED_MODULE_3__["default"].isLoggedIn()) {
       // @ts-ignore
@@ -944,8 +942,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
   _proto.handleShowBGGSearch = function handleShowBGGSearch(event) {
     logger('Handling Show BGG Search View');
-    event.preventDefault();
-    this.hideAllSideBars(); // prevent anything from happening if we are not logged in
+    event.preventDefault(); //this.hideAllSideBars();
+    // prevent anything from happening if we are not logged in
 
     if (!_Controller__WEBPACK_IMPORTED_MODULE_3__["default"].isLoggedIn()) {
       // @ts-ignore
@@ -1014,6 +1012,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _state_GraphQLApiStateManager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./state/GraphQLApiStateManager */ "./src/state/GraphQLApiStateManager.ts");
 /* harmony import */ var _AppTypes__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./AppTypes */ "./src/AppTypes.ts");
 /* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./network/DownloadManager */ "./src/network/DownloadManager.ts");
+/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+
 
 
 
@@ -1091,7 +1091,9 @@ var Controller = /*#__PURE__*/function () {
 
     this.addBoardGameToCollection = this.addBoardGameToCollection.bind(this);
     this.removeBoardGameFromCollection = this.removeBoardGameFromCollection.bind(this);
-    this.removeBoardGameFromDisplay = this.removeBoardGameFromDisplay.bind(this);
+    this.removeBoardGameFromDisplay = this.removeBoardGameFromDisplay.bind(this); // further state management
+
+    this.displayedBoardGamesStateManager = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_12__["default"](true);
     return this;
   }
   /*
@@ -1118,7 +1120,20 @@ var Controller = /*#__PURE__*/function () {
     } // load the users
 
 
-    this.userStateManager.getStateByName(this.config.stateNames.users); //downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.findUsers, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
+    this.getStateManager().getStateByName(this.config.stateNames.users); // load board games from local storage if any
+
+    this.applicationView.setState({
+      boardGames: this.displayedBoardGamesStateManager.getStateByName(this.config.stateNames.boardGames)
+    }); // download the current board game collection
+
+    this.downloadAndSyncSavedBoardGameCollection();
+  };
+
+  _proto.downloadAndSyncSavedBoardGameCollection = function downloadAndSyncSavedBoardGameCollection() {
+    if (this.isLoggedIn()) {
+      // start the call to retrieve the saved collection of board games
+      alert('Implement get board game collection from persistence');
+    }
   };
 
   _proto.getStateManager = function getStateManager() {
@@ -1319,6 +1334,7 @@ var Controller = /*#__PURE__*/function () {
     currentListOfGames.push(boardGame);
     cLogger("Adding received board game to application");
     cLogger(boardGame);
+    this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
     this.applicationView.setState({
       boardGames: currentListOfGames
     }); // now we need an API call to fill in the details
@@ -1357,6 +1373,7 @@ var Controller = /*#__PURE__*/function () {
         currentListOfGames.splice(index, 1, boardGameDetails);
         cLogger(currentListOfGames);
         boardGameDetails.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete;
+        this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
         this.applicationView.setState({
           boardGames: currentListOfGames
         });
@@ -1377,7 +1394,10 @@ var Controller = /*#__PURE__*/function () {
       this.applicationView.setState({
         boardGames: currentBoardGamesOnDisplay
       });
-    }
+    } // save locally
+
+
+    this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentBoardGamesOnDisplay, false);
   };
 
   _proto.findBoardGameInStateFromEvent = function findBoardGameInStateFromEvent(event) {
@@ -1424,6 +1444,7 @@ var Controller = /*#__PURE__*/function () {
           case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete:
             {
               // loaded and ready to save
+              this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames, boardGame, true);
               alert("Implement persist the board game");
               break;
             }
@@ -1803,6 +1824,13 @@ var AbstractView = /*#__PURE__*/function () {
             case 'normal':
               {
                 break;
+              }
+
+            case 'active':
+              {
+                if (domConfig.iconActive !== '') {
+                  textEl.innerHTML += '  ' + domConfig.iconActive;
+                }
               }
           }
 
@@ -2360,6 +2388,10 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
   }
 
   var _proto = ChatSidebarView.prototype;
+
+  _proto.handleNewInviteReceived = function handleNewInviteReceived(invite) {
+    throw new Error('Method not implemented.');
+  };
 
   _proto.leaveChat = function leaveChat(event) {
     event.preventDefault();
@@ -4363,9 +4395,17 @@ var ChatManager = /*#__PURE__*/function () {
     });
   };
 
+  _proto.doesChatRoomExist = function doesChatRoomExist(room) {
+    var index = this.chatLogs.findIndex(function (log) {
+      return log.roomName === room;
+    });
+    return index >= 0;
+  };
+
   _proto.receiveInvitation = function receiveInvitation(invite) {
     //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
     if (!this.isUserInBlockedList(invite.from)) {
+      var didChatAlreadyExist = this.doesChatRoomExist(invite.room);
       var chatLog = this.ensureChatLogExists(invite.room); // add the inviter to the user list for the room, if not already added
 
       if (chatLog.users.findIndex(function (user) {
@@ -4375,6 +4415,9 @@ var ChatManager = /*#__PURE__*/function () {
       cmLogger("Joining chat " + invite.room);
       cmLogger(invite);
       _SocketManager__WEBPACK_IMPORTED_MODULE_3__["default"].joinChat(this.getCurrentUser(), invite.room);
+      if (!didChatAlreadyExist) this.chatListeners.forEach(function (listener) {
+        return listener.handleNewInviteReceived(invite);
+      });
       this.chatListeners.forEach(function (listener) {
         return listener.handleChatLogsUpdated();
       });
@@ -4451,6 +4494,16 @@ var ChatManager = /*#__PURE__*/function () {
     return log;
   };
 
+  _proto.addSenderToRoomIfNotAlreadyPresent = function addSenderToRoomIfNotAlreadyPresent(chatLog, sender) {
+    var index = chatLog.users.findIndex(function (user) {
+      return user === sender;
+    });
+
+    if (index < 0) {
+      chatLog.users.push(sender);
+    }
+  };
+
   _proto.receiveMessage = function receiveMessage(message, wasOffline) {
     if (wasOffline === void 0) {
       wasOffline = false;
@@ -4462,6 +4515,7 @@ var ChatManager = /*#__PURE__*/function () {
     if (!this.isUserInBlockedList(message.from)) {
       // ok, so we need to add the message to the chat log, increase the new message count, save the logs and pass it on
       var chatLog = this.ensureChatLogExists(message.room);
+      this.addSenderToRoomIfNotAlreadyPresent(chatLog, message.from);
       this.addMessageToChatLog(chatLog, message);
       cmLogger("Message received");
       cmLogger(message);
@@ -4649,6 +4703,15 @@ var NotificationController = /*#__PURE__*/function () {
   }
 
   var _proto = NotificationController.prototype;
+
+  _proto.handleNewInviteReceived = function handleNewInviteReceived(invite) {
+    var result = true; // TO- DO some sort of accept/reject functionality
+
+    if (this.doNotDisturb) return result; // notify the user of the new chat
+
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show('Chat Room', "User " + invite.from + " has started a new chat room with you.", 'info', 7000);
+    return result;
+  };
 
   _proto.addListener = function addListener(listener) {
     this.chatListeners.push(listener);

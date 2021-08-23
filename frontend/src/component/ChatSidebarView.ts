@@ -4,7 +4,7 @@ import {StateManager} from '../state/StateManager';
 import {ChatEventListener} from "../socket/ChatEventListener";
 import {NotificationController} from "../socket/NotificationController";
 import {ChatLog, ChatManager} from "../socket/ChatManager";
-import {Message} from "../socket/ChatReceiver";
+import {Invitation, Message} from "../socket/ChatReceiver";
 import browserUtil from "../util/BrowserUtil";
 import moment from "moment";
 
@@ -44,6 +44,10 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         this.leaveChat = this.leaveChat.bind(this);
 
         NotificationController.getInstance().addListener(this);
+    }
+
+    handleNewInviteReceived(invite: Invitation): boolean {
+        throw new Error('Method not implemented.');
     }
 
     private leaveChat(event:Event) {

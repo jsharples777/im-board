@@ -166,6 +166,12 @@ export default abstract class AbstractView implements StateChangeListener {
                     case 'normal': {
                         break;
                     }
+                    case 'active': {
+                        if (domConfig.iconActive !== '') {
+                            textEl.innerHTML += '  ' + domConfig.iconActive;
+                        }
+
+                    }
                 }
 
                 break;

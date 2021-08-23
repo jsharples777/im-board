@@ -8,6 +8,7 @@ import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
 import socketManager from "./SocketManager";
 import {ChatEventListener, ChatUserEventListener} from "./ChatEventListener";
 import uuid from "../util/UUID";
+import notifier from "../notification/NotificationManager";
 
 export type ChatLog = {
     roomName: string,
@@ -288,9 +289,16 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(log,false));
     }
 
+    private doesChatRoomExist(room:string) {
+        let index = this.chatLogs.findIndex((log:ChatLog) => log.roomName === room);
+        return (index >= 0);
+    }
+
     receiveInvitation(invite: Invitation): void {
         //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
         if (!this.isUserInBlockedList(invite.from)) {
+            const didChatAlreadyExist = this.doesChatRoomExist(invite.room);
+
             let chatLog:ChatLog = this.ensureChatLogExists(invite.room);
             // add the inviter to the user list for the room, if not already added
             if ((chatLog.users.findIndex((user) => user === invite.from)) < 0) chatLog.users.push(invite.from);
@@ -299,6 +307,8 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             cmLogger(`Joining chat ${invite.room}`);
             cmLogger(invite);
             socketManager.joinChat(this.getCurrentUser(),invite.room);
+
+            if (!didChatAlreadyExist) this.chatListeners.forEach((listener) => listener.handleNewInviteReceived(invite));
             this.chatListeners.forEach((listener) => listener.handleChatLogsUpdated());
 
         }
@@ -362,6 +372,13 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         return log;
     }
 
+    private addSenderToRoomIfNotAlreadyPresent(chatLog:ChatLog, sender:string) {
+        let index = chatLog.users.findIndex((user) => user === sender);
+        if (index < 0) {
+            chatLog.users.push(sender);
+        }
+    }
+
     receiveMessage(message: Message,wasOffline:boolean = false): void {
         // double check the message is not from us somehow
         if (message.from === this.getCurrentUser()) return;
@@ -370,6 +387,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
             // ok, so we need to add the message to the chat log, increase the new message count, save the logs and pass it on
             let chatLog = this.ensureChatLogExists(message.room);
+            this.addSenderToRoomIfNotAlreadyPresent(chatLog, message.from);
             this.addMessageToChatLog(chatLog, message);
             cmLogger(`Message received`);
             cmLogger(message);

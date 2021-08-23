@@ -196,6 +196,21 @@ export default class MessageQueueManager {
             mqLogger(dataObj);
             this.messageQueue = dataObj.queues;
 
+            // go through the rooms and remove empty ones
+            if (dataObj.rooms) {
+                let counter = dataObj.rooms.length;
+                while (counter > 0) {
+                    const usersOfRoom = dataObj.rooms[counter-1];
+                    if ((usersOfRoom) || (usersOfRoom.length === 0)) {
+                        mqLogger(`Removing room ${dataObj.rooms[counter-1]} and is empty of users`);
+                        dataObj.rooms.splice(counter-1,1);
+                    }
+                    counter--;
+                }
+            }
+
+
+
         }
         catch (error) {
             mqLogger(error);

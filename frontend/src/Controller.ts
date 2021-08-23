@@ -12,6 +12,7 @@ import {NotificationController} from "./socket/NotificationController";
 import {GraphQLApiStateManager} from "./state/GraphQLApiStateManager";
 import {Decorator} from "./AppTypes";
 import downloader from "./network/DownloadManager";
+import BrowserStorageStateManager from "./state/BrowserStorageStateManager";
 
 const cLogger = debug('controller-ts');
 const cLoggerDetail = debug('controller-ts-detail');
@@ -23,7 +24,9 @@ class Controller implements StateChangeListener {
     // @ts-ignore
     protected stateManager: StateManager;
     // @ts-ignore
-    protected userStateManager: StateManager;
+    protected displayedBoardGamesStateManager: StateManager;
+
+
 
     constructor() {
     }
@@ -102,6 +105,9 @@ class Controller implements StateChangeListener {
         this.removeBoardGameFromCollection = this.removeBoardGameFromCollection.bind(this);
         this.removeBoardGameFromDisplay = this.removeBoardGameFromDisplay.bind(this);
 
+        // further state management
+        this.displayedBoardGamesStateManager = new BrowserStorageStateManager(true);
+
         return this;
     }
 
@@ -128,8 +134,20 @@ class Controller implements StateChangeListener {
         }
 
         // load the users
-        this.userStateManager.getStateByName(this.config.stateNames.users);
-        //downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.findUsers, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
+        this.getStateManager().getStateByName(this.config.stateNames.users);
+
+        // load board games from local storage if any
+        this.applicationView.setState({boardGames: this.displayedBoardGamesStateManager.getStateByName(this.config.stateNames.boardGames)});
+
+        // download the current board game collection
+        this.downloadAndSyncSavedBoardGameCollection();
+    }
+
+    private downloadAndSyncSavedBoardGameCollection() {
+        if (this.isLoggedIn()) {
+            // start the call to retrieve the saved collection of board games
+            alert ('Implement get board game collection from persistence');
+        }
     }
 
     public getStateManager(): StateManager {
@@ -303,6 +321,7 @@ class Controller implements StateChangeListener {
         cLogger(`Adding received board game to application`);
         cLogger(boardGame);
 
+        this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentListOfGames,false);
         this.applicationView.setState({boardGames: currentListOfGames});
 
         // now we need an API call to fill in the details
@@ -339,6 +358,7 @@ class Controller implements StateChangeListener {
                 currentListOfGames.splice(index, 1, boardGameDetails);
                 cLogger(currentListOfGames);
                 boardGameDetails.decorator = Decorator.Complete;
+                this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentListOfGames,false);
                 this.applicationView.setState({boardGames: currentListOfGames});
             } else {
                 cLogger(`Board game ${boardGameDetails.id} not found in current state`);
@@ -355,6 +375,8 @@ class Controller implements StateChangeListener {
             currentBoardGamesOnDisplay.splice(index,1);
             this.applicationView.setState({boardGames:currentBoardGamesOnDisplay});
         }
+        // save locally
+        this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentBoardGamesOnDisplay,false);
     }
 
     private findBoardGameInStateFromEvent(event: Event) {
@@ -390,6 +412,7 @@ class Controller implements StateChangeListener {
                     }
                     case (Decorator.Complete): {
                         // loaded and ready to save
+                        this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames,boardGame,true);
                         alert("Implement persist the board game");
                         break;
                     }

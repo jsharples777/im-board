@@ -1,6 +1,5 @@
 import BGGDataSourceDelegate from "./BGGDataSourceDelegate";
 
-require('dotenv').config();
 import debug from 'debug';
 import fs from 'fs';
 import {ApolloServer} from 'apollo-server-express';

@@ -7,7 +7,7 @@ import setupPassport from '../passport/passport';
 // @ts-ignore
 setupPassport(passport,Account);
 
-const rDebug = debug('route');
+const routeDebug = debug('route');
 
 const router = express.Router();
 import auth from './auth';
@@ -18,7 +18,7 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/dashboard', auth.ensureAuthenticated, (req, res, next) => {
-  rDebug(req.user);
+  routeDebug(req.user);
   res.render('index', { user: req.user });
 });
 

@@ -355,7 +355,7 @@ class Root extends React.Component{
 
     handleDeleteBoardGame(event:MouseEvent) {
         event.preventDefault();
-        this.hideAllSideBars();
+        //this.hideAllSideBars();
         // @ts-ignore
         let id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
         logger(`Handling Delete Board Game ${id}`);
@@ -397,8 +397,6 @@ class Root extends React.Component{
 
         // navigation item handlers
         if (document) {
-            // @ts-ignore
-            document.getElementById(this.state.ui.navigation.showMyFavourites).addEventListener('click', () => {});
             // @ts-ignore
             document.getElementById(this.state.ui.navigation.boardGameSearchId).addEventListener('click', this.handleShowBGGSearch);
             // @ts-ignore
@@ -447,7 +445,7 @@ class Root extends React.Component{
     handleShowUserSearch(event:Event) {
         logger('Handling Show User Search');
         event.preventDefault();
-        this.hideAllSideBars();
+        //this.hideAllSideBars();
         // prevent anything from happening if we are not logged in
         if (!controller.isLoggedIn()) {
             // @ts-ignore
@@ -460,7 +458,7 @@ class Root extends React.Component{
     handleShowChat(event:Event) {
         logger('Handling Show Chat');
         event.preventDefault();
-        this.hideAllSideBars();
+        //this.hideAllSideBars();
         // prevent anything from happening if we are not logged in
         if (!controller.isLoggedIn()) {
             // @ts-ignore
@@ -473,7 +471,7 @@ class Root extends React.Component{
     handleShowBGGSearch(event:Event) {
         logger('Handling Show BGG Search View');
         event.preventDefault();
-        this.hideAllSideBars();
+        //this.hideAllSideBars();
         // prevent anything from happening if we are not logged in
         if (!controller.isLoggedIn()) {
             // @ts-ignore

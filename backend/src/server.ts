@@ -1,6 +1,7 @@
 // Configuration and Logging handlers
 /* eslint-disable import/first */
-import BGGDataSource from "./graphql/DataSource";
+
+import DataSource from "./graphql/DataSource";
 
 require('dotenv').config();
 import morgan from 'morgan';
@@ -134,12 +135,14 @@ app.use('/', routes);// add the middleware path routing
 app.use('/api',apiRoutes);// add the api path routing
 // setup the QL server for the Board Game Geek Data retrieval (just for fun, don't need Graph QL, but good practise)
 serverDebug('Setting up Board Game Geek API interface via Graph QL');
-new BGGDataSource(app);
 
 // Setup authentication
 serverDebug('Setting up User model and authentication with Passport');
 // @ts-ignore
 setupPassport(passport, Account);
+
+// setup the Graph SQL
+new DataSource(app);
 
 // route for the env.js file being served to the client
 serverDebug('Setting the environment variables for the browser to access');

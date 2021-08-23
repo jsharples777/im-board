@@ -2,11 +2,11 @@ import {ChatLog, ChatManager} from "./ChatManager";
 import {ChatEventListener, ChatUserEventListener} from "./ChatEventListener";
 import notifier from "../notification/NotificationManager";
 import debug from 'debug';
-import {Message} from "./ChatReceiver";
+import {Invitation, Message} from "./ChatReceiver";
 
 const notLogger = debug('notification-controller');
 
-export class NotificationController implements ChatEventListener,ChatUserEventListener {
+export class NotificationController implements ChatEventListener, ChatUserEventListener {
     private static _instance: NotificationController;
 
     public static getInstance(): NotificationController {
@@ -16,10 +16,10 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
         return NotificationController._instance;
     }
 
-    private doNotDisturb:boolean = false;
-    private chatManager:ChatManager;
-    private chatListeners:ChatEventListener[];
-    private chatUserListeners:ChatUserEventListener[];
+    private doNotDisturb: boolean = false;
+    private chatManager: ChatManager;
+    private chatListeners: ChatEventListener[];
+    private chatUserListeners: ChatUserEventListener[];
 
     private constructor() {
         this.chatManager = ChatManager.getInstance();
@@ -35,6 +35,17 @@ export class NotificationController implements ChatEventListener,ChatUserEventLi
 
         this.chatManager.addChatEventHandler(this);
         this.chatManager.addChatUserEventHandler(this);
+    }
+
+    handleNewInviteReceived(invite: Invitation): boolean {
+        let result = true;
+
+        // TO- DO some sort of accept/reject functionality
+        if (this.doNotDisturb) return result;
+
+        // notify the user of the new chat
+        notifier.show('Chat Room',`User ${invite.from} has started a new chat room with you.`,'info',7000);
+        return result;
     }
 
     public addListener(listener:ChatEventListener) {

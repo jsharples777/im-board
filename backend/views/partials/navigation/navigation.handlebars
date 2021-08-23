@@ -7,15 +7,13 @@
     <div id="navigation" class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
             {{#if user}}
-                <li class="nav-item pr-2"><a class="nav-link" href="#" data-toggle="tooltip" data-placement="bottom" title="Show your favourite board games" id="navigationItemShowMyFavourites">Show My Favourites <i class="fas fa-columns"></i></a></li>
-                <li class="nav-item pr-2"><a class="nav-link" href="#" data-toggle="tooltip" data-placement="bottom" title="Show the board game search side panel" id="navigationItemBoardGameSearch">Board Game Search <i class="fas fa-search"></i></a></li>
+                <li class="nav-item pr-2"><a class="nav-link" href="#" data-toggle="tooltip" data-placement="bottom" title="Show the board game search" id="navigationItemBoardGameSearch">Board Game Search <i class="fas fa-search"></i></a></li>
                 <li class="nav-item pr-2"><a class="nav-link" href="#" data-toggle="tooltip" data-placement="bottom" title="Show the user search side panel" id="navigationItemUserSearch">User Search <i class="fas fa-search"></i></a></li>
                 <li class="nav-item pr-2"><a class="nav-link" href="#" data-toggle="tooltip" data-placement="bottom" title="Show the chat side panel" id="navigationItemChat">Chat <i class="fa fa-paper-plane"></i></a></li>
             {{else}}
-                <li class="nav-item pr-2"><a class="nav-link" href="/login" data-toggle="tooltip" data-placement="bottom" title="Show your favourite board games" id="navigationItemShowMyFavourites">Show My Favourites <i class="fas fa-columns"></i></a></li>
                 <li class="nav-item pr-2"><a class="nav-link" href="/login" data-toggle="tooltip" data-placement="bottom" title="Show the board game search side panel" id="navigationItemBoardGameSearch">Board Game Search <i class="fas fa-search"></i></a></li>
-                <li class="nav-item pr-2"><a class="nav-link" href="/login" data-toggle="tooltip" data-placement="bottom" title="Show the user search side panel" id="navigationItemUserSearch">User Search <i class="fas fa-search"></i></a></li>
-                <li class="nav-item pr-2"><a class="nav-link" href="/login" data-toggle="tooltip" data-placement="bottom" title="Show the chat side panel" id="navigationItemChat">Chat <i class="fa fa-paper-plane"></i></a></li>
+                <li class="nav-item pr-2"><a class="nav-link" href="/login" data-toggle="tooltip" data-placement="bottom" title="Show the user search, requires logging in." id="navigationItemUserSearch">User Search <i class="fas fa-search"></i></a></li>
+                <li class="nav-item pr-2"><a class="nav-link" href="/login" data-toggle="tooltip" data-placement="bottom" title="Show the chat, requires logging in" id="navigationItemChat">Chat <i class="fa fa-paper-plane"></i></a></li>
             {{/if}}
         </ul>
         <ul class="navbar-nav is-pulled-right">
