@@ -539,7 +539,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
         bggSearchResults: 'bggSearchResults'
       },
       apis: {
-        login: '/api/login',
+        login: '/login',
         graphQL: '/graphql',
         bggSearchCall: 'query search($queryString: String!) {findBoardGames(query: $queryString) {gameId, name, year}}',
         bggSearchCallById: {
@@ -553,6 +553,18 @@ var Root = /*#__PURE__*/function (_React$Component) {
         addToMyCollection: {
           queryString: 'mutation addBoardGame($userId: Int!, $boardGame: BoardGameDetailInput!){addToMyCollection(userId: $userId, boardGame: $boardGame) {id,gameId}}',
           resultName: 'addToMyCollection'
+        },
+        removeFromMyCollection: {
+          queryString: 'mutation removeBoardGame($userId: Int!, $boardGameId: Int!) {removeFromMyCollection(userId: $userId, boardGameId: $boardGameId) {result}}',
+          resultName: 'removeFromMyCollection'
+        },
+        getMyBoardGameCollection: {
+          queryString: 'query myCollection($userId: Int!) {getMyBoardGameCollection(userId: $userId) {id,gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories,scores {id, players, scores, jsonData, createdOn}}}',
+          resultName: 'getMyBoardGameCollection'
+        },
+        addScoreSheetToBoardGame: {
+          queryString: 'mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id,players,scores,jsonData,createdOn}',
+          resultName: 'addScoreSheetToBoardGame'
         }
       },
       ui: {
@@ -729,6 +741,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
     _this.cancelDelete = _this.cancelDelete.bind(_assertThisInitialized(_this));
     _this.confirmDelete = _this.confirmDelete.bind(_assertThisInitialized(_this));
+    _this.handleDeleteBoardGame = _this.handleDeleteBoardGame.bind(_assertThisInitialized(_this));
     _this.handleShowUserSearch = _this.handleShowUserSearch.bind(_assertThisInitialized(_this));
     _this.handleShowChat = _this.handleShowChat.bind(_assertThisInitialized(_this));
     _this.handleShowBGGSearch = _this.handleShowBGGSearch.bind(_assertThisInitialized(_this));
@@ -785,7 +798,6 @@ var Root = /*#__PURE__*/function (_React$Component) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_component_BoardGameView__WEBPACK_IMPORTED_MODULE_7__["default"], {
         key: index,
         boardGame: entry,
-        removeFromDisplayHandler: _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].removeBoardGameFromDisplay,
         showScoresHandler: function showScoresHandler() {},
         addToCollectionHandler: _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].addBoardGameToCollection,
         removeFromCollectionHandler: _this2.handleDeleteBoardGame
@@ -814,8 +826,18 @@ var Root = /*#__PURE__*/function (_React$Component) {
     event.preventDefault(); // @ts-ignore
 
     var id = this.modalEl.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
-    logger("Handling Delete with id " + id);
-    _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].removeBoardGameFromCollection(event);
+    id = parseInt(id);
+    logger("Handling Delete with id " + id); // @ts-ignore
+
+    var currentBoardGamesOnDisplay = this.state.boardGames;
+    var index = currentBoardGamesOnDisplay.findIndex(function (game) {
+      return game.gameId === id;
+    });
+
+    if (index >= 0) {
+      var boardGame = currentBoardGamesOnDisplay[index];
+      _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].removeBoardGameFromCollection(boardGame);
+    }
   };
 
   _proto.handleDeleteBoardGame = function handleDeleteBoardGame(event) {
@@ -826,24 +848,33 @@ var Root = /*#__PURE__*/function (_React$Component) {
     logger("Handling Delete Board Game " + id);
 
     if (id) {
-      // @ts-ignore
-      this.modalEl.setAttribute(this.state.controller.events.entry.eventDataKeyId, id); // find the entry from the state manager
-
+      // find the entry from the state manager
       id = parseInt(id); // @ts-ignore
 
       var currentBoardGamesOnDisplay = this.state.boardGames;
       var index = currentBoardGamesOnDisplay.findIndex(function (game) {
-        return game.id === id;
+        return game.gameId === id;
       });
 
       if (index >= 0) {
         var boardGame = currentBoardGamesOnDisplay[index];
 
         if (boardGame.decorator && boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_8__["Decorator"].Persisted) {
-          this.alert(boardGame.name + " (" + boardGame.year + ")", "Are you sure you want to delete this board game from your collection?");
+          logger("Handling Delete Board Game " + id + " - persisted, confirming with user, but only if logged in");
+
+          if (_Controller__WEBPACK_IMPORTED_MODULE_3__["default"].isLoggedIn()) {
+            // @ts-ignore
+            this.modalEl.setAttribute(this.state.controller.events.boardGames.eventDataKeyId, id);
+            this.alert(boardGame.name + " (" + boardGame.year + ")", "Are you sure you want to delete this board game from your collection?");
+          } else {
+            logger("Handling Delete Board Game " + id + " - IS persisted but not logged in, just deleting from local storage  asking controller to remove"); // not persisted yet, let the controller manage this one
+
+            _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].removeBoardGameFromDisplay(boardGame);
+          }
         } else {
-          // not persisted yet, let the controller manage this one
-          _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].removeBoardGameFromDisplay(event);
+          logger("Handling Delete Board Game " + id + " - NOT persisted, asking controller to remove"); // not persisted yet, let the controller manage this one
+
+          _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].removeBoardGameFromDisplay(boardGame);
         }
       }
     }
@@ -952,13 +983,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
   _proto.handleShowBGGSearch = function handleShowBGGSearch(event) {
     logger('Handling Show BGG Search View');
-    event.preventDefault(); //this.hideAllSideBars();
-    // prevent anything from happening if we are not logged in
+    event.preventDefault(); // prevent anything from happening if we are not logged in
 
     if (!_Controller__WEBPACK_IMPORTED_MODULE_3__["default"].isLoggedIn()) {
-      // @ts-ignore
-      window.location.href = this.state.apis.login;
-      return;
+      this.hideAllSideBars(); // @ts-ignore
     }
 
     this.bggSearchView.eventShow(event);
@@ -970,7 +998,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
 
 
-localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail';
+localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -996,6 +1024,7 @@ var Decorator;
   Decorator[Decorator["Incomplete"] = 0] = "Incomplete";
   Decorator[Decorator["Complete"] = 1] = "Complete";
   Decorator[Decorator["Persisted"] = 2] = "Persisted";
+  Decorator[Decorator["PersistedLocally"] = 3] = "PersistedLocally";
 })(Decorator || (Decorator = {}));
 
 /***/ }),
@@ -1024,6 +1053,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./network/DownloadManager */ "./src/network/DownloadManager.ts");
 /* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
 /* harmony import */ var _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./component/ScoreSheetController */ "./src/component/ScoreSheetController.ts");
+/* harmony import */ var _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./util/EqualityFunctions */ "./src/util/EqualityFunctions.ts");
+
 
 
 
@@ -1100,7 +1131,9 @@ var Controller = /*#__PURE__*/function () {
     this.stateChangedItemUpdated = this.stateChangedItemUpdated.bind(this); // call backs
 
     this.callbackBoardGameDetails = this.callbackBoardGameDetails.bind(this);
-    this.callbackAddToCollection = this.callbackAddToCollection.bind(this); //event handlers
+    this.callbackAddToCollection = this.callbackAddToCollection.bind(this);
+    this.callbackRemoveFromCollection = this.callbackRemoveFromCollection.bind(this);
+    this.callbackGetCollection = this.callbackGetCollection.bind(this); //event handlers
 
     this.addBoardGameToCollection = this.addBoardGameToCollection.bind(this);
     this.removeBoardGameFromCollection = this.removeBoardGameFromCollection.bind(this);
@@ -1129,11 +1162,11 @@ var Controller = /*#__PURE__*/function () {
 
       var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_8__["NotificationController"].getInstance();
       chatManager.setCurrentUser(this.getLoggedInUsername());
-      chatManager.login();
-    } // load the users
+      chatManager.login(); // load the users
 
+      this.getStateManager().getStateByName(this.config.stateNames.users);
+    } // load board games from local storage if any
 
-    this.getStateManager().getStateByName(this.config.stateNames.users); // load board games from local storage if any
 
     this.applicationView.setState({
       boardGames: this.displayedBoardGamesStateManager.getStateByName(this.config.stateNames.boardGames)
@@ -1145,7 +1178,9 @@ var Controller = /*#__PURE__*/function () {
   _proto.downloadAndSyncSavedBoardGameCollection = function downloadAndSyncSavedBoardGameCollection() {
     if (this.isLoggedIn()) {
       // start the call to retrieve the saved collection of board games
-      alert('Implement get board game collection from persistence');
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.getMyBoardGameCollection.queryString, {
+        userId: this.getLoggedInUserId()
+      }, this.callbackGetCollection, this.config.stateNames.boardGames, false);
     }
   };
 
@@ -1385,7 +1420,7 @@ var Controller = /*#__PURE__*/function () {
         cLogger("Updating application state");
         currentListOfGames.splice(index, 1, boardGameDetails);
         cLogger(currentListOfGames);
-        boardGameDetails.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete;
+        boardGameDetails.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally;
         this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
         this.applicationView.setState({
           boardGames: currentListOfGames
@@ -1414,9 +1449,11 @@ var Controller = /*#__PURE__*/function () {
   };
 
   _proto.findBoardGameInStateFromEvent = function findBoardGameInStateFromEvent(event) {
-    var boardGame = null; // @ts-ignore
+    var boardGame = null;
+    cLoggerDetail("Finding board game id in event"); // @ts-ignore
 
     var id = event.target.getAttribute(this.config.controller.events.boardGames.eventDataKeyId);
+    cLoggerDetail(id);
 
     if (id) {
       // find the entry from the state manager
@@ -1426,12 +1463,14 @@ var Controller = /*#__PURE__*/function () {
       var index = currentBoardGamesOnDisplay.findIndex(function (game) {
         return game.gameId === id;
       });
+      cLoggerDetail(index);
 
       if (index >= 0) {
         boardGame = currentBoardGamesOnDisplay[index];
       }
     }
 
+    cLoggerDetail(boardGame);
     return boardGame;
   };
 
@@ -1450,13 +1489,76 @@ var Controller = /*#__PURE__*/function () {
   };
 
   _proto.callbackAddToCollection = function callbackAddToCollection(data, status, associatedStateName) {
-    cLogger("callback for bgg search for single board game " + associatedStateName + " with status " + status);
+    cLogger("callback for add single board game " + associatedStateName + " to my collection with status " + status);
 
     if (status >= 200 && status <= 299) {
       // do we have any data?
       cLogger(data);
       var id = data.data[this.config.apis.addToMyCollection.resultName];
-      cLogger(id); //XXX
+      cLogger(id); // Find and update the board game in the state
+
+      var currentGameList = this.applicationView.state.boardGames;
+      var index = currentGameList.findIndex(function (game) {
+        return game.gameId === id.gameId;
+      });
+
+      if (index >= 0) {
+        var updatingBoardGame = currentGameList[index];
+        cLogger("Updating board game " + updatingBoardGame.gameId + " with database id " + id.id + " and new Persisted state");
+        updatingBoardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
+        updatingBoardGame.id = id.id;
+        this.applicationView.setState({
+          boardGames: currentGameList
+        });
+        this.displayedBoardGamesStateManager.updateItemInState(this.config.stateNames.boardGames, updatingBoardGame, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_14__["isSameGame"], false);
+      }
+    }
+  };
+
+  _proto.callbackRemoveFromCollection = function callbackRemoveFromCollection(data, status, associatedStateName) {
+    cLogger("callback for remove single board game " + associatedStateName + " from my collection with status " + status);
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      cLogger(data);
+      var id = data.data[this.config.apis.removeFromMyCollection.resultName];
+      cLogger(id);
+    }
+  };
+
+  _proto.callbackGetCollection = function callbackGetCollection(data, status, associatedStateName) {
+    cLogger("callback for getting my collection of board games " + associatedStateName + " to my collection with status " + status);
+
+    if (status >= 200 && status <= 299) {
+      // do we have any data?
+      cLogger(data);
+      var collectionData = data.data[this.config.apis.getMyBoardGameCollection.resultName]; // loop through the collection data and see if it already exists in the state
+
+      var currentGameList = this.applicationView.state.boardGames;
+      cLoggerDetail("Starting with local state of " + currentGameList.length);
+      collectionData.forEach(function (boardGame) {
+        boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
+        cLoggerDetail("Loading board game from collection ");
+        cLoggerDetail(boardGame);
+        var index = currentGameList.findIndex(function (game) {
+          return game.gameId === boardGame.gameId;
+        });
+        cLoggerDetail("have found the board game locally? " + (index >= 0));
+
+        if (index >= 0) {
+          cLoggerDetail("in current state, replacing"); // replace the current entry
+
+          currentGameList.splice(index, 1, boardGame);
+        } else {
+          cLoggerDetail("not in current state, adding");
+          currentGameList.push(boardGame);
+        }
+      });
+      cLoggerDetail("Ending with local state of " + currentGameList.length);
+      this.applicationView.setState({
+        boardGames: currentGameList
+      });
+      this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentGameList, false);
     }
   };
 
@@ -1479,6 +1581,7 @@ var Controller = /*#__PURE__*/function () {
               break;
             }
 
+          case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally:
           case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete:
             {
               // loaded and ready to save
@@ -1486,11 +1589,18 @@ var Controller = /*#__PURE__*/function () {
               // now we need an API call to fill in the details
 
               delete boardGame.decorator;
-              _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.addToMyCollection.queryString, {
-                userId: this.getCurrentUser(),
-                boardGame: boardGame
-              }, this.callbackAddToCollection, this.config.stateNames.boardGames, true);
-              boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete;
+              delete boardGame.id;
+
+              if (this.isLoggedIn()) {
+                _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.addToMyCollection.queryString, {
+                  userId: this.getCurrentUser(),
+                  boardGame: boardGame
+                }, this.callbackAddToCollection, this.config.stateNames.boardGames, true);
+                boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete;
+              } else {
+                boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally;
+              }
+
               break;
             }
         }
@@ -1498,18 +1608,26 @@ var Controller = /*#__PURE__*/function () {
     }
   };
 
-  _proto.removeBoardGameFromCollection = function removeBoardGameFromCollection(event) {
-    cLogger("Handling Remove Board Game from collection");
-    var boardGame = this.findBoardGameInStateFromEvent(event);
+  _proto.removeBoardGameFromCollection = function removeBoardGameFromCollection(boardGame) {
+    // should be persisted
+    cLogger("Handling Remove Board Game from collection with id " + boardGame.gameId);
 
     if (boardGame) {
       if (boardGame.decorator) {
         switch (boardGame.decorator) {
+          case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally:
           case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted:
             {
               // already in collection,
-              alert('implement delete board game from persistence');
               this.removeBoardGameFromState(boardGame);
+
+              if (this.isLoggedIn()) {
+                _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.removeFromMyCollection.queryString, {
+                  userId: this.getCurrentUser(),
+                  boardGameId: boardGame.gameId
+                }, this.callbackRemoveFromCollection, this.config.stateNames.boardGames, false);
+              }
+
               break;
             }
 
@@ -1529,25 +1647,21 @@ var Controller = /*#__PURE__*/function () {
     }
   };
 
-  _proto.removeBoardGameFromDisplay = function removeBoardGameFromDisplay(event) {
-    cLogger("Handling Add Board Game to collection");
-    var boardGame = this.findBoardGameInStateFromEvent(event);
+  _proto.removeBoardGameFromDisplay = function removeBoardGameFromDisplay(boardGame) {
+    // shouldn't be persisted yet
+    cLogger("Handling Remove Board Game from display " + boardGame.gameId);
 
     if (boardGame) {
       if (boardGame.decorator) {
         switch (boardGame.decorator) {
-          case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted:
-            {
-              // in collection, should not be removed from display
-              break;
-            }
-
           case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Incomplete:
             {
               // not ready to add to collection yet, do nothing
               break;
             }
 
+          case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted:
+          case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally:
           case _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete:
             {
               // loaded and ready to save
@@ -2201,7 +2315,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     vLoggerDetail("Board Game " + event.target.innerText + " with id " + boardGameId + " dragging");
     var boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {
       gameId: parseInt(boardGameId)
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSameGame"]);
     vLoggerDetail(boardGame);
     boardGame[this.config.ui.draggable.draggedType] = this.config.ui.draggable.draggedTypeBoardGame;
     boardGame[this.config.ui.draggable.draggedFrom] = this.config.ui.draggable.draggedFromBoardGameSearch;
@@ -2217,11 +2331,11 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     vLoggerDetail("Board Game " + event.target + " with id " + boardGameId + " delete clicked from " + dataSource);
     var boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {
       id: parseInt(boardGameId)
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSameGame"]);
     vLogger(boardGameId);
 
     if (boardGame) {
-      this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"], true);
+      this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSameGame"], true);
     }
   };
 
@@ -2250,7 +2364,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _AppTypes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../AppTypes */ "./src/AppTypes.ts");
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+/* harmony import */ var _AppTypes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../AppTypes */ "./src/AppTypes.ts");
+
 
 
 
@@ -2259,43 +2375,51 @@ var beLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('view-ts:boardgamevi
 function BoardGameView(_ref) {
   var boardGame = _ref.boardGame,
       showScoresHandler = _ref.showScoresHandler,
-      removeFromDisplayHandler = _ref.removeFromDisplayHandler,
       addToCollectionHandler = _ref.addToCollectionHandler,
       removeFromCollectionHandler = _ref.removeFromCollectionHandler;
 
   if (boardGame) {
     beLogger("Board Game " + boardGame.gameId);
-    var removeButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    var addButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
       type: "button",
-      className: "btn-info btn-sm rounded p-1 mr-2",
-      "board-game-id": boardGame.gameId,
-      onClick: removeFromDisplayHandler
-    }, "\xA0\xA0Remove \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
-      className: "fas fa-trash-alt"
-    }), "\xA0\xA0");
-    var addButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-      type: "button",
-      className: "btn-primary btn-sm rounded p-1 mr-2",
+      className: "btn-primary btn-sm rounded p-1 mr-2 mt-1",
       "board-game-id": boardGame.gameId,
       onClick: addToCollectionHandler
-    }, "\xA0\xA0Add to Collection \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+    }, "\xA0\xA0Add to ", !_Controller__WEBPACK_IMPORTED_MODULE_2__["default"].isLoggedIn() ? 'Browser' : '', " Collection \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
       className: "fas fa-star"
-    }), "\xA0\xA0");
-    var deleteButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    }), "\xA0\xA0"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
       type: "button",
-      className: "btn-warning btn-sm rounded p-1 mr-2",
+      className: "btn-primary btn-sm rounded p-1 ml-2 mt-1",
       "board-game-id": boardGame.gameId,
       onClick: removeFromCollectionHandler
-    }, "\xA0\xA0Remove from collection \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+    }, "\xA0\xA0Remove from Display\xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+      className: "fas fa-trash-alt"
+    })));
+    var deleteButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      type: "button",
+      className: "btn-warning btn-sm rounded p-1 mr-2 mt-1",
+      "board-game-id": boardGame.gameId,
+      onClick: removeFromCollectionHandler
+    }, "\xA0\xA0Remove from ", !_Controller__WEBPACK_IMPORTED_MODULE_2__["default"].isLoggedIn() ? 'Browser' : '', " Collection \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
       className: "far fa-star"
-    }), "\xA0\xA0");
-    var favouriteIcon = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-      className: "card-img-overlay"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
-      className: "fas fa-star"
-    }));
+    }), "\xA0\xA0"); // do we have any scores?
 
-    if (boardGame.decorator && boardGame.decorator !== _AppTypes__WEBPACK_IMPORTED_MODULE_2__["Decorator"].Incomplete) {
+    var scoreCount = 0;
+
+    if (boardGame.scores) {
+      scoreCount = boardGame.scores.length;
+    } //        let overlay = <div className="card-img-overlay">
+
+
+    var favouriteIcon = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+      className: "fas fa-star text-black"
+    });
+    var scoreBadge = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+      "board-game-id": boardGame.gameId,
+      className: "badge badge-pill badge-primary"
+    }, scoreCount);
+
+    if (boardGame.decorator && boardGame.decorator !== _AppTypes__WEBPACK_IMPORTED_MODULE_3__["Decorator"].Incomplete) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -2304,11 +2428,11 @@ function BoardGameView(_ref) {
         className: "card-img-top",
         src: boardGame.image,
         alt: "Card image cap"
-      }), boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_2__["Decorator"].Persisted ? favouriteIcon : '', /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body scroll"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", {
         className: "card-title"
-      }, boardGame.name, " (", boardGame.year, ")", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_2__["Decorator"].Complete ? removeButton : '', "  ", boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_2__["Decorator"].Persisted ? removeButton : addButton), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+      }, boardGame.name, " (", boardGame.year, ") ", boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_3__["Decorator"].Persisted || boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_3__["Decorator"].PersistedLocally ? favouriteIcon : '', " ", boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_3__["Decorator"].Persisted || boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_3__["Decorator"].PersistedLocally ? scoreBadge : '', /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), "  ", _Controller__WEBPACK_IMPORTED_MODULE_2__["default"].isLoggedIn() ? boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_3__["Decorator"].Persisted ? deleteButton : addButton : deleteButton), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         className: "card-text"
       }, boardGame.description), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         className: "card-text"

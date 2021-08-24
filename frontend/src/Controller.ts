@@ -16,6 +16,7 @@ import BrowserStorageStateManager from "./state/BrowserStorageStateManager";
 import {Invitation, Message} from "./socket/Types";
 import {MessageEventListener} from "./socket/ChatEventListener";
 import {ScoreSheetController} from "./component/ScoreSheetController";
+import {isSameGame} from "./util/EqualityFunctions";
 
 const cLogger = debug('controller-ts');
 const cLoggerDetail = debug('controller-ts-detail');
@@ -103,6 +104,8 @@ class Controller implements StateChangeListener {
         // call backs
         this.callbackBoardGameDetails = this.callbackBoardGameDetails.bind(this);
         this.callbackAddToCollection = this.callbackAddToCollection.bind(this);
+        this.callbackRemoveFromCollection = this.callbackRemoveFromCollection.bind(this);
+        this.callbackGetCollection = this.callbackGetCollection.bind(this);
 
         //event handlers
         this.addBoardGameToCollection = this.addBoardGameToCollection.bind(this);
@@ -135,10 +138,10 @@ class Controller implements StateChangeListener {
             chatManager.setCurrentUser(this.getLoggedInUsername());
 
             chatManager.login();
-        }
 
-        // load the users
-        this.getStateManager().getStateByName(this.config.stateNames.users);
+            // load the users
+            this.getStateManager().getStateByName(this.config.stateNames.users);
+        }
 
         // load board games from local storage if any
         this.applicationView.setState({boardGames: this.displayedBoardGamesStateManager.getStateByName(this.config.stateNames.boardGames)});
@@ -150,7 +153,7 @@ class Controller implements StateChangeListener {
     private downloadAndSyncSavedBoardGameCollection() {
         if (this.isLoggedIn()) {
             // start the call to retrieve the saved collection of board games
-            alert ('Implement get board game collection from persistence');
+            downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.getMyBoardGameCollection.queryString, {userId:this.getLoggedInUserId()}, this.callbackGetCollection, this.config.stateNames.boardGames, false);
         }
     }
 
@@ -357,7 +360,7 @@ class Controller implements StateChangeListener {
                 cLogger(`Updating application state`);
                 currentListOfGames.splice(index, 1, boardGameDetails);
                 cLogger(currentListOfGames);
-                boardGameDetails.decorator = Decorator.Complete;
+                boardGameDetails.decorator = Decorator.PersistedLocally;
                 this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentListOfGames,false);
                 this.applicationView.setState({boardGames: currentListOfGames});
             } else {
@@ -381,18 +384,22 @@ class Controller implements StateChangeListener {
 
     private findBoardGameInStateFromEvent(event: Event) {
         let boardGame: any | null = null;
+        cLoggerDetail(`Finding board game id in event`);
         // @ts-ignore
         let id = event.target.getAttribute(this.config.controller.events.boardGames.eventDataKeyId);
+        cLoggerDetail(id);
         if (id) {
             // find the entry from the state manager
             id = parseInt(id);
             // @ts-ignore
             const currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
             let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
+            cLoggerDetail(index);
             if (index >= 0) {
                 boardGame = currentBoardGamesOnDisplay[index];
             }
         }
+        cLoggerDetail(boardGame);
         return boardGame;
     }
 
@@ -412,16 +419,65 @@ class Controller implements StateChangeListener {
 
 
     public callbackAddToCollection(data: any, status: number, associatedStateName: string): void {
-        cLogger(`callback for bgg search for single board game ${associatedStateName} with status ${status}`);
+        cLogger(`callback for add single board game ${associatedStateName} to my collection with status ${status}`);
         if (status >= 200 && status <= 299) { // do we have any data?
             cLogger(data);
             const id = data.data[this.config.apis.addToMyCollection.resultName];
             cLogger(id);
 
-            //XXX
+            // Find and update the board game in the state
+            let currentGameList = this.applicationView.state.boardGames;
+            let index = currentGameList.findIndex((game:any) => game.gameId === id.gameId);
+            if (index >= 0) {
+                let updatingBoardGame = currentGameList[index];
+                cLogger(`Updating board game ${updatingBoardGame.gameId} with database id ${id.id} and new Persisted state`);
+                updatingBoardGame.decorator = Decorator.Persisted;
+                updatingBoardGame.id = id.id;
+                this.applicationView.setState({boardGames:currentGameList});
+                this.displayedBoardGamesStateManager.updateItemInState(this.config.stateNames.boardGames,updatingBoardGame,isSameGame,false);
+            }
         }
     }
 
+    public callbackRemoveFromCollection(data: any, status: number, associatedStateName: string): void {
+        cLogger(`callback for remove single board game ${associatedStateName} from my collection with status ${status}`);
+        if (status >= 200 && status <= 299) { // do we have any data?
+            cLogger(data);
+            const id = data.data[this.config.apis.removeFromMyCollection.resultName];
+            cLogger(id);
+        }
+    }
+
+    public callbackGetCollection(data: any, status: number, associatedStateName: string): void {
+        cLogger(`callback for getting my collection of board games ${associatedStateName} to my collection with status ${status}`);
+        if (status >= 200 && status <= 299) { // do we have any data?
+            cLogger(data);
+            const collectionData = data.data[this.config.apis.getMyBoardGameCollection.resultName];
+
+            // loop through the collection data and see if it already exists in the state
+            let currentGameList = this.applicationView.state.boardGames;
+            cLoggerDetail(`Starting with local state of ${currentGameList.length}`);
+            collectionData.forEach((boardGame:any) => {
+                boardGame.decorator = Decorator.Persisted;
+                cLoggerDetail(`Loading board game from collection `);
+                cLoggerDetail(boardGame);
+                let index = currentGameList.findIndex((game:any) => game.gameId === boardGame.gameId);
+                cLoggerDetail(`have found the board game locally? ${index >=0}`);
+                if (index >= 0) {
+                    cLoggerDetail(`in current state, replacing`);
+                    // replace the current entry
+                    currentGameList.splice(index,1,boardGame);
+                }
+                else {
+                    cLoggerDetail(`not in current state, adding`);
+                    currentGameList.push(boardGame);
+                }
+            });
+            cLoggerDetail(`Ending with local state of ${currentGameList.length}`);
+            this.applicationView.setState({boardGames:currentGameList});
+            this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentGameList,false);
+        }
+    }
 
     addBoardGameToCollection(event: MouseEvent) {
         cLogger(`Handling Add Board Game to collection`);
@@ -437,19 +493,25 @@ class Controller implements StateChangeListener {
                         // not ready to add to collection yet, do nothing
                         break;
                     }
+                    case (Decorator.PersistedLocally):
                     case (Decorator.Complete): {
                         // loaded and ready to save
                         this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames,boardGame,true);
                         // add the board game to my collection
                         // now we need an API call to fill in the details
                         delete boardGame.decorator;
-                        downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addToMyCollection.queryString,
-                            {userId: this.getCurrentUser(), boardGame: boardGame},
-                            this.callbackAddToCollection,
-                            this.config.stateNames.boardGames,
-                            true);
-                        boardGame.decorator = Decorator.Complete;
-
+                        delete boardGame.id;
+                        if (this.isLoggedIn()) {
+                            downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addToMyCollection.queryString,
+                                {userId: this.getCurrentUser(), boardGame: boardGame},
+                                this.callbackAddToCollection,
+                                this.config.stateNames.boardGames,
+                                true);
+                            boardGame.decorator = Decorator.Complete;
+                        }
+                        else {
+                            boardGame.decorator = Decorator.PersistedLocally;
+                        }
                         break;
                     }
                 }
@@ -457,16 +519,22 @@ class Controller implements StateChangeListener {
         }
     }
 
-    removeBoardGameFromCollection(event: MouseEvent) {
-        cLogger(`Handling Remove Board Game from collection`);
-        const boardGame: any | null = this.findBoardGameInStateFromEvent(event);
+    removeBoardGameFromCollection(boardGame: any) { // should be persisted
+        cLogger(`Handling Remove Board Game from collection with id ${boardGame.gameId}`);
         if (boardGame) {
             if (boardGame.decorator) {
                 switch (boardGame.decorator) {
+                    case (Decorator.PersistedLocally):
                     case (Decorator.Persisted): {
                         // already in collection,
-                        alert('implement delete board game from persistence');
                         this.removeBoardGameFromState(boardGame);
+                        if (this.isLoggedIn()) {
+                            downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.removeFromMyCollection.queryString,
+                                {userId: this.getCurrentUser(), boardGameId: boardGame.gameId},
+                                this.callbackRemoveFromCollection,
+                                this.config.stateNames.boardGames,
+                                false);
+                        }
                         break;
                     }
                     case (Decorator.Incomplete): {
@@ -482,20 +550,17 @@ class Controller implements StateChangeListener {
         }
     }
 
-    removeBoardGameFromDisplay(event: MouseEvent) {
-        cLogger(`Handling Add Board Game to collection`);
-        const boardGame: any | null = this.findBoardGameInStateFromEvent(event);
+    removeBoardGameFromDisplay(boardGame: any) { // shouldn't be persisted yet
+        cLogger(`Handling Remove Board Game from display ${boardGame.gameId}`);
         if (boardGame) {
             if (boardGame.decorator) {
                 switch (boardGame.decorator) {
-                    case (Decorator.Persisted): {
-                        // in collection, should not be removed from display
-                        break;
-                    }
                     case (Decorator.Incomplete): {
                         // not ready to add to collection yet, do nothing
                         break;
                     }
+                    case (Decorator.Persisted):
+                    case (Decorator.PersistedLocally):
                     case (Decorator.Complete): {
                         // loaded and ready to save
                         this.removeBoardGameFromState(boardGame);

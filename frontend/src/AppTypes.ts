@@ -1,5 +1,6 @@
 export enum Decorator  {
     Incomplete,
     Complete,
-    Persisted
+    Persisted,
+    PersistedLocally = 3
 }

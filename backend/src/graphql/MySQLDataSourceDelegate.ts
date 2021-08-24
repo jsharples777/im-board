@@ -50,6 +50,20 @@ class MySQLDataSourceDelegate {
             data.boardGame.createdBy = data.userId;
             mysqlLogger(data.boardGame);
 
+            // make sure the user doesn't put duplicates in the database of the same board game
+            BoardGame.findAll({where: {createdBy:data.userId, gameId: data.boardGame.gameId}})
+                .then((boardGames) => {
+                    if (boardGames.length > 0) {
+                        //already in collection, return what we have
+                        // @ts-ignore
+                        resolve({id:boardGames[0].id, gameId: boardGames[0].gameId});
+                    }
+                })
+                .catch((err) => {
+                        mysqlLogger(err);
+                        reject(err);
+                    });
+            // not in collection, create a new record
             BoardGame.create(data.boardGame)
             .then((boardGame) => {
                 // @ts-ignore
@@ -67,7 +81,7 @@ class MySQLDataSourceDelegate {
     public removeFromMyCollection(_:any, data:any) {
         mysqlLogger(`Removing board game ${data.boardGameId} to collection for user ${data.userId}`);
         return new Promise( (resolve, reject) => {
-            BoardGame.destroy({where: {id: data.boardGameId}})
+            BoardGame.destroy({where: {createdBy: data.userId, gameId: data.boardGameId}})
                 .then((result) => {
                     resolve({result});
                 })

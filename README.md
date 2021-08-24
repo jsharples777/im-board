@@ -1,4 +1,4 @@
-# Tech Blog      [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# I'm Board      [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Table of Contents
 - [Project Description](#project-description)
@@ -12,11 +12,22 @@
 
 
 # Project Description
-This small [web application](https://tech-blog-jps.herokuapp.com/) allows the user to create/update/delete and view simple tech blog entries (title and content) that are stored persistently on a webserver in a MySQL database.
+This [web application](https://im-board.herokuapp.com/) allows the user to find board games from Board Game Geek and add them to a local collection.  From there they can manage that
+collection adding and removing as they choose.  They can also start a score sheet for a board game, which is maintained in the browser and has some simple display and math functionality built-in.  
+The user can run a timer on the scoresheet to track the game length and then save the score sheet for that board game and review them at a later date.
 
-The user can access all the existing blog entries and their comments, but only when logged into the site through the login screen.
+A new user can choose register and create a login with the Options menu, and then be able to manage their collections and scoresheets stored in a database.
 
-A new user can register and create a login with the Options menu, and then be able to enter their own entries and comment on other entries.
+A logged in user also has access to:
+1.  A user search function (by username)
+2.  The ability to create chat sessions with users, including group chats
+3.  A user can leave a chat at any time
+4.  A user can note some users as favourites, and will be notified if a user in their favourite list logs in/out
+5.  A user can note some users as blocked, preventing those users from invite them to chat rooms and sending them messages
+
+Finally a user can start a score sheet, when logged in, and make it collaborative, inviting other logged in users and allow all users to enter data and share that data during the game.
+
+As a technical note, the chat sessions are persisted and offline messages are received on login.
 
 If the user is idle, the session expires in 30 minutes.
 
@@ -59,18 +70,20 @@ Please access the [Questions](#questions) section to send me an email, or access
 15. [Sequelize](https://www.npmjs.com/package/sequelize)
 16. [Passport](https://www.npmjs.com/package/passport)
 17. [Socket.io](https://socket.io/)
-18. [Connect Session Sequelize](https://www.npmjs.com/package/connect-session-sequelize)
-19. [Typescript](https://www.typescriptlang.org/)
-20. [ts-node](https://github.com/TypeStrong/ts-node)
-21. [tsc-watch](https://www.npmjs.com/package/tsc-watch)
-22. [ts-loader](https://github.com/TypeStrong/ts-loader)
+18. [Typescript](https://www.typescriptlang.org/)
+19. [ts-node](https://github.com/TypeStrong/ts-node)
+20. [tsc-watch](https://www.npmjs.com/package/tsc-watch)
+21. [ts-loader](https://github.com/TypeStrong/ts-loader)
+22. GraphQL
+23. XML2js
+
 
 
 # Questions
 
 >  **Direct your questions about this project to:**
 >
->  *GitHub:* [Github Project Link](https://github.com/jsharples777/tech-blog-jps)
+>  *GitHub:* [Github Project Link](https://github.com/jsharples777/im-board)
 >
 >  *Email:* [jamie.sharples@gmail.com](mailto:jamie.sharples@gmail.com)
 

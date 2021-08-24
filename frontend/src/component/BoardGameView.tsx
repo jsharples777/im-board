@@ -10,35 +10,40 @@ const beLogger = debug('view-ts:boardgameview');
 
 
 // @ts-ignore
-export default function BoardGameView({boardGame, showScoresHandler, removeFromDisplayHandler,addToCollectionHandler, removeFromCollectionHandler}) {
+export default function BoardGameView({boardGame, showScoresHandler, addToCollectionHandler, removeFromCollectionHandler}) {
     if (boardGame) {
         beLogger(`Board Game ${boardGame.gameId}`);
 
-        let removeButton =
-                <button type="button"
-                        className="btn-info btn-sm rounded p-1 mr-2"
-                        board-game-id={boardGame.gameId} onClick={removeFromDisplayHandler}>
-                    &nbsp;&nbsp;Remove &nbsp;
-                    <i className="fas fa-trash-alt"></i>&nbsp;&nbsp;
-                </button>
-        let addButton =
+        let addButton = <div>
             <button type="button"
-                    className="btn-primary btn-sm rounded p-1 mr-2"
+                    className="btn-primary btn-sm rounded p-1 mr-2 mt-1"
                     board-game-id={boardGame.gameId} onClick={addToCollectionHandler}>
-                &nbsp;&nbsp;Add to Collection &nbsp;
+                &nbsp;&nbsp;Add to {!controller.isLoggedIn()?'Browser':''} Collection &nbsp;
                 <i className="fas fa-star"></i>&nbsp;&nbsp;
             </button>
+            <button type="button"
+                    className="btn-primary btn-sm rounded p-1 ml-2 mt-1"
+                    board-game-id={boardGame.gameId} onClick={removeFromCollectionHandler}>
+                &nbsp;&nbsp;Remove from Display&nbsp;<i className="fas fa-trash-alt"></i>
+            </button>
+            </div>
+
         let deleteButton =
             <button type="button"
-                    className="btn-warning btn-sm rounded p-1 mr-2"
+                    className="btn-warning btn-sm rounded p-1 mr-2 mt-1"
                     board-game-id={boardGame.gameId} onClick={removeFromCollectionHandler}>
-                &nbsp;&nbsp;Remove from collection &nbsp;
+                &nbsp;&nbsp;Remove from {!controller.isLoggedIn()?'Browser':''} Collection &nbsp;
                 <i className="far fa-star"></i>&nbsp;&nbsp;
             </button>
-        let favouriteIcon = <div className="card-img-overlay">
-                                <i className="fas fa-star"></i>
-                            </div>
+        // do we have any scores?
+        let scoreCount = 0;
+        if (boardGame.scores) {
+            scoreCount = boardGame.scores.length;
+        }
 
+//        let overlay = <div className="card-img-overlay">
+        let favouriteIcon = <i className="fas fa-star text-black"></i>
+        let scoreBadge = <span board-game-id={boardGame.gameId} className='badge badge-pill badge-primary'>{scoreCount}</span>
 
         if ((boardGame.decorator) && (boardGame.decorator !== Decorator.Incomplete)) {
 
@@ -46,9 +51,8 @@ export default function BoardGameView({boardGame, showScoresHandler, removeFromD
                 <div className="col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2">
                     <div className="card">
                         <img className="card-img-top" src={boardGame.image} alt="Card image cap"></img>
-                        {(boardGame.decorator === Decorator.Persisted)?favouriteIcon:''}
                         <div className="card-body scroll">
-                            <h5 className="card-title">{boardGame.name} ({boardGame.year})<br/>{(boardGame.decorator === Decorator.Complete)?removeButton:''}  {(boardGame.decorator === Decorator.Persisted)?removeButton:addButton}</h5>
+                            <h5 className="card-title">{boardGame.name} ({boardGame.year}) {((boardGame.decorator === Decorator.Persisted) || (boardGame.decorator === Decorator.PersistedLocally))?favouriteIcon:''} {((boardGame.decorator === Decorator.Persisted) || (boardGame.decorator === Decorator.PersistedLocally))?scoreBadge:''}<br/>  {(controller.isLoggedIn())?((boardGame.decorator === Decorator.Persisted)?deleteButton:addButton):deleteButton}</h5>
                             <p className="card-text">{boardGame.description}</p>
 
                             <p className="card-text">

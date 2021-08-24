@@ -63,7 +63,7 @@ class Root extends React.Component{
                 bggSearchResults: 'bggSearchResults'
             },
             apis: {
-                login: '/api/login',
+                login: '/login',
                 graphQL: '/graphql',
                 bggSearchCall: 'query search($queryString: String!) {findBoardGames(query: $queryString) {gameId, name, year}}',
                 bggSearchCallById: {
@@ -77,7 +77,20 @@ class Root extends React.Component{
                 addToMyCollection: {
                     queryString: 'mutation addBoardGame($userId: Int!, $boardGame: BoardGameDetailInput!){addToMyCollection(userId: $userId, boardGame: $boardGame) {id,gameId}}',
                     resultName: 'addToMyCollection',
+                },
+                removeFromMyCollection: {
+                    queryString: 'mutation removeBoardGame($userId: Int!, $boardGameId: Int!) {removeFromMyCollection(userId: $userId, boardGameId: $boardGameId) {result}}',
+                    resultName: 'removeFromMyCollection'
+                },
+                getMyBoardGameCollection: {
+                    queryString: 'query myCollection($userId: Int!) {getMyBoardGameCollection(userId: $userId) {id,gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories,scores {id, players, scores, jsonData, createdOn}}}',
+                    resultName: 'getMyBoardGameCollection',
+                },
+                addScoreSheetToBoardGame: {
+                    queryString: 'mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id,players,scores,jsonData,createdOn}',
+                    resultName: 'addScoreSheetToBoardGame'
                 }
+
 
 
             },
@@ -263,6 +276,7 @@ class Root extends React.Component{
         // event handlers
         this.cancelDelete = this.cancelDelete.bind(this);
         this.confirmDelete = this.confirmDelete.bind(this);
+        this.handleDeleteBoardGame = this.handleDeleteBoardGame.bind(this);
 
         this.handleShowUserSearch = this.handleShowUserSearch.bind(this);
         this.handleShowChat = this.handleShowChat.bind(this);
@@ -319,7 +333,6 @@ class Root extends React.Component{
             <BoardGameView
                 key={index}
                 boardGame={entry}
-                removeFromDisplayHandler={controller.removeBoardGameFromDisplay}
                 showScoresHandler={() => {}}
                 addToCollectionHandler={controller.addBoardGameToCollection}
                 removeFromCollectionHandler={this.handleDeleteBoardGame}
@@ -351,8 +364,15 @@ class Root extends React.Component{
         event.preventDefault();
         // @ts-ignore
         let id = this.modalEl.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
+        id = parseInt(id);
         logger(`Handling Delete with id ${id}`);
-        controller.removeBoardGameFromCollection(event);
+        // @ts-ignore
+        const currentBoardGamesOnDisplay = this.state.boardGames;
+        let index = currentBoardGamesOnDisplay.findIndex((game:any) => game.gameId === id);
+        if (index >= 0) {
+            const boardGame = currentBoardGamesOnDisplay[index];
+            controller.removeBoardGameFromCollection(boardGame);
+        }
     }
 
     handleDeleteBoardGame(event:MouseEvent) {
@@ -362,21 +382,31 @@ class Root extends React.Component{
         let id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
         logger(`Handling Delete Board Game ${id}`);
         if (id) {
-            // @ts-ignore
-            this.modalEl.setAttribute(this.state.controller.events.entry.eventDataKeyId,id);
             // find the entry from the state manager
             id = parseInt(id);
             // @ts-ignore
             const currentBoardGamesOnDisplay = this.state.boardGames;
-            let index = currentBoardGamesOnDisplay.findIndex((game:any) => game.id === id);
+            let index = currentBoardGamesOnDisplay.findIndex((game:any) => game.gameId === id);
             if (index >= 0) {
                 const boardGame = currentBoardGamesOnDisplay[index];
                 if (boardGame.decorator && (boardGame.decorator === Decorator.Persisted)) {
-                    this.alert(`${boardGame.name} (${boardGame.year})`, "Are you sure you want to delete this board game from your collection?");
+                    logger(`Handling Delete Board Game ${id} - persisted, confirming with user, but only if logged in`);
+                    if (controller.isLoggedIn()) {
+                        // @ts-ignore
+                        this.modalEl.setAttribute(this.state.controller.events.boardGames.eventDataKeyId,id);
+                        this.alert(`${boardGame.name} (${boardGame.year})`, "Are you sure you want to delete this board game from your collection?");
+                    }
+                    else {
+                        logger(`Handling Delete Board Game ${id} - IS persisted but not logged in, just deleting from local storage  asking controller to remove`);
+                        // not persisted yet, let the controller manage this one
+                        controller.removeBoardGameFromDisplay(boardGame);
+
+                    }
                 }
                 else {
+                    logger(`Handling Delete Board Game ${id} - NOT persisted, asking controller to remove`);
                     // not persisted yet, let the controller manage this one
-                    controller.removeBoardGameFromDisplay(event);
+                    controller.removeBoardGameFromDisplay(boardGame);
                 }
             }
         }
@@ -473,12 +503,10 @@ class Root extends React.Component{
     handleShowBGGSearch(event:Event) {
         logger('Handling Show BGG Search View');
         event.preventDefault();
-        //this.hideAllSideBars();
         // prevent anything from happening if we are not logged in
         if (!controller.isLoggedIn()) {
+            this.hideAllSideBars();
             // @ts-ignore
-            window.location.href = this.state.apis.login;
-            return;
         }
         this.bggSearchView.eventShow(event);
     }
@@ -488,7 +516,7 @@ class Root extends React.Component{
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
-localStorage.debug = 'app controller-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail';
+localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

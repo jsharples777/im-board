@@ -17,11 +17,6 @@ router.get('/', (req, res, next) => {
   res.render('index', { user: req.user });
 });
 
-router.get('/dashboard', auth.ensureAuthenticated, (req, res, next) => {
-  routeDebug(req.user);
-  res.render('index', { user: req.user });
-});
-
 router.get('/register', (req, res) => {
   res.render('register', { layout:"login-register",user: req.user, error: req.flash()["error"]});
 });
@@ -38,7 +33,7 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', passport.authenticate('local-login', {
-  successRedirect: '/dashboard',
+  successRedirect: '/',
   failureRedirect: '/login',
   failureFlash: true
 }));

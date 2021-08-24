@@ -150,7 +150,7 @@ class BoardGameSearchSidebarView extends SidebarView {
         const boardGameId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
         // @ts-ignore
         vLoggerDetail(`Board Game ${event.target.innerText} with id ${boardGameId} dragging`);
-        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {gameId: parseInt(boardGameId)}, isSame);
+        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {gameId: parseInt(boardGameId)}, isSameGame);
         vLoggerDetail(boardGame);
         boardGame[this.config.ui.draggable.draggedType] = this.config.ui.draggable.draggedTypeBoardGame;
         boardGame[this.config.ui.draggable.draggedFrom] = this.config.ui.draggable.draggedFromBoardGameSearch;
@@ -165,10 +165,10 @@ class BoardGameSearchSidebarView extends SidebarView {
         // @ts-ignore
         vLoggerDetail(`Board Game ${event.target} with id ${boardGameId} delete clicked from ${dataSource}`);
 
-        let boardGame:any = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {id: parseInt(boardGameId)}, isSame);
+        let boardGame:any = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {id: parseInt(boardGameId)}, isSameGame);
         vLogger(boardGameId);
         if (boardGame) {
-            this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, isSame,true);
+            this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, isSameGame,true);
         }
     }
 

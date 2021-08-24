@@ -107,6 +107,7 @@ class BGGDataSourceDelegate {
 
 
         let boardGame = {
+            id: -1,
             gameId: parseInt(item.$.id),
             thumb: thumb,
             image: image,

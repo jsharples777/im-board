@@ -30,6 +30,7 @@ input BoardGameDetailInput {
 }
 
 type BoardGameDetail {
+    id: Int,
     gameId: Int!
     name: String!
     thumb: String
@@ -55,7 +56,8 @@ type ScoreSheet {
     id:Int!
     players: [String],
     scores: [Int],
-    jsonData: String
+    jsonData: String,
+    createdOn: Int
 }
 
 input ScoreSheetInput {
@@ -74,6 +76,10 @@ type IdGameId {
     gameId: Int!
 }
 
+type NumberResults {
+    result: Int!
+}
+
 ##### top level declarations
 type Query {
     findBoardGames(query:String!): [BoardGame]
@@ -84,6 +90,6 @@ type Query {
 
 type Mutation {
     addToMyCollection(userId: Int, boardGame: BoardGameDetailInput): IdGameId
-    removeFromMyCollection(userId: Int, boardGameId: Int):IdGameId
-    addScoreSheetToBoardGame(userId: Int, boardGameId: Int, sheet: ScoreSheetInput): IdGameId
+    removeFromMyCollection(userId: Int, boardGameId: Int):NumberResults
+    addScoreSheetToBoardGame(userId: Int, boardGameId: Int, sheet: ScoreSheetInput): ScoreSheet
 }
