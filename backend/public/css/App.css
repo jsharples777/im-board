@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'digital';
+    src: url('/assets/digital-7.ttf');
+}
+
+
 .scroll {
     max-height: 400px;
     overflow-y: auto;
@@ -36,9 +42,21 @@
     height: 100%; /* 100% Full-height */
     width: 0px; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
-    z-index: 1; /* Stay on top */
+    z-index: 2; /* Stay on top */
     top: 50px;
     left: 0;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 10px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+}
+
+.sidebar-bottom {
+    height: 25%; /* 25% Full-height */
+    width: 100%; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    bottom: 50px;
+    right: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 10px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
@@ -48,7 +66,7 @@
     height: 100%; /* 100% Full-height */
     width: 0px; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
-    z-index: 1; /* Stay on top */
+    z-index: 2; /* Stay on top */
     top: 50px;
     right: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
@@ -140,6 +158,13 @@ small-heading {
     max-height: 50vh;
     overflow-y: auto;
 }
+
+.scroll-score-sheet {
+    width: 100vh;
+    max-width: 300vh;
+    overflow-x: auto;
+}
+
 .scroll-blocked-users {
     height: 20vh;
     max-height: 50vh;
@@ -276,5 +301,20 @@ h1 {
     height: 100vh;
     background-image: url('../img/splash.jpg');
     background-size: cover;
+    background-repeat: repeat-y;
     padding-top: 110px;
+}
+
+.scoresheet {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../img/scoresheet2.jpg');
+    background-size: cover;
+    padding-top: 110px;
+}
+
+.timer {
+    font-family: 'digital';
+    font-size: 36pt;
+    color: white;
 }
