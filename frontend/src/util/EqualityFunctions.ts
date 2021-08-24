@@ -7,3 +7,7 @@ export function isSame(item1:any, item2:any):boolean {
 export function isSameUsername(item1:any, item2:any):boolean {
   return (item1.username === item2.username);
 }
+
+export function isSameGame(item1:any, item2:any):boolean {
+  return (item1.gameId === item2.gameId);
+}

@@ -10,10 +10,10 @@ type Id {
 
 input BoardGameDetailInput {
     gameId: Int!
-    thumb: String!
-    image: String!
     name: String!
-    description: String!
+    thumb: String
+    image: String
+    description: String
     year: Int
     minPlayers: Int
     maxPlayers: Int
@@ -31,10 +31,10 @@ input BoardGameDetailInput {
 
 type BoardGameDetail {
     gameId: Int!
-    thumb: String!
-    image: String!
     name: String!
-    description: String!
+    thumb: String
+    image: String
+    description: String
     year: Int
     minPlayers: Int
     maxPlayers: Int

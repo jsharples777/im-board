@@ -25,10 +25,9 @@ class ApiUtil {
         if (response.status >= 200 && response.status <= 299) {
           return response.json();
         }
-        // else {
-        //     callback(null, response.status,queueId, requestId);
-        //     throw new Error("no results");
-        // }
+        if (response.status === 400) {
+          apiLogger(response.json());
+        }
       })
       .then((data) => {
         apiLogger(data);

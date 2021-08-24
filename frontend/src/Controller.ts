@@ -329,11 +329,7 @@ class Controller implements StateChangeListener {
         this.applicationView.setState({boardGames: currentListOfGames});
 
         // now we need an API call to fill in the details
-        let query = this.config.apis.bggSearchCallById.queryString;
-        query = query.replace(/@/, boardGame.gameId);
-        downloader.addQLApiRequest(this.config.apis.graphQL, query, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
-
-
+        downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.bggSearchCallById.queryString, {gameId:boardGame.gameId}, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
     }
 
     public callbackBoardGameDetails(data: any, status: number, associatedStateName: string): void {
@@ -422,7 +418,7 @@ class Controller implements StateChangeListener {
             const id = data.data[this.config.apis.addToMyCollection.resultName];
             cLogger(id);
 
-            XXX
+            //XXX
         }
     }
 
@@ -446,10 +442,13 @@ class Controller implements StateChangeListener {
                         this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames,boardGame,true);
                         // add the board game to my collection
                         // now we need an API call to fill in the details
-                        let query = this.config.apis.addToMyCollection.queryString;
-                        query = query.replace(/@/, ''+this.getLoggedInUserId());
-                        query = query.replace(/@/, boardGame.gameId);
-                        downloader.addQLApiRequest(this.config.apis.graphQL, query, this.callbackAddToCollection, this.config.stateNames.boardGames, true);
+                        delete boardGame.decorator;
+                        downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addToMyCollection.queryString,
+                            {userId: this.getCurrentUser(), boardGame: boardGame},
+                            this.callbackAddToCollection,
+                            this.config.stateNames.boardGames,
+                            true);
+                        boardGame.decorator = Decorator.Complete;
 
                         break;
                     }

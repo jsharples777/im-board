@@ -1,11 +1,9 @@
 import debug from 'debug';
 import SidebarView from './SidebarView';
 import {StateManager} from '../state/StateManager';
-import {isSame} from '../util/EqualityFunctions';
-import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
+import {isSame, isSameGame} from '../util/EqualityFunctions';
 import browserUtil from "../util/BrowserUtil";
 import downloader from "../network/DownloadManager";
-import {jsonRequest, RequestType} from "../network/Types";
 import MemoryBufferStateManager from "../state/MemoryBufferStateManager";
 
 const vLogger = debug('board-game-search-sidebar');
@@ -65,15 +63,9 @@ class BoardGameSearchSidebarView extends SidebarView {
 
         // get the query string from state obj
         let query = this.config.apis.bggSearchCall;
-        vLoggerDetail(`query string is now ${query}`);
 
-        // replace the @ symbol with the query
-        const regex = /@/;
 
-        query = query.replace(regex,queryText);
-        vLoggerDetail(`query string is now ${query}`);
-
-        downloader.addQLApiRequest(this.config.apis.graphQL, query, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
+        downloader.addQLApiRequest(this.config.apis.graphQL, query, {queryString:queryText}, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
     }
 
     public handleSearchResultsCB(data:any,status:number,associatedStateName:string):void {
@@ -132,7 +124,7 @@ class BoardGameSearchSidebarView extends SidebarView {
         // @ts-ignore
         vLoggerDetail(`Board Game ${event.target} with id ${boardGameId} clicked from ${dataSource}`);
 
-        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults,{gameId:parseInt(boardGameId)},isSame);
+        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults,{gameId:parseInt(boardGameId)},isSameGame);
         if (boardGame) {
             this.applicationView.addBoardGameToDisplay(boardGame);
         }

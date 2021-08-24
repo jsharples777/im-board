@@ -541,17 +541,17 @@ var Root = /*#__PURE__*/function (_React$Component) {
       apis: {
         login: '/api/login',
         graphQL: '/graphql',
-        bggSearchCall: 'query {\n' + '  findBoardGames(query: "@") {\n' + '    gameId, name, year\n' + '  }\n' + '} ',
+        bggSearchCall: 'query search($queryString: String!) {findBoardGames(query: $queryString) {gameId, name, year}}',
         bggSearchCallById: {
-          queryString: 'query {\n' + '  getBoardGameDetails(gameId: @) {\n' + '    gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' + '  }\n' + '}',
+          queryString: 'query getDetails($gameId:Int!) {getBoardGameDetails(gameId:$gameId) {gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories}}',
           resultName: 'getBoardGameDetails'
         },
         findUsers: {
-          queryString: 'query {\n  findUsers {\n    id, username\n  }\n}',
+          queryString: 'query {findUsers {id, username}}',
           resultName: 'findUsers'
         },
         addToMyCollection: {
-          queryString: 'mutation {\n  addToMyCollection(userId: @, boardGame: @) {\n    id  }\n}',
+          queryString: 'mutation addBoardGame($userId: Int!, $boardGame: BoardGameDetailInput!){addToMyCollection(userId: $userId, boardGame: $boardGame) {id,gameId}}',
           resultName: 'addToMyCollection'
         }
       },
@@ -1352,9 +1352,9 @@ var Controller = /*#__PURE__*/function () {
       boardGames: currentListOfGames
     }); // now we need an API call to fill in the details
 
-    var query = this.config.apis.bggSearchCallById.queryString;
-    query = query.replace(/@/, boardGame.gameId);
-    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, query, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
+    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.bggSearchCallById.queryString, {
+      gameId: boardGame.gameId
+    }, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
   };
 
   _proto.callbackBoardGameDetails = function callbackBoardGameDetails(data, status, associatedStateName) {
@@ -1456,8 +1456,7 @@ var Controller = /*#__PURE__*/function () {
       // do we have any data?
       cLogger(data);
       var id = data.data[this.config.apis.addToMyCollection.resultName];
-      cLogger(id);
-      XXX;
+      cLogger(id); //XXX
     }
   };
 
@@ -1486,10 +1485,12 @@ var Controller = /*#__PURE__*/function () {
               this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames, boardGame, true); // add the board game to my collection
               // now we need an API call to fill in the details
 
-              var query = this.config.apis.addToMyCollection.queryString;
-              query = query.replace(/@/, '' + this.getLoggedInUserId());
-              query = query.replace(/@/, boardGame.gameId);
-              _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, query, this.callbackAddToCollection, this.config.stateNames.boardGames, true);
+              delete boardGame.decorator;
+              _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.addToMyCollection.queryString, {
+                userId: this.getCurrentUser(),
+                boardGame: boardGame
+              }, this.callbackAddToCollection, this.config.stateNames.boardGames, true);
+              boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete;
               break;
             }
         }
@@ -2112,12 +2113,9 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     this.changeSearchButton(false); // get the query string from state obj
 
     var query = this.config.apis.bggSearchCall;
-    vLoggerDetail("query string is now " + query); // replace the @ symbol with the query
-
-    var regex = /@/;
-    query = query.replace(regex, queryText);
-    vLoggerDetail("query string is now " + query);
-    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_4__["default"].addQLApiRequest(this.config.apis.graphQL, query, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
+    _network_DownloadManager__WEBPACK_IMPORTED_MODULE_4__["default"].addQLApiRequest(this.config.apis.graphQL, query, {
+      queryString: queryText
+    }, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
   };
 
   _proto.handleSearchResultsCB = function handleSearchResultsCB(data, status, associatedStateName) {
@@ -2177,7 +2175,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
     vLoggerDetail("Board Game " + event.target + " with id " + boardGameId + " clicked from " + dataSource);
     var boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {
       gameId: parseInt(boardGameId)
-    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSame"]);
+    }, _util_EqualityFunctions__WEBPACK_IMPORTED_MODULE_2__["isSameGame"]);
 
     if (boardGame) {
       this.applicationView.addBoardGameToDisplay(boardGame);
@@ -3492,11 +3490,11 @@ var ApiUtil = /*#__PURE__*/function () {
 
       if (response.status >= 200 && response.status <= 299) {
         return response.json();
-      } // else {
-      //     callback(null, response.status,queueId, requestId);
-      //     throw new Error("no results");
-      // }
+      }
 
+      if (response.status === 400) {
+        apiLogger(response.json());
+      }
     }).then(function (data) {
       apiLogger(data);
       callback(data, 200, queueType, requestId);
@@ -3669,7 +3667,7 @@ var DownloadManager = /*#__PURE__*/function () {
     return this.backgroundQueue.length;
   };
 
-  _proto.addQLApiRequest = function addQLApiRequest(url, query, callback, state, isPriority) {
+  _proto.addQLApiRequest = function addQLApiRequest(url, query, variables, callback, state, isPriority) {
     if (isPriority === void 0) {
       isPriority = false;
     }
@@ -3678,7 +3676,26 @@ var DownloadManager = /*#__PURE__*/function () {
       url: url,
       type: _Types__WEBPACK_IMPORTED_MODULE_2__["RequestType"].POST,
       params: {
-        query: query
+        query: query,
+        variables: variables
+      },
+      callback: callback,
+      associatedStateName: state
+    };
+    downloader.addApiRequest(request, isPriority);
+  };
+
+  _proto.addQLMutationRequest = function addQLMutationRequest(url, mutation, variables, callback, state, isPriority) {
+    if (isPriority === void 0) {
+      isPriority = false;
+    }
+
+    var request = {
+      url: url,
+      type: _Types__WEBPACK_IMPORTED_MODULE_2__["RequestType"].POST,
+      params: {
+        mutation: mutation,
+        variables: variables
       },
       callback: callback,
       associatedStateName: state
@@ -7117,18 +7134,22 @@ var browserUtil = new BrowserUtil();
 /*!***************************************!*\
   !*** ./src/util/EqualityFunctions.ts ***!
   \***************************************/
-/*! exports provided: isSame, isSameUsername */
+/*! exports provided: isSame, isSameUsername, isSameGame */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSame", function() { return isSame; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSameUsername", function() { return isSameUsername; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSameGame", function() { return isSameGame; });
 function isSame(item1, item2) {
   return item1.id === item2.id;
 }
 function isSameUsername(item1, item2) {
   return item1.username === item2.username;
+}
+function isSameGame(item1, item2) {
+  return item1.gameId === item2.gameId;
 }
 
 /***/ }),

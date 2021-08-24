@@ -65,25 +65,17 @@ class Root extends React.Component{
             apis: {
                 login: '/api/login',
                 graphQL: '/graphql',
-                bggSearchCall: 'query {\n' +
-                    '  findBoardGames(query: "@") {\n' +
-                    '    gameId, name, year\n' +
-                    '  }\n' +
-                    '} ',
+                bggSearchCall: 'query search($queryString: String!) {findBoardGames(query: $queryString) {gameId, name, year}}',
                 bggSearchCallById: {
-                    queryString: 'query {\n' +
-                            '  getBoardGameDetails(gameId: @) {\n' +
-                        '    gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories  \n' +
-                        '  }\n' +
-                        '}',
+                    queryString: 'query getDetails($gameId:Int!) {getBoardGameDetails(gameId:$gameId) {gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories}}',
                     resultName:'getBoardGameDetails',
                 },
                 findUsers: {
-                    queryString: 'query {\n  findUsers {\n    id, username\n  }\n}',
+                    queryString: 'query {findUsers {id, username}}',
                     resultName: 'findUsers',
                 },
                 addToMyCollection: {
-                    queryString: 'mutation {\n  addToMyCollection(userId: @, boardGame: @) {\n    id  }\n}',
+                    queryString: 'mutation addBoardGame($userId: Int!, $boardGame: BoardGameDetailInput!){addToMyCollection(userId: $userId, boardGame: $boardGame) {id,gameId}}',
                     resultName: 'addToMyCollection',
                 }
 

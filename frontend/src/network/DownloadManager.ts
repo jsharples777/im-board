@@ -40,11 +40,22 @@ class DownloadManager {
     return this.backgroundQueue.length;
   }
 
-  public addQLApiRequest(url:string, query:string, callback: RequestCallBackFunction, state:string, isPriority = false) {
+  public addQLApiRequest(url:string, query:string, variables:any, callback: RequestCallBackFunction, state:string, isPriority = false) {
     let request:jsonRequest = {
       url: url,
       type: RequestType.POST,
-      params: {query},
+      params: {query:query, variables: variables},
+      callback: callback,
+      associatedStateName: state
+    }
+
+    downloader.addApiRequest(request,isPriority);
+  }
+  public addQLMutationRequest(url:string, mutation:string, variables:any, callback: RequestCallBackFunction, state:string, isPriority = false) {
+    let request:jsonRequest = {
+      url: url,
+      type: RequestType.POST,
+      params: {mutation:mutation, variables:variables},
       callback: callback,
       associatedStateName: state
     }

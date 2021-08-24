@@ -42,7 +42,8 @@ class MySQLDataSourceDelegate {
 
     //addToMyCollection(userId: Int, boardGame: BoardGameDetailInput): Int
     public addToMyCollection(_:any,data:any) {
-        mysqlLogger(`Adding board game ${data.boardGame.id} to collection for user ${data.userId}`);
+        mysqlLogger(data);
+        mysqlLogger(`Adding board game ${data.boardGame.gameId} to collection for user ${data.userId}`);
 
         return new Promise( (resolve, reject) => {
             // set the user id on the board game object for the database
@@ -52,7 +53,7 @@ class MySQLDataSourceDelegate {
             BoardGame.create(data.boardGame)
             .then((boardGame) => {
                 // @ts-ignore
-                resolve({id: boardGame.id});
+                resolve({id: boardGame.id,gameId: boardGame.gameId});
             })
             .catch((err) => {
                 mysqlLogger(err);
@@ -88,7 +89,7 @@ class MySQLDataSourceDelegate {
                 .then((result) => {
                     mysqlLogger(result);
                     // @ts-ignore
-                    resolve({id: result.id});
+                    resolve({id: result.id,gameId: result.gameId});
                 })
                 .catch((err) => {
                     mysqlLogger(err);

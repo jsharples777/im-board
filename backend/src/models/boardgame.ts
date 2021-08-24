@@ -16,12 +16,10 @@ BoardGame.init({
 
     thumb: {
         type: DataTypes.STRING,
-        allowNull:false
     },
 
     image: {
         type: DataTypes.STRING,
-        allowNull:false
     },
         name: {
             type: DataTypes.STRING,
@@ -29,7 +27,6 @@ BoardGame.init({
         },
         description: {
             type: DataTypes.TEXT,
-            allowNull:false
         },
         year: {
             type: DataTypes.INTEGER
@@ -50,16 +47,16 @@ BoardGame.init({
             type: DataTypes.INTEGER
         },
         designers: {
-            type: DataTypes.STRING
+            type: DataTypes.TEXT
         },
         artists: {
-            type: DataTypes.STRING
+            type: DataTypes.TEXT
         },
         publisher: {
             type: DataTypes.STRING
         },
         categories: {
-            type: DataTypes.STRING
+            type: DataTypes.TEXT
         },
         numOfRaters: {
             type: DataTypes.INTEGER
