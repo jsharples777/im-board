@@ -703,6 +703,39 @@ var Root = /*#__PURE__*/function (_React$Component) {
             queryId: 'queryText',
             buttonId: 'bggSearchButton'
           }
+        },
+        scoreSheetSideBar: {
+          dom: {
+            sideBarId: 'scoreSheetSidebar',
+            resultsId: 'scoreSheets',
+            resultsElementType: 'div',
+            resultsElementAttributes: [],
+            resultsClasses: 'card',
+            resultDataKeyId: 'bgg-id',
+            resultLegacyDataKeyId: 'bgg-id',
+            resultDataSourceId: 'data-source',
+            resultDataSourceValue: 'scoreSheet',
+            modifierClassNormal: 'list-group-item-primary',
+            modifierClassInactive: 'list-group-item-light',
+            modifierClassActive: 'list-group-item-info',
+            modifierClassWarning: 'list-group-item-danger',
+            iconNormal: '   <i class="fas fa-dice"></i>',
+            iconInactive: '   <i class="fas fa-dice"></i>',
+            iconActive: '   <i class="fas fa-dice"></i>',
+            iconWarning: '  <i class="fas fa-dice"></i>',
+            resultContentDivClasses: 'd-flex w-100 justify-content-between',
+            resultContentTextElementType: 'span',
+            resultContentTextClasses: 'mb-1',
+            isDraggable: false,
+            isClickable: false,
+            isDeleteable: false,
+            deleteButtonClasses: 'btn btn-circle btn-xsm',
+            deleteButtonText: '',
+            deleteButtonIconClasses: 'fas fa-trash-alt',
+            formId: 'bggSearch',
+            queryId: 'queryText',
+            buttonId: 'bggSearchButton'
+          }
         }
       },
       uiPrefs: {
