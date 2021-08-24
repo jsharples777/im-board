@@ -46,7 +46,7 @@ class BoardGameSearchSidebarView extends SidebarView {
         }
         else {
             if (this.buttonEl) this.buttonEl.setAttribute("disabled","true");
-            if (this.buttonEl) this.buttonEl.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...';
+            if (this.buttonEl) this.buttonEl.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  Loading...';
         }
     }
 

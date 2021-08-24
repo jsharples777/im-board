@@ -2212,7 +2212,7 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
       if (this.buttonEl) this.buttonEl.innerHTML = 'Search';
     } else {
       if (this.buttonEl) this.buttonEl.setAttribute("disabled", "true");
-      if (this.buttonEl) this.buttonEl.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...';
+      if (this.buttonEl) this.buttonEl.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  Loading...';
     }
   };
 
@@ -7186,7 +7186,7 @@ var BrowserUtil = /*#__PURE__*/function () {
 
   _proto.scrollToBottomNow = function scrollToBottomNow(element) {
     if (element) {
-      element.scrollTop = element.scrollHeight - element.clientHeight;
+      element.scrollTop = element.scrollHeight - element.clientHeight + 100;
     }
   };
 
@@ -7195,7 +7195,7 @@ var BrowserUtil = /*#__PURE__*/function () {
       element.scrollIntoView({
         behavior: 'smooth'
       });
-      element.scrollTop = element.scrollHeight - element.clientHeight;
+      element.scrollTop = element.scrollHeight - element.clientHeight + 100;
     }
   };
 

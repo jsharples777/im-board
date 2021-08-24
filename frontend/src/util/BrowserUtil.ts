@@ -14,7 +14,7 @@ class BrowserUtil {
 
   scrollToBottomNow (element:HTMLElement):void {
     if (element) {
-      element.scrollTop = element.scrollHeight - element.clientHeight;
+      element.scrollTop = element.scrollHeight - element.clientHeight + 100;
     }
   }
 
@@ -23,7 +23,7 @@ class BrowserUtil {
       element.scrollIntoView({
         behavior: 'smooth',
       });
-      element.scrollTop = element.scrollHeight - element.clientHeight;
+      element.scrollTop = element.scrollHeight - element.clientHeight + 100;
     }
   }
 
