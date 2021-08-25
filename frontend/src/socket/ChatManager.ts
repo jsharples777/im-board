@@ -254,6 +254,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             created: created,
             room: users.room,
             priority: 0,
+            type: InviteType.ChatRoom,
             message: `${users.username} joined the chat on ${joinDateTime}`
         }
         log.messages.push(message);
@@ -278,6 +279,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             created: created,
             room: users.room,
             priority: 0,
+            type: InviteType.ChatRoom,
             message: `${users.username} left the chat on ${joinDateTime}`
         }
         log.messages.push(message);
@@ -292,6 +294,8 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     }
 
     receiveInvitation(invite: Invitation): void {
+        if (invite.type !== InviteType.ChatRoom) return;
+
         //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
         if (!this.isUserInBlockedList(invite.from)) {
             cmLogger(`Invited to chat ${invite.room}`);
@@ -410,6 +414,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     }
 
     receiveMessage(message: Message,wasOffline:boolean = false): void {
+        if (message.type !== InviteType.ChatRoom) return;
         // double check the message is not from us somehow
         if (message.from === this.getCurrentUser()) return;
         // don't receive messages from the blocked users
@@ -505,7 +510,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         let log = this.ensureChatLogExists(room);
         // send the message
         let created = parseInt(moment().format('YYYYMMDDHHmmss'));
-        socketManager.sendMessage(this.getCurrentUser(),room, content, created);
+        socketManager.sendMessage(this.getCurrentUser(),room, content, created,InviteType.ChatRoom, Priority.Normal,{});
 
         // add the message to the chat log
         if (!attachment) attachment = {};
@@ -515,6 +520,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             message: content,
             created: created,
             priority: priority,
+            type: InviteType.ChatRoom,
             attachment: attachment
         }
         this.addMessageToChatLog(log, sent);

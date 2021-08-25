@@ -229,13 +229,14 @@ class SocketManager {
         this.socket.emit('invite', inviteObj);
     }
 
-    public sendMessage(from:string, room:string, message:string,created:number,priority: Priority = Priority.Normal, attachment:any = {}) {
+    public sendMessage(from:string, room:string, message:string,created:number,type:number,priority: Priority = Priority.Normal, attachment:any = {}) {
         let messageObj:Message = {
             from: from,
             room: room,
             message:message,
             created:created,
             priority:priority,
+            type:type,
             attachment: attachment
         }
         this.socket.emit('chat',messageObj);

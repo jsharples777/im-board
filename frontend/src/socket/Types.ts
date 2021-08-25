@@ -15,6 +15,7 @@ export type Message = {
     message: string,
     created: number,
     priority: number,
+    type:number,
     attachment?: any
 }
 

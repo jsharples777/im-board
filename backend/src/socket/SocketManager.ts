@@ -154,7 +154,7 @@ class SocketManager {
         if (this.io) this.io.to(user.socketId).emit('queue',JSON.stringify(queuedItems));
     }
 
-    protected createMessageForRoom(author:string, roomName:string, message:string,created:number,priority:number = 0,attachment:any = {}):ChatMessage|null {
+    protected createMessageForRoom(author:string, roomName:string, message:string,created:number,type:number, priority:number = 0,attachment:any = {}):ChatMessage|null {
         let sender = this.findUser(author);
         let chatMessage:ChatMessage|null = null;
         if (sender) {
@@ -164,6 +164,7 @@ class SocketManager {
                 message: message,
                 created: created,
                 priority: priority,
+                type:type,
                 attachment: attachment
             };
         }
@@ -287,10 +288,10 @@ class SocketManager {
                 socketDebug(`${from} has declined an invitation to join room ${room}`);
                 socket.to(room).emit('declineinvite',JSON.stringify({username:from,room: room}));
             });
-            socket.on('chat', ({from, room, message,created,priority,attachment}) => {
+            socket.on('chat', ({from, room, message,created,priority,attachment,type}) => {
                 socketDebug(`${from} has sent a message to room ${room}: ${message}`);
                 // send the message to the rest of the room
-                let cMessage = this.createMessageForRoom(from, room, message,created,priority,attachment);
+                let cMessage = this.createMessageForRoom(from, room, message,created,type,priority,attachment);
                 if (cMessage) {
                     socketDebug(`Sending message ${cMessage.message} to room ${cMessage.room}`);
                     socket.to(room).emit('chat',JSON.stringify(cMessage));

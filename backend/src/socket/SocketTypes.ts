@@ -11,6 +11,7 @@ export type ChatMessage = {
     from: string,
     created: number,
     priority: number,
+    type: number,
     attachment: any
 }
 
