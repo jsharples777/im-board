@@ -318,6 +318,10 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
     handleOfflineMessagesReceived(messages: Message[]): void {
     }
 
+    protected getBackgroundImage(name: string, item: any): string {
+        return "";
+    }
+
 
 }
 

@@ -176,6 +176,10 @@ class BoardGameSearchSidebarView extends SidebarView {
         return 0;
     }
 
+    protected getBackgroundImage(name: string, item: any): string {
+        return "";
+    }
+
 
 }
 

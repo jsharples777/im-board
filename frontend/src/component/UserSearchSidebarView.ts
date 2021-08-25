@@ -384,6 +384,10 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         return 0;
     }
 
+    protected getBackgroundImage(name: string, item: any): string {
+        return "";
+    }
+
 
 }
 

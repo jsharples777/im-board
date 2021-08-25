@@ -7,9 +7,10 @@ import debug from 'debug';
 import controller from './Controller';
 import UserSearchSidebarView from "./component/UserSearchSidebarView";
 import ChatSidebarView from "./component/ChatSidebarView";
-import BoardGameSearchSidebarView from "./component/BoardGameSerachSidebarView";
+import BoardGameSearchSidebarView from "./component/BoardGameSearchSidebarView";
 import BoardGameView from "./component/BoardGameView";
 import {Decorator} from "./AppTypes";
+import browserUtil from "./util/BrowserUtil";
 
 
 const logger = debug('app');
@@ -39,6 +40,8 @@ class Root extends React.Component{
 
     // @ts-ignore
     private thisEl: HTMLDivElement | null;
+    // @ts-ignore
+    private scoreSheetEl: HTMLDivElement | null;
 
     constructor() {
         // @ts-ignore
@@ -115,10 +118,12 @@ class Root extends React.Component{
                     showClass: "d-block",
                 },
                 navigation: {
-                    showMyFavourites: 'navigationItemShowMyFavourites',
+                    showMyCollection: 'navigationItemMyCollection',
                     boardGameSearchId: 'navigationItemBoardGameSearch',
                     userSearchId: 'navigationItemUserSearch',
-                    chatId: 'navigationItemChat'
+                    chatId: 'navigationItemChat',
+                    showScoreSheet: 'navigationItemScoreSheet',
+
                 },
                 chatSideBar: {
                     dom: {
@@ -246,31 +251,28 @@ class Root extends React.Component{
                         resultsElementType: 'div',
                         resultsElementAttributes: [
                         ],
-                        resultsClasses: 'card',
+                        resultsClasses: 'card text-white',
                         resultDataKeyId: 'bgg-id',
                         resultLegacyDataKeyId: 'bgg-id',
                         resultDataSourceId: 'data-source',
                         resultDataSourceValue: 'scoreSheet',
-                        modifierClassNormal: 'list-group-item-primary',
-                        modifierClassInactive: 'list-group-item-light',
-                        modifierClassActive: 'list-group-item-info',
-                        modifierClassWarning: 'list-group-item-danger',
-                        iconNormal: '   <i class="fas fa-dice"></i>',
-                        iconInactive: '   <i class="fas fa-dice"></i>',
-                        iconActive: '   <i class="fas fa-dice"></i>',
-                        iconWarning: '  <i class="fas fa-dice"></i>',
-                        resultContentDivClasses: 'd-flex w-100 justify-content-between',
-                        resultContentTextElementType: 'span',
-                        resultContentTextClasses: 'mb-1',
+                        modifierClassNormal: '',
+                        modifierClassInactive: '',
+                        modifierClassActive: '',
+                        modifierClassWarning: '',
+                        iconNormal: ' ',
+                        iconInactive: ' ',
+                        iconActive: ' ',
+                        iconWarning: ' ',
                         isDraggable: false,
                         isClickable: false,
                         isDeleteable: false,
-                        deleteButtonClasses: 'btn btn-circle btn-xsm',
-                        deleteButtonText: '',
-                        deleteButtonIconClasses:'fas fa-trash-alt',
-                        formId: 'bggSearch',
-                        queryId: 'queryText',
-                        buttonId: 'bggSearchButton'
+                        resultContentDivClasses: 'card-img-overlay',
+                        resultContentTextElementType: 'div',
+                        resultContentTextClasses: 'ml-2',
+                        hasBackgroundImage: true,
+                        imgElementType: 'img',
+                        imgClasses: 'card-img',
                     },
                 },
             },
@@ -293,6 +295,12 @@ class Root extends React.Component{
                     view: {
                         location: 'right',
                         expandedSize: '50%',
+                    },
+                },
+                scoreSheetSideBar: {
+                    view: {
+                        location: 'bottom',
+                        expandedSize: '25%',
                     },
                 },
             },
@@ -318,6 +326,9 @@ class Root extends React.Component{
 
         this.handleDragOver = this.handleDragOver.bind(this);
         this.handleDrop = this.handleDrop.bind(this);
+
+        this.handleShowCollection = this.handleShowCollection.bind(this);
+        this.handleShowScoreSheet = this.handleShowScoreSheet.bind(this);
 
         controller.connectToApplication(this, window.localStorage);
     }
@@ -469,6 +480,10 @@ class Root extends React.Component{
             document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch);
             // @ts-ignore
             document.getElementById(this.state.ui.navigation.chatId).addEventListener('click', this.handleShowChat);
+            // @ts-ignore
+            document.getElementById(this.state.ui.navigation.showMyCollection).addEventListener('click', this.handleShowCollection);
+            // @ts-ignore
+            document.getElementById(this.state.ui.navigation.showScoreSheet).addEventListener('click', this.handleShowScoreSheet);
         }
 
         // alert modal dialog setup
@@ -493,6 +508,8 @@ class Root extends React.Component{
         // a reference to the div containing ourselves
         // @ts-ignore
         this.thisEl = document.getElementById('root');
+        // @ts-ignore
+        this.scoreSheetEl = document.getElementById('scoreSheetZone');
         if (this.thisEl) {
             this.thisEl.addEventListener('dragover', this.handleDragOver);
             this.thisEl.addEventListener('drop', this.handleDrop);
@@ -506,6 +523,29 @@ class Root extends React.Component{
         this.chatView.eventHide(null);
         this.userSearchView.eventHide(null);
         this.bggSearchView.eventHide(null);
+    }
+
+    private switchBetweenCollectionAndScoreSheet(showCollection:boolean) {
+        if (showCollection) {
+            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-none', false);
+            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-block', true);
+            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-none', true);
+            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-block', false);
+        }
+        else {
+            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-none', true);
+            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-block', false);
+            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-none', false);
+            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-block', true);
+        }
+    }
+
+    handleShowCollection(event:MouseEvent) {
+        this.switchBetweenCollectionAndScoreSheet(true);
+    }
+
+    handleShowScoreSheet(event:MouseEvent) {
+        this.switchBetweenCollectionAndScoreSheet(false);
     }
 
     handleShowUserSearch(event:Event) {

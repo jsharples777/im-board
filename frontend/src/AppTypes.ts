@@ -4,3 +4,4 @@ export enum Decorator  {
     Persisted,
     PersistedLocally = 3
 }
+

@@ -46,6 +46,7 @@ export default abstract class AbstractView implements StateChangeListener {
     protected abstract getModifierForStateItem(name: string, item: any): string;
     protected abstract getSecondaryModifierForStateItem(name: string, item: any): string;
     protected abstract getBadgeValue(name:string, item:any): number;
+    protected abstract getBackgroundImage(name:string,item:any) :string;
 
     protected abstract updateView(name: string, newState: any): void;
 
@@ -90,6 +91,12 @@ export default abstract class AbstractView implements StateChangeListener {
             textEl.setAttribute(domConfig.resultDataSourceId, dataSource);
 
             contentEl.appendChild(textEl);
+
+            if (domConfig.hasBackgroundImage) {
+                let imgEl = this.document.createElement(domConfig.imgElementType);
+                browserUtil.addRemoveClasses(imgEl,domConfig.imgClasses);
+                imgEl.setAttribute('src',this.getBackgroundImage(name,item));
+            }
 
             if (domConfig.hasBadge) {
                 const badgeValue = this.getBadgeValue(name,item);

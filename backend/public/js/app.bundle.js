@@ -475,9 +475,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Controller */ "./src/Controller.ts");
 /* harmony import */ var _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./component/UserSearchSidebarView */ "./src/component/UserSearchSidebarView.ts");
 /* harmony import */ var _component_ChatSidebarView__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./component/ChatSidebarView */ "./src/component/ChatSidebarView.ts");
-/* harmony import */ var _component_BoardGameSerachSidebarView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./component/BoardGameSerachSidebarView */ "./src/component/BoardGameSerachSidebarView.ts");
+/* harmony import */ var _component_BoardGameSearchSidebarView__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./component/BoardGameSearchSidebarView */ "./src/component/BoardGameSearchSidebarView.ts");
 /* harmony import */ var _component_BoardGameView__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./component/BoardGameView */ "./src/component/BoardGameView.tsx");
 /* harmony import */ var _AppTypes__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./AppTypes */ "./src/AppTypes.ts");
+/* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./util/BrowserUtil */ "./src/util/BrowserUtil.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -500,11 +501,13 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('app');
 
 var Root = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(Root, _React$Component);
 
+  // @ts-ignore
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
@@ -588,10 +591,11 @@ var Root = /*#__PURE__*/function (_React$Component) {
           showClass: "d-block"
         },
         navigation: {
-          showMyFavourites: 'navigationItemShowMyFavourites',
+          showMyCollection: 'navigationItemMyCollection',
           boardGameSearchId: 'navigationItemBoardGameSearch',
           userSearchId: 'navigationItemUserSearch',
-          chatId: 'navigationItemChat'
+          chatId: 'navigationItemChat',
+          showScoreSheet: 'navigationItemScoreSheet'
         },
         chatSideBar: {
           dom: {
@@ -710,31 +714,28 @@ var Root = /*#__PURE__*/function (_React$Component) {
             resultsId: 'scoreSheets',
             resultsElementType: 'div',
             resultsElementAttributes: [],
-            resultsClasses: 'card',
+            resultsClasses: 'card text-white',
             resultDataKeyId: 'bgg-id',
             resultLegacyDataKeyId: 'bgg-id',
             resultDataSourceId: 'data-source',
             resultDataSourceValue: 'scoreSheet',
-            modifierClassNormal: 'list-group-item-primary',
-            modifierClassInactive: 'list-group-item-light',
-            modifierClassActive: 'list-group-item-info',
-            modifierClassWarning: 'list-group-item-danger',
-            iconNormal: '   <i class="fas fa-dice"></i>',
-            iconInactive: '   <i class="fas fa-dice"></i>',
-            iconActive: '   <i class="fas fa-dice"></i>',
-            iconWarning: '  <i class="fas fa-dice"></i>',
-            resultContentDivClasses: 'd-flex w-100 justify-content-between',
-            resultContentTextElementType: 'span',
-            resultContentTextClasses: 'mb-1',
+            modifierClassNormal: '',
+            modifierClassInactive: '',
+            modifierClassActive: '',
+            modifierClassWarning: '',
+            iconNormal: ' ',
+            iconInactive: ' ',
+            iconActive: ' ',
+            iconWarning: ' ',
             isDraggable: false,
             isClickable: false,
             isDeleteable: false,
-            deleteButtonClasses: 'btn btn-circle btn-xsm',
-            deleteButtonText: '',
-            deleteButtonIconClasses: 'fas fa-trash-alt',
-            formId: 'bggSearch',
-            queryId: 'queryText',
-            buttonId: 'bggSearchButton'
+            resultContentDivClasses: 'card-img-overlay',
+            resultContentTextElementType: 'div',
+            resultContentTextClasses: 'ml-2',
+            hasBackgroundImage: true,
+            imgElementType: 'img',
+            imgClasses: 'card-img'
           }
         }
       },
@@ -758,6 +759,12 @@ var Root = /*#__PURE__*/function (_React$Component) {
             location: 'right',
             expandedSize: '50%'
           }
+        },
+        scoreSheetSideBar: {
+          view: {
+            location: 'bottom',
+            expandedSize: '25%'
+          }
         }
       },
       controller: {
@@ -780,6 +787,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
     _this.handleShowBGGSearch = _this.handleShowBGGSearch.bind(_assertThisInitialized(_this));
     _this.handleDragOver = _this.handleDragOver.bind(_assertThisInitialized(_this));
     _this.handleDrop = _this.handleDrop.bind(_assertThisInitialized(_this));
+    _this.handleShowCollection = _this.handleShowCollection.bind(_assertThisInitialized(_this));
+    _this.handleShowScoreSheet = _this.handleShowScoreSheet.bind(_assertThisInitialized(_this));
     _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].connectToApplication(_assertThisInitialized(_this), window.localStorage);
     return _this;
   }
@@ -924,7 +933,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
               this.chatView.onDocumentLoaded();
               this.userSearchView = new _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_4__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getStateManager());
               this.userSearchView.onDocumentLoaded();
-              this.bggSearchView = new _component_BoardGameSerachSidebarView__WEBPACK_IMPORTED_MODULE_6__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getStateManager());
+              this.bggSearchView = new _component_BoardGameSearchSidebarView__WEBPACK_IMPORTED_MODULE_6__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getStateManager());
               this.bggSearchView.onDocumentLoaded(); // navigation item handlers
 
               if (document) {
@@ -933,7 +942,11 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
                 document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch); // @ts-ignore
 
-                document.getElementById(this.state.ui.navigation.chatId).addEventListener('click', this.handleShowChat);
+                document.getElementById(this.state.ui.navigation.chatId).addEventListener('click', this.handleShowChat); // @ts-ignore
+
+                document.getElementById(this.state.ui.navigation.showMyCollection).addEventListener('click', this.handleShowCollection); // @ts-ignore
+
+                document.getElementById(this.state.ui.navigation.showScoreSheet).addEventListener('click', this.handleShowScoreSheet);
               } // alert modal dialog setup
               // @ts-ignore
 
@@ -955,7 +968,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
               if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete); // a reference to the div containing ourselves
               // @ts-ignore
 
-              this.thisEl = document.getElementById('root');
+              this.thisEl = document.getElementById('root'); // @ts-ignore
+
+              this.scoreSheetEl = document.getElementById('scoreSheetZone');
 
               if (this.thisEl) {
                 this.thisEl.addEventListener('dragover', this.handleDragOver);
@@ -965,7 +980,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
               _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].initialise();
 
-            case 20:
+            case 21:
             case "end":
               return _context.stop();
           }
@@ -984,6 +999,28 @@ var Root = /*#__PURE__*/function (_React$Component) {
     this.chatView.eventHide(null);
     this.userSearchView.eventHide(null);
     this.bggSearchView.eventHide(null);
+  };
+
+  _proto.switchBetweenCollectionAndScoreSheet = function switchBetweenCollectionAndScoreSheet(showCollection) {
+    if (showCollection) {
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none', false);
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block', true);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none', true);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block', false);
+    } else {
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none', true);
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block', false);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none', false);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block', true);
+    }
+  };
+
+  _proto.handleShowCollection = function handleShowCollection(event) {
+    this.switchBetweenCollectionAndScoreSheet(true);
+  };
+
+  _proto.handleShowScoreSheet = function handleShowScoreSheet(event) {
+    this.switchBetweenCollectionAndScoreSheet(false);
   };
 
   _proto.handleShowUserSearch = function handleShowUserSearch(event) {
@@ -1929,6 +1966,12 @@ var AbstractView = /*#__PURE__*/function () {
       textEl.setAttribute(domConfig.resultDataSourceId, dataSource);
       contentEl.appendChild(textEl);
 
+      if (domConfig.hasBackgroundImage) {
+        var imgEl = this.document.createElement(domConfig.imgElementType);
+        _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(imgEl, domConfig.imgClasses);
+        imgEl.setAttribute('src', this.getBackgroundImage(name, item));
+      }
+
       if (domConfig.hasBadge) {
         var badgeValue = this.getBadgeValue(name, item);
 
@@ -2159,9 +2202,9 @@ var AbstractView = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./src/component/BoardGameSerachSidebarView.ts":
+/***/ "./src/component/BoardGameSearchSidebarView.ts":
 /*!*****************************************************!*\
-  !*** ./src/component/BoardGameSerachSidebarView.ts ***!
+  !*** ./src/component/BoardGameSearchSidebarView.ts ***!
   \*****************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -2374,6 +2417,10 @@ var BoardGameSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.getBadgeValue = function getBadgeValue(name, item) {
     return 0;
+  };
+
+  _proto.getBackgroundImage = function getBackgroundImage(name, item) {
+    return "";
   };
 
   return BoardGameSearchSidebarView;
@@ -2867,6 +2914,10 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.handleOfflineMessagesReceived = function handleOfflineMessagesReceived(messages) {};
+
+  _proto.getBackgroundImage = function getBackgroundImage(name, item) {
+    return "";
+  };
 
   return ChatSidebarView;
 }(_SidebarView__WEBPACK_IMPORTED_MODULE_1__["default"]);
@@ -3521,6 +3572,10 @@ var UserSearchSidebarView = /*#__PURE__*/function (_SidebarView) {
 
   _proto.getBadgeValue = function getBadgeValue(name, item) {
     return 0;
+  };
+
+  _proto.getBackgroundImage = function getBackgroundImage(name, item) {
+    return "";
   };
 
   return UserSearchSidebarView;
