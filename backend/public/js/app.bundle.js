@@ -1003,15 +1003,15 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
   _proto.switchBetweenCollectionAndScoreSheet = function switchBetweenCollectionAndScoreSheet(showCollection) {
     if (showCollection) {
-      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none', false);
-      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block', true);
-      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none', true);
-      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block', false);
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none hidden', false);
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block visible', true);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none hidden', true);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block visible', false);
     } else {
-      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none', true);
-      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block', false);
-      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none', false);
-      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block', true);
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none hidden', true);
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block visible', false);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none hidden', false);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block visible', true);
     }
   };
 

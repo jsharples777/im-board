@@ -318,3 +318,12 @@ h1 {
     font-size: 36pt;
     color: white;
 }
+
+.hidden {
+    transition: all 0.5s ease;
+    transition-delay:0.2s;}
+
+.visible {
+    transition: all 0.5s ease;
+    transition-delay:0.2s;
+}
