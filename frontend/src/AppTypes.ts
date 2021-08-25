@@ -5,3 +5,12 @@ export enum Decorator  {
     PersistedLocally = 3
 }
 
+export type ScoreSheet = {
+    room: string,
+    boardGameName: string,
+    sheetLayoutOptions: any;
+    timer: number,
+    sheetData: any,
+    isFinished: boolean
+}
+

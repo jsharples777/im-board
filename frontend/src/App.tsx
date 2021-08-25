@@ -329,6 +329,7 @@ class Root extends React.Component{
 
         this.handleShowCollection = this.handleShowCollection.bind(this);
         this.handleShowScoreSheet = this.handleShowScoreSheet.bind(this);
+        this.handleStartScoreSheet = this.handleStartScoreSheet.bind(this);
 
         controller.connectToApplication(this, window.localStorage);
     }
@@ -368,6 +369,7 @@ class Root extends React.Component{
         this.modalEl.classList.add(this.state.ui.alert.showClass);
     }
 
+
     render() {
         logger("Rendering App");
         // @ts-ignore
@@ -381,6 +383,7 @@ class Root extends React.Component{
                 showScoresHandler={() => {}}
                 addToCollectionHandler={controller.addBoardGameToCollection}
                 removeFromCollectionHandler={this.handleDeleteBoardGame}
+                startScoreSheetHandler={this.handleStartScoreSheet}
             />
         );
 
@@ -419,6 +422,27 @@ class Root extends React.Component{
             controller.removeBoardGameFromCollection(boardGame);
         }
     }
+
+    handleStartScoreSheet(event:MouseEvent) {
+        event.preventDefault();
+        this.hideAllSideBars();
+        // @ts-ignore
+        let id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
+        logger(`Handling starting score sheet for ${id}`)
+        if (id) {
+            // find the entry from the state manager
+            id = parseInt(id);
+            // @ts-ignore
+            const currentBoardGamesOnDisplay = this.state.boardGames;
+            let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
+            if (index >= 0) {
+                const boardGame = currentBoardGamesOnDisplay[index];
+
+                XXXX
+            }
+        }
+    }
+
 
     handleDeleteBoardGame(event:MouseEvent) {
         event.preventDefault();

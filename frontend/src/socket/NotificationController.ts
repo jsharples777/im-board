@@ -1,8 +1,8 @@
 import {ChatManager} from "./ChatManager";
-import {ChatEventListener, MessageEventListener} from "./ChatEventListener";
+import {ChatEventListener} from "./ChatEventListener";
 import notifier from "../notification/NotificationManager";
 import debug from 'debug';
-import {ChatLog, Invitation, Message} from "./Types";
+import {ChatLog, Invitation, InviteType, Message} from "./Types";
 import {ChatUserEventListener} from "./ChatUserEventListener";
 import controller from "../Controller";
 
@@ -40,9 +40,19 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         this.chatManager.addChatUserEventHandler(this);
     }
 
+    handleInvitationDeclined(room: string, username: string): void {
+        if ((this.doNotDisturb)) return;
+
+        // notify the user of the new chat
+        notifier.show('Room',`User ${username} has declined the invitation to join you.`,'info',7000);
+    }
+
 
     handleNewInviteReceived(invite: Invitation): boolean {
         let result = true;
+
+        // is this a chat room or score sheet?
+        if (invite.type === InviteType.ScoreSheet) return true;
 
         if ((this.doNotDisturb) && (!invite.requiresAcceptDecline)) return result;
 

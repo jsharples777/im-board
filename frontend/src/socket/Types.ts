@@ -37,6 +37,7 @@ export enum InviteType {
 
 export type ChatLog = {
     roomName: string,
+    type: InviteType,
     users: string[],
     messages: Message[],
     lastViewed: number,

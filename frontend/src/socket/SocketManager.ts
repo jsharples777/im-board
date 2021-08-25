@@ -104,6 +104,19 @@ class SocketManager {
         }
     }
 
+    private callbackForDeclineInvite(data:any):void {
+        sDebug(`Received declined invite : ${data}`);
+        if (this.chatReceiver === null) return;
+        try {
+            const dataObj = JSON.parse(data);
+            sDebug(dataObj);
+            this.chatReceiver.receiveDecline(dataObj.room, dataObj.username);
+        }
+        catch (err) {
+            sDebug('Not JSON data');
+        }
+    }
+
     private callbackForChat(content:any):void {
         sDebug(`Received chat : ${content}`);
         if (this.chatReceiver === null) return;
@@ -182,6 +195,7 @@ class SocketManager {
         this.socket.on('joinroom',this.callbackForJoinRoom);
         this.socket.on('exitroom',this.callbackForExitRoom);
         this.socket.on('invite',this.callbackForInvite);
+        this.socket.on('declineinvite',this.callbackForDeclineInvite);
         this.socket.on('chat',this.callbackForChat);
         this.socket.on('queue',this.callbackForQueue);
         this.socket.on('userlist',this.callbackForUserList);
@@ -229,6 +243,10 @@ class SocketManager {
 
     public getUserList() {
         this.socket.emit('userlist');
+    }
+
+    public sendDeclineInvite(room:string,from:string) {
+        this.socket.emit('declineinvite',{room,from});
     }
 }
 

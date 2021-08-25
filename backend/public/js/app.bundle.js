@@ -789,6 +789,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
     _this.handleDrop = _this.handleDrop.bind(_assertThisInitialized(_this));
     _this.handleShowCollection = _this.handleShowCollection.bind(_assertThisInitialized(_this));
     _this.handleShowScoreSheet = _this.handleShowScoreSheet.bind(_assertThisInitialized(_this));
+    _this.handleStartScoreSheet = _this.handleStartScoreSheet.bind(_assertThisInitialized(_this));
     _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].connectToApplication(_assertThisInitialized(_this), window.localStorage);
     return _this;
   }
@@ -842,7 +843,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
         boardGame: entry,
         showScoresHandler: function showScoresHandler() {},
         addToCollectionHandler: _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].addBoardGameToCollection,
-        removeFromCollectionHandler: _this2.handleDeleteBoardGame
+        removeFromCollectionHandler: _this2.handleDeleteBoardGame,
+        startScoreSheetHandler: _this2.handleStartScoreSheet
       });
     });
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -879,6 +881,29 @@ var Root = /*#__PURE__*/function (_React$Component) {
     if (index >= 0) {
       var boardGame = currentBoardGamesOnDisplay[index];
       _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].removeBoardGameFromCollection(boardGame);
+    }
+  };
+
+  _proto.handleStartScoreSheet = function handleStartScoreSheet(event) {
+    event.preventDefault();
+    this.hideAllSideBars(); // @ts-ignore
+
+    var id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
+    logger("Handling starting score sheet for " + id);
+
+    if (id) {
+      // find the entry from the state manager
+      id = parseInt(id); // @ts-ignore
+
+      var currentBoardGamesOnDisplay = this.state.boardGames;
+      var index = currentBoardGamesOnDisplay.findIndex(function (game) {
+        return game.gameId === id;
+      });
+
+      if (index >= 0) {
+        var boardGame = currentBoardGamesOnDisplay[index];
+        XXXX;
+      }
     }
   };
 
@@ -2456,7 +2481,8 @@ function BoardGameView(_ref) {
   var boardGame = _ref.boardGame,
       showScoresHandler = _ref.showScoresHandler,
       addToCollectionHandler = _ref.addToCollectionHandler,
-      removeFromCollectionHandler = _ref.removeFromCollectionHandler;
+      removeFromCollectionHandler = _ref.removeFromCollectionHandler,
+      startScoreSheetHandler = _ref.startScoreSheetHandler;
 
   if (boardGame) {
     beLogger("Board Game " + boardGame.gameId);
@@ -2482,6 +2508,14 @@ function BoardGameView(_ref) {
       onClick: removeFromCollectionHandler
     }, "\xA0\xA0Remove from ", !_Controller__WEBPACK_IMPORTED_MODULE_2__["default"].isLoggedIn() ? 'Browser' : '', " Collection \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
       className: "far fa-star"
+    }), "\xA0\xA0");
+    var startScoreSheetButton = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      type: "button",
+      className: "btn-secondary btn-sm rounded p-1 mr-2 mt-1",
+      "board-game-id": boardGame.gameId,
+      onClick: startScoreSheetHandler
+    }, "\xA0\xA0Start Score Sheet \xA0", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+      className: "far fa-star"
     }), "\xA0\xA0"); // do we have any scores?
 
     var scoreCount = 0;
@@ -2496,7 +2530,8 @@ function BoardGameView(_ref) {
     });
     var scoreBadge = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
       "board-game-id": boardGame.gameId,
-      className: "badge badge-pill badge-primary"
+      className: "badge badge-pill badge-primary",
+      onClick: showScoresHandler
     }, scoreCount);
 
     if (boardGame.decorator && boardGame.decorator !== _AppTypes__WEBPACK_IMPORTED_MODULE_3__["Decorator"].Incomplete) {
@@ -2520,7 +2555,7 @@ function BoardGameView(_ref) {
         className: "text-muted"
       }, "Play Time: ", boardGame.minPlayTime, " - ", boardGame.maxPlayTime, " min", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), "Players: ", boardGame.minPlayers, " - ", boardGame.maxPlayers, " Min Age:", boardGame.minAge, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), "Categories: ", boardGame.categories))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-footer text-right text-muted"
-      }, "Rank: ", boardGame.rank, " Score: ", boardGame.averageScore, " from ", boardGame.numOfRaters, " raters")));
+      }, "Rank: ", boardGame.rank, " Score: ", boardGame.averageScore, " from ", boardGame.numOfRaters, " raters", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), startScoreSheetButton)));
     } else {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2"
@@ -2938,7 +2973,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ScoreSheetController", function() { return ScoreSheetController; });
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../socket/ChatManager */ "./src/socket/ChatManager.ts");
+/* harmony import */ var _socket_Types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../socket/Types */ "./src/socket/Types.ts");
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+/* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../notification/NotificationManager */ "./src/notification/NotificationManager.ts");
+/* harmony import */ var _util_UUID__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/UUID */ "./src/util/UUID.ts");
+/* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../socket/SocketManager */ "./src/socket/SocketManager.ts");
+/* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../socket/ChatManager */ "./src/socket/ChatManager.ts");
+
+
+
+
+
 
 
 var sscLogger = debug__WEBPACK_IMPORTED_MODULE_0___default()('score-sheet-controller');
@@ -2953,41 +2998,177 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
   function ScoreSheetController() {
     this.applicationView = null;
-    this.invitation = null;
+    this.scoreSheetView = null;
+    this.currentScoreRoom = null;
+    this.currentlySelectedBoardGame = null;
+    this.currentScoreSheet = null;
+    this.currentUsername = '';
   }
 
   var _proto = ScoreSheetController.prototype;
 
-  _proto.setupScoreSheet = function setupScoreSheet(appView, invitation) {
-    this.applicationView = appView;
-    this.invitation = invitation;
-    _socket_ChatManager__WEBPACK_IMPORTED_MODULE_1__["ChatManager"].getInstance().addMessageListener(this);
+  _proto.receiveLogin = function receiveLogin(username) {};
+
+  _proto.receiveLogout = function receiveLogout(username) {};
+
+  _proto.setCurrentUser = function setCurrentUser(username) {
+    sscLogger("Setting current user " + username);
+    this.currentUsername = username;
   };
 
+  _proto.getCurrentUser = function getCurrentUser() {
+    return this.currentUsername;
+  };
+
+  _proto.initialise = function initialise(view) {
+    this.scoreSheetView = view;
+  };
+
+  _proto.receiveInvitation = function receiveInvitation(invite) {
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+    if (_socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__["ChatManager"].getInstance().isUserInBlockedList(invite.from)) {
+      sscLogger("Received invite from blocked user - ignoring");
+      return;
+    } // is this a chat room or score sheet?
+
+
+    if (invite.type === _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ChatRoom) return; // ignore chat rooms
+
+    if (invite.requiresAcceptDecline) {
+      // notify the user of the invitation
+      if (!_Controller__WEBPACK_IMPORTED_MODULE_2__["default"].askUserAboutInvitation(invite)) {
+        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendDeclineInvite(invite.room, this.getCurrentUser());
+      }
+
+      ; // user declines to join the scoresheet
+    } else {
+      // notify the user of the new chat
+      _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_3__["default"].show('Score Sheet', "Joining score sheet", 'info', 7000);
+      _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), invite.room);
+      this.currentScoreRoom = invite.room; // change to the score sheet
+
+      this.applicationView.handleShowScoreSheet(null);
+    }
+  };
+
+  _proto.receiveQueuedMessages = function receiveQueuedMessages(messages) {
+    var _this = this;
+
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+    if (!this.currentScoreRoom) return; // we are not in a room
+
+    messages.forEach(function (message) {
+      if (_this.currentScoreRoom === message.room) {
+        _this.receiveMessage(message);
+      }
+    });
+  };
+
+  _proto.receiveQueuedInvites = function receiveQueuedInvites(invites) {// not implemented, the user needs to be online for a scoresheet
+  };
+
+  _proto.receiveJoinedRoom = function receiveJoinedRoom(users) {
+    if (this.currentScoreRoom !== users.room) return; // update the sheet to include the user
+
+    XXX;
+  };
+
+  _proto.receivedLeftRoom = function receivedLeftRoom(users) {
+    if (this.currentScoreRoom !== users.room) return; // update the sheet to remove the user
+  };
+
+  _proto.receiveUserList = function receiveUserList(users) {} // will be managed in the transfer of sheet data
+  ;
+
   _proto.endScoreSheet = function endScoreSheet() {
-    alert('Implement end score sheet');
-    _socket_ChatManager__WEBPACK_IMPORTED_MODULE_1__["ChatManager"].getInstance().removeMessageListener(this);
+    alert('Implement end score sheet'); // send the final score to everyone
+
+    if (_Controller__WEBPACK_IMPORTED_MODULE_2__["default"].isLoggedIn()) {
+      if (this.currentScoreRoom) {
+        this.sendScoreSheetState(true);
+      }
+    }
+  };
+
+  _proto.getDefaultScoreSheetTemplate = function getDefaultScoreSheetTemplate(boardGame) {
+    return {};
+    XXXX;
+  };
+
+  _proto.getScoreSheetTemplate = function getScoreSheetTemplate(boardGame) {
+    return {};
+    XXXX;
+  };
+
+  _proto.startScoreSheet = function startScoreSheet(boardGame) {
+    if (boardGame) {
+      sscLogger("Starting score sheet for " + boardGame.name);
+      this.currentlySelectedBoardGame = boardGame;
+      this.currentScoreRoom = _util_UUID__WEBPACK_IMPORTED_MODULE_4__["default"].getUniqueId();
+      this.currentScoreSheet = {
+        room: this.currentScoreRoom,
+        boardGameName: boardGame.name,
+        sheetLayoutOptions: {},
+        timer: 0,
+        sheetData: {},
+        isFinished: false
+      }; // start a new chat room, will automatically manage if logged in or not
+
+      if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+      _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), this.currentScoreRoom);
+    }
+  };
+
+  _proto.hasActiveScoreSheet = function hasActiveScoreSheet() {
+    var result = false;
+    if (this.currentScoreRoom && this.currentScoreSheet) result = true;
+    return result;
+  };
+
+  _proto.inviteUser = function inviteUser(username) {
+    // only the user who created the score sheet can do this as they are the only ones with a selected board game
+    if (this.currentScoreRoom && this.currentlySelectedBoardGame) {
+      sscLogger("Inviting user " + username + " to score sheet");
+      if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+      _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendInvite(this.getCurrentUser(), username, this.currentScoreRoom, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet, true, this.currentlySelectedBoardGame.name);
+    }
   };
 
   _proto.receiveMessage = function receiveMessage(message) {
-    // the attachment should have all the data we need to display the scoresheet
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
-    /*scoreSheet: {
-          room: ''
-            boardGameName: '',
-            sheetLayoutOptions: {},
-        timer: 0,
-            sheetData: {}
-    }*/
-    // are we scoring the right sheet?
-    sscLogger("Received message for score sheet " + message.room);
-    sscLogger(message);
+    if (this.currentScoreRoom) {
+      // are we in a room?
+      if (this.currentScoreRoom === message.room) {
+        // are we listening to this score sheet room?
+        if (_socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__["ChatManager"].getInstance().isUserInBlockedList(message.from)) {
+          sscLogger("Received message from blocked user - ignoring");
+          return;
+        } // are we scoring the right sheet?
 
-    if (message.attachment && this.invitation) {
-      if (message.room === this.invitation.room) {
-        alert('TO DO scoresheet');
+
+        sscLogger("Received message for score sheet " + message.room);
+        sscLogger(message);
+
+        if (message.attachment) {
+          // the attachment should be a ScoreSheet object
+          var scoreSheet = message.attachment;
+          XXX;
+        }
       }
     }
+  };
+
+  _proto.sendScoreSheetState = function sendScoreSheetState(isFinished) {
+    if (isFinished === void 0) {
+      isFinished = false;
+    }
+
+    XXX;
   };
 
   return ScoreSheetController;
@@ -4461,17 +4642,6 @@ var ChatManager = /*#__PURE__*/function () {
 
   var _proto = ChatManager.prototype;
 
-  _proto.addMessageListener = function addMessageListener(listener) {
-    this.messageListeners.push(listener);
-  };
-
-  _proto.removeMessageListener = function removeMessageListener(removeListener) {
-    var index = this.messageListeners.findIndex(function (listener) {
-      return listener == removeListener;
-    });
-    if (index >= 0) this.messageListeners.splice(index, 1);
-  };
-
   _proto.addChatEventHandler = function addChatEventHandler(receiver) {
     this.chatListeners.push(receiver);
   };
@@ -4489,7 +4659,6 @@ var ChatManager = /*#__PURE__*/function () {
     this.chatLogs = [];
     this.chatListeners = [];
     this.chatUserListeners = [];
-    this.messageListeners = [];
     this.localStorage = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_4__["default"](true); // connect to the socket manager
 
     _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].setChatReceiver(this); // bind the receiver methods
@@ -4661,7 +4830,8 @@ var ChatManager = /*#__PURE__*/function () {
         users: [this.getCurrentUser()],
         messages: [],
         lastViewed: parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss')),
-        numOfNewMessages: 0
+        numOfNewMessages: 0,
+        type: _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom
       };
       this.chatLogs.push(log);
       this.saveLogs();
@@ -4698,7 +4868,8 @@ var ChatManager = /*#__PURE__*/function () {
         users: [this.getCurrentUser(), username],
         messages: [],
         lastViewed: parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss')),
-        numOfNewMessages: 0
+        numOfNewMessages: 0,
+        type: _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom
       };
       this.chatLogs.push(foundLog);
       this.saveLogs();
@@ -4778,7 +4949,9 @@ var ChatManager = /*#__PURE__*/function () {
       }
 
       if (happyToProceed) {
-        var chatLog = this.ensureChatLogExists(invite.room); // add the users in the invitation user list for the room, if not already added
+        var chatLog = this.ensureChatLogExists(invite.room); // keep a record of the type of invite
+
+        chatLog.type = invite.type; // add the users in the invitation user list for the room, if not already added
 
         if (invite.userList) {
           invite.userList.forEach(function (username) {
@@ -4844,6 +5017,18 @@ var ChatManager = /*#__PURE__*/function () {
     }
   };
 
+  _proto.receiveDecline = function receiveDecline(room, username) {
+    // we get this for all changes to a room, if the username is us can safely ignore
+    if (username === this.currentUsername) return;
+
+    if (!this.isUserInBlockedList(username)) {
+      cmLogger("User " + username + " declined invitation to room");
+      this.chatListeners.forEach(function (listener) {
+        return listener.handleInvitationDeclined(room, username);
+      });
+    }
+  };
+
   _proto.addMessageToChatLog = function addMessageToChatLog(log, message) {
     log.numOfNewMessages++;
     log.messages.push(message);
@@ -4896,9 +5081,6 @@ var ChatManager = /*#__PURE__*/function () {
       this.addMessageToChatLog(chatLog, message);
       cmLogger("Message received");
       cmLogger(message);
-      this.messageListeners.forEach(function (listener) {
-        return listener.receiveMessage(message);
-      });
       this.chatListeners.forEach(function (listener) {
         return listener.handleChatLogUpdated(chatLog, wasOffline);
       });
@@ -4975,7 +5157,25 @@ var ChatManager = /*#__PURE__*/function () {
     _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].logout(this.getCurrentUser());
   };
 
-  _proto.sendInvite = function sendInvite(to, room) {
+  _proto.declineInvite = function declineInvite(room) {
+    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendDeclineInvite(room, this.getCurrentUser());
+  };
+
+  _proto.sendInvite = function sendInvite(to, room, type, requiresAcceptDecline, subject) {
+    if (type === void 0) {
+      type = _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom;
+    }
+
+    if (requiresAcceptDecline === void 0) {
+      requiresAcceptDecline = false;
+    }
+
+    if (subject === void 0) {
+      subject = '';
+    }
+
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
     // can't accidentally send an invite to blacklisted
 
@@ -4986,7 +5186,7 @@ var ChatManager = /*#__PURE__*/function () {
     if (log.users.findIndex(function (user) {
       return user === to;
     }) < 0) {
-      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendInvite(this.getCurrentUser(), to, room);
+      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendInvite(this.getCurrentUser(), to, room, type, requiresAcceptDecline, subject);
     }
   };
 
@@ -5056,7 +5256,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../notification/NotificationManager */ "./src/notification/NotificationManager.ts");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+/* harmony import */ var _Types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Types */ "./src/socket/Types.ts");
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+
 
 
 
@@ -5088,13 +5290,21 @@ var NotificationController = /*#__PURE__*/function () {
 
   var _proto = NotificationController.prototype;
 
+  _proto.handleInvitationDeclined = function handleInvitationDeclined(room, username) {
+    if (this.doNotDisturb) return; // notify the user of the new chat
+
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show('Room', "User " + username + " has declined the invitation to join you.", 'info', 7000);
+  };
+
   _proto.handleNewInviteReceived = function handleNewInviteReceived(invite) {
-    var result = true;
+    var result = true; // is this a chat room or score sheet?
+
+    if (invite.type === _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ScoreSheet) return true;
     if (this.doNotDisturb && !invite.requiresAcceptDecline) return result;
 
     if (invite.requiresAcceptDecline) {
       // notify the user of the invitation
-      result = _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].askUserAboutInvitation(invite);
+      result = _Controller__WEBPACK_IMPORTED_MODULE_4__["default"].askUserAboutInvitation(invite);
     } else {
       // notify the user of the new chat
       _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_1__["default"].show('Chat Room', "User " + invite.from + " has invited you.", 'info', 7000);
@@ -5357,6 +5567,19 @@ var SocketManager = /*#__PURE__*/function () {
     }
   };
 
+  _proto.callbackForDeclineInvite = function callbackForDeclineInvite(data) {
+    sDebug("Received declined invite : " + data);
+    if (this.chatReceiver === null) return;
+
+    try {
+      var dataObj = JSON.parse(data);
+      sDebug(dataObj);
+      this.chatReceiver.receiveDecline(dataObj.room, dataObj.username);
+    } catch (err) {
+      sDebug('Not JSON data');
+    }
+  };
+
   _proto.callbackForChat = function callbackForChat(content) {
     sDebug("Received chat : " + content);
     if (this.chatReceiver === null) return;
@@ -5435,6 +5658,7 @@ var SocketManager = /*#__PURE__*/function () {
     this.socket.on('joinroom', this.callbackForJoinRoom);
     this.socket.on('exitroom', this.callbackForExitRoom);
     this.socket.on('invite', this.callbackForInvite);
+    this.socket.on('declineinvite', this.callbackForDeclineInvite);
     this.socket.on('chat', this.callbackForChat);
     this.socket.on('queue', this.callbackForQueue);
     this.socket.on('userlist', this.callbackForUserList);
@@ -5512,6 +5736,13 @@ var SocketManager = /*#__PURE__*/function () {
 
   _proto.getUserList = function getUserList() {
     this.socket.emit('userlist');
+  };
+
+  _proto.sendDeclineInvite = function sendDeclineInvite(room, from) {
+    this.socket.emit('declineinvite', {
+      room: room,
+      from: from
+    });
   };
 
   return SocketManager;

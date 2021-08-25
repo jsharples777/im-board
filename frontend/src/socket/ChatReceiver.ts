@@ -11,4 +11,5 @@ export interface ChatReceiver {
     receiveJoinedRoom(users:JoinLeft):void;
     receivedLeftRoom(users:JoinLeft):void;
     receiveUserList(users:string[]):void;
+    receiveDecline(room:string, username:string):void
 }

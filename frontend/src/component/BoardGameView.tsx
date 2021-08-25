@@ -10,7 +10,7 @@ const beLogger = debug('view-ts:boardgameview');
 
 
 // @ts-ignore
-export default function BoardGameView({boardGame, showScoresHandler, addToCollectionHandler, removeFromCollectionHandler}) {
+export default function BoardGameView({boardGame, showScoresHandler, addToCollectionHandler, removeFromCollectionHandler,startScoreSheetHandler}) {
     if (boardGame) {
         beLogger(`Board Game ${boardGame.gameId}`);
 
@@ -35,6 +35,15 @@ export default function BoardGameView({boardGame, showScoresHandler, addToCollec
                 &nbsp;&nbsp;Remove from {!controller.isLoggedIn()?'Browser':''} Collection &nbsp;
                 <i className="far fa-star"></i>&nbsp;&nbsp;
             </button>
+
+        let startScoreSheetButton =
+            <button type="button"
+                    className="btn-secondary btn-sm rounded p-1 mr-2 mt-1"
+                    board-game-id={boardGame.gameId} onClick={startScoreSheetHandler}>
+                &nbsp;&nbsp;Start Score Sheet &nbsp;
+                <i className="far fa-star"></i>&nbsp;&nbsp;
+            </button>
+
         // do we have any scores?
         let scoreCount = 0;
         if (boardGame.scores) {
@@ -43,7 +52,7 @@ export default function BoardGameView({boardGame, showScoresHandler, addToCollec
 
 //        let overlay = <div className="card-img-overlay">
         let favouriteIcon = <i className="fas fa-star text-black"></i>
-        let scoreBadge = <span board-game-id={boardGame.gameId} className='badge badge-pill badge-primary'>{scoreCount}</span>
+        let scoreBadge = <span board-game-id={boardGame.gameId} className='badge badge-pill badge-primary' onClick={showScoresHandler}>{scoreCount}</span>
 
         if ((boardGame.decorator) && (boardGame.decorator !== Decorator.Incomplete)) {
 
@@ -65,7 +74,8 @@ export default function BoardGameView({boardGame, showScoresHandler, addToCollec
                             </p>
                         </div>
                         <div className="card-footer text-right text-muted">
-                            Rank: {boardGame.rank} Score: {boardGame.averageScore} from {boardGame.numOfRaters} raters
+                            Rank: {boardGame.rank} Score: {boardGame.averageScore} from {boardGame.numOfRaters} raters<br/>
+                            {startScoreSheetButton}
                         </div>
                     </div>
                 </div>

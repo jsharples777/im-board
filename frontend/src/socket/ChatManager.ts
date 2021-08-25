@@ -2,10 +2,10 @@ import debug from 'debug';
 import moment from "moment";
 import socketManager from "./SocketManager";
 
-import {Priority, Invitation, JoinLeft, Message, ChatLog} from "./Types";
+import {ChatLog, Invitation, InviteType, JoinLeft, Message, Priority} from "./Types";
 import {ChatEmitter} from "./ChatEmitter";
 import {ChatReceiver} from "./ChatReceiver";
-import {ChatEventListener, MessageEventListener} from "./ChatEventListener";
+import {ChatEventListener} from "./ChatEventListener";
 
 import {StateManager} from "../state/StateManager";
 import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
@@ -46,16 +46,6 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
     protected chatListeners:ChatEventListener[];
     protected chatUserListeners:ChatUserEventListener[];
-    private messageListeners: MessageEventListener[];
-
-    public addMessageListener(listener:MessageEventListener):void  {
-        this.messageListeners.push(listener);
-    }
-
-    public removeMessageListener(removeListener:MessageEventListener):void {
-        let index = (this.messageListeners.findIndex((listener) => listener == removeListener));
-        if (index >= 0) this.messageListeners.splice(index,1);
-    }
 
     public addChatEventHandler(receiver:ChatEventListener):void {
         this.chatListeners.push(receiver);
@@ -71,7 +61,6 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         this.chatLogs = [];
         this.chatListeners = [];
         this.chatUserListeners = [];
-        this.messageListeners = [];
         this.localStorage = new BrowserStorageStateManager(true);
 
         // connect to the socket manager
@@ -207,7 +196,8 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
                 users: [this.getCurrentUser()],
                 messages: [],
                 lastViewed: parseInt(moment().format('YYYYMMDDHHmmss')),
-                numOfNewMessages: 0
+                numOfNewMessages: 0,
+                type: InviteType.ChatRoom,
             }
             this.chatLogs.push(log);
             this.saveLogs();
@@ -238,7 +228,8 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
                 users: [this.getCurrentUser(),username],
                 messages: [],
                 lastViewed: parseInt(moment().format('YYYYMMDDHHmmss')),
-                numOfNewMessages: 0
+                numOfNewMessages: 0,
+                type: InviteType.ChatRoom
             }
             this.chatLogs.push(foundLog);
             this.saveLogs();
@@ -320,6 +311,9 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             if (happyToProceed) {
 
                 let chatLog: ChatLog = this.ensureChatLogExists(invite.room);
+                // keep a record of the type of invite
+                chatLog.type = invite.type;
+
                 // add the users in the invitation user list for the room, if not already added
                 if (invite.userList) {
                     invite.userList.forEach((username: string) => {
@@ -371,6 +365,18 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         }
     }
 
+    receiveDecline(room: string, username: string): void {
+        // we get this for all changes to a room, if the username is us can safely ignore
+        if (username === this.currentUsername) return;
+
+        if (!this.isUserInBlockedList(username)) {
+            cmLogger(`User ${username} declined invitation to room`);
+            this.chatListeners.forEach((listener) => listener.handleInvitationDeclined(room,username));
+        }
+
+    }
+
+
     private addMessageToChatLog(log:ChatLog, message:Message) {
         log.numOfNewMessages ++;
         log.messages.push(message);
@@ -416,7 +422,6 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             cmLogger(`Message received`);
             cmLogger(message);
 
-            this.messageListeners.forEach((listener) => listener.receiveMessage(message));
             this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(chatLog,wasOffline));
         }
         else {
@@ -478,14 +483,20 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         socketManager.logout(this.getCurrentUser());
     }
 
-    sendInvite(to: string, room: string): void {
+    declineInvite(room:string) {
+        if (this.getCurrentUser().trim().length === 0) return;  // we are not logged in
+        socketManager.sendDeclineInvite(room, this.getCurrentUser());
+
+    }
+
+    sendInvite(to: string, room: string,type:InviteType = InviteType.ChatRoom,requiresAcceptDecline:boolean = false, subject:string = ''): void {
         if (this.getCurrentUser().trim().length === 0) return;  // we are not logged in
         // can't accidentally send an invite to blacklisted
         if (this.isUserInBlockedList(to)) return;
         // only send an invite if the user isn't already in the room
         const log:ChatLog = this.ensureChatLogExists(room);
         if (log.users.findIndex((user) =>  user === to) < 0) {
-            socketManager.sendInvite(this.getCurrentUser(),to, room);
+            socketManager.sendInvite(this.getCurrentUser(),to, room,type,requiresAcceptDecline,subject);
         }
     }
 
@@ -529,4 +540,5 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             socketManager.joinChat(this.getCurrentUser(), chatLog.roomName);
         }
     }
+
 }

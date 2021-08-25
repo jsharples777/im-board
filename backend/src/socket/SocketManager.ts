@@ -283,6 +283,10 @@ class SocketManager {
                 socketDebug(`${from} has sent an invitation to join room ${room} to ${to}`);
                 this.inviteUserToRoom(from, to, room, inviteType, requiresAcceptDecline,subject);
             });
+            socket.on('declineinvite', ({from,room}) => {
+                socketDebug(`${from} has declined an invitation to join room ${room}`);
+                socket.to(room).emit('declineinvite',JSON.stringify({username:from,room: room}));
+            });
             socket.on('chat', ({from, room, message,created,priority,attachment}) => {
                 socketDebug(`${from} has sent a message to room ${room}: ${message}`);
                 // send the message to the rest of the room
