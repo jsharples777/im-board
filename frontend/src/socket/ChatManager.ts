@@ -541,7 +541,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
 
             // invite the other user
-            socketManager.sendInvite(this.getCurrentUser(), username, chatLog.roomName);
+            socketManager.sendInvite(this.getCurrentUser(), username, chatLog.roomName,InviteType.ChatRoom,false,'');
             // ok, lets connect to the server
             socketManager.joinChat(this.getCurrentUser(), chatLog.roomName);
         }

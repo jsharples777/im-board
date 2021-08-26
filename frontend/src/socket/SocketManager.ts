@@ -35,11 +35,13 @@ class SocketManager {
     private callbackForMessage(content:any):void {
         sDebug(`Received message : ${content}`);
         try {
+            sDebug(content);
             // should be a server side ChatMessage {room, message,user}
             const dataObj = JSON.parse(content);
             this.chatReceivers.forEach((receiver) => receiver.receiveMessage(dataObj));
         }
         catch (err) {
+            sDebug(err);
             sDebug('Not JSON data');
         }
     }
@@ -216,6 +218,8 @@ class SocketManager {
             requiresAcceptDecline: requiresAcceptDecline,
             subject:subject
         }
+        sDebug(`Sending invite`);
+        sDebug(inviteObj);
         this.socket.emit('invite', inviteObj);
     }
 

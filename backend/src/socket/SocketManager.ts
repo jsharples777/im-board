@@ -281,9 +281,9 @@ class SocketManager {
                 }
                 socket.to(room).emit('exitroom',JSON.stringify({username:username,room: room,userList:userList}));
             });
-            socket.on('invite', ({from, to, room,inviteType,requiresAcceptDecline,subject}) => {
-                socketDebug(`${from} has sent an invitation to join room ${room} to ${to}`);
-                this.inviteUserToRoom(from, to, room, inviteType, requiresAcceptDecline,subject);
+            socket.on('invite', ({from, to, room,type,requiresAcceptDecline,subject}) => {
+                socketDebug(`${from} has sent an invitation to join room ${room} to ${to} with type ${type}`);
+                this.inviteUserToRoom(from, to, room, type, requiresAcceptDecline,subject);
             });
             socket.on('declineinvite', ({from,room}) => {
                 socketDebug(`${from} has declined an invitation to join room ${room}`);

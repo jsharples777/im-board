@@ -62,6 +62,10 @@ export class ScoreSheetView implements StateChangeListener{
         // setup event handlers
         if (this.startStopTimer) this.startStopTimer.addEventListener('click',this.handleStartStopTimer);
         if (this.endOrLeaveEl) this.endOrLeaveEl.addEventListener('click',this.handleEndOrLeave);
+        if (this.thisEl) {
+            this.thisEl.addEventListener('dragover',(event) => {event.preventDefault()});
+            this.thisEl.addEventListener('drop',this.handleUserDrop);
+        }
     }
 
     handleEndOrLeave(event:MouseEvent) {
@@ -180,12 +184,13 @@ export class ScoreSheetView implements StateChangeListener{
 
     public updateTimer(time:number, isPaused:boolean = false) {
         // update the view
+        ssvLogger(`Updating timer ${time} ${isPaused}`);
         if (this.startStopTimer) {
             if (isPaused) {
-                this.startStopTimer.innerHTML = 'Start ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
+                this.startStopTimer.innerHTML = 'Start   ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
             }
             else {
-                this.startStopTimer.innerHTML = 'Pause' + this.applicationView.state.ui.scoreSheet.dom.iconInProgress;
+                this.startStopTimer.innerHTML = 'Pause   ' + this.applicationView.state.ui.scoreSheet.dom.iconInProgress;
             }
             this.startStopTimer.removeAttribute("disabled");
         }
@@ -196,6 +201,7 @@ export class ScoreSheetView implements StateChangeListener{
         let scoreSheet:ScoreSheet = newValue;
         ssvLogger(`Processing new state`);
         ssvLogger(scoreSheet);
+        if (this.startStopTimer) this.startStopTimer.removeAttribute("disabled");
 
         // update the board game name
         if (this.boardGameTitleEl) this.boardGameTitleEl.innerText = `${scoreSheet.boardGameName}`;
@@ -225,7 +231,7 @@ export class ScoreSheetView implements StateChangeListener{
                     this.scoreSheetEl,
                     scoreSheet.sheetLayoutOptions);
                 // @ts-ignore
-                this.table.addHook('afterchange',this.controller.userChangedValue);
+                this.table.addHook('afterChange',this.controller.userChangedValue);
             }
         }
 

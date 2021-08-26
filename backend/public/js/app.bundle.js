@@ -1349,16 +1349,16 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
   _proto.switchBetweenCollectionAndScoreSheet = function switchBetweenCollectionAndScoreSheet(showCollection) {
     if (showCollection) {
-      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none hidden', false);
-      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block visible', true);
-      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none hidden', true);
-      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block visible', false);
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none', false);
+      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block', true);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none', true);
+      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block', false);
     } else {
       if (_component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_10__["ScoreSheetController"].getInstance().hasActiveScoreSheet()) {
-        if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none hidden', true);
-        if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block visible', false);
-        if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none hidden', false);
-        if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block visible', true);
+        if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none', true);
+        if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block', false);
+        if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none', false);
+        if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block', true);
       }
     }
   };
@@ -3333,7 +3333,10 @@ var ScoreSheetController = /*#__PURE__*/function () {
     this.receiveQueuedMessages = this.receiveQueuedMessages.bind(this);
     this.receiveQueuedInvites = this.receiveQueuedInvites.bind(this);
     this.receiveJoinedRoom = this.receiveJoinedRoom.bind(this);
-    this.receivedLeftRoom = this.receivedLeftRoom.bind(this); // reset state
+    this.receivedLeftRoom = this.receivedLeftRoom.bind(this);
+    this.userChangedValue = this.userChangedValue.bind(this);
+    this.endScoreSheet = this.endScoreSheet.bind(this);
+    this.pauseTimer = this.pauseTimer.bind(this); // reset state
 
     this.reset();
   }
@@ -3415,7 +3418,16 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
     _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show('Score Sheet', "Joining score sheet", 'info', 7000);
     _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), invite.room);
-    this.currentScoreRoom = invite.room; // change to the score sheet
+    this.currentScoreRoom = invite.room;
+    this.currentScoreSheet = {
+      room: invite.room,
+      boardGameName: '',
+      data: [],
+      sheetLayoutOptions: {},
+      timer: 0,
+      isFinished: false,
+      timerGoing: false
+    }; // change to the score sheet
 
     this.applicationView.handleShowScoreSheet(null);
   };
@@ -3467,10 +3479,12 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
       this.addUserToScoreSheet(users.username); // the owner of the sheet should send a sync message of the data
 
-      if (this.isRoomCreator && this.currentScoreSheet) {
-        sscLogger("Handling user joined " + users.username + " - sending");
-        this.sendScoreSheetState(this.currentScoreSheet, false);
-      }
+      if (this.currentScoreSheet) this.saveCurrentScoreSheet(this.currentScoreSheet);
+    }
+
+    if (this.isRoomCreator && this.currentScoreSheet) {
+      sscLogger("Handling user joined " + users.username + " - sending");
+      this.sendScoreSheetState(this.currentScoreSheet, false);
     }
   };
 
@@ -3489,10 +3503,12 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
       this.removeUserFromScoreSheet(users.username); // the owner of the sheet should send a sync message of the data
 
-      if (this.isRoomCreator && this.currentScoreSheet) {
-        sscLogger("Handling user left " + users.username + " - sending");
-        this.sendScoreSheetState(this.currentScoreSheet, false);
-      }
+      if (this.currentScoreSheet) this.saveCurrentScoreSheet(this.currentScoreSheet);
+    }
+
+    if (this.isRoomCreator && this.currentScoreSheet) {
+      sscLogger("Handling user left " + users.username + " - sending");
+      this.sendScoreSheetState(this.currentScoreSheet, false);
     }
   };
 
@@ -3508,17 +3524,26 @@ var ScoreSheetController = /*#__PURE__*/function () {
       if (this.currentScoreRoom && this.currentScoreSheet) {
         sscLogger("Handling end of score sheet - sending");
         this.sendScoreSheetState(this.currentScoreSheet, true); // if we are logged in and the scoresheet creator then we need to save the score sheet to the selected board game
+      } // close the room
 
-        if (this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet); // reset the controller
 
-        this.reset();
-        this.applicationView.switchBetweenCollectionAndScoreSheet(true);
-      }
+      this.leave();
     }
+
+    if (this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet); // reset the controller
+
+    this.reset();
+    this.applicationView.switchBetweenCollectionAndScoreSheet(true);
   };
 
   _proto.saveScoreSheetToBoardGame = function saveScoreSheetToBoardGame(scoreSheet) {
-    alert("Implement save");
+    sscLogger('Handling save');
+    var saveData = {
+      jsonData: JSON.stringify(scoreSheet),
+      createdOn: parseInt(moment__WEBPACK_IMPORTED_MODULE_8___default()().format('YYYYMMDDHHmmss'))
+    };
+    sscLogger(scoreSheet);
+    alert('implement save');
   };
 
   _proto.getDefaultScoreSheetTemplate = function getDefaultScoreSheetTemplate(boardGame) {
@@ -3615,7 +3640,12 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
   _proto.hasActiveScoreSheet = function hasActiveScoreSheet() {
     var result = false;
-    if (this.currentScoreRoom && this.currentScoreSheet) result = true;
+
+    if (this.currentScoreRoom) {
+      sscLogger(this.currentScoreRoom);
+      result = true;
+    }
+
     return result;
   };
 
@@ -3634,6 +3664,8 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
     if (message.type !== _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet) return; //ignore non-score sheets
 
+    if (message.from === this.getCurrentUser()) return; // my own messages can be ignored
+
     if (this.currentScoreRoom) {
       // are we in a room?
       if (this.currentScoreRoom === message.room) {
@@ -3649,19 +3681,33 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
         if (message.attachment) {
           // the attachment should be a ScoreSheet object
-          var scoreSheet = message.attachment; // only update the scoresheet if the timer value is higher from the attachement
+          var scoreSheet = message.attachment;
+          sscLogger(scoreSheet); // only update the scoresheet if the timer value is higher from the attachement
           // @ts-ignore
 
           if (scoreSheet.timer > this.currentScoreSheet.timer) {
             if (this.currentScoreSheet) {
+              this.currentScoreSheet.room = message.room;
+              this.currentScoreSheet.boardGameName = scoreSheet.boardGameName;
               this.currentScoreSheet.data = scoreSheet.data;
               this.currentScoreSheet.timer = scoreSheet.timer;
               this.currentScoreSheet.timerGoing = scoreSheet.timerGoing;
+              this.currentScoreSheet.sheetLayoutOptions = scoreSheet.sheetLayoutOptions;
+              this.currentScoreSheet.isFinished = scoreSheet.isFinished;
             }
           } // save the new state
 
 
-          this.saveCurrentScoreSheet();
+          if (this.currentScoreSheet) this.saveCurrentScoreSheet(this.currentScoreSheet);
+
+          if (scoreSheet.isFinished) {
+            alert('Score sheet has been finished - closing'); // reset the controller
+
+            this.reset(); // close the room
+
+            this.leave();
+            this.applicationView.switchBetweenCollectionAndScoreSheet(true);
+          }
         }
       }
     }
@@ -3671,8 +3717,8 @@ var ScoreSheetController = /*#__PURE__*/function () {
     return this.isRoomCreator;
   };
 
-  _proto.saveCurrentScoreSheet = function saveCurrentScoreSheet() {
-    this.currentScoreSheet = this.createScoreSheetFromTable();
+  _proto.saveCurrentScoreSheet = function saveCurrentScoreSheet(scoreSheet) {
+    this.currentScoreSheet = scoreSheet;
     this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, false);
   };
 
@@ -3700,7 +3746,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
       isFinished = false;
     }
 
-    if (this.currentScoreRoom && this.currentlySelectedBoardGame && this.isLoggedIn()) {
+    if (this.currentScoreRoom && this.isLoggedIn()) {
       var created = parseInt(moment__WEBPACK_IMPORTED_MODULE_8___default()().format('YYYYMMDDHHmmss')); // @ts-ignore
 
       _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendMessage(this.getCurrentUser(), this.currentScoreRoom, 'data', created, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["Priority"].Normal, scoreSheet);
@@ -3722,11 +3768,18 @@ var ScoreSheetController = /*#__PURE__*/function () {
     this.intervalTimer = setInterval(function () {
       if (_this2.currentScoreSheet && _this2.currentScoreSheet.timerGoing) {
         _this2.currentScoreSheet.timer++;
-        _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().updateTimer(_this2.currentScoreSheet.timer, _this2.currentScoreSheet.timerGoing);
+        _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().updateTimer(_this2.currentScoreSheet.timer, !_this2.currentScoreSheet.timerGoing);
       } else {
-        if (_this2.currentScoreSheet) _this2.currentScoreSheet.timerGoing = false;
+        if (_this2.currentScoreSheet) {
+          _this2.currentScoreSheet.timerGoing = false;
+          _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().updateTimer(_this2.currentScoreSheet.timer, !_this2.currentScoreSheet.timerGoing);
+        }
       }
     }, 1000);
+
+    if (this.currentScoreSheet) {
+      this.saveCurrentScoreSheet(this.currentScoreSheet);
+    }
 
     if (this.isLoggedIn() && this.currentScoreSheet) {
       // start the timer for everyone
@@ -3740,7 +3793,13 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
     if (this.intervalTimer > 0) {
       clearInterval(this.intervalTimer);
-      if (this.currentScoreSheet) this.currentScoreSheet.timerGoing = false; // ask everyone to pause their timers
+
+      if (this.currentScoreSheet) {
+        this.currentScoreSheet.timerGoing = false;
+        this.saveCurrentScoreSheet(this.currentScoreSheet);
+        _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().updateTimer(this.currentScoreSheet.timer, !this.currentScoreSheet.timerGoing);
+      } // ask everyone to pause their timers
+
 
       if (this.isLoggedIn() && this.currentScoreSheet) {
         sscLogger("Handling pause timer - updating all users");
@@ -3756,7 +3815,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
     sscLogger(scoreSheet);
 
     if (scoreSheet) {
-      this.currentScoreSheet = scoreSheet;
+      this.saveCurrentScoreSheet(scoreSheet);
 
       if (this.isLoggedIn()) {
         sscLogger("Handling user change - updating all users");
@@ -3847,6 +3906,13 @@ var ScoreSheetView = /*#__PURE__*/function () {
 
     if (this.startStopTimer) this.startStopTimer.addEventListener('click', this.handleStartStopTimer);
     if (this.endOrLeaveEl) this.endOrLeaveEl.addEventListener('click', this.handleEndOrLeave);
+
+    if (this.thisEl) {
+      this.thisEl.addEventListener('dragover', function (event) {
+        event.preventDefault();
+      });
+      this.thisEl.addEventListener('drop', this.handleUserDrop);
+    }
   };
 
   _proto.handleEndOrLeave = function handleEndOrLeave(event) {
@@ -3962,11 +4028,13 @@ var ScoreSheetView = /*#__PURE__*/function () {
     } // update the view
 
 
+    ssvLogger("Updating timer " + time + " " + isPaused);
+
     if (this.startStopTimer) {
       if (isPaused) {
-        this.startStopTimer.innerHTML = 'Start ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
+        this.startStopTimer.innerHTML = 'Start   ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
       } else {
-        this.startStopTimer.innerHTML = 'Pause' + this.applicationView.state.ui.scoreSheet.dom.iconInProgress;
+        this.startStopTimer.innerHTML = 'Pause   ' + this.applicationView.state.ui.scoreSheet.dom.iconInProgress;
       }
 
       this.startStopTimer.removeAttribute("disabled");
@@ -3978,7 +4046,8 @@ var ScoreSheetView = /*#__PURE__*/function () {
   _proto.stateChanged = function stateChanged(managerName, name, newValue) {
     var scoreSheet = newValue;
     ssvLogger("Processing new state");
-    ssvLogger(scoreSheet); // update the board game name
+    ssvLogger(scoreSheet);
+    if (this.startStopTimer) this.startStopTimer.removeAttribute("disabled"); // update the board game name
 
     if (this.boardGameTitleEl) this.boardGameTitleEl.innerText = "" + scoreSheet.boardGameName; // update the table
 
@@ -4001,7 +4070,7 @@ var ScoreSheetView = /*#__PURE__*/function () {
         scoreSheet.sheetLayoutOptions.data = scoreSheet.data;
         this.table = new handsontable__WEBPACK_IMPORTED_MODULE_1__["default"](this.scoreSheetEl, scoreSheet.sheetLayoutOptions); // @ts-ignore
 
-        this.table.addHook('afterchange', this.controller.userChangedValue);
+        this.table.addHook('afterChange', this.controller.userChangedValue);
       }
     } // update the timer
 
@@ -6086,7 +6155,7 @@ var ChatManager = /*#__PURE__*/function () {
         return listener.handleChatLogUpdated(chatLog, false);
       }); // invite the other user
 
-      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendInvite(this.getCurrentUser(), username, chatLog.roomName); // ok, lets connect to the server
+      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendInvite(this.getCurrentUser(), username, chatLog.roomName, _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom, false, ''); // ok, lets connect to the server
 
       _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), chatLog.roomName);
     }
@@ -6360,12 +6429,14 @@ var SocketManager = /*#__PURE__*/function () {
     sDebug("Received message : " + content);
 
     try {
-      // should be a server side ChatMessage {room, message,user}
+      sDebug(content); // should be a server side ChatMessage {room, message,user}
+
       var dataObj = JSON.parse(content);
       this.chatReceivers.forEach(function (receiver) {
         return receiver.receiveMessage(dataObj);
       });
     } catch (err) {
+      sDebug(err);
       sDebug('Not JSON data');
     }
   };
@@ -6582,6 +6653,8 @@ var SocketManager = /*#__PURE__*/function () {
       requiresAcceptDecline: requiresAcceptDecline,
       subject: subject
     };
+    sDebug("Sending invite");
+    sDebug(inviteObj);
     this.socket.emit('invite', inviteObj);
   };
 

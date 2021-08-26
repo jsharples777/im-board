@@ -63,7 +63,8 @@ type ScoreSheet {
 input ScoreSheetInput {
     players: [String],
     scores: [Int],
-    jsonData: String
+    jsonData: String,
+    createdOn: Int
 }
 
 type User {
