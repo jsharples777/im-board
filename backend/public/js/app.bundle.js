@@ -155,6 +155,292 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/handsontable/node_modules/moment/locale sync recursive ^\\.\\/.*$":
+/*!****************************************************************************!*\
+  !*** ./node_modules/handsontable/node_modules/moment/locale sync ^\.\/.*$ ***!
+  \****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var map = {
+	"./af": "./node_modules/handsontable/node_modules/moment/locale/af.js",
+	"./af.js": "./node_modules/handsontable/node_modules/moment/locale/af.js",
+	"./ar": "./node_modules/handsontable/node_modules/moment/locale/ar.js",
+	"./ar-dz": "./node_modules/handsontable/node_modules/moment/locale/ar-dz.js",
+	"./ar-dz.js": "./node_modules/handsontable/node_modules/moment/locale/ar-dz.js",
+	"./ar-kw": "./node_modules/handsontable/node_modules/moment/locale/ar-kw.js",
+	"./ar-kw.js": "./node_modules/handsontable/node_modules/moment/locale/ar-kw.js",
+	"./ar-ly": "./node_modules/handsontable/node_modules/moment/locale/ar-ly.js",
+	"./ar-ly.js": "./node_modules/handsontable/node_modules/moment/locale/ar-ly.js",
+	"./ar-ma": "./node_modules/handsontable/node_modules/moment/locale/ar-ma.js",
+	"./ar-ma.js": "./node_modules/handsontable/node_modules/moment/locale/ar-ma.js",
+	"./ar-sa": "./node_modules/handsontable/node_modules/moment/locale/ar-sa.js",
+	"./ar-sa.js": "./node_modules/handsontable/node_modules/moment/locale/ar-sa.js",
+	"./ar-tn": "./node_modules/handsontable/node_modules/moment/locale/ar-tn.js",
+	"./ar-tn.js": "./node_modules/handsontable/node_modules/moment/locale/ar-tn.js",
+	"./ar.js": "./node_modules/handsontable/node_modules/moment/locale/ar.js",
+	"./az": "./node_modules/handsontable/node_modules/moment/locale/az.js",
+	"./az.js": "./node_modules/handsontable/node_modules/moment/locale/az.js",
+	"./be": "./node_modules/handsontable/node_modules/moment/locale/be.js",
+	"./be.js": "./node_modules/handsontable/node_modules/moment/locale/be.js",
+	"./bg": "./node_modules/handsontable/node_modules/moment/locale/bg.js",
+	"./bg.js": "./node_modules/handsontable/node_modules/moment/locale/bg.js",
+	"./bm": "./node_modules/handsontable/node_modules/moment/locale/bm.js",
+	"./bm.js": "./node_modules/handsontable/node_modules/moment/locale/bm.js",
+	"./bn": "./node_modules/handsontable/node_modules/moment/locale/bn.js",
+	"./bn.js": "./node_modules/handsontable/node_modules/moment/locale/bn.js",
+	"./bo": "./node_modules/handsontable/node_modules/moment/locale/bo.js",
+	"./bo.js": "./node_modules/handsontable/node_modules/moment/locale/bo.js",
+	"./br": "./node_modules/handsontable/node_modules/moment/locale/br.js",
+	"./br.js": "./node_modules/handsontable/node_modules/moment/locale/br.js",
+	"./bs": "./node_modules/handsontable/node_modules/moment/locale/bs.js",
+	"./bs.js": "./node_modules/handsontable/node_modules/moment/locale/bs.js",
+	"./ca": "./node_modules/handsontable/node_modules/moment/locale/ca.js",
+	"./ca.js": "./node_modules/handsontable/node_modules/moment/locale/ca.js",
+	"./cs": "./node_modules/handsontable/node_modules/moment/locale/cs.js",
+	"./cs.js": "./node_modules/handsontable/node_modules/moment/locale/cs.js",
+	"./cv": "./node_modules/handsontable/node_modules/moment/locale/cv.js",
+	"./cv.js": "./node_modules/handsontable/node_modules/moment/locale/cv.js",
+	"./cy": "./node_modules/handsontable/node_modules/moment/locale/cy.js",
+	"./cy.js": "./node_modules/handsontable/node_modules/moment/locale/cy.js",
+	"./da": "./node_modules/handsontable/node_modules/moment/locale/da.js",
+	"./da.js": "./node_modules/handsontable/node_modules/moment/locale/da.js",
+	"./de": "./node_modules/handsontable/node_modules/moment/locale/de.js",
+	"./de-at": "./node_modules/handsontable/node_modules/moment/locale/de-at.js",
+	"./de-at.js": "./node_modules/handsontable/node_modules/moment/locale/de-at.js",
+	"./de-ch": "./node_modules/handsontable/node_modules/moment/locale/de-ch.js",
+	"./de-ch.js": "./node_modules/handsontable/node_modules/moment/locale/de-ch.js",
+	"./de.js": "./node_modules/handsontable/node_modules/moment/locale/de.js",
+	"./dv": "./node_modules/handsontable/node_modules/moment/locale/dv.js",
+	"./dv.js": "./node_modules/handsontable/node_modules/moment/locale/dv.js",
+	"./el": "./node_modules/handsontable/node_modules/moment/locale/el.js",
+	"./el.js": "./node_modules/handsontable/node_modules/moment/locale/el.js",
+	"./en-SG": "./node_modules/handsontable/node_modules/moment/locale/en-SG.js",
+	"./en-SG.js": "./node_modules/handsontable/node_modules/moment/locale/en-SG.js",
+	"./en-au": "./node_modules/handsontable/node_modules/moment/locale/en-au.js",
+	"./en-au.js": "./node_modules/handsontable/node_modules/moment/locale/en-au.js",
+	"./en-ca": "./node_modules/handsontable/node_modules/moment/locale/en-ca.js",
+	"./en-ca.js": "./node_modules/handsontable/node_modules/moment/locale/en-ca.js",
+	"./en-gb": "./node_modules/handsontable/node_modules/moment/locale/en-gb.js",
+	"./en-gb.js": "./node_modules/handsontable/node_modules/moment/locale/en-gb.js",
+	"./en-ie": "./node_modules/handsontable/node_modules/moment/locale/en-ie.js",
+	"./en-ie.js": "./node_modules/handsontable/node_modules/moment/locale/en-ie.js",
+	"./en-il": "./node_modules/handsontable/node_modules/moment/locale/en-il.js",
+	"./en-il.js": "./node_modules/handsontable/node_modules/moment/locale/en-il.js",
+	"./en-nz": "./node_modules/handsontable/node_modules/moment/locale/en-nz.js",
+	"./en-nz.js": "./node_modules/handsontable/node_modules/moment/locale/en-nz.js",
+	"./eo": "./node_modules/handsontable/node_modules/moment/locale/eo.js",
+	"./eo.js": "./node_modules/handsontable/node_modules/moment/locale/eo.js",
+	"./es": "./node_modules/handsontable/node_modules/moment/locale/es.js",
+	"./es-do": "./node_modules/handsontable/node_modules/moment/locale/es-do.js",
+	"./es-do.js": "./node_modules/handsontable/node_modules/moment/locale/es-do.js",
+	"./es-us": "./node_modules/handsontable/node_modules/moment/locale/es-us.js",
+	"./es-us.js": "./node_modules/handsontable/node_modules/moment/locale/es-us.js",
+	"./es.js": "./node_modules/handsontable/node_modules/moment/locale/es.js",
+	"./et": "./node_modules/handsontable/node_modules/moment/locale/et.js",
+	"./et.js": "./node_modules/handsontable/node_modules/moment/locale/et.js",
+	"./eu": "./node_modules/handsontable/node_modules/moment/locale/eu.js",
+	"./eu.js": "./node_modules/handsontable/node_modules/moment/locale/eu.js",
+	"./fa": "./node_modules/handsontable/node_modules/moment/locale/fa.js",
+	"./fa.js": "./node_modules/handsontable/node_modules/moment/locale/fa.js",
+	"./fi": "./node_modules/handsontable/node_modules/moment/locale/fi.js",
+	"./fi.js": "./node_modules/handsontable/node_modules/moment/locale/fi.js",
+	"./fo": "./node_modules/handsontable/node_modules/moment/locale/fo.js",
+	"./fo.js": "./node_modules/handsontable/node_modules/moment/locale/fo.js",
+	"./fr": "./node_modules/handsontable/node_modules/moment/locale/fr.js",
+	"./fr-ca": "./node_modules/handsontable/node_modules/moment/locale/fr-ca.js",
+	"./fr-ca.js": "./node_modules/handsontable/node_modules/moment/locale/fr-ca.js",
+	"./fr-ch": "./node_modules/handsontable/node_modules/moment/locale/fr-ch.js",
+	"./fr-ch.js": "./node_modules/handsontable/node_modules/moment/locale/fr-ch.js",
+	"./fr.js": "./node_modules/handsontable/node_modules/moment/locale/fr.js",
+	"./fy": "./node_modules/handsontable/node_modules/moment/locale/fy.js",
+	"./fy.js": "./node_modules/handsontable/node_modules/moment/locale/fy.js",
+	"./ga": "./node_modules/handsontable/node_modules/moment/locale/ga.js",
+	"./ga.js": "./node_modules/handsontable/node_modules/moment/locale/ga.js",
+	"./gd": "./node_modules/handsontable/node_modules/moment/locale/gd.js",
+	"./gd.js": "./node_modules/handsontable/node_modules/moment/locale/gd.js",
+	"./gl": "./node_modules/handsontable/node_modules/moment/locale/gl.js",
+	"./gl.js": "./node_modules/handsontable/node_modules/moment/locale/gl.js",
+	"./gom-latn": "./node_modules/handsontable/node_modules/moment/locale/gom-latn.js",
+	"./gom-latn.js": "./node_modules/handsontable/node_modules/moment/locale/gom-latn.js",
+	"./gu": "./node_modules/handsontable/node_modules/moment/locale/gu.js",
+	"./gu.js": "./node_modules/handsontable/node_modules/moment/locale/gu.js",
+	"./he": "./node_modules/handsontable/node_modules/moment/locale/he.js",
+	"./he.js": "./node_modules/handsontable/node_modules/moment/locale/he.js",
+	"./hi": "./node_modules/handsontable/node_modules/moment/locale/hi.js",
+	"./hi.js": "./node_modules/handsontable/node_modules/moment/locale/hi.js",
+	"./hr": "./node_modules/handsontable/node_modules/moment/locale/hr.js",
+	"./hr.js": "./node_modules/handsontable/node_modules/moment/locale/hr.js",
+	"./hu": "./node_modules/handsontable/node_modules/moment/locale/hu.js",
+	"./hu.js": "./node_modules/handsontable/node_modules/moment/locale/hu.js",
+	"./hy-am": "./node_modules/handsontable/node_modules/moment/locale/hy-am.js",
+	"./hy-am.js": "./node_modules/handsontable/node_modules/moment/locale/hy-am.js",
+	"./id": "./node_modules/handsontable/node_modules/moment/locale/id.js",
+	"./id.js": "./node_modules/handsontable/node_modules/moment/locale/id.js",
+	"./is": "./node_modules/handsontable/node_modules/moment/locale/is.js",
+	"./is.js": "./node_modules/handsontable/node_modules/moment/locale/is.js",
+	"./it": "./node_modules/handsontable/node_modules/moment/locale/it.js",
+	"./it-ch": "./node_modules/handsontable/node_modules/moment/locale/it-ch.js",
+	"./it-ch.js": "./node_modules/handsontable/node_modules/moment/locale/it-ch.js",
+	"./it.js": "./node_modules/handsontable/node_modules/moment/locale/it.js",
+	"./ja": "./node_modules/handsontable/node_modules/moment/locale/ja.js",
+	"./ja.js": "./node_modules/handsontable/node_modules/moment/locale/ja.js",
+	"./jv": "./node_modules/handsontable/node_modules/moment/locale/jv.js",
+	"./jv.js": "./node_modules/handsontable/node_modules/moment/locale/jv.js",
+	"./ka": "./node_modules/handsontable/node_modules/moment/locale/ka.js",
+	"./ka.js": "./node_modules/handsontable/node_modules/moment/locale/ka.js",
+	"./kk": "./node_modules/handsontable/node_modules/moment/locale/kk.js",
+	"./kk.js": "./node_modules/handsontable/node_modules/moment/locale/kk.js",
+	"./km": "./node_modules/handsontable/node_modules/moment/locale/km.js",
+	"./km.js": "./node_modules/handsontable/node_modules/moment/locale/km.js",
+	"./kn": "./node_modules/handsontable/node_modules/moment/locale/kn.js",
+	"./kn.js": "./node_modules/handsontable/node_modules/moment/locale/kn.js",
+	"./ko": "./node_modules/handsontable/node_modules/moment/locale/ko.js",
+	"./ko.js": "./node_modules/handsontable/node_modules/moment/locale/ko.js",
+	"./ku": "./node_modules/handsontable/node_modules/moment/locale/ku.js",
+	"./ku.js": "./node_modules/handsontable/node_modules/moment/locale/ku.js",
+	"./ky": "./node_modules/handsontable/node_modules/moment/locale/ky.js",
+	"./ky.js": "./node_modules/handsontable/node_modules/moment/locale/ky.js",
+	"./lb": "./node_modules/handsontable/node_modules/moment/locale/lb.js",
+	"./lb.js": "./node_modules/handsontable/node_modules/moment/locale/lb.js",
+	"./lo": "./node_modules/handsontable/node_modules/moment/locale/lo.js",
+	"./lo.js": "./node_modules/handsontable/node_modules/moment/locale/lo.js",
+	"./lt": "./node_modules/handsontable/node_modules/moment/locale/lt.js",
+	"./lt.js": "./node_modules/handsontable/node_modules/moment/locale/lt.js",
+	"./lv": "./node_modules/handsontable/node_modules/moment/locale/lv.js",
+	"./lv.js": "./node_modules/handsontable/node_modules/moment/locale/lv.js",
+	"./me": "./node_modules/handsontable/node_modules/moment/locale/me.js",
+	"./me.js": "./node_modules/handsontable/node_modules/moment/locale/me.js",
+	"./mi": "./node_modules/handsontable/node_modules/moment/locale/mi.js",
+	"./mi.js": "./node_modules/handsontable/node_modules/moment/locale/mi.js",
+	"./mk": "./node_modules/handsontable/node_modules/moment/locale/mk.js",
+	"./mk.js": "./node_modules/handsontable/node_modules/moment/locale/mk.js",
+	"./ml": "./node_modules/handsontable/node_modules/moment/locale/ml.js",
+	"./ml.js": "./node_modules/handsontable/node_modules/moment/locale/ml.js",
+	"./mn": "./node_modules/handsontable/node_modules/moment/locale/mn.js",
+	"./mn.js": "./node_modules/handsontable/node_modules/moment/locale/mn.js",
+	"./mr": "./node_modules/handsontable/node_modules/moment/locale/mr.js",
+	"./mr.js": "./node_modules/handsontable/node_modules/moment/locale/mr.js",
+	"./ms": "./node_modules/handsontable/node_modules/moment/locale/ms.js",
+	"./ms-my": "./node_modules/handsontable/node_modules/moment/locale/ms-my.js",
+	"./ms-my.js": "./node_modules/handsontable/node_modules/moment/locale/ms-my.js",
+	"./ms.js": "./node_modules/handsontable/node_modules/moment/locale/ms.js",
+	"./mt": "./node_modules/handsontable/node_modules/moment/locale/mt.js",
+	"./mt.js": "./node_modules/handsontable/node_modules/moment/locale/mt.js",
+	"./my": "./node_modules/handsontable/node_modules/moment/locale/my.js",
+	"./my.js": "./node_modules/handsontable/node_modules/moment/locale/my.js",
+	"./nb": "./node_modules/handsontable/node_modules/moment/locale/nb.js",
+	"./nb.js": "./node_modules/handsontable/node_modules/moment/locale/nb.js",
+	"./ne": "./node_modules/handsontable/node_modules/moment/locale/ne.js",
+	"./ne.js": "./node_modules/handsontable/node_modules/moment/locale/ne.js",
+	"./nl": "./node_modules/handsontable/node_modules/moment/locale/nl.js",
+	"./nl-be": "./node_modules/handsontable/node_modules/moment/locale/nl-be.js",
+	"./nl-be.js": "./node_modules/handsontable/node_modules/moment/locale/nl-be.js",
+	"./nl.js": "./node_modules/handsontable/node_modules/moment/locale/nl.js",
+	"./nn": "./node_modules/handsontable/node_modules/moment/locale/nn.js",
+	"./nn.js": "./node_modules/handsontable/node_modules/moment/locale/nn.js",
+	"./pa-in": "./node_modules/handsontable/node_modules/moment/locale/pa-in.js",
+	"./pa-in.js": "./node_modules/handsontable/node_modules/moment/locale/pa-in.js",
+	"./pl": "./node_modules/handsontable/node_modules/moment/locale/pl.js",
+	"./pl.js": "./node_modules/handsontable/node_modules/moment/locale/pl.js",
+	"./pt": "./node_modules/handsontable/node_modules/moment/locale/pt.js",
+	"./pt-br": "./node_modules/handsontable/node_modules/moment/locale/pt-br.js",
+	"./pt-br.js": "./node_modules/handsontable/node_modules/moment/locale/pt-br.js",
+	"./pt.js": "./node_modules/handsontable/node_modules/moment/locale/pt.js",
+	"./ro": "./node_modules/handsontable/node_modules/moment/locale/ro.js",
+	"./ro.js": "./node_modules/handsontable/node_modules/moment/locale/ro.js",
+	"./ru": "./node_modules/handsontable/node_modules/moment/locale/ru.js",
+	"./ru.js": "./node_modules/handsontable/node_modules/moment/locale/ru.js",
+	"./sd": "./node_modules/handsontable/node_modules/moment/locale/sd.js",
+	"./sd.js": "./node_modules/handsontable/node_modules/moment/locale/sd.js",
+	"./se": "./node_modules/handsontable/node_modules/moment/locale/se.js",
+	"./se.js": "./node_modules/handsontable/node_modules/moment/locale/se.js",
+	"./si": "./node_modules/handsontable/node_modules/moment/locale/si.js",
+	"./si.js": "./node_modules/handsontable/node_modules/moment/locale/si.js",
+	"./sk": "./node_modules/handsontable/node_modules/moment/locale/sk.js",
+	"./sk.js": "./node_modules/handsontable/node_modules/moment/locale/sk.js",
+	"./sl": "./node_modules/handsontable/node_modules/moment/locale/sl.js",
+	"./sl.js": "./node_modules/handsontable/node_modules/moment/locale/sl.js",
+	"./sq": "./node_modules/handsontable/node_modules/moment/locale/sq.js",
+	"./sq.js": "./node_modules/handsontable/node_modules/moment/locale/sq.js",
+	"./sr": "./node_modules/handsontable/node_modules/moment/locale/sr.js",
+	"./sr-cyrl": "./node_modules/handsontable/node_modules/moment/locale/sr-cyrl.js",
+	"./sr-cyrl.js": "./node_modules/handsontable/node_modules/moment/locale/sr-cyrl.js",
+	"./sr.js": "./node_modules/handsontable/node_modules/moment/locale/sr.js",
+	"./ss": "./node_modules/handsontable/node_modules/moment/locale/ss.js",
+	"./ss.js": "./node_modules/handsontable/node_modules/moment/locale/ss.js",
+	"./sv": "./node_modules/handsontable/node_modules/moment/locale/sv.js",
+	"./sv.js": "./node_modules/handsontable/node_modules/moment/locale/sv.js",
+	"./sw": "./node_modules/handsontable/node_modules/moment/locale/sw.js",
+	"./sw.js": "./node_modules/handsontable/node_modules/moment/locale/sw.js",
+	"./ta": "./node_modules/handsontable/node_modules/moment/locale/ta.js",
+	"./ta.js": "./node_modules/handsontable/node_modules/moment/locale/ta.js",
+	"./te": "./node_modules/handsontable/node_modules/moment/locale/te.js",
+	"./te.js": "./node_modules/handsontable/node_modules/moment/locale/te.js",
+	"./tet": "./node_modules/handsontable/node_modules/moment/locale/tet.js",
+	"./tet.js": "./node_modules/handsontable/node_modules/moment/locale/tet.js",
+	"./tg": "./node_modules/handsontable/node_modules/moment/locale/tg.js",
+	"./tg.js": "./node_modules/handsontable/node_modules/moment/locale/tg.js",
+	"./th": "./node_modules/handsontable/node_modules/moment/locale/th.js",
+	"./th.js": "./node_modules/handsontable/node_modules/moment/locale/th.js",
+	"./tl-ph": "./node_modules/handsontable/node_modules/moment/locale/tl-ph.js",
+	"./tl-ph.js": "./node_modules/handsontable/node_modules/moment/locale/tl-ph.js",
+	"./tlh": "./node_modules/handsontable/node_modules/moment/locale/tlh.js",
+	"./tlh.js": "./node_modules/handsontable/node_modules/moment/locale/tlh.js",
+	"./tr": "./node_modules/handsontable/node_modules/moment/locale/tr.js",
+	"./tr.js": "./node_modules/handsontable/node_modules/moment/locale/tr.js",
+	"./tzl": "./node_modules/handsontable/node_modules/moment/locale/tzl.js",
+	"./tzl.js": "./node_modules/handsontable/node_modules/moment/locale/tzl.js",
+	"./tzm": "./node_modules/handsontable/node_modules/moment/locale/tzm.js",
+	"./tzm-latn": "./node_modules/handsontable/node_modules/moment/locale/tzm-latn.js",
+	"./tzm-latn.js": "./node_modules/handsontable/node_modules/moment/locale/tzm-latn.js",
+	"./tzm.js": "./node_modules/handsontable/node_modules/moment/locale/tzm.js",
+	"./ug-cn": "./node_modules/handsontable/node_modules/moment/locale/ug-cn.js",
+	"./ug-cn.js": "./node_modules/handsontable/node_modules/moment/locale/ug-cn.js",
+	"./uk": "./node_modules/handsontable/node_modules/moment/locale/uk.js",
+	"./uk.js": "./node_modules/handsontable/node_modules/moment/locale/uk.js",
+	"./ur": "./node_modules/handsontable/node_modules/moment/locale/ur.js",
+	"./ur.js": "./node_modules/handsontable/node_modules/moment/locale/ur.js",
+	"./uz": "./node_modules/handsontable/node_modules/moment/locale/uz.js",
+	"./uz-latn": "./node_modules/handsontable/node_modules/moment/locale/uz-latn.js",
+	"./uz-latn.js": "./node_modules/handsontable/node_modules/moment/locale/uz-latn.js",
+	"./uz.js": "./node_modules/handsontable/node_modules/moment/locale/uz.js",
+	"./vi": "./node_modules/handsontable/node_modules/moment/locale/vi.js",
+	"./vi.js": "./node_modules/handsontable/node_modules/moment/locale/vi.js",
+	"./x-pseudo": "./node_modules/handsontable/node_modules/moment/locale/x-pseudo.js",
+	"./x-pseudo.js": "./node_modules/handsontable/node_modules/moment/locale/x-pseudo.js",
+	"./yo": "./node_modules/handsontable/node_modules/moment/locale/yo.js",
+	"./yo.js": "./node_modules/handsontable/node_modules/moment/locale/yo.js",
+	"./zh-cn": "./node_modules/handsontable/node_modules/moment/locale/zh-cn.js",
+	"./zh-cn.js": "./node_modules/handsontable/node_modules/moment/locale/zh-cn.js",
+	"./zh-hk": "./node_modules/handsontable/node_modules/moment/locale/zh-hk.js",
+	"./zh-hk.js": "./node_modules/handsontable/node_modules/moment/locale/zh-hk.js",
+	"./zh-tw": "./node_modules/handsontable/node_modules/moment/locale/zh-tw.js",
+	"./zh-tw.js": "./node_modules/handsontable/node_modules/moment/locale/zh-tw.js"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./node_modules/handsontable/node_modules/moment/locale sync recursive ^\\.\\/.*$";
+
+/***/ }),
+
 /***/ "./node_modules/moment/locale sync recursive ^\\.\\/.*$":
 /*!**************************************************!*\
   !*** ./node_modules/moment/locale sync ^\.\/.*$ ***!
@@ -479,6 +765,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _component_BoardGameView__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./component/BoardGameView */ "./src/component/BoardGameView.tsx");
 /* harmony import */ var _AppTypes__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./AppTypes */ "./src/AppTypes.ts");
 /* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./util/BrowserUtil */ "./src/util/BrowserUtil.ts");
+/* harmony import */ var _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./component/ScoreSheetController */ "./src/component/ScoreSheetController.ts");
+/* harmony import */ var _component_ScoreSheetView__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./component/ScoreSheetView */ "./src/component/ScoreSheetView.ts");
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -502,11 +790,14 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+
 var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('app');
 
 var Root = /*#__PURE__*/function (_React$Component) {
   _inheritsLoose(Root, _React$Component);
 
+  // @ts-ignore
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
@@ -539,7 +830,8 @@ var Root = /*#__PURE__*/function (_React$Component) {
         scores: 'scores',
         selectedEntry: 'selectedEntry',
         recentUserSearches: 'recentUserSearches',
-        bggSearchResults: 'bggSearchResults'
+        bggSearchResults: 'bggSearchResults',
+        scoreSheet: 'scoreSheet'
       },
       apis: {
         login: '/login',
@@ -737,6 +1029,20 @@ var Root = /*#__PURE__*/function (_React$Component) {
             imgElementType: 'img',
             imgClasses: 'card-img'
           }
+        },
+        scoreSheet: {
+          dom: {
+            dropZone: "scoreSheetZone",
+            boardGame: "selectedBoardGame",
+            startStopTimer: "startStopTimer",
+            timer: "timerDisplay",
+            end: "leaveScoreSheet",
+            scoreSheet: "scoreSheet",
+            iconStart: "<i class='fas fa-hourglass-start'></i>",
+            iconInProgress: "<i class='fas fa-hourglass-half'></i>",
+            iconEnd: "<i class='fas fa-hourglass-end'></i>",
+            iconLeave: "<i class='fas fa-sign-out-alt'></i>"
+          }
         }
       },
       uiPrefs: {
@@ -885,7 +1191,17 @@ var Root = /*#__PURE__*/function (_React$Component) {
   };
 
   _proto.handleStartScoreSheet = function handleStartScoreSheet(event) {
-    event.preventDefault();
+    event.preventDefault(); // do we already have an active score sheet?
+
+    if (_component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_10__["ScoreSheetController"].getInstance().hasActiveScoreSheet()) {
+      if (confirm("You already have an active score sheet, do you want to finish that one and start a new one?")) {
+        _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_10__["ScoreSheetController"].getInstance().endScoreSheet();
+      } else {
+        // user cancelled, finish
+        return;
+      }
+    }
+
     this.hideAllSideBars(); // @ts-ignore
 
     var id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
@@ -902,7 +1218,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
 
       if (index >= 0) {
         var boardGame = currentBoardGamesOnDisplay[index];
-        XXXX;
+        logger(boardGame);
+        _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_10__["ScoreSheetController"].getInstance().startScoreSheet(boardGame);
+        this.switchBetweenCollectionAndScoreSheet(false);
       }
     }
   };
@@ -959,7 +1277,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
               this.userSearchView = new _component_UserSearchSidebarView__WEBPACK_IMPORTED_MODULE_4__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getStateManager());
               this.userSearchView.onDocumentLoaded();
               this.bggSearchView = new _component_BoardGameSearchSidebarView__WEBPACK_IMPORTED_MODULE_6__["default"](this, document, _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].getStateManager());
-              this.bggSearchView.onDocumentLoaded(); // navigation item handlers
+              this.bggSearchView.onDocumentLoaded();
+              this.scoreSheetView = _component_ScoreSheetView__WEBPACK_IMPORTED_MODULE_11__["ScoreSheetView"].getInstance();
+              this.scoreSheetView.onDocumentLoaded(this); // navigation item handlers
 
               if (document) {
                 // @ts-ignore
@@ -1003,9 +1323,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
               } // ok lets try get things done
 
 
+              _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_10__["ScoreSheetController"].getInstance().initialise(this);
               _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].initialise();
 
-            case 21:
+            case 24:
             case "end":
               return _context.stop();
           }
@@ -1033,10 +1354,12 @@ var Root = /*#__PURE__*/function (_React$Component) {
       if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none hidden', true);
       if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block visible', false);
     } else {
-      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none hidden', true);
-      if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block visible', false);
-      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none hidden', false);
-      if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block visible', true);
+      if (_component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_10__["ScoreSheetController"].getInstance().hasActiveScoreSheet()) {
+        if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-none hidden', true);
+        if (this.thisEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.thisEl, 'd-block visible', false);
+        if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-none hidden', false);
+        if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_9__["default"].addRemoveClasses(this.scoreSheetEl, 'd-block visible', true);
+      }
     }
   };
 
@@ -1093,7 +1416,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
 
 
-localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail';
+localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -1255,8 +1578,9 @@ var Controller = /*#__PURE__*/function () {
       var chatManager = _socket_ChatManager__WEBPACK_IMPORTED_MODULE_7__["ChatManager"].getInstance(); // this connects the manager to the socket system
       // setup the chat notification system
 
-      var chatNotificationController = _socket_NotificationController__WEBPACK_IMPORTED_MODULE_8__["NotificationController"].getInstance();
+      _socket_NotificationController__WEBPACK_IMPORTED_MODULE_8__["NotificationController"].getInstance();
       chatManager.setCurrentUser(this.getLoggedInUsername());
+      _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_13__["ScoreSheetController"].getInstance().setCurrentUser(this.getLoggedInUsername());
       chatManager.login(); // load the users
 
       this.getStateManager().getStateByName(this.config.stateNames.users);
@@ -1567,20 +1891,6 @@ var Controller = /*#__PURE__*/function () {
 
     cLoggerDetail(boardGame);
     return boardGame;
-  };
-
-  _proto.startScoreSheet = function startScoreSheet(invite) {
-    _component_ScoreSheetController__WEBPACK_IMPORTED_MODULE_13__["ScoreSheetController"].getInstance().setupScoreSheet(this.applicationView, invite);
-  };
-
-  _proto.askUserAboutInvitation = function askUserAboutInvitation(invite) {
-    var result = confirm("You have been invited by user " + invite.from + " to joint a chat room for the board game " + invite.subject + " score sheet"); // let the application know to setup for a new scoresheet
-
-    if (result) {
-      this.startScoreSheet(invite);
-    }
-
-    return result;
   };
 
   _proto.callbackAddToCollection = function callbackAddToCollection(data, status, associatedStateName) {
@@ -2954,6 +3264,8 @@ var ChatSidebarView = /*#__PURE__*/function (_SidebarView) {
     return "";
   };
 
+  _proto.handleInvitationDeclined = function handleInvitationDeclined(room, username) {};
+
   return ChatSidebarView;
 }(_SidebarView__WEBPACK_IMPORTED_MODULE_1__["default"]);
 
@@ -2974,11 +3286,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _socket_Types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../socket/Types */ "./src/socket/Types.ts");
-/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
-/* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../notification/NotificationManager */ "./src/notification/NotificationManager.ts");
+/* harmony import */ var _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../notification/NotificationManager */ "./src/notification/NotificationManager.ts");
+/* harmony import */ var _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ScoreSheetView */ "./src/component/ScoreSheetView.ts");
 /* harmony import */ var _util_UUID__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/UUID */ "./src/util/UUID.ts");
 /* harmony import */ var _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../socket/SocketManager */ "./src/socket/SocketManager.ts");
 /* harmony import */ var _socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../socket/ChatManager */ "./src/socket/ChatManager.ts");
+/* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_8__);
+
+
 
 
 
@@ -3003,9 +3320,47 @@ var ScoreSheetController = /*#__PURE__*/function () {
     this.currentlySelectedBoardGame = null;
     this.currentScoreSheet = null;
     this.currentUsername = '';
+    this.isRoomCreator = false;
+    this.currentUsersInScoreSheet = [];
+    this.intervalTimer = -1;
+    this.stateManager = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_7__["default"](true);
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].addChatReceiver(this); // bind events
+
+    this.receiveLogin = this.receiveLogin.bind(this);
+    this.receiveLogout = this.receiveLogout.bind(this);
+    this.receiveInvitation = this.receiveInvitation.bind(this);
+    this.receiveMessage = this.receiveMessage.bind(this);
+    this.receiveQueuedMessages = this.receiveQueuedMessages.bind(this);
+    this.receiveQueuedInvites = this.receiveQueuedInvites.bind(this);
+    this.receiveJoinedRoom = this.receiveJoinedRoom.bind(this);
+    this.receivedLeftRoom = this.receivedLeftRoom.bind(this); // reset state
+
+    this.reset();
   }
 
   var _proto = ScoreSheetController.prototype;
+
+  _proto.reset = function reset() {
+    this.currentScoreRoom = null;
+    this.currentScoreSheet = null;
+    this.currentlySelectedBoardGame = null;
+    this.isRoomCreator = false;
+    this.currentUsersInScoreSheet = [];
+  };
+
+  _proto.isTimerGoing = function isTimerGoing() {
+    var result = false;
+
+    if (this.currentScoreSheet) {
+      result = this.currentScoreSheet.timerGoing;
+    }
+
+    return result;
+  };
+
+  _proto.getStateManager = function getStateManager() {
+    return this.stateManager;
+  };
 
   _proto.receiveLogin = function receiveLogin(username) {};
 
@@ -3020,48 +3375,68 @@ var ScoreSheetController = /*#__PURE__*/function () {
     return this.currentUsername;
   };
 
-  _proto.initialise = function initialise(view) {
-    this.scoreSheetView = view;
+  _proto.initialise = function initialise(applicationView) {
+    this.applicationView = applicationView;
+  };
+
+  _proto.isLoggedIn = function isLoggedIn() {
+    return this.getCurrentUser().trim().length > 0;
   };
 
   _proto.receiveInvitation = function receiveInvitation(invite) {
-    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+    if (!this.isLoggedIn()) return; // we are not logged in
+
+    if (invite.type !== _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet) return; //ignore non-score sheets
 
     if (_socket_ChatManager__WEBPACK_IMPORTED_MODULE_6__["ChatManager"].getInstance().isUserInBlockedList(invite.from)) {
       sscLogger("Received invite from blocked user - ignoring");
       return;
-    } // is this a chat room or score sheet?
+    } // are we already in a scoresheet?
 
 
-    if (invite.type === _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ChatRoom) return; // ignore chat rooms
+    if (this.currentScoreRoom) {
+      // are we already in this score sheet?
+      if (this.currentScoreRoom !== invite.room) {
+        // decline the invite, only one score sheet at a time
+        sscLogger("Received invite - already in score sheet - declining");
+        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendDeclineInvite(invite.room, this.getCurrentUser()); // user declines to join the scoresheet
+      }
+    }
 
     if (invite.requiresAcceptDecline) {
       // notify the user of the invitation
-      if (!_Controller__WEBPACK_IMPORTED_MODULE_2__["default"].askUserAboutInvitation(invite)) {
-        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendDeclineInvite(invite.room, this.getCurrentUser());
+      if (!this.askUserAboutInvitation(invite)) {
+        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendDeclineInvite(invite.room, this.getCurrentUser()); // user declines to join the scoresheet
       }
 
-      ; // user declines to join the scoresheet
-    } else {
-      // notify the user of the new chat
-      _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_3__["default"].show('Score Sheet', "Joining score sheet", 'info', 7000);
-      _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), invite.room);
-      this.currentScoreRoom = invite.room; // change to the score sheet
+      ;
+    } // notify the user of the new chat
 
-      this.applicationView.handleShowScoreSheet(null);
-    }
+
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show('Score Sheet', "Joining score sheet", 'info', 7000);
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), invite.room);
+    this.currentScoreRoom = invite.room; // change to the score sheet
+
+    this.applicationView.handleShowScoreSheet(null);
+  };
+
+  _proto.askUserAboutInvitation = function askUserAboutInvitation(invite) {
+    return confirm("You have been invited by user " + invite.from + " to joint a chat room for the board game " + invite.subject + " score sheet");
   };
 
   _proto.receiveQueuedMessages = function receiveQueuedMessages(messages) {
     var _this = this;
 
-    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+    if (!this.isLoggedIn()) return; // we are not logged in
 
     if (!this.currentScoreRoom) return; // we are not in a room
 
     messages.forEach(function (message) {
-      if (_this.currentScoreRoom === message.room) {
-        _this.receiveMessage(message);
+      if (message.type === _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet) {
+        // only process offline messages for scoresheet and our current room
+        if (_this.currentScoreRoom === message.room) {
+          _this.receiveMessage(message);
+        }
       }
     });
   };
@@ -3069,56 +3444,172 @@ var ScoreSheetController = /*#__PURE__*/function () {
   _proto.receiveQueuedInvites = function receiveQueuedInvites(invites) {// not implemented, the user needs to be online for a scoresheet
   };
 
-  _proto.receiveJoinedRoom = function receiveJoinedRoom(users) {
-    if (this.currentScoreRoom !== users.room) return; // update the sheet to include the user
+  _proto.receiveDecline = function receiveDecline(room, username) {
+    if (this.currentScoreRoom) {
+      if (this.currentScoreRoom === room) {
+        _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show('Score Sheet', "User " + username + " declined the invitation.", 'warning');
+      }
+    }
+  };
 
-    XXX;
+  _proto.receiveJoinedRoom = function receiveJoinedRoom(users) {
+    if (!this.isLoggedIn()) return; // we are not logged in
+
+    if (this.currentScoreRoom !== users.room) return;
+    sscLogger("Handling user joined " + users.username); // update the sheet to include the user
+
+    var index = this.currentUsersInScoreSheet.findIndex(function (username) {
+      return username === users.username;
+    });
+
+    if (index < 0) {
+      this.currentUsersInScoreSheet.push(users.username); // update the sheet data
+
+      this.addUserToScoreSheet(users.username); // the owner of the sheet should send a sync message of the data
+
+      if (this.isRoomCreator && this.currentScoreSheet) {
+        sscLogger("Handling user joined " + users.username + " - sending");
+        this.sendScoreSheetState(this.currentScoreSheet, false);
+      }
+    }
   };
 
   _proto.receivedLeftRoom = function receivedLeftRoom(users) {
+    if (!this.isLoggedIn()) return; // we are not logged in
+
     if (this.currentScoreRoom !== users.room) return; // update the sheet to remove the user
+
+    sscLogger("Handling user left " + users.username);
+    var index = this.currentUsersInScoreSheet.findIndex(function (username) {
+      return username === users.username;
+    });
+
+    if (index >= 0) {
+      this.currentUsersInScoreSheet.splice(index, 1); // update the sheet data
+
+      this.removeUserFromScoreSheet(users.username); // the owner of the sheet should send a sync message of the data
+
+      if (this.isRoomCreator && this.currentScoreSheet) {
+        sscLogger("Handling user left " + users.username + " - sending");
+        this.sendScoreSheetState(this.currentScoreSheet, false);
+      }
+    }
   };
 
   _proto.receiveUserList = function receiveUserList(users) {} // will be managed in the transfer of sheet data
   ;
 
   _proto.endScoreSheet = function endScoreSheet() {
-    alert('Implement end score sheet'); // send the final score to everyone
+    // this can only be done by the room creator
+    // send the final score to everyone
+    sscLogger("Handling end of score sheet");
 
-    if (_Controller__WEBPACK_IMPORTED_MODULE_2__["default"].isLoggedIn()) {
-      if (this.currentScoreRoom) {
-        this.sendScoreSheetState(true);
+    if (this.isLoggedIn()) {
+      if (this.currentScoreRoom && this.currentScoreSheet) {
+        sscLogger("Handling end of score sheet - sending");
+        this.sendScoreSheetState(this.currentScoreSheet, true); // if we are logged in and the scoresheet creator then we need to save the score sheet to the selected board game
+
+        if (this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet); // reset the controller
+
+        this.reset();
+        this.applicationView.switchBetweenCollectionAndScoreSheet(true);
       }
     }
   };
 
+  _proto.saveScoreSheetToBoardGame = function saveScoreSheetToBoardGame(scoreSheet) {
+    alert("Implement save");
+  };
+
   _proto.getDefaultScoreSheetTemplate = function getDefaultScoreSheetTemplate(boardGame) {
-    return {};
-    XXXX;
+    return {
+      //width:'90%',
+      //height:'90%',
+      colHeaders: false,
+      rowHeaders: true,
+      licenseKey: 'non-commercial-and-evaluation',
+      manualColumnResize: false,
+      manualRowResize: false,
+      selectionMode: 'single',
+      columnSummary: [{
+        destinationRow: 0,
+        destinationColumn: 0,
+        reversedRowCoords: true,
+        type: 'sum',
+        forceNumeric: true
+      }, {
+        destinationRow: 0,
+        destinationColumn: 1,
+        reversedRowCoords: true,
+        type: 'sum',
+        forceNumeric: true
+      }, {
+        destinationRow: 0,
+        destinationColumn: 2,
+        reversedRowCoords: true,
+        type: 'sum',
+        forceNumeric: true
+      }, {
+        destinationRow: 0,
+        destinationColumn: 3,
+        reversedRowCoords: true,
+        type: 'sum',
+        forceNumeric: true
+      }, {
+        destinationRow: 0,
+        destinationColumn: 4,
+        reversedRowCoords: true,
+        type: 'sum',
+        forceNumeric: true
+      }, {
+        destinationRow: 0,
+        destinationColumn: 5,
+        reversedRowCoords: true,
+        type: 'sum',
+        forceNumeric: true
+      }, {
+        destinationRow: 0,
+        destinationColumn: 6,
+        reversedRowCoords: true,
+        type: 'sum',
+        forceNumeric: true
+      }]
+    };
+  };
+
+  _proto.getDefaultScoreSheetStartingData = function getDefaultScoreSheetStartingData(boardGame) {
+    return [['P 1', 'P 2', 'P 3', 'P 4', 'P 5', 'P 6', 'P 7'], ['0', '0', '0', '0', '0', '0', '0'], ['0', '0', '0', '0', '0', '0', '0'], ['0', '0', '0', '0', '0', '0', '0'], ['0', '0', '0', '0', '0', '0', '0'], ['0', '0', '0', '0', '0', '0', '0'], ['0', '0', '0', '0', '0', '0', '0']];
   };
 
   _proto.getScoreSheetTemplate = function getScoreSheetTemplate(boardGame) {
-    return {};
-    XXXX;
+    return this.getDefaultScoreSheetTemplate(boardGame);
+  };
+
+  _proto.getScoreSheetStartingData = function getScoreSheetStartingData(boardGame) {
+    return this.getDefaultScoreSheetStartingData(boardGame);
   };
 
   _proto.startScoreSheet = function startScoreSheet(boardGame) {
     if (boardGame) {
       sscLogger("Starting score sheet for " + boardGame.name);
       this.currentlySelectedBoardGame = boardGame;
+      if (this.isLoggedIn()) this.currentUsersInScoreSheet = [this.getCurrentUser()];
+      this.isRoomCreator = true;
       this.currentScoreRoom = _util_UUID__WEBPACK_IMPORTED_MODULE_4__["default"].getUniqueId();
       this.currentScoreSheet = {
         room: this.currentScoreRoom,
         boardGameName: boardGame.name,
-        sheetLayoutOptions: {},
+        sheetLayoutOptions: this.getScoreSheetTemplate(boardGame),
         timer: 0,
-        sheetData: {},
+        timerGoing: false,
+        data: this.getScoreSheetStartingData(boardGame),
         isFinished: false
-      }; // start a new chat room, will automatically manage if logged in or not
+      };
+      sscLogger(this.currentScoreSheet); // store the score sheet locally
 
-      if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+      this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, true); // start a new chat room, will automatically manage if logged in or not
 
-      _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), this.currentScoreRoom);
+      if (this.isLoggedIn()) _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), this.currentScoreRoom);
     }
   };
 
@@ -3129,17 +3620,19 @@ var ScoreSheetController = /*#__PURE__*/function () {
   };
 
   _proto.inviteUser = function inviteUser(username) {
+    if (!this.isLoggedIn()) return; // we are not logged in
     // only the user who created the score sheet can do this as they are the only ones with a selected board game
-    if (this.currentScoreRoom && this.currentlySelectedBoardGame) {
-      sscLogger("Inviting user " + username + " to score sheet");
-      if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
+    if (this.currentScoreRoom && this.currentlySelectedBoardGame && this.isRoomCreator) {
+      sscLogger("Inviting user " + username + " to score sheet");
       _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendInvite(this.getCurrentUser(), username, this.currentScoreRoom, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet, true, this.currentlySelectedBoardGame.name);
     }
   };
 
   _proto.receiveMessage = function receiveMessage(message) {
-    if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
+    if (!this.isLoggedIn()) return; // we are not logged in
+
+    if (message.type !== _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet) return; //ignore non-score sheets
 
     if (this.currentScoreRoom) {
       // are we in a room?
@@ -3156,22 +3649,381 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
         if (message.attachment) {
           // the attachment should be a ScoreSheet object
-          var scoreSheet = message.attachment;
-          XXX;
+          var scoreSheet = message.attachment; // only update the scoresheet if the timer value is higher from the attachement
+          // @ts-ignore
+
+          if (scoreSheet.timer > this.currentScoreSheet.timer) {
+            if (this.currentScoreSheet) {
+              this.currentScoreSheet.data = scoreSheet.data;
+              this.currentScoreSheet.timer = scoreSheet.timer;
+              this.currentScoreSheet.timerGoing = scoreSheet.timerGoing;
+            }
+          } // save the new state
+
+
+          this.saveCurrentScoreSheet();
         }
       }
     }
   };
 
-  _proto.sendScoreSheetState = function sendScoreSheetState(isFinished) {
+  _proto.isSheetOwner = function isSheetOwner() {
+    return this.isRoomCreator;
+  };
+
+  _proto.saveCurrentScoreSheet = function saveCurrentScoreSheet() {
+    this.currentScoreSheet = this.createScoreSheetFromTable();
+    this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, false);
+  };
+
+  _proto.createScoreSheetFromTable = function createScoreSheetFromTable() {
+    var scoreSheet = null;
+    var tableData = _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().getTableData();
+
+    if (this.currentScoreSheet && this.currentScoreRoom) {
+      scoreSheet = {
+        room: this.currentScoreRoom,
+        data: tableData,
+        boardGameName: this.currentlySelectedBoardGame.name,
+        timer: this.currentScoreSheet.timer,
+        sheetLayoutOptions: null,
+        timerGoing: this.currentScoreSheet.timerGoing,
+        isFinished: false
+      };
+    }
+
+    return scoreSheet;
+  };
+
+  _proto.sendScoreSheetState = function sendScoreSheetState(scoreSheet, isFinished) {
     if (isFinished === void 0) {
       isFinished = false;
     }
 
-    XXX;
+    if (this.currentScoreRoom && this.currentlySelectedBoardGame && this.isLoggedIn()) {
+      var created = parseInt(moment__WEBPACK_IMPORTED_MODULE_8___default()().format('YYYYMMDDHHmmss')); // @ts-ignore
+
+      _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendMessage(this.getCurrentUser(), this.currentScoreRoom, 'data', created, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["Priority"].Normal, scoreSheet);
+    }
+  };
+
+  _proto.addUserToScoreSheet = function addUserToScoreSheet(username) {// TO DO
+  };
+
+  _proto.removeUserFromScoreSheet = function removeUserFromScoreSheet(username) {// TO DO
+  };
+
+  _proto.startTimer = function startTimer() {
+    var _this2 = this;
+
+    sscLogger("Handling pause timer");
+    if (!this.currentScoreSheet) return;
+    this.currentScoreSheet.timerGoing = true;
+    this.intervalTimer = setInterval(function () {
+      if (_this2.currentScoreSheet && _this2.currentScoreSheet.timerGoing) {
+        _this2.currentScoreSheet.timer++;
+        _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().updateTimer(_this2.currentScoreSheet.timer, _this2.currentScoreSheet.timerGoing);
+      } else {
+        if (_this2.currentScoreSheet) _this2.currentScoreSheet.timerGoing = false;
+      }
+    }, 1000);
+
+    if (this.isLoggedIn() && this.currentScoreSheet) {
+      // start the timer for everyone
+      sscLogger("Handling pause timer - sending score sheet");
+      this.sendScoreSheetState(this.currentScoreSheet, false);
+    }
+  };
+
+  _proto.pauseTimer = function pauseTimer() {
+    sscLogger("Handling pause timer");
+
+    if (this.intervalTimer > 0) {
+      clearInterval(this.intervalTimer);
+      if (this.currentScoreSheet) this.currentScoreSheet.timerGoing = false; // ask everyone to pause their timers
+
+      if (this.isLoggedIn() && this.currentScoreSheet) {
+        sscLogger("Handling pause timer - updating all users");
+        this.sendScoreSheetState(this.currentScoreSheet, false);
+      }
+    }
+  };
+
+  _proto.userChangedValue = function userChangedValue(value) {
+    var scoreSheet = this.createScoreSheetFromTable();
+    sscLogger("Handling user changed Value");
+    sscLogger(value);
+    sscLogger(scoreSheet);
+
+    if (scoreSheet) {
+      this.currentScoreSheet = scoreSheet;
+
+      if (this.isLoggedIn()) {
+        sscLogger("Handling user change - updating all users");
+        this.sendScoreSheetState(scoreSheet, false);
+      }
+    }
+  };
+
+  _proto.leave = function leave() {
+    sscLogger("Handling user leaving");
+
+    if (this.currentScoreSheet && this.currentScoreRoom) {
+      if (this.isLoggedIn()) {
+        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].leaveChat(this.getCurrentUser(), this.currentScoreRoom);
+      }
+    }
   };
 
   return ScoreSheetController;
+}();
+
+/***/ }),
+
+/***/ "./src/component/ScoreSheetView.ts":
+/*!*****************************************!*\
+  !*** ./src/component/ScoreSheetView.ts ***!
+  \*****************************************/
+/*! exports provided: ScoreSheetView */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ScoreSheetView", function() { return ScoreSheetView; });
+/* harmony import */ var _ScoreSheetController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ScoreSheetController */ "./src/component/ScoreSheetController.ts");
+/* harmony import */ var handsontable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! handsontable */ "./node_modules/handsontable/index.mjs");
+/* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/BrowserUtil */ "./src/util/BrowserUtil.ts");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+var ssvLogger = debug__WEBPACK_IMPORTED_MODULE_3___default()('score-sheet-view');
+var ScoreSheetView = /*#__PURE__*/function () {
+  ScoreSheetView.getInstance = function getInstance() {
+    if (!ScoreSheetView._instance) {
+      ScoreSheetView._instance = new ScoreSheetView();
+    }
+
+    return ScoreSheetView._instance;
+  };
+
+  function ScoreSheetView() {
+    this.applicationView = null;
+    this.thisEl = null;
+    this.boardGameTitleEl = null;
+    this.startStopTimer = null;
+    this.timerEl = null;
+    this.endOrLeaveEl = null;
+    this.scoreSheetEl = null;
+    this.table = null;
+    this.controller = _ScoreSheetController__WEBPACK_IMPORTED_MODULE_0__["ScoreSheetController"].getInstance();
+  }
+
+  var _proto = ScoreSheetView.prototype;
+
+  _proto.onDocumentLoaded = function onDocumentLoaded(applicationView) {
+    this.applicationView = applicationView;
+    this.resetDisplay();
+    _ScoreSheetController__WEBPACK_IMPORTED_MODULE_0__["ScoreSheetController"].getInstance().getStateManager().addChangeListenerForName(this.applicationView.state.stateNames.scoreSheet, this); // load references to the key elements on the page
+    // @ts-ignore
+
+    this.thisEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.dropZone); // @ts-ignore
+
+    this.boardGameTitleEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.boardGame); // @ts-ignore
+
+    this.startStopTimer = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.startStopTimer); // @ts-ignore
+
+    this.timerEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.timer); // @ts-ignore
+
+    this.endOrLeaveEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.end); // @ts-ignore
+
+    this.scoreSheetEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.scoreSheet); // bind event handlers
+
+    this.handleStartStopTimer = this.handleStartStopTimer.bind(this);
+    this.handleEndOrLeave = this.handleEndOrLeave.bind(this);
+    this.handleUserDrop = this.handleUserDrop.bind(this); // setup event handlers
+
+    if (this.startStopTimer) this.startStopTimer.addEventListener('click', this.handleStartStopTimer);
+    if (this.endOrLeaveEl) this.endOrLeaveEl.addEventListener('click', this.handleEndOrLeave);
+  };
+
+  _proto.handleEndOrLeave = function handleEndOrLeave(event) {
+    ssvLogger('leave or end'); // are we leaving or ending?
+
+    if (this.controller.hasActiveScoreSheet() && this.controller.isSheetOwner()) {
+      // finishing the score sheet
+      // double check this is want we want
+      if (!confirm("Are you sure you want to close the score sheet")) return; // user wants to finish
+
+      this.controller.endScoreSheet(); // reset the display
+
+      this.resetDisplay();
+    } else {
+      // leavingg the score sheet
+      // double check this is want we want
+      if (!confirm("Are you sure you want to leave the score sheet")) return; // user wants to finish
+
+      this.controller.leave(); // reset the display
+
+      this.resetDisplay();
+    }
+  };
+
+  _proto.handleStartStopTimer = function handleStartStopTimer(event) {
+    ssvLogger('start/pause timer');
+
+    if (this.controller.isTimerGoing()) {
+      this.controller.pauseTimer();
+    } else {
+      this.controller.startTimer();
+    }
+  };
+
+  _proto.handleUserDrop = function handleUserDrop(event) {
+    ssvLogger('drop event on current score sheet');
+
+    if (this.controller.hasActiveScoreSheet() && this.controller.isSheetOwner()) {
+      // @ts-ignore
+      var draggedObjectJSON = event.dataTransfer.getData(this.applicationView.state.ui.draggable.draggableDataKeyId);
+      var draggedObject = JSON.parse(draggedObjectJSON);
+      ssvLogger(draggedObject);
+
+      if (draggedObject[this.applicationView.state.ui.draggable.draggedType] === this.applicationView.state.ui.draggable.draggedTypeUser) {
+        //add the user to the current chat if not already there
+        this.controller.inviteUser(draggedObject.username);
+      }
+    }
+  };
+
+  _proto.resetDisplay = function resetDisplay() {
+    this.table = null; // reset the display
+
+    if (this.boardGameTitleEl) this.boardGameTitleEl.innerText = '';
+    if (this.startStopTimer) this.startStopTimer.innerHTML = 'Start ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
+    if (this.startStopTimer) this.startStopTimer.setAttribute("disabled", "true");
+    if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(0);
+    if (this.endOrLeaveEl) this.endOrLeaveEl.innerHTML = this.applicationView.state.ui.scoreSheet.dom.iconLeave;
+    if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeAllChildren(this.scoreSheetEl);
+  };
+
+  _proto.createTimerDisplay = function createTimerDisplay(timer) {
+    var result = '';
+
+    if (timer === 0) {
+      result = '00:00';
+    } else {
+      if (timer >= 60) {
+        var hours = Math.floor(timer / 3600);
+        var minutes = Math.floor(timer / 60);
+        var seconds = timer - hours * 3600 - minutes * 60;
+
+        if (hours > 0) {
+          result += hours + ":";
+        }
+
+        if (minutes > 0) {
+          if (minutes < 10) {
+            result += "0" + minutes + ":";
+          } else {
+            result += minutes + ":";
+          }
+        } else {
+          result += '00:';
+        }
+
+        if (seconds > 0) {
+          if (seconds < 10) {
+            result += "0" + seconds;
+          } else {
+            result += "" + seconds;
+          }
+        }
+      } else {
+        result = "00:";
+
+        if (timer > 0) {
+          if (timer < 10) {
+            result += "0" + timer;
+          } else {
+            result += "" + timer;
+          }
+        }
+      }
+    }
+
+    return result;
+  };
+
+  _proto.updateTimer = function updateTimer(time, isPaused) {
+    if (isPaused === void 0) {
+      isPaused = false;
+    } // update the view
+
+
+    if (this.startStopTimer) {
+      if (isPaused) {
+        this.startStopTimer.innerHTML = 'Start ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
+      } else {
+        this.startStopTimer.innerHTML = 'Pause' + this.applicationView.state.ui.scoreSheet.dom.iconInProgress;
+      }
+
+      this.startStopTimer.removeAttribute("disabled");
+    }
+
+    if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(time);
+  };
+
+  _proto.stateChanged = function stateChanged(managerName, name, newValue) {
+    var scoreSheet = newValue;
+    ssvLogger("Processing new state");
+    ssvLogger(scoreSheet); // update the board game name
+
+    if (this.boardGameTitleEl) this.boardGameTitleEl.innerText = "" + scoreSheet.boardGameName; // update the table
+
+    if (this.table) {
+      // process the data in the state change, will be array of array (rows) into what the table wants
+      var tableData = []; // @ts-ignore
+
+      scoreSheet.data.forEach(function (row, rowIndex) {
+        row.forEach(function (column, columnIndex) {
+          tableData.push([rowIndex, columnIndex, column]);
+        });
+      });
+      ssvLogger("Table data is ");
+      ssvLogger(tableData); // @ts-ignore
+
+      this.table.setDataAtCell(tableData);
+    } else {
+      // create a new table
+      if (this.scoreSheetEl) {
+        scoreSheet.sheetLayoutOptions.data = scoreSheet.data;
+        this.table = new handsontable__WEBPACK_IMPORTED_MODULE_1__["default"](this.scoreSheetEl, scoreSheet.sheetLayoutOptions); // @ts-ignore
+
+        this.table.addHook('afterchange', this.controller.userChangedValue);
+      }
+    } // update the timer
+
+
+    if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(scoreSheet.timer);
+  };
+
+  _proto.getTableData = function getTableData() {
+    if (this.table) {
+      return this.table.getData();
+    } else {
+      return [];
+    }
+  };
+
+  _proto.stateChangedItemAdded = function stateChangedItemAdded(managerName, name, itemAdded) {};
+
+  _proto.stateChangedItemRemoved = function stateChangedItemRemoved(managerName, name, itemRemoved) {};
+
+  _proto.stateChangedItemUpdated = function stateChangedItemUpdated(managerName, name, itemUpdated, itemNewValue) {};
+
+  return ScoreSheetView;
 }();
 
 /***/ }),
@@ -4661,7 +5513,7 @@ var ChatManager = /*#__PURE__*/function () {
     this.chatUserListeners = [];
     this.localStorage = new _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_4__["default"](true); // connect to the socket manager
 
-    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].setChatReceiver(this); // bind the receiver methods
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].addChatReceiver(this); // bind the receiver methods
 
     this.receiveLogin = this.receiveLogin.bind(this);
     this.receiveLogout = this.receiveLogout.bind(this);
@@ -4892,6 +5744,7 @@ var ChatManager = /*#__PURE__*/function () {
       created: created,
       room: users.room,
       priority: 0,
+      type: _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom,
       message: users.username + " joined the chat on " + joinDateTime
     };
     log.messages.push(message);
@@ -4915,6 +5768,7 @@ var ChatManager = /*#__PURE__*/function () {
       created: created,
       room: users.room,
       priority: 0,
+      type: _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom,
       message: users.username + " left the chat on " + joinDateTime
     };
     log.messages.push(message);
@@ -4932,7 +5786,8 @@ var ChatManager = /*#__PURE__*/function () {
   };
 
   _proto.receiveInvitation = function receiveInvitation(invite) {
-    //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
+    if (invite.type !== _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom) return; //  unless we are receiving an invite from someone in our blocked list, we automatically accept this invite
+
     if (!this.isUserInBlockedList(invite.from)) {
       cmLogger("Invited to chat " + invite.room);
       var didChatAlreadyExist = this.doesChatRoomExist(invite.room);
@@ -5069,8 +5924,10 @@ var ChatManager = /*#__PURE__*/function () {
   _proto.receiveMessage = function receiveMessage(message, wasOffline) {
     if (wasOffline === void 0) {
       wasOffline = false;
-    } // double check the message is not from us somehow
+    }
 
+    if (message.type !== _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom) return; // ignore messages that aren't for chat rooms
+    // double check the message is not from us somehow
 
     if (message.from === this.getCurrentUser()) return; // don't receive messages from the blocked users
 
@@ -5200,7 +6057,7 @@ var ChatManager = /*#__PURE__*/function () {
     var log = this.ensureChatLogExists(room); // send the message
 
     var created = parseInt(moment__WEBPACK_IMPORTED_MODULE_1___default()().format('YYYYMMDDHHmmss'));
-    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendMessage(this.getCurrentUser(), room, content, created); // add the message to the chat log
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendMessage(this.getCurrentUser(), room, content, created, _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom, _Types__WEBPACK_IMPORTED_MODULE_3__["Priority"].Normal, {}); // add the message to the chat log
 
     if (!attachment) attachment = {};
     var sent = {
@@ -5209,6 +6066,7 @@ var ChatManager = /*#__PURE__*/function () {
       message: content,
       created: created,
       priority: priority,
+      type: _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom,
       attachment: attachment
     };
     this.addMessageToChatLog(log, sent);
@@ -5476,16 +6334,17 @@ var sDebug = debug__WEBPACK_IMPORTED_MODULE_0___default()('socket-ts');
 var SocketManager = /*#__PURE__*/function () {
   var _proto = SocketManager.prototype;
 
-  _proto.setChatReceiver = function setChatReceiver(receiver) {
-    this.chatReceiver = receiver;
+  _proto.addChatReceiver = function addChatReceiver(receiver) {
+    this.chatReceivers.push(receiver);
   };
 
   function SocketManager() {
+    this.chatReceivers = [];
     this.callbackForMessage = this.callbackForMessage.bind(this);
     this.callbackForData = this.callbackForData.bind(this);
     this.listener = null;
     this.socket = null;
-    this.chatReceiver = null;
+    this.chatReceivers = [];
     this.callbackForMessage = this.callbackForMessage.bind(this);
     this.callbackForLogin = this.callbackForLogin.bind(this);
     this.callbackForLogout = this.callbackForLogout.bind(this);
@@ -5499,12 +6358,13 @@ var SocketManager = /*#__PURE__*/function () {
 
   _proto.callbackForMessage = function callbackForMessage(content) {
     sDebug("Received message : " + content);
-    if (this.chatReceiver === null) return;
 
     try {
       // should be a server side ChatMessage {room, message,user}
       var dataObj = JSON.parse(content);
-      this.chatReceiver.receiveMessage(dataObj);
+      this.chatReceivers.forEach(function (receiver) {
+        return receiver.receiveMessage(dataObj);
+      });
     } catch (err) {
       sDebug('Not JSON data');
     }
@@ -5512,30 +6372,34 @@ var SocketManager = /*#__PURE__*/function () {
 
   _proto.callbackForLogin = function callbackForLogin(message) {
     sDebug("Received login : " + message);
-    if (this.chatReceiver === null) return;
-    this.chatReceiver.receiveLogin(message);
+    this.chatReceivers.forEach(function (receiver) {
+      return receiver.receiveLogin(message);
+    });
   };
 
   _proto.callbackForUserList = function callbackForUserList(message) {
     sDebug("Received user list : " + message);
-    if (this.chatReceiver === null) return;
-    this.chatReceiver.receiveUserList(message);
+    this.chatReceivers.forEach(function (receiver) {
+      return receiver.receiveUserList(message);
+    });
   };
 
   _proto.callbackForLogout = function callbackForLogout(message) {
     sDebug("Received logout : " + message);
-    if (this.chatReceiver === null) return;
-    this.chatReceiver.receiveLogout(message);
+    this.chatReceivers.forEach(function (receiver) {
+      return receiver.receiveLogout(message);
+    });
   };
 
   _proto.callbackForJoinRoom = function callbackForJoinRoom(data) {
     sDebug("Received joined room : " + data);
-    if (this.chatReceiver === null) return;
 
     try {
       var dataObj = JSON.parse(data);
       sDebug(dataObj);
-      this.chatReceiver.receiveJoinedRoom(dataObj);
+      this.chatReceivers.forEach(function (receiver) {
+        return receiver.receiveJoinedRoom(dataObj);
+      });
     } catch (err) {
       sDebug('Not JSON data');
     }
@@ -5543,12 +6407,13 @@ var SocketManager = /*#__PURE__*/function () {
 
   _proto.callbackForExitRoom = function callbackForExitRoom(data) {
     sDebug("Received left room : " + data);
-    if (this.chatReceiver === null) return;
 
     try {
       var dataObj = JSON.parse(data);
       sDebug(dataObj);
-      this.chatReceiver.receivedLeftRoom(dataObj);
+      this.chatReceivers.forEach(function (receiver) {
+        return receiver.receivedLeftRoom(dataObj);
+      });
     } catch (err) {
       sDebug('Not JSON data');
     }
@@ -5556,12 +6421,13 @@ var SocketManager = /*#__PURE__*/function () {
 
   _proto.callbackForInvite = function callbackForInvite(data) {
     sDebug("Received invite : " + data);
-    if (this.chatReceiver === null) return;
 
     try {
       var dataObj = JSON.parse(data);
       sDebug(dataObj);
-      this.chatReceiver.receiveInvitation(dataObj);
+      this.chatReceivers.forEach(function (receiver) {
+        return receiver.receiveInvitation(dataObj);
+      });
     } catch (err) {
       sDebug('Not JSON data');
     }
@@ -5569,12 +6435,13 @@ var SocketManager = /*#__PURE__*/function () {
 
   _proto.callbackForDeclineInvite = function callbackForDeclineInvite(data) {
     sDebug("Received declined invite : " + data);
-    if (this.chatReceiver === null) return;
 
     try {
       var dataObj = JSON.parse(data);
       sDebug(dataObj);
-      this.chatReceiver.receiveDecline(dataObj.room, dataObj.username);
+      this.chatReceivers.forEach(function (receiver) {
+        return receiver.receiveDecline(dataObj.room, dataObj.username);
+      });
     } catch (err) {
       sDebug('Not JSON data');
     }
@@ -5582,13 +6449,14 @@ var SocketManager = /*#__PURE__*/function () {
 
   _proto.callbackForChat = function callbackForChat(content) {
     sDebug("Received chat : " + content);
-    if (this.chatReceiver === null) return;
 
     try {
       // should be a server side ChatMessage {room, message,user}
       var dataObj = JSON.parse(content);
       sDebug(dataObj);
-      this.chatReceiver.receiveMessage(dataObj);
+      this.chatReceivers.forEach(function (receiver) {
+        return receiver.receiveMessage(dataObj);
+      });
     } catch (err) {
       sDebug('Not JSON data');
     }
@@ -5596,18 +6464,21 @@ var SocketManager = /*#__PURE__*/function () {
 
   _proto.callbackForQueue = function callbackForQueue(data) {
     sDebug("Received queued items : " + data);
-    if (this.chatReceiver === null) return;
 
     try {
       var dataObj = JSON.parse(data);
       sDebug(dataObj); // this object should contain two arrays of invites and messages
 
       if (dataObj.invites && dataObj.invites.length > 0) {
-        this.chatReceiver.receiveQueuedInvites(dataObj.invites);
+        this.chatReceivers.forEach(function (receiver) {
+          return receiver.receiveQueuedInvites(dataObj.invites);
+        });
       }
 
       if (dataObj.messages && dataObj.messages.length > 0) {
-        this.chatReceiver.receiveQueuedMessages(dataObj.messages);
+        this.chatReceivers.forEach(function (receiver) {
+          return receiver.receiveQueuedMessages(dataObj.messages);
+        });
       }
     } catch (err) {
       sDebug('Not JSON data');
@@ -5714,7 +6585,7 @@ var SocketManager = /*#__PURE__*/function () {
     this.socket.emit('invite', inviteObj);
   };
 
-  _proto.sendMessage = function sendMessage(from, room, message, created, priority, attachment) {
+  _proto.sendMessage = function sendMessage(from, room, message, created, type, priority, attachment) {
     if (priority === void 0) {
       priority = _Types__WEBPACK_IMPORTED_MODULE_1__["Priority"].Normal;
     }
@@ -5729,6 +6600,7 @@ var SocketManager = /*#__PURE__*/function () {
       message: message,
       created: created,
       priority: priority,
+      type: type,
       attachment: attachment
     };
     this.socket.emit('chat', messageObj);

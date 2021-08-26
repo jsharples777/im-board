@@ -1,8 +1,7 @@
 import debug from 'debug';
 
-import {Invitation, InviteType, JoinLeft, Message} from "../socket/Types";
+import {Invitation, InviteType, JoinLeft, Message, Priority} from "../socket/Types";
 import {ChatReceiver} from "../socket/ChatReceiver";
-import controller from "../Controller";
 import notifier from "../notification/NotificationManager";
 import {ScoreSheetView} from "./ScoreSheetView";
 import {ScoreSheet} from "../AppTypes";
@@ -11,6 +10,7 @@ import socketManager from "../socket/SocketManager";
 import {ChatManager} from "../socket/ChatManager";
 import {StateManager} from "../state/StateManager";
 import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
+import moment from "moment";
 
 const sscLogger = debug('score-sheet-controller');
 
@@ -109,6 +109,7 @@ export class ScoreSheetController implements ChatReceiver {
             // are we already in this score sheet?
             if (this.currentScoreRoom !== invite.room) {
                 // decline the invite, only one score sheet at a time
+                sscLogger(`Received invite - already in score sheet - declining`);
                 socketManager.sendDeclineInvite(invite.room,this.getCurrentUser());// user declines to join the scoresheet
             }
         }
@@ -164,6 +165,7 @@ export class ScoreSheetController implements ChatReceiver {
 
         if (this.currentScoreRoom !== users.room) return;
 
+        sscLogger(`Handling user joined ${users.username}`)
         // update the sheet to include the user
         let index = this.currentUsersInScoreSheet.findIndex((username) => username === users.username);
         if (index < 0) {
@@ -171,8 +173,9 @@ export class ScoreSheetController implements ChatReceiver {
             // update the sheet data
             this.addUserToScoreSheet(users.username);
             // the owner of the sheet should send a sync message of the data
-            if (this.isRoomCreator) {
-                this.sendScoreSheetState(false);
+            if (this.isRoomCreator && this.currentScoreSheet) {
+                sscLogger(`Handling user joined ${users.username} - sending`)
+                this.sendScoreSheetState(this.currentScoreSheet,false);
             }
         }
     }
@@ -182,14 +185,17 @@ export class ScoreSheetController implements ChatReceiver {
 
         if (this.currentScoreRoom !== users.room) return;
         // update the sheet to remove the user
+        sscLogger(`Handling user left ${users.username}`)
+
         let index = this.currentUsersInScoreSheet.findIndex((username) => username === users.username);
         if (index >= 0) {
             this.currentUsersInScoreSheet.splice(index,1);
             // update the sheet data
             this.removeUserFromScoreSheet(users.username);
             // the owner of the sheet should send a sync message of the data
-            if (this.isRoomCreator) {
-                this.sendScoreSheetState(false);
+            if (this.isRoomCreator && this.currentScoreSheet) {
+                sscLogger(`Handling user left ${users.username} - sending`)
+                this.sendScoreSheetState(this.currentScoreSheet,false);
             }
         }
     }
@@ -199,13 +205,19 @@ export class ScoreSheetController implements ChatReceiver {
 
     public endScoreSheet():void { // this can only be done by the room creator
         // send the final score to everyone
+        sscLogger(`Handling end of score sheet`)
         if (this.isLoggedIn()) {
-            if (this.currentScoreRoom) {
-                this.sendScoreSheetState(true);
+            if (this.currentScoreRoom && this.currentScoreSheet) {
+                sscLogger(`Handling end of score sheet - sending`)
+                this.sendScoreSheetState(this.currentScoreSheet,true);
                 // if we are logged in and the scoresheet creator then we need to save the score sheet to the selected board game
-                if (this.isLoggedIn() && this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet);
+                if (this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet);
+
                 // reset the controller
                 this.reset();
+
+                this.applicationView.switchBetweenCollectionAndScoreSheet(true);
+
             }
         }
     }
@@ -215,19 +227,89 @@ export class ScoreSheetController implements ChatReceiver {
     }
 
 
-    private getDefaultScoreSheetTemplate(boardGame:any) {
-        return {}
+    private getDefaultScoreSheetTemplate(boardGame:any):any {
+        return {
+            //width:'90%',
+            //height:'90%',
+            colHeaders:false,
+            rowHeaders:true,
+            licenseKey: 'non-commercial-and-evaluation',
+            manualColumnResize:false,
+            manualRowResize:false,
+            selectionMode:'single',
+            columnSummary: [
+                {
+                    destinationRow: 0,
+                    destinationColumn:0,
+                    reversedRowCoords: true,
+                    type: 'sum',
+                    forceNumeric:true
+                },
+                {
+                    destinationRow: 0,
+                    destinationColumn:1,
+                    reversedRowCoords: true,
+                    type: 'sum',
+                    forceNumeric:true
+                },
+                {
+                    destinationRow: 0,
+                    destinationColumn:2,
+                    reversedRowCoords: true,
+                    type: 'sum',
+                    forceNumeric:true
+                },
+                {
+                    destinationRow: 0,
+                    destinationColumn:3,
+                    reversedRowCoords: true,
+                    type: 'sum',
+                    forceNumeric:true
+                },
+                {
+                    destinationRow: 0,
+                    destinationColumn:4,
+                    reversedRowCoords: true,
+                    type: 'sum',
+                    forceNumeric:true
+                },
+                {
+                    destinationRow: 0,
+                    destinationColumn:5,
+                    reversedRowCoords: true,
+                    type: 'sum',
+                    forceNumeric:true
+                },
+                {
+                    destinationRow: 0,
+                    destinationColumn:6,
+                    reversedRowCoords: true,
+                    type: 'sum',
+                    forceNumeric:true
+                },
+            ]
+
+        }
     }
 
-    private getDefaultScoreSheetStartingData(boardGame:any) {
-        return {}
+    private getDefaultScoreSheetStartingData(boardGame:any):any[] {
+        return [
+            ['P 1','P 2','P 3','P 4','P 5','P 6','P 7'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
+        ];
     }
 
-    private getScoreSheetTemplate(boardGame:any) {
+
+    private getScoreSheetTemplate(boardGame:any):any|null {
         return this.getDefaultScoreSheetTemplate(boardGame);
     }
 
-    private getScoreSheetStartingData(boardGame:any) {
+    private getScoreSheetStartingData(boardGame:any):any[]|null {
         return this.getDefaultScoreSheetStartingData(boardGame);
     }
 
@@ -235,7 +317,7 @@ export class ScoreSheetController implements ChatReceiver {
         if (boardGame) {
             sscLogger(`Starting score sheet for ${boardGame.name}`);
             this.currentlySelectedBoardGame = boardGame;
-            this.currentUsersInScoreSheet = [this.getCurrentUser()];
+            if (this.isLoggedIn()) this.currentUsersInScoreSheet = [this.getCurrentUser()];
             this.isRoomCreator = true;
             this.currentScoreRoom = uuid.getUniqueId();
             this.currentScoreSheet = {
@@ -244,12 +326,13 @@ export class ScoreSheetController implements ChatReceiver {
                 sheetLayoutOptions: this.getScoreSheetTemplate(boardGame),
                 timer:0,
                 timerGoing:false,
-                sheetData: this.getScoreSheetStartingData(boardGame),
+                data: this.getScoreSheetStartingData(boardGame),
                 isFinished:false
             }
+            sscLogger(this.currentScoreSheet);
 
             // store the score sheet locally
-            this.stateManager.setStateByName(this.applicationView.stateNames.scoreSheet,this.currentScoreSheet,false);
+            this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet,this.currentScoreSheet,true);
 
             // start a new chat room, will automatically manage if logged in or not
             if (this.isLoggedIn()) socketManager.joinChat(this.getCurrentUser(),this.currentScoreRoom);
@@ -290,7 +373,11 @@ export class ScoreSheetController implements ChatReceiver {
                     // only update the scoresheet if the timer value is higher from the attachement
                     // @ts-ignore
                     if (scoreSheet.timer > this.currentScoreSheet.timer) {
-                        this.currentScoreSheet = scoreSheet;
+                        if (this.currentScoreSheet) {
+                            this.currentScoreSheet.data = scoreSheet.data;
+                            this.currentScoreSheet.timer = scoreSheet.timer;
+                            this.currentScoreSheet.timerGoing = scoreSheet.timerGoing;
+                        }
                     }
                     // save the new state
                     this.saveCurrentScoreSheet();
@@ -300,40 +387,57 @@ export class ScoreSheetController implements ChatReceiver {
         }
     }
 
+    public isSheetOwner():boolean {
+        return this.isRoomCreator;
+    }
+
     private saveCurrentScoreSheet() {
         this.currentScoreSheet = this.createScoreSheetFromTable();
-        this.stateManager.setStateByName(this.applicationView.stateNames.scoreSheet,this.currentScoreSheet,false);
+        this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet,this.currentScoreSheet,false);
     }
 
-    public createScoreSheetFromTable():ScoreSheet {
+    public createScoreSheetFromTable():ScoreSheet|null {
+        let scoreSheet:ScoreSheet|null = null;
         let tableData = ScoreSheetView.getInstance().getTableData();
-        if (this.currentScoreSheet) {
-            let scoreSheet:ScoreSheet = {
-                room:
+        if (this.currentScoreSheet && this.currentScoreRoom) {
+            scoreSheet = {
+                room: this.currentScoreRoom,
+                data: tableData,
+                boardGameName: this.currentlySelectedBoardGame.name,
+                timer: this.currentScoreSheet.timer,
+                sheetLayoutOptions: null,
+                timerGoing: this.currentScoreSheet.timerGoing,
+                isFinished: false
             }
-
         }
-
+        return scoreSheet;
     }
 
-    public sendScoreSheetState(isFinished:boolean = false):void {
-
+    public sendScoreSheetState(scoreSheet:ScoreSheet,isFinished:boolean = false):void {
+        if (this.currentScoreRoom && this.currentlySelectedBoardGame && this.isLoggedIn()) {
+            const created = parseInt(moment().format('YYYYMMDDHHmmss'));
+            // @ts-ignore
+            socketManager.sendMessage(
+                this.getCurrentUser(),
+                this.currentScoreRoom,
+                'data',
+                created,
+                InviteType.ScoreSheet,
+                Priority.Normal,
+                scoreSheet);
+        }
     }
-
-    public updateDisplay(scoreSheet:ScoreSheet) {
-
-    }
-
     protected addUserToScoreSheet(username:string):void {
-
+        // TO DO
     }
 
     protected removeUserFromScoreSheet(username:string):void {
-
+        // TO DO
     }
 
 
     public startTimer() {
+        sscLogger(`Handling pause timer`);
         if (!this.currentScoreSheet) return;
 
         this.currentScoreSheet.timerGoing = true;
@@ -346,26 +450,45 @@ export class ScoreSheetController implements ChatReceiver {
                 if (this.currentScoreSheet) this.currentScoreSheet.timerGoing = false;
             }
         },1000);
-        if (this.isLoggedIn()) {
+        if (this.isLoggedIn() && this.currentScoreSheet) {
             // start the timer for everyone
-            this.sendScoreSheetState(false);
+            sscLogger(`Handling pause timer - sending score sheet`);
+            this.sendScoreSheetState(this.currentScoreSheet,false);
         }
     }
 
     public pauseTimer() {
+        sscLogger(`Handling pause timer`);
         if (this.intervalTimer > 0) {
+            clearInterval(this.intervalTimer);
             if (this.currentScoreSheet) this.currentScoreSheet.timerGoing = false;
             // ask everyone to pause their timers
-            if (this.isLoggedIn()) {
-                this.sendScoreSheetState(false);
+            if (this.isLoggedIn() && this.currentScoreSheet) {
+                sscLogger(`Handling pause timer - updating all users`);
+                this.sendScoreSheetState(this.currentScoreSheet,false);
             }
         }
     }
 
-    public userChangedValue() {
-        if (this.currentScoreSheet) {
+    public userChangedValue(value:any) {
+        let scoreSheet:ScoreSheet|null = this.createScoreSheetFromTable();
+        sscLogger(`Handling user changed Value`);
+        sscLogger(value);
+        sscLogger(scoreSheet);
+        if (scoreSheet) {
+            this.currentScoreSheet = scoreSheet;
             if (this.isLoggedIn()) {
-                this.sendScoreSheetState(false);
+                sscLogger(`Handling user change - updating all users`);
+                this.sendScoreSheetState(scoreSheet,false);
+            }
+        }
+    }
+
+    public leave() {
+        sscLogger(`Handling user leaving`);
+        if (this.currentScoreSheet && this.currentScoreRoom) {
+            if (this.isLoggedIn()) {
+                socketManager.leaveChat(this.getCurrentUser(),this.currentScoreRoom);
             }
         }
     }

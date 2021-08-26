@@ -280,6 +280,22 @@ class Root extends React.Component{
                         imgClasses: 'card-img',
                     },
                 },
+                scoreSheet: {
+                    dom: {
+                        dropZone: "scoreSheetZone",
+                        boardGame: "selectedBoardGame",
+                        startStopTimer: "startStopTimer",
+                        timer: "timerDisplay",
+                        end: "leaveScoreSheet",
+                        scoreSheet: "scoreSheet",
+                        iconStart: "<i class='fas fa-hourglass-start'></i>",
+                        iconInProgress: "<i class='fas fa-hourglass-half'></i>",
+                        iconEnd: "<i class='fas fa-hourglass-end'></i>",
+                        iconLeave: "<i class='fas fa-sign-out-alt'></i>",
+
+
+                    }
+                }
             },
             uiPrefs: {
                 navigation: {},
@@ -453,7 +469,9 @@ class Root extends React.Component{
             let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
             if (index >= 0) {
                 const boardGame = currentBoardGamesOnDisplay[index];
+                logger(boardGame);
                 ScoreSheetController.getInstance().startScoreSheet(boardGame);
+                this.switchBetweenCollectionAndScoreSheet(false);
             }
         }
     }
@@ -569,17 +587,19 @@ class Root extends React.Component{
     }
 
     private switchBetweenCollectionAndScoreSheet(showCollection:boolean) {
-        if (showCollection && ScoreSheetController.getInstance().hasActiveScoreSheet()) {
+        if (showCollection) {
             if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-none hidden',false);
             if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-block visible', true);
             if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-none hidden', true);
             if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-block visible', false);
         }
         else {
-            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-none hidden', true);
-            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-block visible', false);
-            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-none hidden', false);
-            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-block visible', true);
+            if (ScoreSheetController.getInstance().hasActiveScoreSheet()) {
+                if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl, 'd-none hidden', true);
+                if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl, 'd-block visible', false);
+                if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl, 'd-none hidden', false);
+                if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl, 'd-block visible', true);
+            }
         }
     }
 
@@ -633,7 +653,7 @@ class Root extends React.Component{
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
-localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail';
+localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

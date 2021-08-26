@@ -8,9 +8,9 @@ export enum Decorator  {
 export type ScoreSheet = {
     room: string,
     boardGameName: string,
-    sheetLayoutOptions: any;
+    sheetLayoutOptions: any|null;
     timer: number,
-    sheetData: any,
+    data: any[]|null,
     isFinished: boolean,
     timerGoing: boolean
 }

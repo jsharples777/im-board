@@ -322,6 +322,9 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         return "";
     }
 
+    handleInvitationDeclined(room: string, username: string): void {
+    }
+
 
 }
 
