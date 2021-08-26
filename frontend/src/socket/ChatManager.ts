@@ -64,7 +64,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         this.localStorage = new BrowserStorageStateManager(true);
 
         // connect to the socket manager
-        socketManager.setChatReceiver(this);
+        socketManager.addChatReceiver(this);
 
         // bind the receiver methods
         this.receiveLogin = this.receiveLogin.bind(this);
@@ -414,7 +414,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     }
 
     receiveMessage(message: Message,wasOffline:boolean = false): void {
-        if (message.type !== InviteType.ChatRoom) return;
+        if (message.type !== InviteType.ChatRoom) return; // ignore messages that aren't for chat rooms
         // double check the message is not from us somehow
         if (message.from === this.getCurrentUser()) return;
         // don't receive messages from the blocked users

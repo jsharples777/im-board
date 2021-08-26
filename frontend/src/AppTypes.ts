@@ -11,6 +11,7 @@ export type ScoreSheet = {
     sheetLayoutOptions: any;
     timer: number,
     sheetData: any,
-    isFinished: boolean
+    isFinished: boolean,
+    timerGoing: boolean
 }
 

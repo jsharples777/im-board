@@ -165,6 +165,7 @@ class SocketManager {
                 created: created,
                 priority: priority,
                 type:type,
+
                 attachment: attachment
             };
         }

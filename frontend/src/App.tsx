@@ -11,6 +11,8 @@ import BoardGameSearchSidebarView from "./component/BoardGameSearchSidebarView";
 import BoardGameView from "./component/BoardGameView";
 import {Decorator} from "./AppTypes";
 import browserUtil from "./util/BrowserUtil";
+import {ScoreSheetController} from "./component/ScoreSheetController";
+import {ScoreSheetView} from "./component/ScoreSheetView";
 
 
 const logger = debug('app');
@@ -30,6 +32,8 @@ class Root extends React.Component{
     private bggSearchView: BoardGameSearchSidebarView;
     // @ts-ignore
     private chatView: ChatSidebarView;
+    // @ts-ignore
+    private scoreSheetView: ScoreSheetView;
 
     // @ts-ignore
     private cancelBtnEl: HTMLElement | null;
@@ -63,7 +67,8 @@ class Root extends React.Component{
                 scores: 'scores',
                 selectedEntry: 'selectedEntry',
                 recentUserSearches: 'recentUserSearches',
-                bggSearchResults: 'bggSearchResults'
+                bggSearchResults: 'bggSearchResults',
+                scoreSheet: 'scoreSheet'
             },
             apis: {
                 login: '/login',
@@ -425,6 +430,17 @@ class Root extends React.Component{
 
     handleStartScoreSheet(event:MouseEvent) {
         event.preventDefault();
+        // do we already have an active score sheet?
+        if (ScoreSheetController.getInstance().hasActiveScoreSheet()) {
+            if (confirm("You already have an active score sheet, do you want to finish that one and start a new one?")) {
+                ScoreSheetController.getInstance().endScoreSheet();
+            }
+            else {
+                // user cancelled, finish
+                return;
+            }
+        }
+
         this.hideAllSideBars();
         // @ts-ignore
         let id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
@@ -437,8 +453,7 @@ class Root extends React.Component{
             let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
             if (index >= 0) {
                 const boardGame = currentBoardGamesOnDisplay[index];
-
-                XXXX
+                ScoreSheetController.getInstance().startScoreSheet(boardGame);
             }
         }
     }
@@ -496,6 +511,9 @@ class Root extends React.Component{
         this.bggSearchView = new BoardGameSearchSidebarView(this,document,controller.getStateManager());
         this.bggSearchView.onDocumentLoaded();
 
+        this.scoreSheetView = ScoreSheetView.getInstance();
+        this.scoreSheetView.onDocumentLoaded(this);
+
         // navigation item handlers
         if (document) {
             // @ts-ignore
@@ -540,6 +558,7 @@ class Root extends React.Component{
         }
 
         // ok lets try get things done
+        ScoreSheetController.getInstance().initialise(this);
         controller.initialise();
     }
 
@@ -550,7 +569,7 @@ class Root extends React.Component{
     }
 
     private switchBetweenCollectionAndScoreSheet(showCollection:boolean) {
-        if (showCollection) {
+        if (showCollection && ScoreSheetController.getInstance().hasActiveScoreSheet()) {
             if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-none hidden',false);
             if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-block visible', true);
             if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-none hidden', true);

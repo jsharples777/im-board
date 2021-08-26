@@ -8,10 +8,10 @@ const sDebug = debug('socket-ts');
 class SocketManager {
     protected listener:SocketListener|null;
     protected socket:any|null;
-    protected chatReceiver:ChatReceiver|null;
+    protected chatReceivers:ChatReceiver[] = [];
 
-    public setChatReceiver(receiver:ChatReceiver):void {
-        this.chatReceiver = receiver;
+    public addChatReceiver(receiver:ChatReceiver):void {
+        this.chatReceivers.push(receiver);
     }
 
 
@@ -20,7 +20,7 @@ class SocketManager {
         this.callbackForData = this.callbackForData.bind(this);
         this.listener = null;
         this.socket = null;
-        this.chatReceiver = null;
+        this.chatReceivers = [];
         this.callbackForMessage = this.callbackForMessage.bind(this);
         this.callbackForLogin = this.callbackForLogin.bind(this);
         this.callbackForLogout = this.callbackForLogout.bind(this);
@@ -34,11 +34,10 @@ class SocketManager {
 
     private callbackForMessage(content:any):void {
         sDebug(`Received message : ${content}`);
-        if (this.chatReceiver === null) return;
         try {
             // should be a server side ChatMessage {room, message,user}
             const dataObj = JSON.parse(content);
-            this.chatReceiver.receiveMessage(dataObj);
+            this.chatReceivers.forEach((receiver) => receiver.receiveMessage(dataObj));
         }
         catch (err) {
             sDebug('Not JSON data');
@@ -48,30 +47,26 @@ class SocketManager {
 
     private callbackForLogin(message:any):void {
         sDebug(`Received login : ${message}`);
-        if (this.chatReceiver === null) return;
-        this.chatReceiver.receiveLogin(message);
+        this.chatReceivers.forEach((receiver) => receiver.receiveLogin(message));
     }
 
 
     private callbackForUserList(message:any):void {
         sDebug(`Received user list : ${message}`);
-        if (this.chatReceiver === null) return;
-        this.chatReceiver.receiveUserList(message);
+        this.chatReceivers.forEach((receiver) => receiver.receiveUserList(message));
     }
 
     private callbackForLogout(message:any):void {
         sDebug(`Received logout : ${message}`);
-        if (this.chatReceiver === null) return;
-        this.chatReceiver.receiveLogout(message);
+        this.chatReceivers.forEach((receiver) => receiver.receiveLogout(message));
     }
 
     private callbackForJoinRoom(data:any):void {
         sDebug(`Received joined room : ${data}`);
-        if (this.chatReceiver === null) return;
         try {
             const dataObj = JSON.parse(data);
             sDebug(dataObj);
-            this.chatReceiver.receiveJoinedRoom(dataObj);
+            this.chatReceivers.forEach((receiver) => receiver.receiveJoinedRoom(dataObj));
         }
         catch (err) {
             sDebug('Not JSON data');
@@ -80,11 +75,10 @@ class SocketManager {
 
     private callbackForExitRoom(data:any):void {
         sDebug(`Received left room : ${data}`);
-        if (this.chatReceiver === null) return;
         try {
             const dataObj = JSON.parse(data);
             sDebug(dataObj);
-            this.chatReceiver.receivedLeftRoom(dataObj);
+            this.chatReceivers.forEach((receiver) => receiver.receivedLeftRoom(dataObj));
         }
         catch (err) {
             sDebug('Not JSON data');
@@ -93,11 +87,10 @@ class SocketManager {
 
     private callbackForInvite(data:any):void {
         sDebug(`Received invite : ${data}`);
-        if (this.chatReceiver === null) return;
         try {
             const dataObj = JSON.parse(data);
             sDebug(dataObj);
-            this.chatReceiver.receiveInvitation(dataObj);
+            this.chatReceivers.forEach((receiver) => receiver.receiveInvitation(dataObj));
         }
         catch (err) {
             sDebug('Not JSON data');
@@ -106,11 +99,10 @@ class SocketManager {
 
     private callbackForDeclineInvite(data:any):void {
         sDebug(`Received declined invite : ${data}`);
-        if (this.chatReceiver === null) return;
         try {
             const dataObj = JSON.parse(data);
             sDebug(dataObj);
-            this.chatReceiver.receiveDecline(dataObj.room, dataObj.username);
+            this.chatReceivers.forEach((receiver) => receiver.receiveDecline(dataObj.room, dataObj.username));
         }
         catch (err) {
             sDebug('Not JSON data');
@@ -119,12 +111,11 @@ class SocketManager {
 
     private callbackForChat(content:any):void {
         sDebug(`Received chat : ${content}`);
-        if (this.chatReceiver === null) return;
         try {
             // should be a server side ChatMessage {room, message,user}
             const dataObj = JSON.parse(content);
             sDebug(dataObj);
-            this.chatReceiver.receiveMessage(dataObj);
+            this.chatReceivers.forEach((receiver) => receiver.receiveMessage(dataObj));
         }
         catch (err) {
             sDebug('Not JSON data');
@@ -133,16 +124,15 @@ class SocketManager {
 
     private callbackForQueue(data:any):void {
         sDebug(`Received queued items : ${data}`);
-        if (this.chatReceiver === null) return;
         try {
             const dataObj = JSON.parse(data);
             sDebug(dataObj);
             // this object should contain two arrays of invites and messages
             if (dataObj.invites && (dataObj.invites.length > 0)) {
-                this.chatReceiver.receiveQueuedInvites(dataObj.invites);
+                this.chatReceivers.forEach((receiver) => receiver.receiveQueuedInvites(dataObj.invites));
             }
             if (dataObj.messages && (dataObj.messages.length > 0)) {
-                this.chatReceiver.receiveQueuedMessages(dataObj.messages);
+                this.chatReceivers.forEach((receiver) => receiver.receiveQueuedMessages(dataObj.messages));
             }
         }
         catch (err) {

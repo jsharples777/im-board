@@ -14,7 +14,6 @@ import {Decorator} from "./AppTypes";
 import downloader from "./network/DownloadManager";
 import BrowserStorageStateManager from "./state/BrowserStorageStateManager";
 import {Invitation, Message} from "./socket/Types";
-import {MessageEventListener} from "./socket/ChatEventListener";
 import {ScoreSheetController} from "./component/ScoreSheetController";
 import {isSameGame} from "./util/EqualityFunctions";
 
@@ -134,10 +133,12 @@ class Controller implements StateChangeListener {
             let chatManager = ChatManager.getInstance(); // this connects the manager to the socket system
 
             // setup the chat notification system
-            let chatNotificationController = NotificationController.getInstance();
+            NotificationController.getInstance();
             chatManager.setCurrentUser(this.getLoggedInUsername());
+            ScoreSheetController.getInstance().setCurrentUser(this.getLoggedInUsername());
 
             chatManager.login();
+
 
             // load the users
             this.getStateManager().getStateByName(this.config.stateNames.users);
@@ -403,19 +404,8 @@ class Controller implements StateChangeListener {
         return boardGame;
     }
 
-    private startScoreSheet(invite:Invitation):void {
-        ScoreSheetController.getInstance().setupScoreSheet(this.applicationView, invite);
-    }
 
 
-    askUserAboutInvitation(invite:Invitation):boolean {
-        const result = confirm(`You have been invited by user ${invite.from} to joint a chat room for the board game ${invite.subject} score sheet`);
-        // let the application know to setup for a new scoresheet
-        if (result) {
-            this.startScoreSheet(invite);
-        }
-        return result;
-    }
 
 
     public callbackAddToCollection(data: any, status: number, associatedStateName: string): void {
