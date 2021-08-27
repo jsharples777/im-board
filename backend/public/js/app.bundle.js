@@ -858,7 +858,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
           resultName: 'getMyBoardGameCollection'
         },
         addScoreSheetToBoardGame: {
-          queryString: 'mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id,players,scores,jsonData,createdOn}',
+          queryString: 'mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}}',
           resultName: 'addScoreSheetToBoardGame'
         }
       },
@@ -1964,6 +1964,38 @@ var Controller = /*#__PURE__*/function () {
         boardGames: currentGameList
       });
       this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentGameList, false);
+    }
+  };
+
+  _proto.scoreSheetAddedToBoardGame = function scoreSheetAddedToBoardGame(boardGame, scoreSheet) {
+    var cb = function cb(data, status, associatedStateName) {};
+
+    if (this.isLoggedIn() && boardGame.decorator && boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted) {
+      //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString, {
+        userId: this.getCurrentUser(),
+        boardGameId: boardGame.id,
+        sheet: scoreSheet
+      }, cb, this.config.stateNames.scoreSheet, false);
+    }
+
+    var currentListOfGames = this.applicationView.state.boardGames;
+    var index = currentListOfGames.findIndex(function (value) {
+      return value.gameId === boardGame.gameId;
+    });
+
+    if (index >= 0) {
+      var oldBoardGame = currentListOfGames[index];
+      boardGame.decorator = oldBoardGame.decorator;
+      cLogger("Updating application state");
+      currentListOfGames.splice(index, 1, boardGame);
+      cLogger(currentListOfGames);
+      this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
+      this.applicationView.setState({
+        boardGames: currentListOfGames
+      });
+    } else {
+      cLogger("Board game " + boardGame.id + " not found in current state");
     }
   };
 
@@ -3294,6 +3326,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _state_BrowserStorageStateManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../state/BrowserStorageStateManager */ "./src/state/BrowserStorageStateManager.ts");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+
 
 
 
@@ -3528,6 +3562,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
     // this can only be done by the room creator
     // send the final score to everyone
     sscLogger("Handling end of score sheet");
+    if (this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet);
 
     if (this.isLoggedIn()) {
       if (this.currentScoreRoom && this.currentScoreSheet) {
@@ -3537,9 +3572,8 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
 
       this.leave();
-    }
+    } // reset the controller
 
-    if (this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet); // reset the controller
 
     this.reset();
     this.applicationView.switchBetweenCollectionAndScoreSheet(true);
@@ -3548,11 +3582,36 @@ var ScoreSheetController = /*#__PURE__*/function () {
   _proto.saveScoreSheetToBoardGame = function saveScoreSheetToBoardGame(scoreSheet) {
     sscLogger('Handling save');
     var saveData = {
+      id: scoreSheet.room,
       jsonData: JSON.stringify(scoreSheet),
-      createdOn: parseInt(moment__WEBPACK_IMPORTED_MODULE_8___default()().format('YYYYMMDDHHmmss'))
+      createdOn: parseInt(moment__WEBPACK_IMPORTED_MODULE_8___default()().format('YYYYMMDDHHmm')),
+      players: [],
+      scores: []
     };
-    sscLogger(scoreSheet);
-    alert('implement save');
+    sscLogger(scoreSheet); // process the table data for names and scores
+    // the first row is the player names
+    // @ts-ignore
+
+    var playerNames = scoreSheet.data[0]; // @ts-ignore
+
+    var scores = scoreSheet.data[scoreSheet.data.length - 1];
+    sscLogger("players and scores");
+    sscLogger(playerNames);
+    sscLogger(scores); // @ts-ignore
+
+    saveData.players = playerNames; // @ts-ignore
+
+    saveData.scores = scores;
+    sscLogger(saveData); // add the data to the selected board game
+
+    if (this.currentlySelectedBoardGame) {
+      if (!this.currentlySelectedBoardGame.scores) {
+        this.currentlySelectedBoardGame.scores = [];
+      }
+
+      this.currentlySelectedBoardGame.scores.push(saveData);
+      _Controller__WEBPACK_IMPORTED_MODULE_9__["default"].scoreSheetAddedToBoardGame(this.currentlySelectedBoardGame, saveData);
+    }
   };
 
   _proto.getDefaultScoreSheetTemplate = function getDefaultScoreSheetTemplate(boardGame) {
@@ -4258,7 +4317,6 @@ var SidebarView = /*#__PURE__*/function (_AbstractView) {
   _proto.eventShow = function eventShow(event) {
     //414,768,1024
     var size = this.uiPrefs.view.expandedSize;
-    console.log(window.innerWidth);
 
     if (window.innerWidth < 769) {
       size = '50%';
@@ -4268,7 +4326,6 @@ var SidebarView = /*#__PURE__*/function (_AbstractView) {
       size = '100%';
     }
 
-    console.log(size);
     this.showHide(size);
   };
 

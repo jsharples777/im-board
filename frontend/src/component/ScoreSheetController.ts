@@ -11,6 +11,7 @@ import {ChatManager} from "../socket/ChatManager";
 import {StateManager} from "../state/StateManager";
 import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
 import moment from "moment";
+import controller from "../Controller";
 
 const sscLogger = debug('score-sheet-controller');
 
@@ -226,6 +227,7 @@ export class ScoreSheetController implements ChatReceiver {
     public endScoreSheet():void { // this can only be done by the room creator
         // send the final score to everyone
         sscLogger(`Handling end of score sheet`)
+        if (this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet);
         if (this.isLoggedIn()) {
             if (this.currentScoreRoom && this.currentScoreSheet) {
                 sscLogger(`Handling end of score sheet - sending`)
@@ -235,7 +237,6 @@ export class ScoreSheetController implements ChatReceiver {
             // close the room
             this.leave();
         }
-        if (this.isRoomCreator && this.currentScoreSheet) this.saveScoreSheetToBoardGame(this.currentScoreSheet);
         // reset the controller
         this.reset();
         this.applicationView.switchBetweenCollectionAndScoreSheet(true);
@@ -244,13 +245,38 @@ export class ScoreSheetController implements ChatReceiver {
     private saveScoreSheetToBoardGame(scoreSheet:ScoreSheet) {
         sscLogger('Handling save');
         let saveData = {
-            jsonData:JSON.stringify(scoreSheet),
-            createdOn:parseInt(moment().format('YYYYMMDDHHmmss'))
+            id: scoreSheet.room,
+            jsonData: JSON.stringify(scoreSheet),
+            createdOn: parseInt(moment().format('YYYYMMDDHHmm')),
+            players: [],
+            scores: []
         }
         sscLogger(scoreSheet);
-        alert('implement save');
+        // process the table data for names and scores
+        // the first row is the player names
+        // @ts-ignore
+        const playerNames: string[] = scoreSheet.data[0];
+        // @ts-ignore
+        const scores: any[] = scoreSheet.data[scoreSheet.data.length - 1]
+        sscLogger(`players and scores`);
+        sscLogger(playerNames);
+        sscLogger(scores);
 
+        // @ts-ignore
+        saveData.players = playerNames;
+        // @ts-ignore
+        saveData.scores = scores;
 
+        sscLogger(saveData);
+
+        // add the data to the selected board game
+        if (this.currentlySelectedBoardGame) {
+            if (!this.currentlySelectedBoardGame.scores) {
+                this.currentlySelectedBoardGame.scores = [];
+            }
+            this.currentlySelectedBoardGame.scores.push(saveData);
+            controller.scoreSheetAddedToBoardGame(this.currentlySelectedBoardGame, saveData);
+        }
     }
 
 

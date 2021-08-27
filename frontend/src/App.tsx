@@ -95,7 +95,7 @@ class Root extends React.Component{
                     resultName: 'getMyBoardGameCollection',
                 },
                 addScoreSheetToBoardGame: {
-                    queryString: 'mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id,players,scores,jsonData,createdOn}',
+                    queryString: 'mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}}',
                     resultName: 'addScoreSheetToBoardGame'
                 }
 

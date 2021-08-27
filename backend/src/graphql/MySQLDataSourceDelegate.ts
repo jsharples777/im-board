@@ -23,6 +23,10 @@ class MySQLDataSourceDelegate {
 
     }
 
+    private convertDBScoreSheetsToQLScoreSheets(boardGame:BoardGame) {
+        //const dbScores = boardGame.ScoreSheet;
+    }
+
     public getMyBoardGameCollection(_:any,data:any) {
         mysqlLogger(`Getting board game collection for user ${data.userId}`);
         return new Promise( (resolve, reject) => {
@@ -97,13 +101,45 @@ class MySQLDataSourceDelegate {
     public addScoreSheetToBoardGame(_:any, data:any) {
         mysqlLogger(`Adding score sheet to  board game ${data.boardGameId}  for user ${data.userId}`);
         mysqlLogger(data.sheet);
+        // convert the input sheet to the database format
+        let scoreSheet = {
+            id: data.sheet.id,
+            jsonData:data.sheet.jsonData,
+            player1: 'P1',
+            score1:0,
+            player2: 'P2',
+            score2:0,
+            player3: 'P3',
+            score3:0,
+            player4: 'P4',
+            score4:0,
+            player5: 'P5',
+            score5:0,
+            player6: 'P6',
+            score6:0,
+            player7: 'P7',
+            score8:0,
+            scoreFor: data.boardGameId
+        }
+        if (data.sheet.players) {
+            for (let index = 1;index <= data.sheet.players.length;index++) {
+                const playerName = data.sheet.players[index];
+                const score = data.sheet.scores[index];
+                // @ts-ignore
+                scoreSheet[`player${index}`] = playerName;
+                // @ts-ignore
+                scoreSheet[`score${index}`] = parsetInt(score);
+            }
+        }
+
+        mysqlLogger(scoreSheet);
+
         return new Promise( (resolve, reject) => {
-            data.sheet.scoreFor = data.boardGameId;
-            ScoreSheet.create(data.sheet)
+            ScoreSheet.create(scoreSheet)
                 .then((result) => {
                     mysqlLogger(result);
                     // @ts-ignore
-                    resolve({id: result.id,gameId: result.gameId});
+                    resolve({id:result.id});
                 })
                 .catch((err) => {
                     mysqlLogger(err);

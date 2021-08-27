@@ -469,6 +469,34 @@ class Controller implements StateChangeListener {
         }
     }
 
+    scoreSheetAddedToBoardGame(boardGame:any,scoreSheet:any) {
+        const cb = (data: any, status: number, associatedStateName: string) => {};
+
+            if (this.isLoggedIn() && (boardGame.decorator && (boardGame.decorator === Decorator.Persisted))) {
+            //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
+                downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString,
+                    {userId: this.getCurrentUser(), boardGameId: boardGame.id,sheet:scoreSheet},
+                    cb,
+                    this.config.stateNames.scoreSheet,
+                    false);
+        }
+        let currentListOfGames: any[] = this.applicationView.state.boardGames;
+        let index = currentListOfGames.findIndex((value) => value.gameId === boardGame.gameId);
+        if (index >= 0) {
+            const oldBoardGame = currentListOfGames[index];
+            boardGame.decorator = oldBoardGame.decorator;
+
+            cLogger(`Updating application state`);
+            currentListOfGames.splice(index, 1, boardGame);
+            cLogger(currentListOfGames);
+            this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentListOfGames,false);
+            this.applicationView.setState({boardGames: currentListOfGames});
+        } else {
+            cLogger(`Board game ${boardGame.id} not found in current state`);
+        }
+
+    }
+
     addBoardGameToCollection(event: MouseEvent) {
         cLogger(`Handling Add Board Game to collection`);
         const boardGame: any | null = this.findBoardGameInStateFromEvent(event);

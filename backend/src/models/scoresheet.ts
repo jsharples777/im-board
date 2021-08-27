@@ -7,9 +7,11 @@ class ScoreSheet extends Model {}
 
 ScoreSheet.init({
         id: {
-            autoIncrement: true,
             primaryKey: true,
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING
+        },
+        createdOn: {
+            type: DataTypes.STRING
         },
         player1: {
             type: DataTypes.STRING
