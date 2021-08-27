@@ -46,8 +46,8 @@ class BGGDataSourceDelegate {
             minPlayTime = parseInt(item.minplaytime[0].$.value);
         }
         let maxPlayTime = 0;
-        if (item.yearpublished) {
-            maxPlayTime = parseInt(item.yearpublished[0].$.value);
+        if (item.maxplaytime) {
+            maxPlayTime = parseInt(item.maxplaytime[0].$.value);
         }
         let minAge = 0;
         if (item.minage) {
