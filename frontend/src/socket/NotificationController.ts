@@ -58,7 +58,7 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
 
         if (invite.requiresAcceptDecline) {
             // notify the user of the invitation
-            result = controller.askUserAboutInvitation(invite);
+            //result = controller.askUserAboutInvitation(invite); ///////TO FIX
 
         }
         else {
@@ -167,8 +167,9 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         this.chatUserListeners.forEach((listener) => listener.handleFavouriteUsersChanged(usernames));
     }
 
-    public startChatWithUser(username:string) {
-        ChatManager.getInstance().startChatWithUser(username);
+    public startChatWithUser(username:string):string|null {
+        return ChatManager.getInstance().startChatWithUser(username);
+
     }
 
     handleChatStarted(log: ChatLog): void {

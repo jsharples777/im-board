@@ -254,8 +254,8 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
 
         let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: parseInt(userId)}, isSame);
         vLogger(user);
-        NotificationController.getInstance().startChatWithUser(user.username);
-        this.applicationView.handleShowChat(event);
+        const roomName = NotificationController.getInstance().startChatWithUser(user.username);
+        this.applicationView.handleShowChat(event,roomName);
     }
 
 

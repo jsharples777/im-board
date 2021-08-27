@@ -261,6 +261,16 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         }
     }
 
+    public selectChatRoom(room:string) {
+        csLoggerDetail(`Chat Log with id ${room} selected`);
+        this.selectedChatLog = ChatManager.getInstance().getChatLog(room);
+        if (this.selectedChatLog) {
+            this.checkCanComment();
+            this.renderChatLog(this.selectedChatLog);
+        }
+
+    }
+
 
     updateView(name: string, newState: any) {
         csLoggerDetail(`Updating state with chat manager`);

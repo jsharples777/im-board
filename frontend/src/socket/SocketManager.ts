@@ -30,6 +30,7 @@ class SocketManager {
         this.callbackForChat = this.callbackForChat.bind(this);
         this.callbackForQueue = this.callbackForQueue.bind(this);
         this.callbackForUserList = this.callbackForUserList.bind(this);
+        this.callbackForDeclineInvite = this.callbackForDeclineInvite.bind(this);
     }
 
     private callbackForMessage(content:any):void {

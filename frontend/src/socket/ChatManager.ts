@@ -536,7 +536,8 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     }
 
 
-    public startChatWithUser(username:string) {
+    public startChatWithUser(username:string):string|null {
+        let roomName:string|null = null;
         if (username) {
             cmLogger(`Starting chat with ${username}`);
             // first thing, do we have a chat log with this user (and just this user) already?
@@ -548,7 +549,9 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             socketManager.sendInvite(this.getCurrentUser(), username, chatLog.roomName,InviteType.ChatRoom,false,'');
             // ok, lets connect to the server
             socketManager.joinChat(this.getCurrentUser(), chatLog.roomName, InviteType.ChatRoom);
+            roomName = chatLog.roomName;
         }
+        return roomName;
     }
 
 }

@@ -258,9 +258,9 @@ class Root extends React.Component{
                         resultsId: 'scoreSheets',
                         resultsElementType: 'div',
                         resultsElementAttributes: [
-                            ['style','height:300px; width:200px']
+                            ['style','height:300px; width:120px']
                         ],
-                        resultsClasses: 'card text-warning col-sm-3 mr-2',
+                        resultsClasses: 'text-black bg-light col-sm-6 col-md-3 col-lg-2 mt-1 mr-2',
                         resultDataKeyId: 'bgg-id',
                         resultLegacyDataKeyId: 'bgg-id',
                         resultDataSourceId: 'data-source',
@@ -279,9 +279,9 @@ class Root extends React.Component{
                         resultContentDivClasses: 'card-img-overlay',
                         resultContentTextElementType: 'div',
                         resultContentTextClasses: 'ml-2',
-                        hasBackgroundImage: true,
+                        hasBackgroundImage: false,
                         imgElementType: 'img',
-                        imgClasses: 'card-img score-img',
+                        imgClasses: 'score-card-img',
                     },
                 },
                 scoreSheet: {
@@ -325,7 +325,7 @@ class Root extends React.Component{
                 scoreSheetSideBar: {
                     view: {
                         location: 'bottom',
-                        expandedSize: '25%',
+                        expandedSize: '50%',
                     },
                 },
             },
@@ -653,7 +653,7 @@ class Root extends React.Component{
         }
     }
 
-    handleShowChat(event:Event) {
+    handleShowChat(event:Event,roomName:string|null) {
         logger('Handling Show Chat');
         event.preventDefault();
         //this.hideAllSideBars();
@@ -664,6 +664,9 @@ class Root extends React.Component{
             return;
         }
         this.chatView.eventShow(event);
+        if (roomName) {
+            this.chatView.selectChatRoom(roomName);
+        }
     }
 
     handleShowBGGSearch(event:Event) {

@@ -143,12 +143,47 @@ class Controller implements StateChangeListener {
             // load the users
             this.getStateManager().getStateByName(this.config.stateNames.users);
         }
+        let currentGameList:any[] = this.displayedBoardGamesStateManager.getStateByName(this.config.stateNames.boardGames);
+        currentGameList = this.cleanupBoardGameState(currentGameList);
+
 
         // load board games from local storage if any
-        this.applicationView.setState({boardGames: this.displayedBoardGamesStateManager.getStateByName(this.config.stateNames.boardGames)});
+        this.applicationView.setState({boardGames: currentGameList});
 
         // download the current board game collection
         this.downloadAndSyncSavedBoardGameCollection();
+    }
+
+    private cleanupBoardGameState(boardGames:any[]):any[]{ // lets tidy up any duplicates, keeping Persisted ones by preference
+        let cleanedUpList:any[] = [];
+        boardGames.forEach((boardGame) => {
+            // is already in the list?
+            let index = cleanedUpList.findIndex((game) => game.gameId === boardGame.gameId);
+            if (index >= 0) { // found in the list
+                // is this a persisted board game?
+                let existingListGame = cleanedUpList[index]
+                if (existingListGame.decorator && existingListGame.decorator === Decorator.Persisted) {
+                    // leave the persisted version in the cleaned up list
+                }
+                else {
+                    // do we have persisted game to replace the one in the list
+                    if (boardGame.decorator && boardGame.decorator === Decorator.Persisted) {
+                        // replace the existing one with this one
+                        cleanedUpList.splice(index,1,boardGame);
+                    }
+                    else {
+                        // just leave the one there, neither are persisted to a database
+                    }
+                }
+            }
+            else {
+                // not found yet, add to list
+                cleanedUpList.push(boardGame);
+            }
+
+        });
+        return cleanedUpList;
+
     }
 
     private downloadAndSyncSavedBoardGameCollection() {
@@ -463,6 +498,7 @@ class Controller implements StateChangeListener {
                     currentGameList.push(boardGame);
                 }
             });
+            currentGameList = this.cleanupBoardGameState(currentGameList);
             cLoggerDetail(`Ending with local state of ${currentGameList.length}`);
             this.applicationView.setState({boardGames:currentGameList});
             this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentGameList,false);

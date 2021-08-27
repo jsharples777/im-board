@@ -134,8 +134,14 @@ export class ScoreSheetController implements ChatReceiver {
         notifier.show('Score Sheet',`Joining score sheet`,'info',7000);
         socketManager.joinChat(this.getCurrentUser(),invite.room,InviteType.ScoreSheet);
         this.currentScoreRoom = invite.room;
-        this.currentlySelectedBoardGame = {name:invite.subject};
-        this.currentScoreSheet = invite.attachment;
+        this.currentlySelectedBoardGame = invite.attachment.boardGame;
+        this.currentScoreSheet = invite.attachment.scoreSheet;
+
+        // check to see if the timer should be going
+        if (this.isTimerGoing()) {
+            this.stopTimerStoppedByAnotherUser();
+            this.startTimer();
+        }
         // ask the view to initialise with these values
         ScoreSheetView.getInstance().stateChanged("","",this.currentScoreSheet);
 
@@ -161,7 +167,13 @@ export class ScoreSheetController implements ChatReceiver {
 
 
     receiveQueuedInvites(invites: any): void {
-        // not implemented, the user needs to be online for a scoresheet
+        if (!this.isLoggedIn()) return;  // we are not logged in
+
+        invites.forEach((invite:Invitation) => {
+            if (invite.type === InviteType.ScoreSheet) {  // only process offline invites to scoresheet
+               this.receiveInvitation(invite);
+            }
+        });
     }
 
     receiveDecline(room: string, username: string, type:number): void {
@@ -272,8 +284,8 @@ export class ScoreSheetController implements ChatReceiver {
 
         // add the data to the selected board game
         if (this.currentlySelectedBoardGame) {
-            if (!this.currentlySelectedBoardGame.scores) {
-                this.currentlySelectedBoardGame.scores = [];
+            if (!this.currentlySelectedBoardGame.scoresheets) {
+                this.currentlySelectedBoardGame.scoresheets = [];
             }
             this.currentlySelectedBoardGame.scoresheets.push(saveData);
             controller.scoreSheetAddedToBoardGame(this.currentlySelectedBoardGame, saveData);
@@ -414,7 +426,7 @@ export class ScoreSheetController implements ChatReceiver {
         if ((this.currentScoreRoom) && (this.currentlySelectedBoardGame) ) {
             sscLogger(`Inviting user ${username} to score sheet`);
             if (this.isRoomCreator) {
-                socketManager.sendInvite(this.getCurrentUser(),username,this.currentScoreRoom,InviteType.ScoreSheet,true,this.currentlySelectedBoardGame.name,this.currentScoreSheet);
+                socketManager.sendInvite(this.getCurrentUser(),username,this.currentScoreRoom,InviteType.ScoreSheet,true,this.currentlySelectedBoardGame.name,{scoreSheet: this.currentScoreSheet,boardGame:this.currentlySelectedBoardGame});
             }
             else {
                 alert("Only the score sheet creator can invite other users.");
@@ -518,7 +530,7 @@ export class ScoreSheetController implements ChatReceiver {
                 data: tableData,
                 boardGameName: this.currentlySelectedBoardGame.name,
                 timer: this.currentScoreSheet.timer,
-                sheetLayoutOptions: null,
+                sheetLayoutOptions: (this.currentlySelectedBoardGame)?this.getScoreSheetTemplate(this.currentlySelectedBoardGame):null,
                 timerGoing: this.currentScoreSheet.timerGoing,
                 isFinished: false
             }
@@ -581,6 +593,7 @@ export class ScoreSheetController implements ChatReceiver {
         sscLogger(`Handling timer stopped by another user`);
         if (this.intervalTimer > 0) {
             clearInterval(this.intervalTimer);
+            if (this.currentScoreSheet) ScoreSheetView.getInstance().updateTimer(this.currentScoreSheet.timer,true);
         }
         this.intervalTimer = -1;
     }

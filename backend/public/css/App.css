@@ -57,8 +57,8 @@
     z-index: 1; /* Stay on top */
     bottom: 0px;
     right: 0;
-    overflow-y: hidden; /* Disable horizontal scroll */
-    padding-top: 10px; /* Place content 60px from the top */
+    /*overflow-y: hidden;  Disable horizontal scroll */
+    padding-bottom: 10px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
 }
 
@@ -161,8 +161,8 @@ small-heading {
 
 .scroll-score-sheet {
     width: 100vw;
-    max-width: 300vw;
-    overflow-x: auto;
+    /*max-width: 300vw;*/
+    overflow-x: scroll;
 }
 
 .scroll-score-sheet-active {
@@ -349,7 +349,8 @@ h2 {
     transition-delay:0.2s;
 }
 
-score-img {
-    height: 50px;
-    width: 50px;
+.score-card-img {
+    width: 100%;
+    height: 15vw;
+    object-fit: cover;
 }

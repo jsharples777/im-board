@@ -62,7 +62,7 @@ class ScoreSheetSidebarView extends SidebarView {
         }
         */
         buffer += `<h5 class="card-title">${this.selectedBoardGame.name} (${this.selectedBoardGame.year})</h5>`;
-        buffer += `<p class="card-text">Played On: ${moment(item.createdOn,'YYYYMMDDHHmmss').format('dd/MM/YYYY HH:mm')}</p>`;
+        buffer += `<p class="card-text">Played On: ${moment(item.createdOn,'YYYYMMDDHHmmss').format('ddd, DD/MM/YYYY HH:mm')}</p>`;
         buffer += `<p class="card-text">Scores: `;
         if (item.player1) {
             if (item.score1 > 0) {
