@@ -3,7 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 const bcrypt_nodejs_1 = __importDefault(require("bcrypt-nodejs"));
-const SocketManager_1 = __importDefault(require("../util/SocketManager"));
+const SocketManager_1 = __importDefault(require("../socket/SocketManager"));
+const debug_1 = __importDefault(require("debug"));
+const passportLogger = debug_1.default('my-passport');
 // @ts-ignore
 function setupPassport(passport, user) {
     const User = user;
@@ -43,8 +45,8 @@ function setupPassport(passport, user) {
                         }
                     }).then(function (user) {
                         // @ts-ignore
-                        let message = { type: "create", objectType: "User", data: user, user: user.id };
-                        SocketManager_1.default.sendMessage(message);
+                        let message = { type: "create", stateName: "users", data: user, user: user.id };
+                        SocketManager_1.default.sendDataMessage(message);
                     });
                     if (!newUser) {
                         return done(null, false);
@@ -84,6 +86,7 @@ function setupPassport(passport, user) {
                 });
             }
             const userinfo = user.get();
+            passportLogger(userinfo);
             return done(null, userinfo);
         }).catch(function (err) {
             return done(err);

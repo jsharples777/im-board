@@ -9,14 +9,10 @@ const debug_1 = __importDefault(require("debug"));
 const passport_2 = __importDefault(require("../passport/passport"));
 // @ts-ignore
 passport_2.default(passport_1.default, account_1.default);
-const rDebug = debug_1.default('route');
+const routeDebug = debug_1.default('route');
 const router = express_1.default.Router();
-const auth_1 = __importDefault(require("./auth"));
 /* GET home page. */
 router.get('/', (req, res, next) => {
-    res.render('index', { user: req.user });
-});
-router.get('/dashboard', auth_1.default.ensureAuthenticated, (req, res, next) => {
     res.render('index', { user: req.user });
 });
 router.get('/register', (req, res) => {
@@ -31,7 +27,7 @@ router.get('/login', (req, res) => {
     res.render('login', { layout: "login-register", user: req.user, error: req.flash()["error"] });
 });
 router.post('/login', passport_1.default.authenticate('local-login', {
-    successRedirect: '/dashboard',
+    successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
 }));

@@ -1,4 +1,4 @@
 import Account = require('./account');
-import BlogEntry = require('./blogentry');
-import Comment = require('./comment');
-export { Account, BlogEntry, Comment };
+import BoardGame = require('./boardgame');
+import ScoreSheet = require('./scoresheet');
+export { Account, BoardGame, ScoreSheet };

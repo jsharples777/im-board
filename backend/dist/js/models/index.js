@@ -1,14 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Comment = exports.BlogEntry = exports.Account = void 0;
+exports.ScoreSheet = exports.BoardGame = exports.Account = void 0;
 const Account = require("./account");
 exports.Account = Account;
-const BlogEntry = require("./blogentry");
-exports.BlogEntry = BlogEntry;
-const Comment = require("./comment");
-exports.Comment = Comment;
-Account.hasMany(BlogEntry, { foreignKey: 'createdBy' });
-Account.hasMany(Comment, { foreignKey: 'createdBy' });
-BlogEntry.hasMany(Comment, { foreignKey: 'commentOn', onDelete: 'cascade' });
-BlogEntry.belongsTo(Account, { foreignKey: 'createdBy' });
+const BoardGame = require("./boardgame");
+exports.BoardGame = BoardGame;
+const ScoreSheet = require("./scoresheet");
+exports.ScoreSheet = ScoreSheet;
+//import BlogEntry = require('./blogentry');
+//import Comment = require('./comment');
+// Account.hasMany(BlogEntry,{foreignKey: 'createdBy'});
+// Account.hasMany(Comment,{foreignKey: 'createdBy'});
+// BlogEntry.hasMany(Comment, {foreignKey: 'commentOn', onDelete:'cascade'});
+//
+// BlogEntry.belongsTo(Account,{foreignKey: 'createdBy'})
+Account.hasMany(BoardGame, { foreignKey: 'createdBy' });
+BoardGame.hasMany(ScoreSheet, { foreignKey: 'scoreFor', onDelete: 'cascade' });
+//
+BoardGame.belongsTo(Account, { foreignKey: 'createdBy' });
 //# sourceMappingURL=index.js.map

@@ -1,10 +1,11 @@
 "use strict";
+// Configuration and Logging handlers
+/* eslint-disable import/first */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Configuration and Logging handlers
-/* eslint-disable import/first */
+const DataSource_1 = __importDefault(require("./graphql/DataSource"));
 require('dotenv').config();
 const morgan_1 = __importDefault(require("morgan"));
 const debug_1 = __importDefault(require("debug"));
@@ -19,7 +20,7 @@ const express_session_1 = __importDefault(require("express-session"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const connect_flash_1 = __importDefault(require("connect-flash"));
 // Sockets
-const SocketManager_1 = __importDefault(require("./util/SocketManager"));
+const SocketManager_1 = __importDefault(require("./socket/SocketManager"));
 // Authentication middleware
 const passport_1 = __importDefault(require("passport"));
 //Passport and User model
@@ -28,7 +29,7 @@ const connection_1 = __importDefault(require("./db/connection"));
 const models_1 = require("./models");
 // routes
 const routes_1 = __importDefault(require("./routes"));
-const api_1 = __importDefault(require("./routes/api"));
+//import apiRoutes from './routes/api';
 const serverDebug = debug_1.default('server');
 const isDevelopment = (process.env.MODE === 'Development');
 serverDebug(`Is development mode ${isDevelopment}`);
@@ -97,8 +98,10 @@ if (isDevelopment) {
     /* log call requests with body */
     app.use((request, response, next) => {
         serverDebug(`Received request for ${request.url} with/without body`);
-        if (request.body)
-            console.log(request.body);
+        if (request.body) {
+            if (process.env.SHOW_BODY)
+                console.log(request.body);
+        }
         next();
     });
 }
@@ -108,20 +111,19 @@ else {
 // ensure the user is logged in with a path
 serverDebug('Installing routes');
 app.use('/', routes_1.default); // add the middleware path routing
-app.use('/api', api_1.default); // add the api path routing
+//app.use('/api',apiRoutes);// add the api path routing
+// setup the QL server for the Board Game Geek Data retrieval (just for fun, don't need Graph QL, but good practise)
+serverDebug('Setting up Board Game Geek API interface via Graph QL');
 // Setup authentication
 serverDebug('Setting up User model and authentication with Passport');
 // @ts-ignore
 passport_2.default(passport_1.default, models_1.Account);
+// setup the Graph SQL
+new DataSource_1.default(app);
 // route for the env.js file being served to the client
 serverDebug('Setting the environment variables for the browser to access');
 const port = process.env.PORT || 3000;
-const LOCAL_HOST_API_DEVELOPMENT = `http://localhost:${port}/api`;
-const LOCAL_HOST_API_PRODUCTION = `https://localhost:${port}/api`;
-let localhostAPIURL = LOCAL_HOST_API_DEVELOPMENT;
-if (!isDevelopment)
-    localhostAPIURL = LOCAL_HOST_API_PRODUCTION;
-const API_SERVER_URL = process.env.API_SERVER_URL || localhostAPIURL;
+const API_SERVER_URL = process.env.API_SERVER_URL || '';
 let env = { serverURL: API_SERVER_URL };
 app.get('/js/env.js', (req, res) => {
     let session = req.session;
@@ -164,8 +166,11 @@ else {
         });
     });
 }
+// construct the web server
+serverDebug('Create HTTP Server');
 const httpServer = new http_1.default.Server(app);
 // setup the sockets manager with the server
+serverDebug('Setting up Socket manager');
 SocketManager_1.default.connectToServer(httpServer);
 httpServer.listen(port, () => {
     serverDebug(`Server started on port ${port}`);
