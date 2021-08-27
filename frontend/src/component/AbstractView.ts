@@ -96,6 +96,7 @@ export default abstract class AbstractView implements StateChangeListener {
                 let imgEl = this.document.createElement(domConfig.imgElementType);
                 browserUtil.addRemoveClasses(imgEl,domConfig.imgClasses);
                 imgEl.setAttribute('src',this.getBackgroundImage(name,item));
+                childEl.appendChild(imgEl);
             }
 
             if (domConfig.hasBadge) {

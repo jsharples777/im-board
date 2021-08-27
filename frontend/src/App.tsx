@@ -13,6 +13,7 @@ import {Decorator} from "./AppTypes";
 import browserUtil from "./util/BrowserUtil";
 import {ScoreSheetController} from "./component/ScoreSheetController";
 import {ScoreSheetView} from "./component/ScoreSheetView";
+import ScoreSheetSidebarView from "./component/ScoreSheetSidebarView";
 
 
 const logger = debug('app');
@@ -34,6 +35,8 @@ class Root extends React.Component{
     private chatView: ChatSidebarView;
     // @ts-ignore
     private scoreSheetView: ScoreSheetView;
+    // @ts-ignore
+    private scoresView: ScoreSheetSidebarView;
 
     // @ts-ignore
     private cancelBtnEl: HTMLElement | null;
@@ -91,7 +94,7 @@ class Root extends React.Component{
                     resultName: 'removeFromMyCollection'
                 },
                 getMyBoardGameCollection: {
-                    queryString: 'query myCollection($userId: Int!) {getMyBoardGameCollection(userId: $userId) {id,gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories,scores {id, players, scores, jsonData, createdOn}}}',
+                    queryString: 'query myCollection($userId: Int!) {getMyBoardGameCollection(userId: $userId) {id,gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories,scoresheets {id, player1, score1, player2, score2, player3, score3, player4, score4, player5, score5, player6, score6, player7, score7, createdOn}}}',
                     resultName: 'getMyBoardGameCollection',
                 },
                 addScoreSheetToBoardGame: {
@@ -255,8 +258,9 @@ class Root extends React.Component{
                         resultsId: 'scoreSheets',
                         resultsElementType: 'div',
                         resultsElementAttributes: [
+                            ['style','height:300px; width:200px']
                         ],
-                        resultsClasses: 'card text-white',
+                        resultsClasses: 'card text-warning col-sm-3 mr-2',
                         resultDataKeyId: 'bgg-id',
                         resultLegacyDataKeyId: 'bgg-id',
                         resultDataSourceId: 'data-source',
@@ -277,7 +281,7 @@ class Root extends React.Component{
                         resultContentTextClasses: 'ml-2',
                         hasBackgroundImage: true,
                         imgElementType: 'img',
-                        imgClasses: 'card-img',
+                        imgClasses: 'card-img score-img',
                     },
                 },
                 scoreSheet: {
@@ -351,6 +355,7 @@ class Root extends React.Component{
         this.handleShowCollection = this.handleShowCollection.bind(this);
         this.handleShowScoreSheet = this.handleShowScoreSheet.bind(this);
         this.handleStartScoreSheet = this.handleStartScoreSheet.bind(this);
+        this.handleShowScores = this.handleShowScores.bind(this);
 
         controller.connectToApplication(this, window.localStorage);
     }
@@ -401,7 +406,7 @@ class Root extends React.Component{
             <BoardGameView
                 key={index}
                 boardGame={entry}
-                showScoresHandler={() => {}}
+                showScoresHandler={this.handleShowScores}
                 addToCollectionHandler={controller.addBoardGameToCollection}
                 removeFromCollectionHandler={this.handleDeleteBoardGame}
                 startScoreSheetHandler={this.handleStartScoreSheet}
@@ -529,6 +534,10 @@ class Root extends React.Component{
         this.bggSearchView = new BoardGameSearchSidebarView(this,document,controller.getStateManager());
         this.bggSearchView.onDocumentLoaded();
 
+        this.scoresView = new ScoreSheetSidebarView(this,document,controller.getStateManager());
+        this.scoresView.onDocumentLoaded();
+
+
         this.scoreSheetView = ScoreSheetView.getInstance();
         this.scoreSheetView.onDocumentLoaded(this);
 
@@ -624,6 +633,26 @@ class Root extends React.Component{
         this.userSearchView.eventShow(event);
     }
 
+    handleShowScores(event:Event) {
+        logger(`Handling show board game scores`);
+        event.preventDefault();
+        // @ts-ignore
+        let id = event.target.getAttribute(this.state.controller.events.boardGames.eventDataKeyId);
+        logger(`Handling Show board game scores ${id}`);
+        if (id) {
+            // find the entry from the state manager
+            id = parseInt(id);
+            // @ts-ignore
+            const currentBoardGamesOnDisplay = this.state.boardGames;
+            let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
+            if (index >= 0) {
+                const boardGame = currentBoardGamesOnDisplay[index];
+                this.scoresView.setSelectedBoardGame(boardGame);
+                this.scoresView.eventShow(null);
+            }
+        }
+    }
+
     handleShowChat(event:Event) {
         logger('Handling Show Chat');
         event.preventDefault();
@@ -653,7 +682,7 @@ class Root extends React.Component{
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
-localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view';
+localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view score-sheet-sidebar score-sheet-sidebar:detail view-ts' ;
 debug.log = console.info.bind(console);
 
 // @ts-ignore

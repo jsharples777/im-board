@@ -38,21 +38,21 @@ export default function BoardGameView({boardGame, showScoresHandler, addToCollec
 
         let startScoreSheetButton =
             <button type="button"
-                    className="btn-secondary btn-sm rounded p-1 mr-2 mt-1"
+                    className="btn-secondary btn-sm rounded p-1 mr-2 mt-2"
                     board-game-id={boardGame.gameId} onClick={startScoreSheetHandler}>
                 &nbsp;&nbsp;Start Score Sheet &nbsp;
-                <i className="far fa-star"></i>&nbsp;&nbsp;
+                <i className="fas fa-list-alt"></i>&nbsp;&nbsp;
             </button>
 
         // do we have any scores?
         let scoreCount = 0;
-        if (boardGame.scores) {
-            scoreCount = boardGame.scores.length;
+        if (boardGame.scoresheets) {
+            scoreCount = boardGame.scoresheets.length;
         }
 
 //        let overlay = <div className="card-img-overlay">
         let favouriteIcon = <i className="fas fa-star text-black"></i>
-        let scoreBadge = <span board-game-id={boardGame.gameId} className='badge badge-pill badge-primary' onClick={showScoresHandler}>{scoreCount}</span>
+        let scoreBadge = <span board-game-id={boardGame.gameId} className='badge badge-pill badge-primary ml-1' onClick={showScoresHandler}>{scoreCount}</span>
 
         if ((boardGame.decorator) && (boardGame.decorator !== Decorator.Incomplete)) {
 

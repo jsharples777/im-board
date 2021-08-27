@@ -112,19 +112,22 @@ export class ScoreSheetController implements ChatReceiver {
         }
 
         // are we already in a scoresheet?
-        if (this.currentScoreRoom) {
+        if (this.currentScoreSheet) {
+            sscLogger(`Received invite - already in score sheet - declining`);
             // are we already in this score sheet?
-            if (this.currentScoreRoom !== invite.room) {
+            if (this.currentScoreSheet.room !== invite.room) {
                 // decline the invite, only one score sheet at a time
                 sscLogger(`Received invite - already in score sheet - declining`);
                 socketManager.sendDeclineInvite(invite.room,this.getCurrentUser(),InviteType.ScoreSheet);// user declines to join the scoresheet
+                return;
             }
         }
 
         if (invite.requiresAcceptDecline) {
             // notify the user of the invitation
-            if (!this.askUserAboutInvitation(invite)) {
+            if (!confirm(`You have been invited by user ${invite.from} to joint a chat room for the board game ${invite.subject} score sheet`)) {
                 socketManager.sendDeclineInvite(invite.room,this.getCurrentUser(),InviteType.ScoreSheet);// user declines to join the scoresheet
+                return;
             };
         }
         // notify the user of the new chat
@@ -140,9 +143,6 @@ export class ScoreSheetController implements ChatReceiver {
         this.applicationView.handleShowScoreSheet(null);
     }
 
-    askUserAboutInvitation(invite:Invitation):boolean {
-        return confirm(`You have been invited by user ${invite.from} to joint a chat room for the board game ${invite.subject} score sheet`);
-    }
 
 
     receiveQueuedMessages(messages: any): void {
@@ -166,6 +166,7 @@ export class ScoreSheetController implements ChatReceiver {
 
     receiveDecline(room: string, username: string, type:number): void {
         if (type !== InviteType.ScoreSheet) return; //ignore non-score sheets
+        sscLogger(`Receive decline for room ${room} from ${username}`);
         if (this.currentScoreRoom) {
             if (this.currentScoreRoom === room) {
                 notifier.show('Score Sheet',`User ${username} declined the invitation.`,'warning');
@@ -247,7 +248,7 @@ export class ScoreSheetController implements ChatReceiver {
         let saveData = {
             id: scoreSheet.room,
             jsonData: JSON.stringify(scoreSheet),
-            createdOn: parseInt(moment().format('YYYYMMDDHHmm')),
+            createdOn: moment().format('YYYYMMDDHHmmss'),
             players: [],
             scores: []
         }
@@ -274,7 +275,7 @@ export class ScoreSheetController implements ChatReceiver {
             if (!this.currentlySelectedBoardGame.scores) {
                 this.currentlySelectedBoardGame.scores = [];
             }
-            this.currentlySelectedBoardGame.scores.push(saveData);
+            this.currentlySelectedBoardGame.scoresheets.push(saveData);
             controller.scoreSheetAddedToBoardGame(this.currentlySelectedBoardGame, saveData);
         }
     }
@@ -285,7 +286,7 @@ export class ScoreSheetController implements ChatReceiver {
             //width:'90%',
             //height:'90%',
             colHeaders:false,
-            rowHeaders:true,
+            rowHeaders:false,
             licenseKey: 'non-commercial-and-evaluation',
             manualColumnResize:false,
             manualRowResize:false,
@@ -348,6 +349,11 @@ export class ScoreSheetController implements ChatReceiver {
     private getDefaultScoreSheetStartingData(boardGame:any):any[] {
         return [
             ['P 1','P 2','P 3','P 4','P 5','P 6','P 7'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
+            ['0','0','0','0','0','0','0'],
             ['0','0','0','0','0','0','0'],
             ['0','0','0','0','0','0','0'],
             ['0','0','0','0','0','0','0'],

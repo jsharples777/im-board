@@ -1,19 +1,22 @@
-<div id="scoreSheetZone" class="container-fluid w-100 scoresheet d-none">
-    <div class="row justify-content-around">
-        <h1 style="font-size:40pt" id="selectedBoardGame" class="col-sm-8">Board Game</h1> <button type="submit" class="col-sm-4 btn btn-warning btn-circle btn-md" id="leaveScoreSheet"><i class="fas fa-sign-out-alt"></i></button>
-
-    </div>
-    <div class="row align-content-center">
-        <div class="offset-sm-0 offset-md-4 offset-xl-8 col-sm-12 col-md-2 align-content-center">
-            <div id="timerDisplay" class="timer bg-dark mt-2">00:00 </div>
+<div id="scoreSheetZone" class="container-fluid scoresheet d-none pt-3 pb-3">
+    <div class="row">
+        <div class="col-sm-12 offset-sm-0 offset-md-3 col-md-6 align-content-center">
+            <div class="card m-0">
+                <div class="card-header bg-light text-black-50">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h1 style="font-size:40pt" id="selectedBoardGame" class="col-sm-8">Board Game</h1>
+                        <button type="submit" class="col-sm-4 btn btn-warning btn-circle btn-md" id="leaveScoreSheet"><i class="fas fa-sign-out-alt"></i></button>
+                    </div>
+                </div>
+                <div class="card-body align-content-center justify-content-center">
+                    <div id="scoreSheet"></div>
+                </div>
+                <div class="card-footer bg-light">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div id="timerDisplay" class="timer bg-dark text-right pr-1">00:00</div><button type="submit" class="btn btn-success" id="startStopTimer" style="width: 30%">Start <i class='fas fa-hourglass-start'></i></button>
+                        </div>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-3 pt-2">
-            <button type="submit" class="btn btn-primary" id="startStopTimer">Start <i class='fas fa-hourglass-start'></i></button>
-        </div>
-
     </div>
-    <div id="scoreSheet"></div>
-    <!--<div class="row justify-content-around" style="height: 60vh">
-    </div>-->
-
 </div>

@@ -53,15 +53,26 @@ type BoardGameDetail {
     averageScore: Float
     rank: Int
     categories: String
-    scores: [ScoreSheet]
+    scoresheets: [ScoreSheet]
 }
 
 type ScoreSheet {
     id:String!
-    players: [String],
-    scores: [Int],
-    jsonData: String,
-    createdOn: Int
+    player1: String,
+    score1: Int,
+    player2: String,
+    score2: Int,
+    player3: String,
+    score3: Int,
+    player4: String,
+    score4: Int,
+    player5: String,
+    score5: Int,
+    player6: String,
+    score6: Int,
+    player7: String,
+    score7: Int,
+    createdOn: String
 }
 
 input ScoreSheetInput {
@@ -69,7 +80,7 @@ input ScoreSheetInput {
     players: [String],
     scores: [Int],
     jsonData: String,
-    createdOn: Int
+    createdOn: String
 }
 
 type User {

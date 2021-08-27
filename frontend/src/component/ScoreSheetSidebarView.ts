@@ -28,6 +28,15 @@ class ScoreSheetSidebarView extends SidebarView {
         this.updateView('', {});
     }
 
+    public setSelectedBoardGame(boardGame:any) {
+        csLogger(`setting selected board game to`);
+        csLoggerDetail(boardGame);
+        if (boardGame) {
+            this.selectedBoardGame = boardGame;
+            this.updateView('',boardGame);
+        }
+    }
+
     getIdForStateItem(name: string, item: any) {
         return this.selectedBoardGame.boardGameId;
     }
@@ -53,12 +62,42 @@ class ScoreSheetSidebarView extends SidebarView {
         }
         */
         buffer += `<h5 class="card-title">${this.selectedBoardGame.name} (${this.selectedBoardGame.year})</h5>`;
-        buffer += `<p class="card-text">Played On: ${moment(item.createdOn,'YYYYMMDDHHmm').format('dd/MM/YYYY HH:mm')}</p>`;
+        buffer += `<p class="card-text">Played On: ${moment(item.createdOn,'YYYYMMDDHHmmss').format('dd/MM/YYYY HH:mm')}</p>`;
         buffer += `<p class="card-text">Scores: `;
-        if (item.players) {
-            item.players.forEach((player:string,index:number) => {
-                buffer += `${player} ${item.scores[index]} `;
-            });
+        if (item.player1) {
+            if (item.score1 > 0) {
+                buffer += `${item.player1}:${item.score1} `;
+            }
+        }
+        if (item.player2) {
+            if (item.score2 > 0) {
+                buffer += `${item.player2}:${item.score2} `;
+            }
+        }
+        if (item.player3) {
+            if (item.score3 > 0) {
+                buffer += `${item.player3}:${item.score3} `;
+            }
+        }
+        if (item.player4) {
+            if (item.score4 > 0) {
+                buffer += `${item.player4}:${item.score4} `;
+            }
+        }
+        if (item.player5) {
+            if (item.score5 > 0) {
+                buffer += `${item.player5}:${item.score5} `;
+            }
+        }
+        if (item.player6) {
+            if (item.score6 > 0) {
+                buffer += `${item.player6}:${item.score6} `;
+            }
+        }
+        if (item.player7) {
+            if (item.score7 > 0) {
+                buffer += `${item.player7}:${item.score7} `;
+            }
         }
         buffer += `</p>`;
         return buffer;
@@ -88,9 +127,9 @@ class ScoreSheetSidebarView extends SidebarView {
 
     updateView(name: string, newState: any) {
         csLoggerDetail(`Updating state with selected board game`);
-        if (this.selectedBoardGame) {
-            if (this.selectedBoardGame.scores) {
-                this.createResultsForState(name, this.selectedBoardGame.scores);
+        if (newState) {
+            if (newState.scoresheets) {
+                this.createResultsForState(name, newState.scoresheets);
             }
         }
 

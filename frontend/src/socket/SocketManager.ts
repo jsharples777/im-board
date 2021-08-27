@@ -107,6 +107,7 @@ class SocketManager {
             this.chatReceivers.forEach((receiver) => receiver.receiveDecline(dataObj.room, dataObj.username, dataObj.type));
         }
         catch (err) {
+            sDebug(err);
             sDebug('Not JSON data');
         }
     }

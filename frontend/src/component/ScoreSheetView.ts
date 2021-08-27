@@ -127,8 +127,12 @@ export class ScoreSheetView implements StateChangeListener{
 
         // reset the display
         if (this.boardGameTitleEl) this.boardGameTitleEl.innerText = '';
-        if (this.startStopTimer) this.startStopTimer.innerHTML = 'Start ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
-        if (this.startStopTimer) this.startStopTimer.setAttribute("disabled", "true");
+        if (this.startStopTimer) {
+            this.startStopTimer.innerHTML = 'Start ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
+            this.startStopTimer.setAttribute("disabled", "true");
+            browserUtil.addRemoveClasses(this.startStopTimer,'btn-warning',false);
+            browserUtil.addRemoveClasses(this.startStopTimer,'btn-success',true);
+        }
         if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(0);
         if (this.endOrLeaveEl) this.endOrLeaveEl.innerHTML = this.applicationView.state.ui.scoreSheet.dom.iconLeave;
         if (this.scoreSheetEl) browserUtil.removeAllChildren(this.scoreSheetEl);
@@ -166,6 +170,9 @@ export class ScoreSheetView implements StateChangeListener{
                         result += `${seconds}`;
                     }
                 }
+                else {
+                    result += '00';
+                }
             }
             else {
                 result = `00:`;
@@ -176,6 +183,9 @@ export class ScoreSheetView implements StateChangeListener{
                     else {
                         result += `${timer}`;
                     }
+                }
+                else {
+                    result += '00';
                 }
             }
         }
@@ -189,9 +199,13 @@ export class ScoreSheetView implements StateChangeListener{
         if (this.startStopTimer) {
             if (isPaused) {
                 this.startStopTimer.innerHTML = 'Start   ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
+                browserUtil.addRemoveClasses(this.startStopTimer,'btn-warning',false);
+                browserUtil.addRemoveClasses(this.startStopTimer,'btn-success',true);
             }
             else {
                 this.startStopTimer.innerHTML = 'Pause   ' + this.applicationView.state.ui.scoreSheet.dom.iconInProgress;
+                browserUtil.addRemoveClasses(this.startStopTimer,'btn-warning',true);
+                browserUtil.addRemoveClasses(this.startStopTimer,'btn-success',false);
             }
             this.startStopTimer.removeAttribute("disabled");
         }

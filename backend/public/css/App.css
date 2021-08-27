@@ -55,9 +55,9 @@
     width: 100%; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
     z-index: 1; /* Stay on top */
-    bottom: 50px;
+    bottom: 0px;
     right: 0;
-    overflow-x: hidden; /* Disable horizontal scroll */
+    overflow-y: hidden; /* Disable horizontal scroll */
     padding-top: 10px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
 }
@@ -160,8 +160,14 @@ small-heading {
 }
 
 .scroll-score-sheet {
-    width: 100vh;
-    max-width: 300vh;
+    width: 100vw;
+    max-width: 300vw;
+    overflow-x: auto;
+}
+
+.scroll-score-sheet-active {
+    width: 100%;
+    max-width: 200%;
     overflow-x: auto;
 }
 
@@ -264,6 +270,12 @@ h1 {
     font-size: 32px;
 }
 
+h2 {
+    font-family: 'Special Elite', cursive;
+    font-weight: bold;
+    font-size: 24px;
+}
+
 @media(max-width: 500px) {
     .btn-circle.btn-md {
         width: 30px;
@@ -279,11 +291,19 @@ h1 {
     .notifications .notification {
         width: 90vw
     }
+    .timer {
+        font-size: 12pt;
+        width: 45%;
+    }
 
 }
 @media screen and (max-width: 768px) {
     .notifications .notification {
         width: 50vw
+    }
+    .timer {
+        font-size: 20pt;
+        width: 40%;
     }
 
 }
@@ -313,6 +333,7 @@ h1 {
     padding-top: 110px;
 }
 
+
 .timer {
     font-family: 'digital';
     font-size: 36pt;
@@ -326,4 +347,9 @@ h1 {
 .visible {
     transition: all 0.5s ease;
     transition-delay:0.2s;
+}
+
+score-img {
+    height: 50px;
+    width: 50px;
 }
