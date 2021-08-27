@@ -3315,7 +3315,6 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
   function ScoreSheetController() {
     this.applicationView = null;
-    this.scoreSheetView = null;
     this.currentScoreRoom = null;
     this.currentlySelectedBoardGame = null;
     this.currentScoreSheet = null;
@@ -3349,6 +3348,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
     this.currentlySelectedBoardGame = null;
     this.isRoomCreator = false;
     this.currentUsersInScoreSheet = [];
+    this.stopTimerStoppedByAnotherUser();
   };
 
   _proto.isTimerGoing = function isTimerGoing() {
@@ -3402,14 +3402,14 @@ var ScoreSheetController = /*#__PURE__*/function () {
       if (this.currentScoreRoom !== invite.room) {
         // decline the invite, only one score sheet at a time
         sscLogger("Received invite - already in score sheet - declining");
-        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendDeclineInvite(invite.room, this.getCurrentUser()); // user declines to join the scoresheet
+        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendDeclineInvite(invite.room, this.getCurrentUser(), _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet); // user declines to join the scoresheet
       }
     }
 
     if (invite.requiresAcceptDecline) {
       // notify the user of the invitation
       if (!this.askUserAboutInvitation(invite)) {
-        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendDeclineInvite(invite.room, this.getCurrentUser()); // user declines to join the scoresheet
+        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendDeclineInvite(invite.room, this.getCurrentUser(), _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet); // user declines to join the scoresheet
       }
 
       ;
@@ -3417,17 +3417,14 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
 
     _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show('Score Sheet', "Joining score sheet", 'info', 7000);
-    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), invite.room);
+    _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), invite.room, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet);
     this.currentScoreRoom = invite.room;
-    this.currentScoreSheet = {
-      room: invite.room,
-      boardGameName: '',
-      data: [],
-      sheetLayoutOptions: {},
-      timer: 0,
-      isFinished: false,
-      timerGoing: false
-    }; // change to the score sheet
+    this.currentlySelectedBoardGame = {
+      name: invite.subject
+    };
+    this.currentScoreSheet = invite.attachment; // ask the view to initialise with these values
+
+    _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().stateChanged("", "", this.currentScoreSheet); // change to the score sheet
 
     this.applicationView.handleShowScoreSheet(null);
   };
@@ -3456,7 +3453,9 @@ var ScoreSheetController = /*#__PURE__*/function () {
   _proto.receiveQueuedInvites = function receiveQueuedInvites(invites) {// not implemented, the user needs to be online for a scoresheet
   };
 
-  _proto.receiveDecline = function receiveDecline(room, username) {
+  _proto.receiveDecline = function receiveDecline(room, username, type) {
+    if (type !== _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet) return; //ignore non-score sheets
+
     if (this.currentScoreRoom) {
       if (this.currentScoreRoom === room) {
         _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show('Score Sheet', "User " + username + " declined the invitation.", 'warning');
@@ -3465,8 +3464,11 @@ var ScoreSheetController = /*#__PURE__*/function () {
   };
 
   _proto.receiveJoinedRoom = function receiveJoinedRoom(users) {
+    if (users.type !== _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet) return; //ignore non-score sheets
+
     if (!this.isLoggedIn()) return; // we are not logged in
 
+    if (users.username === this.getCurrentUser()) return;
     if (this.currentScoreRoom !== users.room) return;
     sscLogger("Handling user joined " + users.username); // update the sheet to include the user
 
@@ -3486,11 +3488,16 @@ var ScoreSheetController = /*#__PURE__*/function () {
       sscLogger("Handling user joined " + users.username + " - sending");
       this.sendScoreSheetState(this.currentScoreSheet, false);
     }
+
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show(this.currentlySelectedBoardGame.name, "User " + users.username + " joined.");
   };
 
   _proto.receivedLeftRoom = function receivedLeftRoom(users) {
+    if (users.type !== _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet) return; //ignore non-score sheets
+
     if (!this.isLoggedIn()) return; // we are not logged in
 
+    if (users.username === this.getCurrentUser()) return;
     if (this.currentScoreRoom !== users.room) return; // update the sheet to remove the user
 
     sscLogger("Handling user left " + users.username);
@@ -3510,6 +3517,8 @@ var ScoreSheetController = /*#__PURE__*/function () {
       sscLogger("Handling user left " + users.username + " - sending");
       this.sendScoreSheetState(this.currentScoreSheet, false);
     }
+
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show(this.currentlySelectedBoardGame.name, "User " + users.username + " left.");
   };
 
   _proto.receiveUserList = function receiveUserList(users) {} // will be managed in the transfer of sheet data
@@ -3634,7 +3643,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
       this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, true); // start a new chat room, will automatically manage if logged in or not
 
-      if (this.isLoggedIn()) _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), this.currentScoreRoom);
+      if (this.isLoggedIn()) _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), this.currentScoreRoom, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet);
     }
   };
 
@@ -3653,13 +3662,20 @@ var ScoreSheetController = /*#__PURE__*/function () {
     if (!this.isLoggedIn()) return; // we are not logged in
     // only the user who created the score sheet can do this as they are the only ones with a selected board game
 
-    if (this.currentScoreRoom && this.currentlySelectedBoardGame && this.isRoomCreator) {
+    if (this.currentScoreRoom && this.currentlySelectedBoardGame) {
       sscLogger("Inviting user " + username + " to score sheet");
-      _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendInvite(this.getCurrentUser(), username, this.currentScoreRoom, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet, true, this.currentlySelectedBoardGame.name);
+
+      if (this.isRoomCreator) {
+        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendInvite(this.getCurrentUser(), username, this.currentScoreRoom, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet, true, this.currentlySelectedBoardGame.name, this.currentScoreSheet);
+      } else {
+        alert("Only the score sheet creator can invite other users.");
+      }
     }
   };
 
   _proto.receiveMessage = function receiveMessage(message) {
+    sscLogger("'Handling receive message");
+    sscLogger(message);
     if (!this.isLoggedIn()) return; // we are not logged in
 
     if (message.type !== _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet) return; //ignore non-score sheets
@@ -3682,30 +3698,48 @@ var ScoreSheetController = /*#__PURE__*/function () {
         if (message.attachment) {
           // the attachment should be a ScoreSheet object
           var scoreSheet = message.attachment;
-          sscLogger(scoreSheet); // only update the scoresheet if the timer value is higher from the attachement
-          // @ts-ignore
+          sscLogger(scoreSheet); // @ts-ignore
 
-          if (scoreSheet.timer > this.currentScoreSheet.timer) {
-            if (this.currentScoreSheet) {
-              this.currentScoreSheet.room = message.room;
-              this.currentScoreSheet.boardGameName = scoreSheet.boardGameName;
-              this.currentScoreSheet.data = scoreSheet.data;
-              this.currentScoreSheet.timer = scoreSheet.timer;
-              this.currentScoreSheet.timerGoing = scoreSheet.timerGoing;
-              this.currentScoreSheet.sheetLayoutOptions = scoreSheet.sheetLayoutOptions;
-              this.currentScoreSheet.isFinished = scoreSheet.isFinished;
+          if (this.currentScoreSheet) {
+            var timerWasGoing = this.currentScoreSheet.timerGoing;
+            this.currentScoreSheet.room = message.room;
+            this.currentScoreSheet.boardGameName = scoreSheet.boardGameName;
+            this.currentScoreSheet.data = scoreSheet.data;
+            this.currentScoreSheet.timer = scoreSheet.timer > this.currentScoreSheet.timer ? scoreSheet.timer : this.currentScoreSheet.timer;
+            this.currentScoreSheet.timerGoing = scoreSheet.timerGoing;
+            this.currentScoreSheet.sheetLayoutOptions = scoreSheet.sheetLayoutOptions;
+            this.currentScoreSheet.isFinished = scoreSheet.isFinished; // has the timer changed?
+
+            if (scoreSheet.timerGoing) {
+              if (timerWasGoing) {// both timers going, no need to do anything
+              } else {
+                // timer is going with another user, but we aren't going - start timer
+                this.stopTimerStoppedByAnotherUser();
+                this.startTimer();
+              }
+            } else {
+              // timer not going at the other users end
+              if (timerWasGoing) {
+                // our timer is active - pause it
+                this.stopTimerStoppedByAnotherUser();
+              } else {// neither timer going
+              }
             }
-          } // save the new state
+          }
 
+          sscLogger('Updated score sheet');
+          sscLogger(this.currentScoreSheet); // save the new state
 
-          if (this.currentScoreSheet) this.saveCurrentScoreSheet(this.currentScoreSheet);
+          if (this.currentScoreSheet) this.saveCurrentScoreSheet(this.currentScoreSheet, true);
 
           if (scoreSheet.isFinished) {
             alert('Score sheet has been finished - closing'); // reset the controller
 
             this.reset(); // close the room
 
-            this.leave();
+            this.leave(); // reset the view
+
+            _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().resetDisplay();
             this.applicationView.switchBetweenCollectionAndScoreSheet(true);
           }
         }
@@ -3717,9 +3751,13 @@ var ScoreSheetController = /*#__PURE__*/function () {
     return this.isRoomCreator;
   };
 
-  _proto.saveCurrentScoreSheet = function saveCurrentScoreSheet(scoreSheet) {
+  _proto.saveCurrentScoreSheet = function saveCurrentScoreSheet(scoreSheet, informListeners) {
+    if (informListeners === void 0) {
+      informListeners = true;
+    }
+
     this.currentScoreSheet = scoreSheet;
-    this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, false);
+    this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, informListeners);
   };
 
   _proto.createScoreSheetFromTable = function createScoreSheetFromTable() {
@@ -3788,11 +3826,22 @@ var ScoreSheetController = /*#__PURE__*/function () {
     }
   };
 
+  _proto.stopTimerStoppedByAnotherUser = function stopTimerStoppedByAnotherUser() {
+    sscLogger("Handling timer stopped by another user");
+
+    if (this.intervalTimer > 0) {
+      clearInterval(this.intervalTimer);
+    }
+
+    this.intervalTimer = -1;
+  };
+
   _proto.pauseTimer = function pauseTimer() {
     sscLogger("Handling pause timer");
 
     if (this.intervalTimer > 0) {
       clearInterval(this.intervalTimer);
+      this.intervalTimer = -1;
 
       if (this.currentScoreSheet) {
         this.currentScoreSheet.timerGoing = false;
@@ -3808,14 +3857,18 @@ var ScoreSheetController = /*#__PURE__*/function () {
     }
   };
 
-  _proto.userChangedValue = function userChangedValue(value) {
+  _proto.userChangedValue = function userChangedValue(value, source) {
+    sscLogger("Handling user changed value " + source);
+    if (source === ScoreSheetController.SOURCE_View) return; // is the source an edit?
+
+    if (source !== 'edit') return;
     var scoreSheet = this.createScoreSheetFromTable();
     sscLogger("Handling user changed Value");
     sscLogger(value);
     sscLogger(scoreSheet);
 
     if (scoreSheet) {
-      this.saveCurrentScoreSheet(scoreSheet);
+      this.saveCurrentScoreSheet(scoreSheet, false);
 
       if (this.isLoggedIn()) {
         sscLogger("Handling user change - updating all users");
@@ -3829,13 +3882,17 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
     if (this.currentScoreSheet && this.currentScoreRoom) {
       if (this.isLoggedIn()) {
-        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].leaveChat(this.getCurrentUser(), this.currentScoreRoom);
+        _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].leaveChat(this.getCurrentUser(), this.currentScoreRoom, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet);
       }
+
+      this.reset();
+      this.applicationView.switchBetweenCollectionAndScoreSheet(true);
     }
   };
 
   return ScoreSheetController;
 }();
+ScoreSheetController.SOURCE_View = 'ssv';
 
 /***/ }),
 
@@ -3927,7 +3984,7 @@ var ScoreSheetView = /*#__PURE__*/function () {
 
       this.resetDisplay();
     } else {
-      // leavingg the score sheet
+      // leaving the score sheet
       // double check this is want we want
       if (!confirm("Are you sure you want to leave the score sheet")) return; // user wants to finish
 
@@ -4063,7 +4120,7 @@ var ScoreSheetView = /*#__PURE__*/function () {
       ssvLogger("Table data is ");
       ssvLogger(tableData); // @ts-ignore
 
-      this.table.setDataAtCell(tableData);
+      this.table.setDataAtCell(tableData, _ScoreSheetController__WEBPACK_IMPORTED_MODULE_0__["ScoreSheetController"].SOURCE_View);
     } else {
       // create a new table
       if (this.scoreSheetEl) {
@@ -5802,6 +5859,7 @@ var ChatManager = /*#__PURE__*/function () {
   _proto.receiveJoinedRoom = function receiveJoinedRoom(users) {
     // we get this for all changes to a room, if the username is us can safely ignore
     //if (users.username === this.currentUsername) return;
+    if (users.type !== _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom) return;
     var log = this.ensureChatLogExists(users.room);
     cmLogger("User list for room " + users.room + " - " + users.userList.join(','));
     log.users = users.userList; // add a "message" for joined user
@@ -5825,6 +5883,7 @@ var ChatManager = /*#__PURE__*/function () {
 
   _proto.receivedLeftRoom = function receivedLeftRoom(users) {
     // we get this for all changes to a room, if the username is us can safely ignore
+    if (users.type !== _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom) return;
     if (users.username === this.currentUsername) return;
     var log = this.ensureChatLogExists(users.room);
     cmLogger("User list for room " + users.room + " - " + users.userList.join(','));
@@ -5890,7 +5949,7 @@ var ChatManager = /*#__PURE__*/function () {
         }) < 0) chatLog.users.push(invite.from);
         this.saveLogs();
         cmLogger("Joining chat " + invite.room);
-        _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), invite.room);
+        _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), invite.room, _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom);
         this.chatListeners.forEach(function (listener) {
           return listener.handleChatLogUpdated(chatLog, false);
         });
@@ -5941,8 +6000,9 @@ var ChatManager = /*#__PURE__*/function () {
     }
   };
 
-  _proto.receiveDecline = function receiveDecline(room, username) {
-    // we get this for all changes to a room, if the username is us can safely ignore
+  _proto.receiveDecline = function receiveDecline(room, username, type) {
+    if (type !== _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom) return; // we get this for all changes to a room, if the username is us can safely ignore
+
     if (username === this.currentUsername) return;
 
     if (!this.isUserInBlockedList(username)) {
@@ -6040,7 +6100,7 @@ var ChatManager = /*#__PURE__*/function () {
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
     this.ensureChatLogExists(room);
-    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), room);
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), room, _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom);
   };
 
   _proto.removeChatLog = function removeChatLog(room) {
@@ -6060,7 +6120,7 @@ var ChatManager = /*#__PURE__*/function () {
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
     this.removeChatLog(room);
-    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].leaveChat(this.getCurrentUser(), room);
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].leaveChat(this.getCurrentUser(), room, _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom);
   };
 
   _proto.login = function login() {
@@ -6073,7 +6133,7 @@ var ChatManager = /*#__PURE__*/function () {
     _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].getUserList(); // connect to the chat rooms already in logs
 
     this.chatLogs.forEach(function (log) {
-      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(_this9.currentUsername, log.roomName);
+      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(_this9.currentUsername, log.roomName, _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom);
     });
   };
 
@@ -6086,7 +6146,7 @@ var ChatManager = /*#__PURE__*/function () {
   _proto.declineInvite = function declineInvite(room) {
     if (this.getCurrentUser().trim().length === 0) return; // we are not logged in
 
-    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendDeclineInvite(room, this.getCurrentUser());
+    _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendDeclineInvite(room, this.getCurrentUser(), _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom);
   };
 
   _proto.sendInvite = function sendInvite(to, room, type, requiresAcceptDecline, subject) {
@@ -6157,7 +6217,7 @@ var ChatManager = /*#__PURE__*/function () {
 
       _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].sendInvite(this.getCurrentUser(), username, chatLog.roomName, _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom, false, ''); // ok, lets connect to the server
 
-      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), chatLog.roomName);
+      _SocketManager__WEBPACK_IMPORTED_MODULE_2__["default"].joinChat(this.getCurrentUser(), chatLog.roomName, _Types__WEBPACK_IMPORTED_MODULE_3__["InviteType"].ChatRoom);
     }
   };
 
@@ -6511,7 +6571,7 @@ var SocketManager = /*#__PURE__*/function () {
       var dataObj = JSON.parse(data);
       sDebug(dataObj);
       this.chatReceivers.forEach(function (receiver) {
-        return receiver.receiveDecline(dataObj.room, dataObj.username);
+        return receiver.receiveDecline(dataObj.room, dataObj.username, dataObj.type);
       });
     } catch (err) {
       sDebug('Not JSON data');
@@ -6618,21 +6678,23 @@ var SocketManager = /*#__PURE__*/function () {
     });
   };
 
-  _proto.joinChat = function joinChat(username, room) {
+  _proto.joinChat = function joinChat(username, room, type) {
     this.socket.emit('joinroom', {
       username: username,
-      room: room
+      room: room,
+      type: type
     });
   };
 
-  _proto.leaveChat = function leaveChat(username, room) {
+  _proto.leaveChat = function leaveChat(username, room, type) {
     this.socket.emit('exitroom', {
       username: username,
-      room: room
+      room: room,
+      type: type
     });
   };
 
-  _proto.sendInvite = function sendInvite(from, to, room, type, requiresAcceptDecline, subject) {
+  _proto.sendInvite = function sendInvite(from, to, room, type, requiresAcceptDecline, subject, attachment) {
     if (type === void 0) {
       type = _Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ChatRoom;
     }
@@ -6645,13 +6707,18 @@ var SocketManager = /*#__PURE__*/function () {
       subject = '';
     }
 
+    if (attachment === void 0) {
+      attachment = {};
+    }
+
     var inviteObj = {
       from: from,
       to: to,
       room: room,
       type: type,
       requiresAcceptDecline: requiresAcceptDecline,
-      subject: subject
+      subject: subject,
+      attachment: attachment
     };
     sDebug("Sending invite");
     sDebug(inviteObj);
@@ -6683,10 +6750,11 @@ var SocketManager = /*#__PURE__*/function () {
     this.socket.emit('userlist');
   };
 
-  _proto.sendDeclineInvite = function sendDeclineInvite(room, from) {
+  _proto.sendDeclineInvite = function sendDeclineInvite(room, from, type) {
     this.socket.emit('declineinvite', {
       room: room,
-      from: from
+      from: from,
+      type: type
     });
   };
 

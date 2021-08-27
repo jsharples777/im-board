@@ -94,22 +94,22 @@ class SocketManager {
         return chatUser;
     }
 
-    protected findOrCreateRoom(roomName:string):ChatRoom {
+    protected findOrCreateRoom(roomName:string, type:number):ChatRoom {
         let index = this.rooms.findIndex((value) => value.name === roomName);
         let room:ChatRoom;
         if (index >= 0) {
             room = this.rooms[index];
         }
         else {
-            room = {name:roomName,users:[]};
+            room = {name:roomName,users:[],type};
             this.rooms.push(room);
         }
         return room;
     }
 
-    protected getUserListForRoom(roomName:string):string[] {
+    protected getUserListForRoom(roomName:string,type:number):string[] {
         let results:string[] = [];
-        let room:ChatRoom = this.findOrCreateRoom(roomName);
+        let room:ChatRoom = this.findOrCreateRoom(roomName,type);
         room.users.forEach((user) => {
            results.push(user.username);
         });
@@ -117,9 +117,9 @@ class SocketManager {
     }
 
 
-    protected inviteUserToRoom(inviteFrom:string, inviteTo:string, roomName:string, type:number, requiresAcceptDecline:boolean = false, subject:string = '') {
+    protected inviteUserToRoom(inviteFrom:string, inviteTo:string, roomName:string, type:number, requiresAcceptDecline:boolean = false, subject:string = '',attachment:any = {}) {
         let receivingUser = this.findUser(inviteTo);
-        const userList = this.getUserListForRoom(roomName);
+        const userList = this.getUserListForRoom(roomName,type);
 
         let inviteMessage:InviteMessage = {
             from: inviteFrom,
@@ -129,7 +129,8 @@ class SocketManager {
             requiresAcceptDecline: requiresAcceptDecline,
             userList: userList,
             type: type,
-            subject: subject
+            subject: subject,
+            attachment: attachment
         }
         if (receivingUser) {
             this.sendInviteMessageToUser(receivingUser, inviteMessage);
@@ -165,7 +166,6 @@ class SocketManager {
                 created: created,
                 priority: priority,
                 type:type,
-
                 attachment: attachment
             };
         }
@@ -174,11 +174,11 @@ class SocketManager {
 
 
 
-    protected addUserToRoom (socketId:string, username:string, roomName:string) {
+    protected addUserToRoom (socketId:string, username:string, roomName:string, type:number) {
         let user = this.findUser(username);
         if (user) {
             // find the room, create if not already existing
-            let room = this.findOrCreateRoom(roomName);
+            let room = this.findOrCreateRoom(roomName,type);
             // the user may be in the room with an old id
             let index = room.users.findIndex((value) => value.username === username);
             if (index >= 0) {
@@ -191,9 +191,9 @@ class SocketManager {
         }
     }
 
-    protected removeUserFromRoom(username:string, roomName:string): void {
+    protected removeUserFromRoom(username:string, roomName:string,type:number): void {
         socketDebug(`Removing user ${username} from room ${roomName}`);
-        const room = this.findOrCreateRoom(roomName);
+        const room = this.findOrCreateRoom(roomName,type);
         if (room.users) {
             let index = room.users.findIndex((value) => value.username === username);
             socketDebug(`Removing user ${username} from room ${room.name} with index ${index}`)
@@ -262,32 +262,32 @@ class SocketManager {
                     MessageQueueManager.getInstance().setUserHasLoggedOut(user.username);
                 }
             });
-            socket.on('joinroom', ({username,room}) => {
+            socket.on('joinroom', ({username,room,type}) => {
                 socketDebug(`${username} joining room ${room} `);
-                this.addUserToRoom(socket.id,username,room);
+                this.addUserToRoom(socket.id,username,room,type);
                 socket.join(room);
-                let userList:string[] = this.getUserListForRoom(room);
-                socket.to(room).emit('joinroom',JSON.stringify({username:username,room: room,userList:userList}));
+                let userList:string[] = this.getUserListForRoom(room,type);
+                socket.to(room).emit('joinroom',JSON.stringify({username:username,room: room,userList:userList,type:type}));
             });
-            socket.on('exitroom', ({username,room}) => {
+            socket.on('exitroom', ({username,room,type}) => {
                 socketDebug(`${username} exiting room ${room} `);
-                this.removeUserFromRoom(username,room);
+                this.removeUserFromRoom(username,room,type);
                 socket.leave(room);
-                let userList:string[] = this.getUserListForRoom(room);
+                let userList:string[] = this.getUserListForRoom(room,type);
                 socketDebug(userList);
                 if (userList.length == 0) {
                     socketDebug(`No users left in room ${room} removing from server cache`);
                     this.removeRoom(room);
                 }
-                socket.to(room).emit('exitroom',JSON.stringify({username:username,room: room,userList:userList}));
+                socket.to(room).emit('exitroom',JSON.stringify({username:username,room: room,userList:userList,type:type}));
             });
-            socket.on('invite', ({from, to, room,type,requiresAcceptDecline,subject}) => {
+            socket.on('invite', ({from, to, room,type,requiresAcceptDecline,subject,attachment}) => {
                 socketDebug(`${from} has sent an invitation to join room ${room} to ${to} with type ${type}`);
-                this.inviteUserToRoom(from, to, room, type, requiresAcceptDecline,subject);
+                this.inviteUserToRoom(from, to, room, type, requiresAcceptDecline,subject,attachment);
             });
-            socket.on('declineinvite', ({from,room}) => {
+            socket.on('declineinvite', ({from,room,type}) => {
                 socketDebug(`${from} has declined an invitation to join room ${room}`);
-                socket.to(room).emit('declineinvite',JSON.stringify({username:from,room: room}));
+                socket.to(room).emit('declineinvite',JSON.stringify({username:from,room: room,type:type}));
             });
             socket.on('chat', ({from, room, message,created,priority,attachment,type}) => {
                 socketDebug(`${from} has sent a message to room ${room}: ${message}`);
@@ -310,7 +310,7 @@ class SocketManager {
     }
 
     protected queueMessagesForOfflineRoomUsers(message:ChatMessage):void {
-        let room = this.findOrCreateRoom(message.room);
+        let room = this.findOrCreateRoom(message.room,message.type);
         room.users.forEach((user) => {
             if (!MessageQueueManager.getInstance().isUserLoggedIn(user.username)) {
                 MessageQueueManager.getInstance().queueMessageForUser(user.username,message);

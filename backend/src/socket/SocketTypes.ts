@@ -24,7 +24,8 @@ export type InviteMessage = {
     requiresAcceptDecline: boolean,
     userList: string[],
     type: InviteType,
-    subject:string
+    subject:string,
+    attachment:any
 }
 
 export enum InviteType {
@@ -40,6 +41,7 @@ export type ChatUser = {
 
 export type ChatRoom = {
     name: string
+    type: number
     users: ChatUser[]
 }
 

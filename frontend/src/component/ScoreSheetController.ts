@@ -15,6 +15,8 @@ import moment from "moment";
 const sscLogger = debug('score-sheet-controller');
 
 export class ScoreSheetController implements ChatReceiver {
+    public static SOURCE_View:string = 'ssv';
+
     private static _instance: ScoreSheetController;
 
     public static getInstance(): ScoreSheetController {
@@ -25,7 +27,6 @@ export class ScoreSheetController implements ChatReceiver {
     }
 
     private applicationView: any | null = null;
-    private scoreSheetView: ScoreSheetView|null = null;
     private currentScoreRoom: string|null = null;
     private currentlySelectedBoardGame: any|null = null;
     private currentScoreSheet: ScoreSheet|null = null;
@@ -65,6 +66,7 @@ export class ScoreSheetController implements ChatReceiver {
         this.currentlySelectedBoardGame = null;
         this.isRoomCreator = false;
         this.currentUsersInScoreSheet = [];
+        this.stopTimerStoppedByAnotherUser();
     }
 
     public isTimerGoing(): boolean {
@@ -114,29 +116,25 @@ export class ScoreSheetController implements ChatReceiver {
             if (this.currentScoreRoom !== invite.room) {
                 // decline the invite, only one score sheet at a time
                 sscLogger(`Received invite - already in score sheet - declining`);
-                socketManager.sendDeclineInvite(invite.room,this.getCurrentUser());// user declines to join the scoresheet
+                socketManager.sendDeclineInvite(invite.room,this.getCurrentUser(),InviteType.ScoreSheet);// user declines to join the scoresheet
             }
         }
 
         if (invite.requiresAcceptDecline) {
             // notify the user of the invitation
             if (!this.askUserAboutInvitation(invite)) {
-                socketManager.sendDeclineInvite(invite.room,this.getCurrentUser());// user declines to join the scoresheet
+                socketManager.sendDeclineInvite(invite.room,this.getCurrentUser(),InviteType.ScoreSheet);// user declines to join the scoresheet
             };
         }
         // notify the user of the new chat
         notifier.show('Score Sheet',`Joining score sheet`,'info',7000);
-        socketManager.joinChat(this.getCurrentUser(),invite.room);
+        socketManager.joinChat(this.getCurrentUser(),invite.room,InviteType.ScoreSheet);
         this.currentScoreRoom = invite.room;
-        this.currentScoreSheet = {
-            room: invite.room,
-            boardGameName: '',
-            data: [],
-            sheetLayoutOptions: {},
-            timer: 0,
-            isFinished: false,
-            timerGoing: false
-        }
+        this.currentlySelectedBoardGame = {name:invite.subject};
+        this.currentScoreSheet = invite.attachment;
+        // ask the view to initialise with these values
+        ScoreSheetView.getInstance().stateChanged("","",this.currentScoreSheet);
+
         // change to the score sheet
         this.applicationView.handleShowScoreSheet(null);
     }
@@ -165,7 +163,8 @@ export class ScoreSheetController implements ChatReceiver {
         // not implemented, the user needs to be online for a scoresheet
     }
 
-    receiveDecline(room: string, username: string): void {
+    receiveDecline(room: string, username: string, type:number): void {
+        if (type !== InviteType.ScoreSheet) return; //ignore non-score sheets
         if (this.currentScoreRoom) {
             if (this.currentScoreRoom === room) {
                 notifier.show('Score Sheet',`User ${username} declined the invitation.`,'warning');
@@ -174,7 +173,9 @@ export class ScoreSheetController implements ChatReceiver {
     }
 
     receiveJoinedRoom(users: JoinLeft): void {
+        if (users.type !== InviteType.ScoreSheet) return; //ignore non-score sheets
         if (!this.isLoggedIn()) return;  // we are not logged in
+        if (users.username === this.getCurrentUser()) return;
 
         if (this.currentScoreRoom !== users.room) return;
 
@@ -192,10 +193,13 @@ export class ScoreSheetController implements ChatReceiver {
             sscLogger(`Handling user joined ${users.username} - sending`)
             this.sendScoreSheetState(this.currentScoreSheet,false);
         }
+        notifier.show(this.currentlySelectedBoardGame.name,`User ${users.username} joined.`);
     }
 
     receivedLeftRoom(users: JoinLeft): void {
+        if (users.type !== InviteType.ScoreSheet) return; //ignore non-score sheets
         if (!this.isLoggedIn()) return;  // we are not logged in
+        if (users.username === this.getCurrentUser()) return;
 
         if (this.currentScoreRoom !== users.room) return;
         // update the sheet to remove the user
@@ -213,6 +217,7 @@ export class ScoreSheetController implements ChatReceiver {
             sscLogger(`Handling user left ${users.username} - sending`)
             this.sendScoreSheetState(this.currentScoreSheet,false);
         }
+        notifier.show(this.currentlySelectedBoardGame.name,`User ${users.username} left.`);
     }
 
     receiveUserList(users: string[]): void {} // will be managed in the transfer of sheet data
@@ -357,7 +362,7 @@ export class ScoreSheetController implements ChatReceiver {
             this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet,this.currentScoreSheet,true);
 
             // start a new chat room, will automatically manage if logged in or not
-            if (this.isLoggedIn()) socketManager.joinChat(this.getCurrentUser(),this.currentScoreRoom);
+            if (this.isLoggedIn()) socketManager.joinChat(this.getCurrentUser(),this.currentScoreRoom,InviteType.ScoreSheet);
 
         }
     }
@@ -374,13 +379,20 @@ export class ScoreSheetController implements ChatReceiver {
     public inviteUser(username:string) {
         if (!this.isLoggedIn()) return;  // we are not logged in
         // only the user who created the score sheet can do this as they are the only ones with a selected board game
-        if ((this.currentScoreRoom) && (this.currentlySelectedBoardGame) && (this.isRoomCreator)) {
+        if ((this.currentScoreRoom) && (this.currentlySelectedBoardGame) ) {
             sscLogger(`Inviting user ${username} to score sheet`);
-            socketManager.sendInvite(this.getCurrentUser(),username,this.currentScoreRoom,InviteType.ScoreSheet,true,this.currentlySelectedBoardGame.name);
+            if (this.isRoomCreator) {
+                socketManager.sendInvite(this.getCurrentUser(),username,this.currentScoreRoom,InviteType.ScoreSheet,true,this.currentlySelectedBoardGame.name,this.currentScoreSheet);
+            }
+            else {
+                alert("Only the score sheet creator can invite other users.");
+            }
         }
     }
 
     public receiveMessage(message: Message): void {
+        sscLogger(`'Handling receive message`);
+        sscLogger(message);
         if (!this.isLoggedIn()) return;  // we are not logged in
         if (message.type !== InviteType.ScoreSheet) return; //ignore non-score sheets
         if (message.from === this.getCurrentUser()) return; // my own messages can be ignored
@@ -398,21 +410,45 @@ export class ScoreSheetController implements ChatReceiver {
                     // the attachment should be a ScoreSheet object
                     let scoreSheet:ScoreSheet = message.attachment;
                     sscLogger(scoreSheet);
-                    // only update the scoresheet if the timer value is higher from the attachement
+
                     // @ts-ignore
-                    if (scoreSheet.timer > this.currentScoreSheet.timer) {
-                        if (this.currentScoreSheet) {
-                            this.currentScoreSheet.room = message.room;
-                            this.currentScoreSheet.boardGameName = scoreSheet.boardGameName;
-                            this.currentScoreSheet.data = scoreSheet.data;
-                            this.currentScoreSheet.timer = scoreSheet.timer;
-                            this.currentScoreSheet.timerGoing = scoreSheet.timerGoing;
-                            this.currentScoreSheet.sheetLayoutOptions = scoreSheet.sheetLayoutOptions;
-                            this.currentScoreSheet.isFinished = scoreSheet.isFinished;
+                    if (this.currentScoreSheet) {
+                        let timerWasGoing = this.currentScoreSheet.timerGoing;
+                        this.currentScoreSheet.room = message.room;
+                        this.currentScoreSheet.boardGameName = scoreSheet.boardGameName;
+                        this.currentScoreSheet.data = scoreSheet.data;
+                        this.currentScoreSheet.timer = (scoreSheet.timer > this.currentScoreSheet.timer)?scoreSheet.timer:this.currentScoreSheet.timer;
+                        this.currentScoreSheet.timerGoing = scoreSheet.timerGoing;
+                        this.currentScoreSheet.sheetLayoutOptions = scoreSheet.sheetLayoutOptions;
+                        this.currentScoreSheet.isFinished = scoreSheet.isFinished;
+
+                        // has the timer changed?
+                        if (scoreSheet.timerGoing) {
+                            if (timerWasGoing) {
+                                // both timers going, no need to do anything
+                            }
+                            else {
+                                // timer is going with another user, but we aren't going - start timer
+                                this.stopTimerStoppedByAnotherUser();
+                                this.startTimer();
+                            }
                         }
+                        else { // timer not going at the other users end
+                            if (timerWasGoing) {
+                                // our timer is active - pause it
+                                this.stopTimerStoppedByAnotherUser();
+                            }
+                            else {
+                                // neither timer going
+                            }
+                        }
+
+
                     }
+                    sscLogger('Updated score sheet');
+                    sscLogger(this.currentScoreSheet);
                     // save the new state
-                    if (this.currentScoreSheet) this.saveCurrentScoreSheet(this.currentScoreSheet);
+                    if (this.currentScoreSheet) this.saveCurrentScoreSheet(this.currentScoreSheet,true);
                     if (scoreSheet.isFinished) {
                         alert('Score sheet has been finished - closing');
                         // reset the controller
@@ -420,6 +456,9 @@ export class ScoreSheetController implements ChatReceiver {
 
                         // close the room
                         this.leave();
+
+                        // reset the view
+                        ScoreSheetView.getInstance().resetDisplay();
 
                         this.applicationView.switchBetweenCollectionAndScoreSheet(true);
                     }
@@ -433,9 +472,9 @@ export class ScoreSheetController implements ChatReceiver {
         return this.isRoomCreator;
     }
 
-    private saveCurrentScoreSheet(scoreSheet:ScoreSheet) {
+    private saveCurrentScoreSheet(scoreSheet:ScoreSheet, informListeners:boolean = true) {
         this.currentScoreSheet = scoreSheet;
-        this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet,this.currentScoreSheet,false);
+        this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet,this.currentScoreSheet,informListeners);
     }
 
     public createScoreSheetFromTable():ScoreSheet|null {
@@ -506,10 +545,20 @@ export class ScoreSheetController implements ChatReceiver {
         }
     }
 
+    private stopTimerStoppedByAnotherUser() {
+        sscLogger(`Handling timer stopped by another user`);
+        if (this.intervalTimer > 0) {
+            clearInterval(this.intervalTimer);
+        }
+        this.intervalTimer = -1;
+    }
+
     public pauseTimer() {
         sscLogger(`Handling pause timer`);
         if (this.intervalTimer > 0) {
             clearInterval(this.intervalTimer);
+            this.intervalTimer = -1;
+
             if (this.currentScoreSheet) {
                 this.currentScoreSheet.timerGoing = false;
                 this.saveCurrentScoreSheet(this.currentScoreSheet);
@@ -525,13 +574,19 @@ export class ScoreSheetController implements ChatReceiver {
         }
     }
 
-    public userChangedValue(value:any) {
+    public userChangedValue(value:any,source:string) {
+        sscLogger(`Handling user changed value ${source}`)
+        if (source === ScoreSheetController.SOURCE_View) return;
+
+        // is the source an edit?
+        if (source !== 'edit') return;
+
         let scoreSheet:ScoreSheet|null = this.createScoreSheetFromTable();
         sscLogger(`Handling user changed Value`);
         sscLogger(value);
         sscLogger(scoreSheet);
         if (scoreSheet) {
-            this.saveCurrentScoreSheet(scoreSheet);
+            this.saveCurrentScoreSheet(scoreSheet,false);
             if (this.isLoggedIn()) {
                 sscLogger(`Handling user change - updating all users`);
                 this.sendScoreSheetState(scoreSheet,false);
@@ -543,8 +598,10 @@ export class ScoreSheetController implements ChatReceiver {
         sscLogger(`Handling user leaving`);
         if (this.currentScoreSheet && this.currentScoreRoom) {
             if (this.isLoggedIn()) {
-                socketManager.leaveChat(this.getCurrentUser(),this.currentScoreRoom);
+                socketManager.leaveChat(this.getCurrentUser(),this.currentScoreRoom,InviteType.ScoreSheet);
             }
+            this.reset();
+            this.applicationView.switchBetweenCollectionAndScoreSheet(true);
         }
     }
 }

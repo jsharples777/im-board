@@ -241,6 +241,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     receiveJoinedRoom(users: JoinLeft): void {
         // we get this for all changes to a room, if the username is us can safely ignore
         //if (users.username === this.currentUsername) return;
+        if (users.type !== InviteType.ChatRoom) return;
 
         let log:ChatLog = this.ensureChatLogExists(users.room);
 
@@ -265,6 +266,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
     receivedLeftRoom(users: JoinLeft): void {
         // we get this for all changes to a room, if the username is us can safely ignore
+        if (users.type !== InviteType.ChatRoom) return;
         if (users.username === this.currentUsername) return;
 
         let log:ChatLog = this.ensureChatLogExists(users.room);
@@ -329,7 +331,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
                 this.saveLogs();
                 cmLogger(`Joining chat ${invite.room}`);
-                socketManager.joinChat(this.getCurrentUser(), invite.room);
+                socketManager.joinChat(this.getCurrentUser(), invite.room,InviteType.ChatRoom);
                 this.chatListeners.forEach((listener) => listener.handleChatLogUpdated(chatLog, false));
             }
 
@@ -369,9 +371,11 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         }
     }
 
-    receiveDecline(room: string, username: string): void {
+    receiveDecline(room: string, username: string, type:number): void {
+        if (type !== InviteType.ChatRoom) return;
         // we get this for all changes to a room, if the username is us can safely ignore
         if (username === this.currentUsername) return;
+
 
         if (!this.isUserInBlockedList(username)) {
             cmLogger(`User ${username} declined invitation to room`);
@@ -453,7 +457,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     joinChat(room: string): void {
         if (this.getCurrentUser().trim().length === 0) return;  // we are not logged in
         this.ensureChatLogExists(room);
-        socketManager.joinChat(this.getCurrentUser(),room);
+        socketManager.joinChat(this.getCurrentUser(),room,InviteType.ChatRoom);
     }
 
     private removeChatLog(room:string) {
@@ -469,7 +473,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     leaveChat(room: string): void {
         if (this.getCurrentUser().trim().length === 0) return;  // we are not logged in
         this.removeChatLog(room);
-        socketManager.leaveChat(this.getCurrentUser(),room);
+        socketManager.leaveChat(this.getCurrentUser(),room,InviteType.ChatRoom);
     }
 
     login(): void {
@@ -479,7 +483,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         socketManager.getUserList();
         // connect to the chat rooms already in logs
         this.chatLogs.forEach((log) => {
-            socketManager.joinChat(this.currentUsername,log.roomName);
+            socketManager.joinChat(this.currentUsername,log.roomName,InviteType.ChatRoom);
         });
     }
 
@@ -490,7 +494,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
     declineInvite(room:string) {
         if (this.getCurrentUser().trim().length === 0) return;  // we are not logged in
-        socketManager.sendDeclineInvite(room, this.getCurrentUser());
+        socketManager.sendDeclineInvite(room, this.getCurrentUser(),InviteType.ChatRoom);
 
     }
 
@@ -543,7 +547,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
             // invite the other user
             socketManager.sendInvite(this.getCurrentUser(), username, chatLog.roomName,InviteType.ChatRoom,false,'');
             // ok, lets connect to the server
-            socketManager.joinChat(this.getCurrentUser(), chatLog.roomName);
+            socketManager.joinChat(this.getCurrentUser(), chatLog.roomName, InviteType.ChatRoom);
         }
     }
 

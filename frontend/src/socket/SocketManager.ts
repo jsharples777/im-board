@@ -104,7 +104,7 @@ class SocketManager {
         try {
             const dataObj = JSON.parse(data);
             sDebug(dataObj);
-            this.chatReceivers.forEach((receiver) => receiver.receiveDecline(dataObj.room, dataObj.username));
+            this.chatReceivers.forEach((receiver) => receiver.receiveDecline(dataObj.room, dataObj.username, dataObj.type));
         }
         catch (err) {
             sDebug('Not JSON data');
@@ -201,22 +201,23 @@ class SocketManager {
         this.socket.emit('logout',{username});
     }
 
-    public joinChat(username:string, room:string):void {
-        this.socket.emit('joinroom',{username,room});
+    public joinChat(username:string, room:string, type:number):void {
+        this.socket.emit('joinroom',{username,room,type});
     }
 
-    public leaveChat(username:string, room:string):void {
-        this.socket.emit('exitroom', {username,room});
+    public leaveChat(username:string, room:string, type:number):void {
+        this.socket.emit('exitroom', {username,room,type});
     }
 
-    public sendInvite(from:string, to:string, room:string, type:InviteType = InviteType.ChatRoom, requiresAcceptDecline:boolean = false,subject:string = '') {
+    public sendInvite(from:string, to:string, room:string, type:InviteType = InviteType.ChatRoom, requiresAcceptDecline:boolean = false,subject:string = '',attachment:any = {}) {
         let inviteObj:any = {
             from:from,
             to:to,
             room: room,
             type: type,
             requiresAcceptDecline: requiresAcceptDecline,
-            subject:subject
+            subject:subject,
+            attachment:attachment
         }
         sDebug(`Sending invite`);
         sDebug(inviteObj);
@@ -240,8 +241,8 @@ class SocketManager {
         this.socket.emit('userlist');
     }
 
-    public sendDeclineInvite(room:string,from:string) {
-        this.socket.emit('declineinvite',{room,from});
+    public sendDeclineInvite(room:string,from:string,type:number) {
+        this.socket.emit('declineinvite',{room,from,type});
     }
 }
 

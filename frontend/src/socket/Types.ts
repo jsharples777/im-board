@@ -6,7 +6,8 @@ export type Invitation = {
     userList:string[],
     type: InviteType,
     requiresAcceptDecline: boolean,
-    subject:string
+    subject:string,
+    attachment:any
 }
 
 export type Message = {
@@ -15,14 +16,15 @@ export type Message = {
     message: string,
     created: number,
     priority: number,
-    type:number,
+    type:InviteType,
     attachment?: any
 }
 
 export type JoinLeft = {
     username: string,
     room: string,
-    userList: string[]
+    userList: string[],
+    type: InviteType
 }
 
 export enum Priority {

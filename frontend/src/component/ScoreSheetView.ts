@@ -83,12 +83,13 @@ export class ScoreSheetView implements StateChangeListener{
             this.resetDisplay();
         }
         else {
-            // leavingg the score sheet
+            // leaving the score sheet
             // double check this is want we want
             if (!confirm("Are you sure you want to leave the score sheet")) return;
 
             // user wants to finish
             this.controller.leave();
+
 
             // reset the display
             this.resetDisplay();
@@ -121,7 +122,7 @@ export class ScoreSheetView implements StateChangeListener{
     }
 
 
-    private resetDisplay() {
+    public resetDisplay() {
         this.table = null;
 
         // reset the display
@@ -219,7 +220,7 @@ export class ScoreSheetView implements StateChangeListener{
             ssvLogger(`Table data is `);
             ssvLogger(tableData);
             // @ts-ignore
-            this.table.setDataAtCell(tableData);
+            this.table.setDataAtCell(tableData,ScoreSheetController.SOURCE_View);
 
         }
         else {
