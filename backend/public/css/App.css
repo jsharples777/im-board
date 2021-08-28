@@ -1,14 +1,32 @@
+/*
+*
+*  Fonts
+*
+ */
 @font-face {
     font-family: 'digital';
     src: url('/assets/digital-7.ttf');
 }
 
-
-.scroll {
-    max-height: 400px;
-    overflow-y: auto;
+/* headings for the site using the new font */
+h1 {
+    font-family: 'Special Elite', cursive;
+    font-weight: bold;
+    font-size: 32px;
 }
 
+h2 {
+    font-family: 'Special Elite', cursive;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+
+/*
+*
+*  Notifications
+*
+ */
 .notifications {
     position:fixed;
     top:0;
@@ -25,10 +43,29 @@
     width: 30vw
 }
 
+/* hovering over badges and icons */
 .badge:hover {
     cursor: pointer;
 }
 
+i:hover {
+    cursor: pointer;
+}
+
+
+/* card scrolling on side bars*/
+.scroll {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/*
+*
+*  Sidebars, styles, content styling, scrolling
+*
+ */
+
+/* standard list items in the sidebars */
 .my-list-item {
     margin-top: 3px;
     margin-bottom: 1px;
@@ -37,13 +74,56 @@
     padding-bottom: 5px;
 }
 
-/* The sidebar menu */
+/* scrolling if the sidebar cards */
+.scroll-user-search {
+    height: 20vh;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+.scroll-favourite-users {
+    height: 20vh;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+.scroll-blocked-users {
+    height: 20vh;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+.scroll-bgg-search {
+    height: 70vh;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+.scroll-chatlogs {
+    height: 30vh;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+
+.scroll-score-sheet {
+    width: 100vw;
+    overflow-x: scroll;
+}
+
+.scroll-score-sheet-active {
+    width: 100%;
+    max-width: 200%;
+    overflow-x: auto;
+}
+
+
+
+/* The sidebar sty styles, left, right and bottom */
 .sidebar-left {
     height: 100%; /* 100% Full-height */
     width: 0px; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
     z-index: 2; /* Stay on top */
-    top: 50px;
+    top: 100px;
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 10px; /* Place content 60px from the top */
@@ -51,14 +131,14 @@
 }
 
 .sidebar-bottom {
-    height: 25%; /* 25% Full-height */
+    height: 0px; /* 25% Full-height */
     width: 100%; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
     z-index: 1; /* Stay on top */
     bottom: 0px;
     right: 0;
     /*overflow-y: hidden;  Disable horizontal scroll */
-    padding-bottom: 10px; /* Place content 60px from the top */
+    padding-bottom: 0px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
 }
 
@@ -67,7 +147,7 @@
     width: 0px; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
     z-index: 2; /* Stay on top */
-    top: 50px;
+    top: 100px;
     right: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 10px; /* Place content 60px from the top */
@@ -98,9 +178,6 @@
     background-color: #444;
 }
 
-i:hover {
-    cursor: pointer;
-}
 
 /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
 #main {
@@ -109,73 +186,13 @@ i:hover {
     padding: 20px;
 }
 
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-    .sidebar {padding-top: 15px;}
-}
 
-small-text {
-    font-size: 8pt;
-}
 
-small-heading {
-    font-size: 10pt;
-}
-
-.truncate-comment {
-    width:100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.scroll-chatlogs {
-    height: 200px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.scroll-chat {
-    height: 300px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.scroll-user-search {
-    height: 40vh;
-    max-height: 100vh;
-    overflow-y: auto;
-}
-
-.scroll-bgg-search {
-    height: 70vh;
-    max-height: 100vh;
-    overflow-y: auto;
-}
-
-.scroll-favourite-users {
-    height: 20vh;
-    max-height: 50vh;
-    overflow-y: auto;
-}
-
-.scroll-score-sheet {
-    width: 100vw;
-    /*max-width: 300vw;*/
-    overflow-x: scroll;
-}
-
-.scroll-score-sheet-active {
-    width: 100%;
-    max-width: 200%;
-    overflow-x: auto;
-}
-
-.scroll-blocked-users {
-    height: 20vh;
-    max-height: 50vh;
-    overflow-y: auto;
-}
+/*
+*
+*  Circle buttons in Boostrap
+*
+ */
 .btn-circle.btn-xsm {
     width: 18px;
     height: 18px;
@@ -211,18 +228,24 @@ small-heading {
     text-align: center;
 }
 
+/*
+*
+*  Chat room styles
+*
+ */
 .room {
     background: #EAEAEA;
     padding:0.5em;
 }
+
 .messages {
     display: flex;
     align-items: flex-start;
     flex-direction: column;
     width: auto !important;
     overflow:auto;
-    min-height:400px;
-    max-height:400px;
+    min-height:20vw;
+    max-height:20vw;
 }
 
 .message{
@@ -248,7 +271,6 @@ small-heading {
     background: white;
 }
 
-
 .my-message-content {
     font-size: small;
     padding: 0.4rem 0.8rem;
@@ -258,23 +280,54 @@ small-heading {
 }
 
 
+/*
+*
+*  Main screen
+*
+ */
+.root {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../img/splash.jpg');
+    background-size: cover;
+    background-repeat: repeat-y;
+    padding-top: 110px;
+}
+
+/*
+*
+*  Score sheet screen
+*
+ */
+.scoresheet {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../img/scoresheet2.jpg');
+    background-size: cover;
+    padding-top: 110px;
+}
+
+/* timer font */
+.timer {
+    font-family: 'digital';
+    font-size: 36pt;
+    color: white;
+}
+
+/* score card side background image sizing */
+.score-card-img {
+    width: 100%;
+    height: 15vw;
+    object-fit: cover;
+}
+
+/* keep the messages where they are (left or right) */
 @media(max-width : 30em){
     .room.messages{
         flex: 1;
     }
 }
 
-h1 {
-    font-family: 'Special Elite', cursive;
-    font-weight: bold;
-    font-size: 32px;
-}
-
-h2 {
-    font-family: 'Special Elite', cursive;
-    font-weight: bold;
-    font-size: 24px;
-}
 
 @media(max-width: 500px) {
     .btn-circle.btn-md {
@@ -287,16 +340,6 @@ h2 {
     }
 }
 
-@media screen and (max-width: 414px) {
-    .notifications .notification {
-        width: 90vw
-    }
-    .timer {
-        font-size: 12pt;
-        width: 45%;
-    }
-
-}
 @media screen and (max-width: 768px) {
     .notifications .notification {
         width: 50vw
@@ -305,52 +348,50 @@ h2 {
         font-size: 20pt;
         width: 40%;
     }
+    .messages {
+        min-height: 40vw;
+        max-height: 40vw;
+    }
 
 }
-
 
 @media screen and (max-width: 467px) {
     .notifications .notification {
         width: 80vw
     }
+    .sidebar-left {
+        padding-top: 0px;
+        top:0;
+    }
+    .sidebar-right {
+        padding-top: 0px;
+        top:0;
+    }
+
+}
+@media screen and (max-width: 414px) {
+    .notifications .notification {
+        width: 90vw
+    }
+    .timer {
+        font-size: 12pt;
+        width: 45%;
+    }
+    .notifications .notification {
+        width: 100vw
+    }
+    .sidebar-left {
+        padding-top: 0px;
+        top:0;
+    }
+    .sidebar-right {
+        padding-top: 0px;
+        top:0;
+    }
+    .messages {
+        min-height: 55vw;
+        max-height: 55vw;
+    }
 
 }
 
-.root {
-    width: 100vw;
-    height: 100vh;
-    background-image: url('../img/splash.jpg');
-    background-size: cover;
-    background-repeat: repeat-y;
-    padding-top: 110px;
-}
-
-.scoresheet {
-    width: 100vw;
-    height: 100vh;
-    background-image: url('../img/scoresheet2.jpg');
-    background-size: cover;
-    padding-top: 110px;
-}
-
-
-.timer {
-    font-family: 'digital';
-    font-size: 36pt;
-    color: white;
-}
-
-.hidden {
-    transition: all 0.5s ease;
-    transition-delay:0.2s;}
-
-.visible {
-    transition: all 0.5s ease;
-    transition-delay:0.2s;
-}
-
-.score-card-img {
-    width: 100%;
-    height: 15vw;
-    object-fit: cover;
-}
