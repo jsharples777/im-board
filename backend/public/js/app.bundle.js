@@ -4153,7 +4153,7 @@ var ScoreSheetSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.getBackgroundImage = function getBackgroundImage(name, item) {
-    return './img/scorecard.jpg';
+    return './img/scorecard-vertical.jpg';
   };
 
   _proto.eventClickItem = function eventClickItem(event) {};

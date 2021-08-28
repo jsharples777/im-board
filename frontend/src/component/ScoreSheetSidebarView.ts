@@ -116,7 +116,7 @@ class ScoreSheetSidebarView extends SidebarView {
     }
 
     protected getBackgroundImage(name: string, item: any): string {
-        return './img/scorecard.jpg';
+        return './img/scorecard-vertical.jpg';
     }
 
 

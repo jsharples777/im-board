@@ -395,12 +395,14 @@ i:hover {
         top:0;
     }
     .root-login {
+        background-image: url('../img/login-vertical.jpg');
         background-size: contain;
-        background-repeat: repeat-y;
+        background-repeat: no-repeat;
     }
     .root-registration {
+        background-image: url('../img/registration-vertical.jpg');
         background-size: contain;
-        background-repeat: repeat-y;
+        background-repeat: no-repeat;
     }
 
 }
