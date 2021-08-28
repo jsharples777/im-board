@@ -294,6 +294,24 @@ i:hover {
     padding-top: 110px;
 }
 
+.root-login {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../img/login.jpg');
+    background-size: cover;
+    background-repeat: repeat-y;
+    padding-top: 110px;
+}
+
+.root-registration {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../img/registration.jpg');
+    background-size: cover;
+    background-repeat: repeat-y;
+    padding-top: 110px;
+}
+
 /*
 *
 *  Score sheet screen
@@ -312,6 +330,7 @@ i:hover {
     font-family: 'digital';
     font-size: 36pt;
     color: white;
+    width: 40%;
 }
 
 /* score card side background image sizing */
@@ -352,6 +371,14 @@ i:hover {
         min-height: 40vw;
         max-height: 40vw;
     }
+    .root-login {
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+    .root-registration {
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
 
 }
 
@@ -367,6 +394,14 @@ i:hover {
         padding-top: 0px;
         top:0;
     }
+    .root-login {
+        background-size: contain;
+        background-repeat: repeat-y;
+    }
+    .root-registration {
+        background-size: contain;
+        background-repeat: repeat-y;
+    }
 
 }
 @media screen and (max-width: 414px) {
@@ -374,7 +409,7 @@ i:hover {
         width: 90vw
     }
     .timer {
-        font-size: 12pt;
+        font-size: 30pt;
         width: 45%;
     }
     .notifications .notification {

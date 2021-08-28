@@ -1010,7 +1010,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
             resultsId: 'scoreSheets',
             resultsElementType: 'div',
             resultsElementAttributes: [['style', 'height:300px; width:120px']],
-            resultsClasses: 'text-black bg-light col-sm-6 col-md-3 col-lg-2 mt-1 mr-2',
+            resultsClasses: 'text-white bg-info col-sm-6 col-md-3 col-lg-2 mt-1 mr-2',
             resultDataKeyId: 'bgg-id',
             resultLegacyDataKeyId: 'bgg-id',
             resultDataSourceId: 'data-source',
@@ -1029,7 +1029,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
             resultContentDivClasses: 'card-img-overlay',
             resultContentTextElementType: 'div',
             resultContentTextClasses: 'ml-2',
-            hasBackgroundImage: false,
+            hasBackgroundImage: true,
             imgElementType: 'img',
             imgClasses: 'score-card-img'
           }
@@ -4153,7 +4153,7 @@ var ScoreSheetSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.getBackgroundImage = function getBackgroundImage(name, item) {
-    return this.selectedBoardGame.thumb;
+    return './img/scorecard.jpg';
   };
 
   _proto.eventClickItem = function eventClickItem(event) {};

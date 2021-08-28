@@ -263,7 +263,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         resultsElementAttributes: [
                             ['style','height:300px; width:120px']
                         ],
-                        resultsClasses: 'text-black bg-light col-sm-6 col-md-3 col-lg-2 mt-1 mr-2',
+                        resultsClasses: 'text-white bg-info col-sm-6 col-md-3 col-lg-2 mt-1 mr-2',
                         resultDataKeyId: 'bgg-id',
                         resultLegacyDataKeyId: 'bgg-id',
                         resultDataSourceId: 'data-source',
@@ -282,7 +282,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         resultContentDivClasses: 'card-img-overlay',
                         resultContentTextElementType: 'div',
                         resultContentTextClasses: 'ml-2',
-                        hasBackgroundImage: false,
+                        hasBackgroundImage: true,
                         imgElementType: 'img',
                         imgClasses: 'score-card-img',
                     },
