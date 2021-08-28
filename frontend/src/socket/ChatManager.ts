@@ -11,6 +11,7 @@ import {StateManager} from "../state/StateManager";
 import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
 import uuid from "../util/UUID";
 import {ChatUserEventListener} from "./ChatUserEventListener";
+import {UnreadMessageCountListener} from "./UnreadMessageCountListener";
 
 
 enum UserStatus {
@@ -39,6 +40,7 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
     private static blockedListKey = 'im-board-blocked-list';
     protected favouriteList: string[] = [];
     private static favouriteListKey = 'im-board-favourite-list';
+    private unreadListener:UnreadMessageCountListener|null = null;
 
 
     protected loggedInUsers: string[] = [];
@@ -384,10 +386,25 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
 
     }
 
+    public setUnreadCountListener(listener:UnreadMessageCountListener) {
+        this.unreadListener = listener;
+    }
+
+    private emitUnreadMessageCountChanged() {
+        let unreadCount = 0;
+        this.chatLogs.forEach((log) => {
+            unreadCount += log.numOfNewMessages;
+        });
+        this.unreadListener?.countChanged(unreadCount);
+    }
+
 
     private addMessageToChatLog(log:ChatLog, message:Message) {
         log.numOfNewMessages ++;
         log.messages.push(message);
+
+        this.emitUnreadMessageCountChanged();
+
         if (message.from === this.getCurrentUser()) {
             this.touchChatLog(log.roomName); // this will also save the logs
         }
@@ -400,6 +417,9 @@ export class ChatManager implements ChatReceiver,ChatEmitter {
         let chatLog = this.ensureChatLogExists(room);
         chatLog.numOfNewMessages = 0;
         chatLog.lastViewed = parseInt(moment().format('YYYYMMDDHHmmss'));
+
+        this.emitUnreadMessageCountChanged();
+
         this.saveLogs();
     }
 

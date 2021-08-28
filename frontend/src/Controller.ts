@@ -137,6 +137,9 @@ class Controller implements StateChangeListener {
             chatManager.setCurrentUser(this.getLoggedInUsername());
             ScoreSheetController.getInstance().setCurrentUser(this.getLoggedInUsername());
 
+            // let the application view know about message counts
+            chatManager.setUnreadCountListener(this.applicationView);
+
             chatManager.login();
 
 

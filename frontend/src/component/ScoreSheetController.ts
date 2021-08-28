@@ -12,6 +12,7 @@ import {StateManager} from "../state/StateManager";
 import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
 import moment from "moment";
 import controller from "../Controller";
+import {TemplateManager} from "../template/TemplateManager";
 
 const sscLogger = debug('score-sheet-controller');
 
@@ -137,6 +138,8 @@ export class ScoreSheetController implements ChatReceiver {
         this.currentlySelectedBoardGame = invite.attachment.boardGame;
         this.currentScoreSheet = invite.attachment.scoreSheet;
 
+        controller.addBoardGameToDisplay(invite.attachment.boardGame);
+
         // check to see if the timer should be going
         if (this.isTimerGoing()) {
             this.stopTimerStoppedByAnotherUser();
@@ -257,33 +260,11 @@ export class ScoreSheetController implements ChatReceiver {
 
     private saveScoreSheetToBoardGame(scoreSheet:ScoreSheet) {
         sscLogger('Handling save');
-        let saveData = {
-            id: scoreSheet.room,
-            jsonData: JSON.stringify(scoreSheet),
-            createdOn: moment().format('YYYYMMDDHHmmss'),
-            players: [],
-            scores: []
-        }
-        sscLogger(scoreSheet);
-        // process the table data for names and scores
-        // the first row is the player names
-        // @ts-ignore
-        const playerNames: string[] = scoreSheet.data[0];
-        // @ts-ignore
-        const scores: any[] = scoreSheet.data[scoreSheet.data.length - 1]
-        sscLogger(`players and scores`);
-        sscLogger(playerNames);
-        sscLogger(scores);
-
-        // @ts-ignore
-        saveData.players = playerNames;
-        // @ts-ignore
-        saveData.scores = scores;
-
-        sscLogger(saveData);
 
         // add the data to the selected board game
         if (this.currentlySelectedBoardGame) {
+            const saveData = TemplateManager.getInstance().getSaveData(this.currentlySelectedBoardGame,scoreSheet);
+            sscLogger(saveData);
             if (!this.currentlySelectedBoardGame.scoresheets) {
                 this.currentlySelectedBoardGame.scoresheets = [];
             }
@@ -293,96 +274,6 @@ export class ScoreSheetController implements ChatReceiver {
     }
 
 
-    private getDefaultScoreSheetTemplate(boardGame:any):any {
-        return {
-            //width:'90%',
-            //height:'90%',
-            colHeaders:false,
-            rowHeaders:false,
-            licenseKey: 'non-commercial-and-evaluation',
-            manualColumnResize:false,
-            manualRowResize:false,
-            selectionMode:'single',
-            columnSummary: [
-                {
-                    destinationRow: 0,
-                    destinationColumn:0,
-                    reversedRowCoords: true,
-                    type: 'sum',
-                    forceNumeric:true
-                },
-                {
-                    destinationRow: 0,
-                    destinationColumn:1,
-                    reversedRowCoords: true,
-                    type: 'sum',
-                    forceNumeric:true
-                },
-                {
-                    destinationRow: 0,
-                    destinationColumn:2,
-                    reversedRowCoords: true,
-                    type: 'sum',
-                    forceNumeric:true
-                },
-                {
-                    destinationRow: 0,
-                    destinationColumn:3,
-                    reversedRowCoords: true,
-                    type: 'sum',
-                    forceNumeric:true
-                },
-                {
-                    destinationRow: 0,
-                    destinationColumn:4,
-                    reversedRowCoords: true,
-                    type: 'sum',
-                    forceNumeric:true
-                },
-                {
-                    destinationRow: 0,
-                    destinationColumn:5,
-                    reversedRowCoords: true,
-                    type: 'sum',
-                    forceNumeric:true
-                },
-                {
-                    destinationRow: 0,
-                    destinationColumn:6,
-                    reversedRowCoords: true,
-                    type: 'sum',
-                    forceNumeric:true
-                },
-            ]
-
-        }
-    }
-
-    private getDefaultScoreSheetStartingData(boardGame:any):any[] {
-        return [
-            ['P 1','P 2','P 3','P 4','P 5','P 6','P 7'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-        ];
-    }
-
-
-    private getScoreSheetTemplate(boardGame:any):any|null {
-        return this.getDefaultScoreSheetTemplate(boardGame);
-    }
-
-    private getScoreSheetStartingData(boardGame:any):any[]|null {
-        return this.getDefaultScoreSheetStartingData(boardGame);
-    }
 
     public startScoreSheet(boardGame:any):void {
         if (boardGame) {
@@ -394,10 +285,10 @@ export class ScoreSheetController implements ChatReceiver {
             this.currentScoreSheet = {
                 room: this.currentScoreRoom,
                 boardGameName: boardGame.name,
-                sheetLayoutOptions: this.getScoreSheetTemplate(boardGame),
+                sheetLayoutOptions: TemplateManager.getInstance().getScoreSheetTemplate(boardGame),
                 timer:0,
                 timerGoing:false,
-                data: this.getScoreSheetStartingData(boardGame),
+                data: TemplateManager.getInstance().getScoreSheetStartingData(boardGame),
                 isFinished:false
             }
             sscLogger(this.currentScoreSheet);
@@ -530,7 +421,7 @@ export class ScoreSheetController implements ChatReceiver {
                 data: tableData,
                 boardGameName: this.currentlySelectedBoardGame.name,
                 timer: this.currentScoreSheet.timer,
-                sheetLayoutOptions: (this.currentlySelectedBoardGame)?this.getScoreSheetTemplate(this.currentlySelectedBoardGame):null,
+                sheetLayoutOptions: (this.currentlySelectedBoardGame)?TemplateManager.getInstance().getScoreSheetTemplate(this.currentlySelectedBoardGame):null,
                 timerGoing: this.currentScoreSheet.timerGoing,
                 isFinished: false
             }

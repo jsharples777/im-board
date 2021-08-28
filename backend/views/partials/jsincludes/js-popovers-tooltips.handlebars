@@ -2,14 +2,15 @@
     $(function () {
         $('[data-toggle="popover"]').popover()
     })
-    $('.popover-dismiss').popover({
-        trigger: 'focus'
-    })
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
 
     $(document).ready(function() {
         $(".toast").toast('show');
+        $('.alert').alert();
+        $('.popover-dismiss').popover({
+            trigger: 'focus'
+        })
     });
 </script>

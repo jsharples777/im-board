@@ -14,11 +14,12 @@ import browserUtil from "./util/BrowserUtil";
 import {ScoreSheetController} from "./component/ScoreSheetController";
 import {ScoreSheetView} from "./component/ScoreSheetView";
 import ScoreSheetSidebarView from "./component/ScoreSheetSidebarView";
+import {UnreadMessageCountListener} from "./socket/UnreadMessageCountListener";
 
 
 const logger = debug('app');
 
-class Root extends React.Component{
+class Root extends React.Component implements UnreadMessageCountListener{
     private titleEl: any;
     private contentEl: any;
     private modalEl: any;
@@ -49,6 +50,8 @@ class Root extends React.Component{
     private thisEl: HTMLDivElement | null;
     // @ts-ignore
     private scoreSheetEl: HTMLDivElement | null;
+    // @ts-ignore
+    private chatNavigationItem: HTMLAnchorElement|null;
 
     constructor() {
         // @ts-ignore
@@ -548,7 +551,10 @@ class Root extends React.Component{
             // @ts-ignore
             document.getElementById(this.state.ui.navigation.userSearchId).addEventListener('click', this.handleShowUserSearch);
             // @ts-ignore
-            document.getElementById(this.state.ui.navigation.chatId).addEventListener('click', this.handleShowChat);
+            this.chatNavigationItem = document.getElementById(this.state.ui.navigation.chatId);
+
+            // @ts-ignore
+            this.chatNavigationItem.addEventListener('click', this.handleShowChat);
             // @ts-ignore
             document.getElementById(this.state.ui.navigation.showMyCollection).addEventListener('click', this.handleShowCollection);
             // @ts-ignore
@@ -678,6 +684,15 @@ class Root extends React.Component{
             // @ts-ignore
         }
         this.bggSearchView.eventShow(event);
+    }
+
+    countChanged(newCount: number): void {
+        //
+        let buffer = 'Chat <i class="fas fa-inbox"></i>';
+        if (newCount > 0) {
+            buffer += ` <span class="badge badge-pill badge-primary">&nbsp;${newCount}&nbsp;</span>`;
+        }
+        if (this.chatNavigationItem) this.chatNavigationItem.innerHTML = `${buffer}`;
     }
 
 }
