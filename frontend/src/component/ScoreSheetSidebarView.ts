@@ -38,11 +38,11 @@ class ScoreSheetSidebarView extends SidebarView {
     }
 
     getIdForStateItem(name: string, item: any) {
-        return this.selectedBoardGame.boardGameId;
+        return item.id;
     }
 
     getLegacyIdForStateItem(name: string, item: any) {
-        return this.selectedBoardGame.boardGameId;
+        return item.id;
     }
 
     /*
@@ -98,6 +98,12 @@ class ScoreSheetSidebarView extends SidebarView {
             if (item.score7 > 0) {
                 buffer += `${item.player7}:${item.score7} `;
             }
+        }
+        if (item.players) {
+            for (let index = 0;index < item.players.length;index++) {
+
+            }
+
         }
         buffer += `</p>`;
         return buffer;

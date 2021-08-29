@@ -210,7 +210,7 @@ export class ScoreSheetController implements ChatReceiver {
             sscLogger(`Handling user joined ${users.username} - sending`)
             this.sendScoreSheetState(this.currentScoreSheet,false);
         }
-        notifier.show(this.currentlySelectedBoardGame.name,`User ${users.username} joined.`);
+        notifier.show(this.currentlySelectedBoardGame.name,`User ${users.username} joined the scoresheet.`,'message',120000);
     }
 
     receivedLeftRoom(users: JoinLeft): void {
@@ -234,7 +234,7 @@ export class ScoreSheetController implements ChatReceiver {
             sscLogger(`Handling user left ${users.username} - sending`)
             this.sendScoreSheetState(this.currentScoreSheet,false);
         }
-        notifier.show(this.currentlySelectedBoardGame.name,`User ${users.username} left.`);
+        notifier.show(this.currentlySelectedBoardGame.name,`User ${users.username} left the scoresheet.`,'warning',100000);
     }
 
     receiveUserList(users: string[]): void {} // will be managed in the transfer of sheet data
@@ -317,6 +317,7 @@ export class ScoreSheetController implements ChatReceiver {
         if ((this.currentScoreRoom) && (this.currentlySelectedBoardGame) ) {
             sscLogger(`Inviting user ${username} to score sheet`);
             if (this.isRoomCreator) {
+                notifier.show(this.currentlySelectedBoardGame.name,`You have invited user ${username} to the scoresheet`,'message');
                 socketManager.sendInvite(this.getCurrentUser(),username,this.currentScoreRoom,InviteType.ScoreSheet,true,this.currentlySelectedBoardGame.name,{scoreSheet: this.currentScoreSheet,boardGame:this.currentlySelectedBoardGame});
             }
             else {
@@ -522,7 +523,13 @@ export class ScoreSheetController implements ChatReceiver {
         sscLogger(value);
         sscLogger(scoreSheet);
         if (scoreSheet) {
-            this.saveCurrentScoreSheet(scoreSheet,false);
+            sscLogger(`Letting the template manager change any values`);
+            const changedByTM:boolean = TemplateManager.getInstance().transformDataAfterUserChange(this.currentlySelectedBoardGame,scoreSheet);
+            if (changedByTM) {
+                sscLogger(scoreSheet);
+            }
+
+            this.saveCurrentScoreSheet(scoreSheet,changedByTM);
             if (this.isLoggedIn()) {
                 sscLogger(`Handling user change - updating all users`);
                 this.sendScoreSheetState(scoreSheet,false);

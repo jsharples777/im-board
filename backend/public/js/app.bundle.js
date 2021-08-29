@@ -1025,7 +1025,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
             iconWarning: ' ',
             isDraggable: false,
             isClickable: false,
-            isDeleteable: false,
+            isDeleteable: true,
+            deleteButtonClasses: 'btn btn-rounded btn-warning ml-6 mt-4',
+            deleteButtonText: 'Delete&nbsp;',
+            deleteButtonIconClasses: 'fas fa-trash-alt',
             resultContentDivClasses: 'card-img-overlay',
             resultContentTextElementType: 'div',
             resultContentTextClasses: 'ml-2',
@@ -1464,7 +1467,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
 
 
-localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view score-sheet-sidebar score-sheet-sidebar:detail view-ts';
+localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view score-sheet-sidebar score-sheet-sidebar:detail view-ts template-manager';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -2054,6 +2057,8 @@ var Controller = /*#__PURE__*/function () {
   _proto.scoreSheetAddedToBoardGame = function scoreSheetAddedToBoardGame(boardGame, scoreSheet) {
     var cb = function cb(data, status, associatedStateName) {};
 
+    scoreSheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally;
+
     if (this.isLoggedIn() && boardGame.decorator && boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted) {
       //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
       _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString, {
@@ -2061,6 +2066,45 @@ var Controller = /*#__PURE__*/function () {
         boardGameId: boardGame.id,
         sheet: scoreSheet
       }, cb, this.config.stateNames.scoreSheet, false);
+      scoreSheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
+    } // convert the scoresheet into the usual received format from the database
+
+
+    if (scoreSheet.players) {
+      if (scoreSheet.players.length >= 1) {
+        scoreSheet.player1 = scoreSheet.players[0];
+        scoreSheet.score1 = scoreSheet.scores[0];
+      }
+
+      if (scoreSheet.players.length >= 2) {
+        scoreSheet.player2 = scoreSheet.players[1];
+        scoreSheet.score2 = scoreSheet.scores[1];
+      }
+
+      if (scoreSheet.players.length >= 3) {
+        scoreSheet.player3 = scoreSheet.players[2];
+        scoreSheet.score3 = scoreSheet.scores[2];
+      }
+
+      if (scoreSheet.players.length >= 4) {
+        scoreSheet.player4 = scoreSheet.players[3];
+        scoreSheet.score4 = scoreSheet.scores[3];
+      }
+
+      if (scoreSheet.players.length >= 5) {
+        scoreSheet.player5 = scoreSheet.players[4];
+        scoreSheet.score5 = scoreSheet.scores[4];
+      }
+
+      if (scoreSheet.players.length >= 6) {
+        scoreSheet.player6 = scoreSheet.players[5];
+        scoreSheet.score6 = scoreSheet.scores[5];
+      }
+
+      if (scoreSheet.players.length >= 7) {
+        scoreSheet.player7 = scoreSheet.players[6];
+        scoreSheet.score7 = scoreSheet.scores[6];
+      }
     }
 
     var currentListOfGames = this.applicationView.state.boardGames;
@@ -2445,8 +2489,8 @@ var AbstractView = /*#__PURE__*/function () {
         _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_1__["default"].addRemoveClasses(deleteButtonEl, domConfig.deleteButtonClasses);
 
         if (domConfig.deleteButtonText) {
-          if (domConfig.deleteButtonText.trim().length() > 0) {
-            domConfig.innerText = domConfig.deleteButtonText;
+          if (domConfig.deleteButtonText.trim().length > 0) {
+            deleteButtonEl.innerHTML = domConfig.deleteButtonText;
           }
         }
 
@@ -3642,7 +3686,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
       this.sendScoreSheetState(this.currentScoreSheet, false);
     }
 
-    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show(this.currentlySelectedBoardGame.name, "User " + users.username + " joined.");
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show(this.currentlySelectedBoardGame.name, "User " + users.username + " joined the scoresheet.", 'message', 120000);
   };
 
   _proto.receivedLeftRoom = function receivedLeftRoom(users) {
@@ -3671,7 +3715,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
       this.sendScoreSheetState(this.currentScoreSheet, false);
     }
 
-    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show(this.currentlySelectedBoardGame.name, "User " + users.username + " left.");
+    _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show(this.currentlySelectedBoardGame.name, "User " + users.username + " left the scoresheet.", 'warning', 100000);
   };
 
   _proto.receiveUserList = function receiveUserList(users) {} // will be managed in the transfer of sheet data
@@ -3757,6 +3801,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
       sscLogger("Inviting user " + username + " to score sheet");
 
       if (this.isRoomCreator) {
+        _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show(this.currentlySelectedBoardGame.name, "You have invited user " + username + " to the scoresheet", 'message');
         _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].sendInvite(this.getCurrentUser(), username, this.currentScoreRoom, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet, true, this.currentlySelectedBoardGame.name, {
           scoreSheet: this.currentScoreSheet,
           boardGame: this.currentlySelectedBoardGame
@@ -3963,7 +4008,14 @@ var ScoreSheetController = /*#__PURE__*/function () {
     sscLogger(scoreSheet);
 
     if (scoreSheet) {
-      this.saveCurrentScoreSheet(scoreSheet, false);
+      sscLogger("Letting the template manager change any values");
+      var changedByTM = _template_TemplateManager__WEBPACK_IMPORTED_MODULE_10__["TemplateManager"].getInstance().transformDataAfterUserChange(this.currentlySelectedBoardGame, scoreSheet);
+
+      if (changedByTM) {
+        sscLogger(scoreSheet);
+      }
+
+      this.saveCurrentScoreSheet(scoreSheet, changedByTM);
 
       if (this.isLoggedIn()) {
         sscLogger("Handling user change - updating all users");
@@ -4069,11 +4121,11 @@ var ScoreSheetSidebarView = /*#__PURE__*/function (_SidebarView) {
   };
 
   _proto.getIdForStateItem = function getIdForStateItem(name, item) {
-    return this.selectedBoardGame.boardGameId;
+    return item.id;
   };
 
   _proto.getLegacyIdForStateItem = function getLegacyIdForStateItem(name, item) {
-    return this.selectedBoardGame.boardGameId;
+    return item.id;
   }
   /*
       <h5 class="card-title">Card title</h5>
@@ -4138,6 +4190,10 @@ var ScoreSheetSidebarView = /*#__PURE__*/function (_SidebarView) {
       if (item.score7 > 0) {
         buffer += item.player7 + ":" + item.score7 + " ";
       }
+    }
+
+    if (item.players) {
+      for (var index = 0; index < item.players.length; index++) {}
     }
 
     buffer += "</p>";
@@ -8825,7 +8881,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TemplateManager", function() { return TemplateManager; });
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
 
+
+var templateLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('template-manager');
 var TemplateManager = /*#__PURE__*/function () {
   TemplateManager.getInstance = function getInstance() {
     if (!TemplateManager._instance) {
@@ -8838,6 +8898,61 @@ var TemplateManager = /*#__PURE__*/function () {
   function TemplateManager() {}
 
   var _proto = TemplateManager.prototype;
+
+  _proto.getOhanamiTemplate = function getOhanamiTemplate() {
+    var template = {
+      colHeaders: false,
+      rowHeaders: false,
+      licenseKey: 'non-commercial-and-evaluation',
+      manualColumnResize: false,
+      manualRowResize: false,
+      selectionMode: 'single',
+      cells: function cells(row, column) {
+        if (column === 0 || column === 1 || row === 8) {
+          return {
+            readOnly: true,
+            className: 'bg-readonly-heading'
+          };
+        }
+
+        if (column > 1) {
+          if (row === 1 || row === 2 || row === 4) {
+            return {
+              className: 'bg-ohanami-blue',
+              forceNumeric: true
+            };
+          }
+
+          if (row === 3 || row === 5) {
+            return {
+              className: 'bg-ohanami-green',
+              forceNumeric: true
+            };
+          }
+
+          if (row === 6) {
+            return {
+              className: 'bg-ohanami-grey',
+              forceNumeric: true
+            };
+          }
+
+          if (row === 7) {
+            return {
+              className: 'bg-ohanami-pink',
+              forceNumeric: true
+            };
+          }
+        }
+      }
+    };
+    templateLogger(template);
+    return template;
+  };
+
+  _proto.getOhanamiStartingData = function getOhanamiStartingData() {
+    return [['Round', 'Mult.', 'P 1', 'P 2', 'P 3', 'P 4'], ['1', 'x3', '0', '0', '0', '0'], ['2', 'x3', '0', '0', '0', '0'], ['', 'x4', '0', '0', '0', '0'], ['3', 'x3', '0', '0', '0', '0'], ['', 'x4', '0', '0', '0', '0'], ['', 'x7', '0', '0', '0', '0'], ['', 'var', '0', '0', '0', '0'], ['Total', '', '0', '0', '0', '0']];
+  };
 
   _proto.getDefaultScoreSheetTemplate = function getDefaultScoreSheetTemplate(boardGame) {
     return {
@@ -8900,10 +9015,18 @@ var TemplateManager = /*#__PURE__*/function () {
   };
 
   _proto.getScoreSheetTemplate = function getScoreSheetTemplate(boardGame) {
+    if (boardGame.gameId === 270314) {
+      return this.getOhanamiTemplate();
+    }
+
     return this.getDefaultScoreSheetTemplate(boardGame);
   };
 
   _proto.getScoreSheetStartingData = function getScoreSheetStartingData(boardGame) {
+    if (boardGame.gameId === 270314) {
+      return this.getOhanamiStartingData();
+    }
+
     return this.getDefaultScoreSheetStartingData(boardGame);
   };
 
@@ -8928,8 +9051,102 @@ var TemplateManager = /*#__PURE__*/function () {
     return saveData;
   };
 
+  _proto.getOhanamiSaveData = function getOhanamiSaveData(scoreSheet) {
+    var saveData = {
+      id: scoreSheet.room,
+      jsonData: JSON.stringify(scoreSheet),
+      createdOn: moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYYMMDDHHmmss'),
+      players: [],
+      scores: []
+    }; // process the table data for names and scores
+    // the first row is the player names, after the first two columns
+    // @ts-ignore
+
+    var playerNames = scoreSheet.data[0]; // @ts-ignore
+
+    var scores = scoreSheet.data[scoreSheet.data.length - 1];
+
+    for (var index = 2; index < playerNames.length; index++) {
+      // @ts-ignore
+      saveData.players.push(playerNames[index]); // @ts-ignore
+
+      saveData.scores.push(scores[index]);
+    }
+
+    templateLogger("Save data for ohanami is");
+    templateLogger(saveData);
+    return saveData;
+  };
+
   _proto.getSaveData = function getSaveData(boardGame, scoreSheet) {
+    if (boardGame.gameId === 270314) {
+      return this.getOhanamiSaveData(scoreSheet);
+    }
+
     return this.getDefaultSaveData(scoreSheet);
+  };
+
+  _proto.calculateOhanamiPinkScore = function calculateOhanamiPinkScore(numOfCards) {
+    var score = 0;
+
+    if (numOfCards > 0) {
+      if (numOfCards > 15) numOfCards = 15;
+
+      while (numOfCards > 0) {
+        score += numOfCards;
+        numOfCards--;
+      }
+    }
+
+    return score;
+  };
+
+  _proto.transformOhanamiData = function transformOhanamiData(scoreSheet) {
+    // need to calculate the player scores
+    for (var index = 0; index < 4; index++) {
+      /*
+       *  for each player the score is the sum of
+       *  3 x row 1, 2, and 4
+       *  4 x row 3 and 5
+       *  7 x row 6
+       *  row 7 is complicated
+       */
+      var score = 0; // @ts-ignore
+
+      var parsed = parseInt(scoreSheet.data[1][index + 2]);
+      if (!isNaN(parsed)) score += 3 * parsed; // @ts-ignore
+
+      parsed = parseInt(scoreSheet.data[2][index + 2]);
+      if (!isNaN(parsed)) score += 3 * parsed; // @ts-ignore
+
+      parsed = parseInt(scoreSheet.data[4][index + 2]);
+      if (!isNaN(parsed)) score += 3 * parsed; // @ts-ignore
+
+      parsed = parseInt(scoreSheet.data[3][index + 2]);
+      if (!isNaN(parsed)) score += 4 * parsed; // @ts-ignore
+
+      parsed = parseInt(scoreSheet.data[5][index + 2]);
+      if (!isNaN(parsed)) score += 4 * parsed; // @ts-ignore
+
+      parsed = parseInt(scoreSheet.data[6][index + 2]);
+      if (!isNaN(parsed)) score += 7 * parsed; // @ts-ignore
+
+      parsed = parseInt(scoreSheet.data[7][index + 2]);
+      if (!isNaN(parsed)) score += this.calculateOhanamiPinkScore(parsed); // @ts-ignore
+
+      scoreSheet.data[8][index + 2] = score;
+    }
+  };
+
+  _proto.transformDataAfterUserChange = function transformDataAfterUserChange(boardGame, scoreSheet) {
+    var result = false;
+
+    if (boardGame.gameId === 270314) {
+      result = true;
+      this.transformOhanamiData(scoreSheet);
+    }
+
+    return result; // do nothing unless for a specific game
   };
 
   return TemplateManager;

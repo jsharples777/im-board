@@ -510,15 +510,50 @@ class Controller implements StateChangeListener {
 
     scoreSheetAddedToBoardGame(boardGame:any,scoreSheet:any) {
         const cb = (data: any, status: number, associatedStateName: string) => {};
+        scoreSheet.decorator = Decorator.PersistedLocally;
 
-            if (this.isLoggedIn() && (boardGame.decorator && (boardGame.decorator === Decorator.Persisted))) {
+        if (this.isLoggedIn() && (boardGame.decorator && (boardGame.decorator === Decorator.Persisted))) {
             //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
                 downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString,
                     {userId: this.getCurrentUser(), boardGameId: boardGame.id,sheet:scoreSheet},
                     cb,
                     this.config.stateNames.scoreSheet,
                     false);
+                scoreSheet.decorator = Decorator.Persisted;
         }
+        // convert the scoresheet into the usual received format from the database
+        if (scoreSheet.players) {
+            if (scoreSheet.players.length >= 1) {
+                scoreSheet.player1 = scoreSheet.players[0];
+                scoreSheet.score1 = scoreSheet.scores[0];
+            }
+            if (scoreSheet.players.length >= 2) {
+                scoreSheet.player2 = scoreSheet.players[1];
+                scoreSheet.score2 = scoreSheet.scores[1];
+            }
+            if (scoreSheet.players.length >= 3) {
+                scoreSheet.player3 = scoreSheet.players[2];
+                scoreSheet.score3 = scoreSheet.scores[2];
+            }
+            if (scoreSheet.players.length >= 4) {
+                scoreSheet.player4 = scoreSheet.players[3];
+                scoreSheet.score4 = scoreSheet.scores[3];
+            }
+            if (scoreSheet.players.length >= 5) {
+                scoreSheet.player5 = scoreSheet.players[4];
+                scoreSheet.score5 = scoreSheet.scores[4];
+            }
+            if (scoreSheet.players.length >= 6) {
+                scoreSheet.player6 = scoreSheet.players[5];
+                scoreSheet.score6 = scoreSheet.scores[5];
+            }
+            if (scoreSheet.players.length >= 7) {
+                scoreSheet.player7 = scoreSheet.players[6];
+                scoreSheet.score7 = scoreSheet.scores[6];
+            }
+
+        }
+
         let currentListOfGames: any[] = this.applicationView.state.boardGames;
         let index = currentListOfGames.findIndex((value) => value.gameId === boardGame.gameId);
         if (index >= 0) {

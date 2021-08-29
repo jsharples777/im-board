@@ -1,4 +1,13 @@
 <div id="scoreSheetZone" class="container-fluid scoresheet d-none pt-3 pb-3">
+    {{#if user}}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <strong>Collaborate</strong> Drag a user from the user search panel to here to invite them to joint in to the scoresheet.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {{/if}}
+
     <div class="row">
         <div class="col-sm-12 offset-sm-0 offset-md-2 col-md-8 align-content-center">
             <div class="card m-0">

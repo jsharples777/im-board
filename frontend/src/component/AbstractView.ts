@@ -118,8 +118,8 @@ export default abstract class AbstractView implements StateChangeListener {
                 deleteButtonEl.setAttribute('type','button');
                 browserUtil.addRemoveClasses(deleteButtonEl,domConfig.deleteButtonClasses);
                 if (domConfig.deleteButtonText) {
-                    if (domConfig.deleteButtonText.trim().length() > 0) {
-                        domConfig.innerText = domConfig.deleteButtonText;
+                    if (domConfig.deleteButtonText.trim().length > 0) {
+                        deleteButtonEl.innerHTML = domConfig.deleteButtonText;
                     }
                 }
                 if (domConfig.deleteButtonIconClasses) {
