@@ -261,9 +261,8 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         resultsId: 'scoreSheets',
                         resultsElementType: 'div',
                         resultsElementAttributes: [
-                            ['style','height:300px; width:120px']
                         ],
-                        resultsClasses: 'text-white bg-info col-sm-6 col-md-3 col-lg-2 mt-1 mr-2',
+                        resultsClasses: 'text-white bg-info col-sm-6 col-md-3 col-lg-2 score-card',
                         resultDataKeyId: 'bgg-id',
                         resultLegacyDataKeyId: 'bgg-id',
                         resultDataSourceId: 'data-source',
@@ -328,7 +327,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
                 scoreSheetSideBar: {
                     view: {
                         location: 'bottom',
-                        expandedSize: '50%',
+                        expandedSize: '30%',
                     },
                 },
             },
