@@ -109,4 +109,5 @@ type Mutation {
     addToMyCollection(userId: Int, boardGame: BoardGameDetailInput): IdGameId
     removeFromMyCollection(userId: Int, boardGameId: Int):NumberResults
     addScoreSheetToBoardGame(userId: Int, boardGameId: Int, sheet: ScoreSheetInput): StringId
+    removeScoreSheet(sheetId:String):NumberResults
 }

@@ -103,7 +103,11 @@ class Root extends React.Component implements UnreadMessageCountListener{
                 addScoreSheetToBoardGame: {
                     queryString: 'mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}}',
                     resultName: 'addScoreSheetToBoardGame'
-                }
+                },
+                removeScoreSheet: {
+                    queryString: 'mutation removeSheet($sheetId: String!) {removeScoreSheet(sheetId: $sheetId) {result}}',
+                    resultName: 'removeFromMyCollection'
+                },
 
 
 
@@ -159,9 +163,9 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         isDraggable: false,
                         isClickable: true,
                         isDeleteable: true,
-                        deleteButtonClasses: 'btn btn-circle btn-xsm',
+                        deleteButtonClasses: 'btn btn-circle bg-warning btn-sm',
                         deleteButtonText: '',
-                        deleteButtonIconClasses:'fas fa-trash-alt',
+                        deleteButtonIconClasses:'text-black fas fa-sign-out-alt',
                         hasBadge: true,
                         resultContentDivClasses: 'd-flex w-100 justify-content-between',
                         resultContentTextElementType: 'span',

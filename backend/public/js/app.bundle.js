@@ -864,6 +864,10 @@ var Root = /*#__PURE__*/function (_React$Component) {
         addScoreSheetToBoardGame: {
           queryString: 'mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}}',
           resultName: 'addScoreSheetToBoardGame'
+        },
+        removeScoreSheet: {
+          queryString: 'mutation removeSheet($sheetId: String!) {removeScoreSheet(sheetId: $sheetId) {result}}',
+          resultName: 'removeFromMyCollection'
         }
       },
       ui: {
@@ -914,9 +918,9 @@ var Root = /*#__PURE__*/function (_React$Component) {
             isDraggable: false,
             isClickable: true,
             isDeleteable: true,
-            deleteButtonClasses: 'btn btn-circle btn-xsm',
+            deleteButtonClasses: 'btn btn-circle bg-warning btn-sm',
             deleteButtonText: '',
-            deleteButtonIconClasses: 'fas fa-trash-alt',
+            deleteButtonIconClasses: 'text-black fas fa-sign-out-alt',
             hasBadge: true,
             resultContentDivClasses: 'd-flex w-100 justify-content-between',
             resultContentTextElementType: 'span',
@@ -1980,6 +1984,8 @@ var Controller = /*#__PURE__*/function () {
   };
 
   _proto.callbackAddToCollection = function callbackAddToCollection(data, status, associatedStateName) {
+    var _this = this;
+
     cLogger("callback for add single board game " + associatedStateName + " to my collection with status " + status);
 
     if (status >= 200 && status <= 299) {
@@ -1998,6 +2004,26 @@ var Controller = /*#__PURE__*/function () {
         cLogger("Updating board game " + updatingBoardGame.gameId + " with database id " + id.id + " and new Persisted state");
         updatingBoardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
         updatingBoardGame.id = id.id;
+
+        if (updatingBoardGame.scoresheets) {
+          var cb = function cb(data, status, associatedStateName) {}; // add the scoresheets to database
+
+
+          updatingBoardGame.scoresheets.forEach(function (scoreSheet) {
+            _this.convertScoreSheetToApiCallFormat(scoreSheet);
+
+            _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(_this.config.apis.graphQL, _this.config.apis.addScoreSheetToBoardGame.queryString, {
+              userId: _this.getCurrentUser(),
+              boardGameId: updatingBoardGame.id,
+              sheet: scoreSheet
+            }, cb, _this.config.stateNames.scoreSheet, false);
+
+            _this.convertScoreSheetToDatabaseFormat(scoreSheet);
+
+            scoreSheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
+          });
+        }
+
         this.applicationView.setState({
           boardGames: currentGameList
         });
@@ -2017,7 +2043,59 @@ var Controller = /*#__PURE__*/function () {
     }
   };
 
+  _proto.decorateScoreSheets = function decorateScoreSheets(boardGame) {
+    if (boardGame) {
+      if (boardGame.scoresheets) {
+        boardGame.scoresheets.forEach(function (sheet) {
+          sheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
+        });
+      } else {
+        boardGame.scoresheets = [];
+      }
+    }
+  };
+
+  _proto.copyLocallySavedScoreSheetsToBoardGame = function copyLocallySavedScoreSheetsToBoardGame(target, source) {
+    var _this2 = this;
+
+    if (source.scoresheets) {
+      var toSave = [];
+      source.scoresheets.forEach(function (sheet) {
+        // is the scoresheet already in the target?
+        var index = target.scoresheets.findIndex(function (item) {
+          return item.id === sheet.id;
+        });
+
+        if (index < 0) {
+          sheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally;
+          target.scoresheets.push(sheet);
+          toSave.push(sheet);
+        }
+      }); // do we have any sheets to save?
+
+      if (toSave.length > 0) {
+        var cb = function cb(data, status, associatedStateName) {};
+
+        toSave.forEach(function (sheetToSave) {
+          _this2.convertScoreSheetToApiCallFormat(sheetToSave);
+
+          _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(_this2.config.apis.graphQL, _this2.config.apis.addScoreSheetToBoardGame.queryString, {
+            userId: _this2.getCurrentUser(),
+            boardGameId: target.id,
+            sheet: sheetToSave
+          }, cb, _this2.config.stateNames.scoreSheet, false);
+
+          _this2.convertScoreSheetToDatabaseFormat(sheetToSave);
+
+          sheetToSave.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
+        });
+      }
+    }
+  };
+
   _proto.callbackGetCollection = function callbackGetCollection(data, status, associatedStateName) {
+    var _this3 = this;
+
     cLogger("callback for getting my collection of board games " + associatedStateName + " to my collection with status " + status);
 
     if (status >= 200 && status <= 299) {
@@ -2031,13 +2109,20 @@ var Controller = /*#__PURE__*/function () {
         boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
         cLoggerDetail("Loading board game from collection ");
         cLoggerDetail(boardGame);
+
+        _this3.decorateScoreSheets(boardGame);
+
         var index = currentGameList.findIndex(function (game) {
           return game.gameId === boardGame.gameId;
         });
         cLoggerDetail("have found the board game locally? " + (index >= 0));
 
         if (index >= 0) {
-          cLoggerDetail("in current state, replacing"); // replace the current entry
+          var locallySaveBoardGame = currentGameList[index];
+          cLoggerDetail("in current state, replacing"); // copy any locally saved score sheets to the database object
+
+          _this3.copyLocallySavedScoreSheetsToBoardGame(boardGame, locallySaveBoardGame); // replace the current entry
+
 
           currentGameList.splice(index, 1, boardGame);
         } else {
@@ -2054,22 +2139,7 @@ var Controller = /*#__PURE__*/function () {
     }
   };
 
-  _proto.scoreSheetAddedToBoardGame = function scoreSheetAddedToBoardGame(boardGame, scoreSheet) {
-    var cb = function cb(data, status, associatedStateName) {};
-
-    scoreSheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally;
-
-    if (this.isLoggedIn() && boardGame.decorator && boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted) {
-      //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
-      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString, {
-        userId: this.getCurrentUser(),
-        boardGameId: boardGame.id,
-        sheet: scoreSheet
-      }, cb, this.config.stateNames.scoreSheet, false);
-      scoreSheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
-    } // convert the scoresheet into the usual received format from the database
-
-
+  _proto.convertScoreSheetToDatabaseFormat = function convertScoreSheetToDatabaseFormat(scoreSheet) {
     if (scoreSheet.players) {
       if (scoreSheet.players.length >= 1) {
         scoreSheet.player1 = scoreSheet.players[0];
@@ -2105,6 +2175,72 @@ var Controller = /*#__PURE__*/function () {
         scoreSheet.player7 = scoreSheet.players[6];
         scoreSheet.score7 = scoreSheet.scores[6];
       }
+    }
+  };
+
+  _proto.convertScoreSheetToApiCallFormat = function convertScoreSheetToApiCallFormat(scoreSheet) {
+    delete scoreSheet.decorator;
+    delete scoreSheet.player1;
+    delete scoreSheet.score1;
+    delete scoreSheet.player2;
+    delete scoreSheet.score2;
+    delete scoreSheet.player3;
+    delete scoreSheet.score3;
+    delete scoreSheet.player4;
+    delete scoreSheet.score4;
+    delete scoreSheet.player5;
+    delete scoreSheet.score5;
+    delete scoreSheet.player6;
+    delete scoreSheet.score6;
+    delete scoreSheet.player7;
+    delete scoreSheet.score7;
+  };
+
+  _proto.scoreSheetAddedToBoardGame = function scoreSheetAddedToBoardGame(boardGame, scoreSheet) {
+    var cb = function cb(data, status, associatedStateName) {};
+
+    if (this.isLoggedIn() && boardGame.decorator && boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted) {
+      //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString, {
+        userId: this.getCurrentUser(),
+        boardGameId: boardGame.id,
+        sheet: scoreSheet
+      }, cb, this.config.stateNames.scoreSheet, false);
+      scoreSheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted;
+    } else {
+      scoreSheet.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally;
+    } // convert the scoresheet into the usual received format from the database
+
+
+    this.convertScoreSheetToDatabaseFormat(scoreSheet);
+    var currentListOfGames = this.applicationView.state.boardGames;
+    var index = currentListOfGames.findIndex(function (value) {
+      return value.gameId === boardGame.gameId;
+    });
+
+    if (index >= 0) {
+      var oldBoardGame = currentListOfGames[index];
+      boardGame.decorator = oldBoardGame.decorator;
+      cLogger("Updating application state");
+      currentListOfGames.splice(index, 1, boardGame);
+      cLogger(currentListOfGames);
+      this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
+      this.applicationView.setState({
+        boardGames: currentListOfGames
+      });
+    } else {
+      cLogger("Board game " + boardGame.id + " not found in current state");
+    }
+  };
+
+  _proto.scoreSheetRemovedFromBoardGame = function scoreSheetRemovedFromBoardGame(boardGame, scoreSheetId) {
+    var cb = function cb(data, status, associatedStateName) {};
+
+    if (this.isLoggedIn() && boardGame.decorator && boardGame.decorator === _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Persisted) {
+      //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
+      _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.removeScoreSheet.queryString, {
+        sheetId: scoreSheetId
+      }, cb, this.config.stateNames.scoreSheet, false);
     }
 
     var currentListOfGames = this.applicationView.state.boardGames;
@@ -2157,11 +2293,14 @@ var Controller = /*#__PURE__*/function () {
               delete boardGame.id;
 
               if (this.isLoggedIn()) {
+                var scoreSheets = boardGame.scoresheets;
+                delete boardGame.scoresheets;
                 _network_DownloadManager__WEBPACK_IMPORTED_MODULE_11__["default"].addQLApiRequest(this.config.apis.graphQL, this.config.apis.addToMyCollection.queryString, {
                   userId: this.getCurrentUser(),
                   boardGame: boardGame
                 }, this.callbackAddToCollection, this.config.stateNames.boardGames, true);
                 boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].Complete;
+                boardGame.scoresheets = scoreSheets;
               } else {
                 boardGame.decorator = _AppTypes__WEBPACK_IMPORTED_MODULE_10__["Decorator"].PersistedLocally;
               }
@@ -4057,6 +4196,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _SidebarView__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SidebarView */ "./src/component/SidebarView.ts");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -4080,6 +4220,7 @@ function _setPrototypeOf(o, p) {
 
   return _setPrototypeOf(o, p);
 }
+
 
 
 
@@ -4219,7 +4360,29 @@ var ScoreSheetSidebarView = /*#__PURE__*/function (_SidebarView) {
   _proto.eventClickItem = function eventClickItem(event) {};
 
   _proto.eventDeleteClickItem = function eventDeleteClickItem(event) {
-    throw new Error('Method not implemented.');
+    // @ts-ignore
+    var sheetId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId); // @ts-ignore
+
+    var dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId); // @ts-ignore
+
+    csLogger("Score Sheet " + event.target + " with id " + sheetId + " delete clicked from " + dataSource);
+
+    if (this.selectedBoardGame && confirm("Are you sure you want to delete this Score Sheet?")) {
+      // remove the sheet from the selected board game
+      if (this.selectedBoardGame.scoresheets) {
+        var index = this.selectedBoardGame.scoresheets.findIndex(function (sheet) {
+          return sheet.id === sheetId;
+        });
+
+        if (index >= 0) {
+          this.selectedBoardGame.scoresheets.splice(index, 1); // let the controller know to remove from the database if the user is logged in
+
+          _Controller__WEBPACK_IMPORTED_MODULE_3__["default"].scoreSheetRemovedFromBoardGame(this.selectedBoardGame, sheetId);
+        }
+      }
+
+      this.updateView('', this.selectedBoardGame);
+    }
   };
 
   _proto.updateView = function updateView(name, newState) {

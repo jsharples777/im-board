@@ -2,6 +2,7 @@ import debug from 'debug';
 import SidebarView from './SidebarView';
 import {StateManager} from '../state/StateManager';
 import moment from "moment";
+import controller from "../Controller";
 
 
 
@@ -127,8 +128,31 @@ class ScoreSheetSidebarView extends SidebarView {
 
 
     eventClickItem(event: MouseEvent) {}
+
     protected eventDeleteClickItem(event: MouseEvent): void {
-        throw new Error('Method not implemented.');
+        // @ts-ignore
+        const sheetId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
+        // @ts-ignore
+        const dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId)
+        // @ts-ignore
+        csLogger(`Score Sheet ${event.target} with id ${sheetId} delete clicked from ${dataSource}`);
+
+
+
+
+        if (this.selectedBoardGame && confirm("Are you sure you want to delete this Score Sheet?")) {
+            // remove the sheet from the selected board game
+            if (this.selectedBoardGame.scoresheets) {
+                let index = this.selectedBoardGame.scoresheets.findIndex((sheet:any) => sheet.id === sheetId);
+                if (index >= 0) {
+                    this.selectedBoardGame.scoresheets.splice(index,1);
+                    // let the controller know to remove from the database if the user is logged in
+                    controller.scoreSheetRemovedFromBoardGame(this.selectedBoardGame,sheetId);
+                }
+            }
+            this.updateView('',this.selectedBoardGame);
+        }
+
     }
 
     updateView(name: string, newState: any) {
