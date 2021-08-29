@@ -7,6 +7,9 @@
     font-family: 'digital';
     src: url('/assets/digital-7.ttf');
 }
+.enter-message {
+    width:30vw;
+}
 
 /* headings for the site using the new font */
 h1 {
@@ -359,6 +362,8 @@ i:hover {
     }
 }
 
+
+
 @media screen and (max-width: 768px) {
     .notifications .notification {
         width: 50vw
@@ -378,6 +383,9 @@ i:hover {
     .root-registration {
         background-size: contain;
         background-repeat: no-repeat;
+    }
+    .enter-message {
+        width:60vw;
     }
 
 }
@@ -403,6 +411,9 @@ i:hover {
         background-image: url('../img/registration-vertical.jpg');
         background-size: contain;
         background-repeat: no-repeat;
+    }
+    .enter-message {
+        width:70vw;
     }
 
 }
