@@ -55,11 +55,12 @@ export default function BoardGameView({boardGame, showScoresHandler, addToCollec
         let scoreBadge = <span board-game-id={boardGame.gameId} className='badge badge-pill badge-primary ml-1' onClick={showScoresHandler}>{scoreCount}</span>
 
         if ((boardGame.decorator) && (boardGame.decorator !== Decorator.Incomplete)) {
+            const bggURL = `https://boardgamegeek.com/boardgame/${boardGame.gameId}`;
 
             return (
                 <div className="col-sm-12 col-md-6 col-lg-4 col-xl-3 p-2">
                     <div className="card">
-                        <a href="https://boardgamegeek.com/boardgame/${boardGame.gameId}" target="_blank"><img className="card-img-top" src={boardGame.image} alt="Card image cap"></img></a>
+                        <a href={bggURL} target="_blank"><img className="card-img-top" src={boardGame.image} alt="Card image cap"></img></a>
                         <div className="card-body scroll">
                             <h5 className="card-title">{boardGame.name} ({boardGame.year}) {((boardGame.decorator === Decorator.Persisted) || (boardGame.decorator === Decorator.PersistedLocally))?favouriteIcon:''} {((boardGame.decorator === Decorator.Persisted) || (boardGame.decorator === Decorator.PersistedLocally))?scoreBadge:''}<br/>  {(controller.isLoggedIn())?((boardGame.decorator === Decorator.Persisted)?deleteButton:addButton):deleteButton}</h5>
                             <p className="card-text">{boardGame.description}</p>
