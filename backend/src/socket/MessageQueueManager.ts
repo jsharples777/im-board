@@ -33,6 +33,34 @@ export default class MessageQueueManager {
     private constructor() {
     }
 
+    public roomHasExpired(room:ChatRoom) {
+        // remove all expired invites and messages
+        mqLogger(`Removing expired room - ${room.name}`);
+        this.messageQueue.forEach((userQueue) => {
+            let index = userQueue.invites.length - 1;
+            while (index >= 0) {
+                let invite = userQueue.invites[index];
+                if (invite.room === room.name) {
+                    mqLogger(`Removing expired room invite for user ${userQueue.username}`);
+                    userQueue.invites.splice(index,1);
+                }
+                index--;
+            }
+            index = userQueue.messages.length - 1;
+            while (index >= 0) {
+                let message = userQueue.messages[index];
+                if (message.room === room.name) {
+                    mqLogger(`Removing expired room message for user ${userQueue.username}`);
+                    userQueue.messages.splice(index,1);
+                }
+                index--;
+            }
+
+        });
+
+
+    }
+
     public setUserHasLoggedInAndReturnQueuedItems(username: string): QueuedMessages | null {
         // find the user queue if any
         let queueItems: QueuedMessages | null = null;

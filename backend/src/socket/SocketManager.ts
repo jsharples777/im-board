@@ -1,7 +1,7 @@
 import debug = require('debug');
 import {Server}  from 'socket.io';
 import {Server as httpServer} from 'http';
-import {ChatMessage, ChatRoom, ChatUser, DataMessage, InviteMessage, QueuedMessages} from "./SocketTypes";
+import {ChatMessage, ChatRoom, ChatUser, DataMessage, InviteMessage, InviteType, QueuedMessages} from "./SocketTypes";
 import MessageQueueManager from "./MessageQueueManager";
 import moment from "moment";
 
@@ -54,9 +54,27 @@ class SocketManager {
             interval = parseInt(process.env.MQ_INTERVAL);
         }
         setInterval(() => {
+            socketDebug(`Checking for expired rooms and persisting state`);
+            this.checkForExpiredRooms();
             MessageQueueManager.getInstance().persistQueueAndRooms(this.rooms);
         },interval);
 
+    }
+
+    private checkForExpiredRooms() {
+        const checkTime = parseInt(moment().format('YYYYMMDDHHmmss'));
+        let index = this.rooms.length - 1;
+        while (index >= 0) {
+            let room = this.rooms[index];
+            socketDebug(`Room ${room.name} expires on ${room.expiry}`)
+            if (room.expiry <= checkTime) {
+                socketDebug(`Room ${room.name} has expired - removing`)
+                this.rooms.splice(index,1);
+                MessageQueueManager.getInstance().roomHasExpired(room);
+
+            }
+            index--;
+        }
     }
 
     protected findUser(username:string):ChatUser|undefined {
@@ -101,10 +119,29 @@ class SocketManager {
             room = this.rooms[index];
         }
         else {
-            room = {name:roomName,users:[],type};
+            let m = moment(); // now
+            if (type === InviteType.ChatRoom) {
+                m.add((process.env.SM_EXPIRY_CHAT||43200),'minutes'); // 30 days by default
+            }
+            else {
+                m.add((process.env.SM_EXPIRY_SCORESHEET||60),'minutes'); // 1 hour by default
+            }
+            room = {name:roomName,users:[],type,expiry:parseInt(m.format('YYYYYMMDDHHmmss'))};
             this.rooms.push(room);
+            socketDebug(`Created room ${roomName} with type ${type} expires on ${parseInt(m.format('YYYYYMMDDHHmmss'))}`)
         }
         return room;
+    }
+
+    private touchRoom(room:ChatRoom) {
+        let m = moment(); // now
+        if (room.type === InviteType.ChatRoom) {
+            m.add((process.env.SM_EXPIRY_CHAT||720),'hours');
+        }
+        else {
+            m.add((process.env.SM_EXPIRY_SCORESHEET||1),'hours');
+        }
+        room.expiry = parseInt(m.format('YYYYYMMDDHHmmss'));
     }
 
     protected getUserListForRoom(roomName:string,type:number):string[] {
@@ -296,6 +333,11 @@ class SocketManager {
                 if (cMessage) {
                     socketDebug(`Sending message ${cMessage.message} to room ${cMessage.room}`);
                     socket.to(room).emit('chat',JSON.stringify(cMessage));
+
+                    let chatRoom:ChatRoom = this.findOrCreateRoom(room, type);
+                    this.touchRoom(chatRoom);
+                    socketDebug(`Updating room expiry to ${chatRoom.expiry}`);
+
                     // check for offline users and queue their messages
                     this.queueMessagesForOfflineRoomUsers(cMessage);
                 }

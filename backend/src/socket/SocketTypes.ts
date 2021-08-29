@@ -43,6 +43,7 @@ export type ChatRoom = {
     name: string
     type: number
     users: ChatUser[]
+    expiry: number
 }
 
 export type QueuedMessages = {
