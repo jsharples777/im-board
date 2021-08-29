@@ -54,7 +54,7 @@ class SocketManager {
             interval = parseInt(process.env.MQ_INTERVAL);
         }
         setInterval(() => {
-            socketDebug(`Checking for expired rooms and persisting state`);
+            //socketDebug(`Checking for expired rooms and persisting state`);
             this.checkForExpiredRooms();
             MessageQueueManager.getInstance().persistQueueAndRooms(this.rooms);
         },interval);
@@ -66,7 +66,7 @@ class SocketManager {
         let index = this.rooms.length - 1;
         while (index >= 0) {
             let room = this.rooms[index];
-            socketDebug(`Room ${room.name} expires on ${room.expiry}`)
+            //socketDebug(`Room ${room.name} expires on ${room.expiry}`)
             if (room.expiry <= checkTime) {
                 socketDebug(`Room ${room.name} has expired - removing`)
                 this.rooms.splice(index,1);
@@ -142,6 +142,7 @@ class SocketManager {
             m.add((process.env.SM_EXPIRY_SCORESHEET||1),'hours');
         }
         room.expiry = parseInt(m.format('YYYYYMMDDHHmmss'));
+        //socketDebug(`Room ${room.name} expiry updated to ${room.expiry}`);
     }
 
     protected getUserListForRoom(roomName:string,type:number):string[] {
