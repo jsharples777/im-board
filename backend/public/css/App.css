@@ -123,7 +123,7 @@ i:hover {
     width: 0px; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
     z-index: 2; /* Stay on top */
-    top: 100px;
+    top: 0px;
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 10px; /* Place content 60px from the top */
@@ -147,7 +147,7 @@ i:hover {
     width: 0px; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
     z-index: 2; /* Stay on top */
-    top: 100px;
+    top: 0px;
     right: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 10px; /* Place content 60px from the top */
@@ -406,29 +406,5 @@ i:hover {
     }
 
 }
-@media screen and (max-width: 414px) {
-    .notifications .notification {
-        width: 90vw
-    }
-    .timer {
-        font-size: 30pt;
-        width: 45%;
-    }
-    .notifications .notification {
-        width: 100vw
-    }
-    .sidebar-left {
-        padding-top: 0px;
-        top:0;
-    }
-    .sidebar-right {
-        padding-top: 0px;
-        top:0;
-    }
-    .messages {
-        min-height: 55vw;
-        max-height: 55vw;
-    }
 
-}
 
