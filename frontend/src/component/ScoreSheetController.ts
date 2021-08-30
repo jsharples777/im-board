@@ -152,6 +152,10 @@ export class ScoreSheetController implements ChatReceiver {
         this.applicationView.handleShowScoreSheet(null);
     }
 
+    public getSelectedBoardGame():any|null {
+        return this.currentlySelectedBoardGame;
+    }
+
 
 
     receiveQueuedMessages(messages: any): void {

@@ -4,6 +4,7 @@ import Handsontable from "handsontable";
 import browserUtil from "../util/BrowserUtil";
 import debug from 'debug';
 import {ScoreSheet} from "../AppTypes";
+import {TemplateManager} from "../template/TemplateManager";
 
 const ssvLogger = debug('score-sheet-view');
 
@@ -241,6 +242,10 @@ export class ScoreSheetView implements StateChangeListener{
             // create a new table
 
             if (this.scoreSheetEl) {
+                const boardGame = this.controller.getSelectedBoardGame();
+                if (boardGame) {
+                    scoreSheet.sheetLayoutOptions = TemplateManager.getInstance().getScoreSheetTemplate(boardGame);
+                }
                 scoreSheet.sheetLayoutOptions.data = scoreSheet.data;
                 this.table = new Handsontable(
                     this.scoreSheetEl,
