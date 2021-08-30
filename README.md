@@ -3,7 +3,8 @@
 # Table of Contents
 - [Project Description](#project-description)
 - [Installation Instructions](#installation-instructions)
-- [Usage](#usage)
+- [Configuration Variables](#configuration-variables)
+- [User Story](#user-story)
 - [Screenshot](#screenshot)
 - [How To Contribute](#how-to-contribute)
 - [Technology](#technology)
@@ -34,10 +35,24 @@ If the user is idle, the session expires in 30 minutes.
 # Installation Instructions
 
 1.  Install [node.js](http://nodejs.org)
-2.  Using the installed Node Package Manager `npm`, execute `npm install` to in the `frontend` directory, and again in the `backend` directory.
+2.  Using the installed Node Package Manager `npm`, execute `npm install`  in the `frontend` directory, and again in the `backend` directory.
+3.  In the `frontend` directory, execute `npm run build.prod`, to build the webpacks for the backend `public/js` directory.
+4.  In the `backend` directory, execute `npm run build`, to build the `.js` files from the Typescript, which are compiled to the `dist` directory.
+5.  Configure the `.env` file with the specifics of your database, configuration files, and other parameters (message queue persistence, room timeouts):
+
+# Configuration Variables
+
+`API_SERVER_URL` - URL of the server completing the API calls (default `blank`)
+`DB_HOST` - address of the MySQL server machine
+`DB_NAME` - the name of the database to use
+`DB_USER` - the username to login to the database
+`DB_PW` - the password of the database user
+`DEBUG` - activate debug output (sub-options are space separated names (e.g. `server socket db api route message-queue`)
+`MODE` - `Production`
+`MQ_FILE` - Location of the offline message queue storage file (default `./db/queue.json`)
 
 
-# Usage
+# User Story
 
 1. To execute the application, use a command line interface (CLI) such as terminal (or in windows command), goto the `backend` directory and execute `npm run start` or alternatively `node src/server.ts`
 2. Open a web browser and navigate to the homepage of the web application ([default is](http://localhost:3000))
