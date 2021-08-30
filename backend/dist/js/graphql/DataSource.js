@@ -22,7 +22,8 @@ class DataSource {
             Mutation: {
                 addToMyCollection: this.mysqlDelegate.addToMyCollection,
                 removeFromMyCollection: this.mysqlDelegate.removeFromMyCollection,
-                addScoreSheetToBoardGame: this.mysqlDelegate.addScoreSheetToBoardGame
+                addScoreSheetToBoardGame: this.mysqlDelegate.addScoreSheetToBoardGame,
+                removeScoreSheet: this.mysqlDelegate.removeScoreSheet
             }
         };
         // @ts-ignore

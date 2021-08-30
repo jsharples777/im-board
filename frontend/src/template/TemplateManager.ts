@@ -286,11 +286,41 @@ export class TemplateManager {
         templateLogger(saveData);
         return saveData;
     }
+    private getSkullKingSaveData(scoreSheet:ScoreSheet):any {
+        let saveData = {
+            id: scoreSheet.room,
+            jsonData: JSON.stringify(scoreSheet),
+            createdOn: moment().format('YYYYMMDDHHmmss'),
+            players: [],
+            scores: []
+        }
+        // process the table data for names and scores
+        // the first row is the player names, after the first three columns, every second column
+        // @ts-ignore
+        const playerNames: string[] = scoreSheet.data[0];
+        // last row is the scores, following the same pattern as the playr names
+        // @ts-ignore
+        const scores: any[] = scoreSheet.data[scoreSheet.data.length - 1]
+
+        for (let index = 3;index < playerNames.length;index+=2) {
+            // @ts-ignore
+            saveData.players.push(playerNames[index]);
+            // @ts-ignore
+            saveData.scores.push(scores[index]);
+
+        }
+        templateLogger(`Save data for skull king is`);
+        templateLogger(saveData);
+        return saveData;
+    }
 
 
     public getSaveData(boardGame:any,scoreSheet:ScoreSheet):any {
         if (boardGame.gameId === 270314) {
             return this.getOhanamiSaveData(scoreSheet);
+        }
+        if (boardGame.gameId === 333201) {
+            return this.getSkullKingSaveData(scoreSheet);
         }
         return this.getDefaultSaveData(scoreSheet);
     }
@@ -348,11 +378,57 @@ export class TemplateManager {
         }
     }
 
+    private transformSkullKingData(scoreSheet:ScoreSheet) {
+        // need to calculate the player scores
+        for (let index = 2;index < 10;index+=2) {
+            /*
+             *  for each player the score is the sum of
+             *  each bid score plus a bonus
+             *  if bid is 0, and actual is 0, score is 10 x round
+             *  if bid is x, and actual is x, score is 20 x bid
+             *  if bid ix x, and actual is y (x != y), score is 10 x abs(x-y)
+             */
+            let score:number = 0;
+
+
+            for (let round = 1; round <= 10;round++) {
+                let row = 2*round - 1;
+                // @ts-ignore
+                let parsedBid = parseInt(scoreSheet.data[row][index]);
+                // @ts-ignore
+                let parsedActual = parseInt(scoreSheet.data[row][index+1])
+                // @ts-ignore
+                let parsedBonus = parseInt(scoreSheet.data[row + 1][index+1]);
+                // @ts-ignore
+                if (!isNaN(parsedBid) && !isNaN(parsedActual)) {
+                    if ((parsedBid === 0) && (parsedActual === 0)) {
+                        score += round*10;
+                    }
+                    if (parsedBid === parsedActual) {
+                        score += 20 * parsedBid;
+                    }
+                    if ((parsedBid > 0) && (parsedBid !== parsedActual)) {
+                        score -= 10 * Math.abs(parsedBid - parsedActual);
+                    }
+                    if (!isNaN(parsedBonus)) score += parsedBonus;
+                }
+            }
+
+            // @ts-ignore
+            scoreSheet.data[21][index + 1] = score;
+        }
+
+    }
+
     public transformDataAfterUserChange(boardGame:any,scoreSheet:ScoreSheet):boolean {
         let result = false;
         if (boardGame.gameId === 270314) {
             result = true;
             this.transformOhanamiData(scoreSheet);
+        }
+        if (boardGame.gameId === 333201) {
+            result = true;
+            this.transformSkullKingData(scoreSheet);
         }
         return result; // do nothing unless for a specific game
     }

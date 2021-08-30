@@ -4,6 +4,7 @@ export default class MessageQueueManager {
     static getInstance(): MessageQueueManager;
     private messageQueue;
     private constructor();
+    roomHasExpired(room: ChatRoom): void;
     setUserHasLoggedInAndReturnQueuedItems(username: string): QueuedMessages | null;
     setUserHasLoggedOut(username: string): void;
     isUserLoggedIn(username: string): boolean;

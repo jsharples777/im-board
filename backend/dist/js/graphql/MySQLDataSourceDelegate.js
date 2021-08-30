@@ -83,6 +83,20 @@ class MySQLDataSourceDelegate {
             });
         });
     }
+    //    removeScoreSheet(sheetId:String):NumberResults
+    removeScoreSheet(_, data) {
+        mysqlLogger(`Removing score sheet ${data.sheetId} from collection`);
+        return new Promise((resolve, reject) => {
+            models_1.ScoreSheet.destroy({ where: { id: data.sheetId } })
+                .then((result) => {
+                resolve({ result });
+            })
+                .catch((err) => {
+                mysqlLogger(err);
+                reject(err);
+            });
+        });
+    }
     //addScoreSheetToBoardGame(userId: Int, boardGameId: Int, sheet: ScoreSheetInput): Boolean
     addScoreSheetToBoardGame(_, data) {
         mysqlLogger(`Adding score sheet to  board game ${data.boardGameId}  for user ${data.userId}`);

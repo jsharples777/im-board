@@ -36,6 +36,7 @@ export declare type ChatRoom = {
     name: string;
     type: number;
     users: ChatUser[];
+    expiry: number;
 };
 export declare type QueuedMessages = {
     invites: InviteMessage[];

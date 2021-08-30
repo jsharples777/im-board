@@ -9,12 +9,14 @@ declare class SocketManager {
     constructor();
     private getUserList;
     connectToServer(httpServer: httpServer): void;
+    private checkForExpiredRooms;
     protected findUser(username: string): ChatUser | undefined;
     protected findUserBySocket(socketId: any): ChatUser | undefined;
     protected removeUserBySocket(socketId: any): void;
     protected removeUser(username: any): void;
     protected login(socketId: any, username: string): ChatUser;
     protected findOrCreateRoom(roomName: string, type: number): ChatRoom;
+    private touchRoom;
     protected getUserListForRoom(roomName: string, type: number): string[];
     protected inviteUserToRoom(inviteFrom: string, inviteTo: string, roomName: string, type: number, requiresAcceptDecline?: boolean, subject?: string, attachment?: any): void;
     protected sendInviteMessageToUser(receiver: ChatUser, message: InviteMessage): void;

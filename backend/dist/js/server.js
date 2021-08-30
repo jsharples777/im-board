@@ -84,7 +84,7 @@ app.use(express_session_1.default({
     resave: true,
     saveUninitialized: false,
     cookie: {
-        maxAge: 30 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000,
     },
     proxy: true,
 }));
