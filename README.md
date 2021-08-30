@@ -26,11 +26,11 @@ A logged in user also has access to:
 4.  A user can note some users as favourites, and will be notified if a user in their favourite list logs in/out
 5.  A user can note some users as blocked, preventing those users from invite them to chat rooms and sending them messages
 
-Finally a user can start a score sheet, when logged in, and make it collaborative, inviting other logged in users and allow all users to enter data and share that data during the game.
+Finally a user can start a score sheet, and if logged in, and make it collaborative, inviting other logged in users and allow all invited users to enter data and share that data during the game.
 
 As a technical note, the chat sessions are persisted and offline messages are received on login.
 
-If the user is idle, the session expires in 30 minutes.
+If the user is idle, the session expires in 24 hours.
 
 # Installation Instructions
 
@@ -43,24 +43,64 @@ If the user is idle, the session expires in 30 minutes.
 # Configuration Variables
 
 `API_SERVER_URL` - URL of the server completing the API calls (default `blank`)
+
 `DB_HOST` - address of the MySQL server machine
+
 `DB_NAME` - the name of the database to use
+
 `DB_USER` - the username to login to the database
+
 `DB_PW` - the password of the database user
+
 `DEBUG` - activate debug output (sub-options are space separated names (e.g. `server socket db api route message-queue`)
+
 `MODE` - `Production`
+
 `MQ_FILE` - Location of the offline message queue storage file (default `./db/queue.json`)
 
+`MQ_INTERVAL` - Milliseconds between queue persistence (default `10000` - 10 seconds)
+
+`QL_SCHEMA` - configuration file for the QL API (default `./config/schema.ql`)
+
+`SM_EXPIRY_CHAT` - number of minutes to keep a chat room persisted with no activity (default `43200` - 30 days)
+
+`SM_EXPIRY_SCORESHEET` - number of minutes to keep a score sheet room persisted with no activity (default `60`)
+
+`URL_FindById` - URL for the BoardGameGeek.com XML2 API call for finding the details of a board game
+
+`URL_Search` - URL for the BoardGameGeek.com XML2 API call to search for board games by name 
+
+`VIEW_RELATIVE_PATH` - location of the handlebars files in production, should be set to `/../../`
 
 # User Story
 
-1. To execute the application, use a command line interface (CLI) such as terminal (or in windows command), goto the `backend` directory and execute `npm run start` or alternatively `node src/server.ts`
-2. Open a web browser and navigate to the homepage of the web application ([default is](http://localhost:3000))
+```
+As a USER I want to be able to search for a board game by name, including partial matches
+THEN I can choose to save the displayed board game details into the browser storage
+As a USER I want to be able to create a score sheet for a board game in my collection
+THEN I want to save the scoresheet, along with player names and scores and the date played, against the board game
+As a USER I want to be able to review the scores for a given board game and delete those if I so choose
 
+As a USER if I choose to register with the site
+THEN previously browser stored board games and their scoresheets are loaded into my user account
+As a USER I want to be able to find other users of the site
+THEN I can save users as Favourites or, for privacy reasons, save a user to a Blocked
+THEN I want to be notified if a Favourite user logins/out to the site
+As a USER I want to be able to chat with another user, creating a chat conversation with that user
+THEN I can close the chat room if I so choose
+THEN I can also add another user, creating a group chat, by dragging them into the chat from the User Search
+As a USER I want to be able to start a scoresheet for a boardgame and invite other users to join in
+THEN the other users may accept/decline that invitation, and if accept, we can all modify the values on the scoresheet
+WITH those values shown on each of our views, with a Start/Stop timer we can use to track game played time
+As a USER if I receive an invitation to a scoresheet from a non-Blocked user, I want the option to decline
+OR if I am already in a scoresheet, don't interrupt me
+As a USER if I log off the site for a time, when I log back in, I want to receive any messages
+FROM non-Blocked users when I log back in, with notifications telling me what I have waiting to review
+```
 
 # Screenshot
 
-![screenshot](./backend/public/img/screenshot.png)
+![screenshot](./backend/public/img/screenshot1.png)![screenshot2](./backend/public/img/screenshot2.png)
 
 ## How to contribute
 
@@ -89,8 +129,11 @@ Please access the [Questions](#questions) section to send me an email, or access
 19. [ts-node](https://github.com/TypeStrong/ts-node)
 20. [tsc-watch](https://www.npmjs.com/package/tsc-watch)
 21. [ts-loader](https://github.com/TypeStrong/ts-loader)
-22. GraphQL
-23. XML2js
+22. [GraphQL](https://graphql.org/)
+23. [XML2js](https://www.npmjs.com/package/xml2js)
+24. [Digital 7 Font](http://www.styleseven.com/)
+25. [Bootstrap 4 Round Buttons](https://www.geeksforgeeks.org/how-to-get-circular-buttons-in-bootstrap-4/)
+26. [Handsontable](https://handsontable.com/)
 
 
 
