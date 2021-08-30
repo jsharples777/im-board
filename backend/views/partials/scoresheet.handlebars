@@ -12,9 +12,16 @@
         <div class="col-sm-12 offset-sm-0 offset-md-2 col-md-8 align-content-center">
             <div class="card m-0">
                 <div class="card-header bg-light text-black-50">
-                    <div class="d-flex w-100 justify-content-between">
+                    <div class="container-fluid justify-content-between">
+                        <div class="row">
                         <h1 style="font-size:40pt" id="selectedBoardGame" class="col-sm-12 col-md-10">Board Game</h1>
-                        <button type="submit" class="col-sm-12 col-md-2 btn btn-warning btn-circle btn-md mt-sm-2" id="leaveScoreSheet"><i class="fas fa-sign-out-alt"></i></button>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6 form-group">
+                                <input type="text" class="form-control" placeholder="name" id="ssFastSearchUserNames" data-source="fastSearchUserNames">
+                            </div>
+                            <button type="submit" class="col-sm-12 col-md-4 offset-md-2 btn btn-warning btn-circle btn-md mt-sm-2" id="leaveScoreSheet"><i class="fas fa-sign-out-alt"></i></button>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">

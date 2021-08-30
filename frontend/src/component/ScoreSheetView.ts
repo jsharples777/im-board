@@ -5,6 +5,8 @@ import browserUtil from "../util/BrowserUtil";
 import debug from 'debug';
 import {ScoreSheet} from "../AppTypes";
 import {TemplateManager} from "../template/TemplateManager";
+import notifier from "../notification/NotificationManager";
+import {StateManager} from "../state/StateManager";
 
 const ssvLogger = debug('score-sheet-view');
 
@@ -27,17 +29,37 @@ export class ScoreSheetView implements StateChangeListener{
     private endOrLeaveEl:HTMLButtonElement|null = null;
     private scoreSheetEl:HTMLDivElement|null = null;
 
+    // @ts-ignore
+    protected ssFastSearchUserNames: HTMLElement;
+
+
     private table:Handsontable|null = null;
 
     private controller:ScoreSheetController;
 
+    private config:any;
+
     private constructor() {
         this.controller = ScoreSheetController.getInstance();
+        this.eventUserSelected = this.eventUserSelected.bind(this);
+    }
+
+    public setApplication(applicationView:any, stateManager:StateManager) {
+        this.config = applicationView.state;
+        stateManager.addChangeListenerForName(this.config.stateNames.users,this);
     }
 
     public onDocumentLoaded(applicationView:any) {
         this.applicationView = applicationView;
         this.resetDisplay();
+
+        // @ts-ignore
+        this.ssFastSearchUserNames = document.getElementById(this.config.ui.scoreSheet.dom.ssFastSearchUserNames);
+        // fast user search
+        // @ts-ignore
+        const fastSearchEl = $(`#${this.config.ui.scoreSheet.dom.ssFastSearchUserNames}`);
+        fastSearchEl.on('autocompleteselect', this.eventUserSelected);
+
 
         ScoreSheetController.getInstance().getStateManager().addChangeListenerForName(this.applicationView.state.stateNames.scoreSheet,this);
 
@@ -68,6 +90,20 @@ export class ScoreSheetView implements StateChangeListener{
             this.thisEl.addEventListener('drop',this.handleUserDrop);
         }
     }
+
+    eventUserSelected(event: Event, ui: any) {
+        event.preventDefault();
+        event.stopPropagation();
+        ssvLogger(`User ${ui.item.label} with id ${ui.item.value} selected`);
+        // @ts-ignore
+        event.target.innerText = '';
+
+        // add to the chat, if one selected, and is scoresheet owner
+        if (ScoreSheetController.getInstance().isSheetOwner()) {
+            ScoreSheetController.getInstance().inviteUser(ui.item.label);
+        }
+    }
+
 
     handleEndOrLeave(event:MouseEvent) {
         ssvLogger('leave or end');
@@ -214,51 +250,69 @@ export class ScoreSheetView implements StateChangeListener{
     }
 
     stateChanged(managerName: string, name: string, newValue: any): void {
-        let scoreSheet:ScoreSheet = newValue;
-        ssvLogger(`Processing new state`);
-        ssvLogger(scoreSheet);
-        if (this.startStopTimer) this.startStopTimer.removeAttribute("disabled");
-
-        // update the board game name
-        if (this.boardGameTitleEl) this.boardGameTitleEl.innerText = `${scoreSheet.boardGameName}`;
-
-        // update the table
-        if (this.table) {
-            // process the data in the state change, will be array of array (rows) into what the table wants
-            let tableData:any = [];
+        if (name === this.config.stateNames.users) {
             // @ts-ignore
-            scoreSheet.data.forEach((row:any[],rowIndex:number) => {
-                row.forEach((column:any, columnIndex:number) => {
-                    tableData.push([rowIndex, columnIndex, column]);
-                });
+            const fastSearchEl = $(`#${this.config.ui.scoreSheet.dom.ssFastSearchUserNames}`);
+            // for each name, construct the patient details to display and the id referenced
+            const fastSearchValues: any = [];
+            newValue.forEach((item: any) => {
+                const searchValue = {
+                    label: item.username,
+                    value: item.id,
+                };
+                // @ts-ignore
+                let index = this.selectedChatLog.users.findIndex((user) => user === item.username);
+                if (index < 0) fastSearchValues.push(searchValue); // don't search for ourselves
             });
-            ssvLogger(`Table data is `);
-            ssvLogger(tableData);
-            // @ts-ignore
-            this.table.setDataAtCell(tableData,ScoreSheetController.SOURCE_View);
+            fastSearchEl.autocomplete({source: fastSearchValues});
+            fastSearchEl.autocomplete('option', {disabled: false, minLength: 1});
 
         }
         else {
-            // create a new table
+            let scoreSheet: ScoreSheet = newValue;
+            ssvLogger(`Processing new state`);
+            ssvLogger(scoreSheet);
+            if (this.startStopTimer) this.startStopTimer.removeAttribute("disabled");
 
-            if (this.scoreSheetEl) {
-                const boardGame = this.controller.getSelectedBoardGame();
-                if (boardGame) {
-                    scoreSheet.sheetLayoutOptions = TemplateManager.getInstance().getScoreSheetTemplate(boardGame);
-                }
-                scoreSheet.sheetLayoutOptions.data = scoreSheet.data;
-                this.table = new Handsontable(
-                    this.scoreSheetEl,
-                    scoreSheet.sheetLayoutOptions);
+            // update the board game name
+            if (this.boardGameTitleEl) this.boardGameTitleEl.innerText = `${scoreSheet.boardGameName}`;
+
+            // update the table
+            if (this.table) {
+                // process the data in the state change, will be array of array (rows) into what the table wants
+                let tableData: any = [];
                 // @ts-ignore
-                this.table.addHook('afterChange',this.controller.userChangedValue);
+                scoreSheet.data.forEach((row: any[], rowIndex: number) => {
+                    row.forEach((column: any, columnIndex: number) => {
+                        tableData.push([rowIndex, columnIndex, column]);
+                    });
+                });
+                ssvLogger(`Table data is `);
+                ssvLogger(tableData);
+                // @ts-ignore
+                this.table.setDataAtCell(tableData, ScoreSheetController.SOURCE_View);
+
+            } else {
+                // create a new table
+
+                if (this.scoreSheetEl) {
+                    const boardGame = this.controller.getSelectedBoardGame();
+                    if (boardGame) {
+                        scoreSheet.sheetLayoutOptions = TemplateManager.getInstance().getScoreSheetTemplate(boardGame);
+                    }
+                    scoreSheet.sheetLayoutOptions.data = scoreSheet.data;
+                    this.table = new Handsontable(
+                        this.scoreSheetEl,
+                        scoreSheet.sheetLayoutOptions);
+                    // @ts-ignore
+                    this.table.addHook('afterChange', this.controller.userChangedValue);
+                }
             }
+
+
+            // update the timer
+            if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(scoreSheet.timer);
         }
-
-
-        // update the timer
-        if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(scoreSheet.timer);
-
 
     }
 

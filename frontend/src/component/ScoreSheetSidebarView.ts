@@ -3,6 +3,9 @@ import SidebarView from './SidebarView';
 import {StateManager} from '../state/StateManager';
 import moment from "moment";
 import controller from "../Controller";
+import {ChatManager} from "../socket/ChatManager";
+import notifier from "../notification/NotificationManager";
+import {ScoreSheetController} from "./ScoreSheetController";
 
 
 
@@ -26,8 +29,11 @@ class ScoreSheetSidebarView extends SidebarView {
 
     onDocumentLoaded() {
         super.onDocumentLoaded();
+
         this.updateView('', {});
     }
+
+
 
     public setSelectedBoardGame(boardGame:any) {
         csLogger(`setting selected board game to`);

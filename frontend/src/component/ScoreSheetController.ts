@@ -83,6 +83,10 @@ export class ScoreSheetController implements ChatReceiver {
         return this.stateManager;
     }
 
+    public getCurrentRoom():string|null {
+        return this.currentScoreRoom;
+    }
+
 
     receiveLogin(username: string): void {}
     receiveLogout(username: string): void {}
