@@ -63,6 +63,61 @@ export class TemplateManager {
         templateLogger(template);
         return template;
     }
+    private getSkullKingTemplate():any {
+        let template = {
+            colHeaders: false,
+            rowHeaders: false,
+            licenseKey: 'non-commercial-and-evaluation',
+            manualColumnResize: false,
+            manualRowResize: false,
+            selectionMode: 'single',
+            cells(row:number,column:number) {
+                if ((column === 0) || (column === 1) || (row === 21)) {
+                    return {
+                        readOnly:true,
+                        className: 'bg-readonly-heading'
+                    }
+                }
+                if (column%2 === 0) {
+                    if (row%2 === 0){
+                        return {
+                            className: 'bg-readonly',
+                        }
+                    }
+                }
+
+            }
+        }
+        templateLogger(template);
+        return template;
+    }
+
+    private getSkullKingStartingData():any[] {
+        return [
+            ['Round','','P 1','','P 2','','P 3','','P 4',''],
+            ['1','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['2','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['3','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['4','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['5','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['6','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['7','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['8','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['9','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['10','bid','','','','','','','',''],
+            ['','bonus','','','','','','','',''],
+            ['Total','','','','','','','','','']
+        ];
+    }
 
     private getOhanamiStartingData():any[] {
         return [
@@ -167,12 +222,18 @@ export class TemplateManager {
         if (boardGame.gameId === 270314) {
             return this.getOhanamiTemplate();
         }
+        if (boardGame.gameId === 333201) {
+            return this.getSkullKingTemplate();
+        }
         return this.getDefaultScoreSheetTemplate(boardGame);
     }
 
     public getScoreSheetStartingData(boardGame:any):any[]|null {
         if (boardGame.gameId === 270314) {
             return this.getOhanamiStartingData();
+        }
+        if (boardGame.gameId === 333201) {
+            return this.getSkullKingStartingData();
         }
         return this.getDefaultScoreSheetStartingData(boardGame);
     }

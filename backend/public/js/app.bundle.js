@@ -9113,6 +9113,39 @@ var TemplateManager = /*#__PURE__*/function () {
     return template;
   };
 
+  _proto.getSkullKingTemplate = function getSkullKingTemplate() {
+    var template = {
+      colHeaders: false,
+      rowHeaders: false,
+      licenseKey: 'non-commercial-and-evaluation',
+      manualColumnResize: false,
+      manualRowResize: false,
+      selectionMode: 'single',
+      cells: function cells(row, column) {
+        if (column === 0 || column === 1 || row === 21) {
+          return {
+            readOnly: true,
+            className: 'bg-readonly-heading'
+          };
+        }
+
+        if (column % 2 === 0) {
+          if (row % 2 === 0) {
+            return {
+              className: 'bg-readonly'
+            };
+          }
+        }
+      }
+    };
+    templateLogger(template);
+    return template;
+  };
+
+  _proto.getSkullKingStartingData = function getSkullKingStartingData() {
+    return [['Round', '', 'P 1', '', 'P 2', '', 'P 3', '', 'P 4', ''], ['1', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['2', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['3', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['4', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['5', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['6', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['7', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['8', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['9', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['10', 'bid', '', '', '', '', '', '', '', ''], ['', 'bonus', '', '', '', '', '', '', '', ''], ['Total', '', '', '', '', '', '', '', '', '']];
+  };
+
   _proto.getOhanamiStartingData = function getOhanamiStartingData() {
     return [['Round', 'Mult.', 'P 1', 'P 2', 'P 3', 'P 4'], ['1', 'x3', '0', '0', '0', '0'], ['2', 'x3', '0', '0', '0', '0'], ['', 'x4', '0', '0', '0', '0'], ['3', 'x3', '0', '0', '0', '0'], ['', 'x4', '0', '0', '0', '0'], ['', 'x7', '0', '0', '0', '0'], ['', 'var', '0', '0', '0', '0'], ['Total', '', '0', '0', '0', '0']];
   };
@@ -9182,12 +9215,20 @@ var TemplateManager = /*#__PURE__*/function () {
       return this.getOhanamiTemplate();
     }
 
+    if (boardGame.gameId === 333201) {
+      return this.getSkullKingTemplate();
+    }
+
     return this.getDefaultScoreSheetTemplate(boardGame);
   };
 
   _proto.getScoreSheetStartingData = function getScoreSheetStartingData(boardGame) {
     if (boardGame.gameId === 270314) {
       return this.getOhanamiStartingData();
+    }
+
+    if (boardGame.gameId === 333201) {
+      return this.getSkullKingStartingData();
     }
 
     return this.getDefaultScoreSheetStartingData(boardGame);

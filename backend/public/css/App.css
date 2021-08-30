@@ -62,6 +62,10 @@ i:hover {
     overflow-y: auto;
 }
 
+.hscroll {
+    overflow-x: scroll;
+}
+
 /*
 *
 *  Sidebars, styles, content styling, scrolling
