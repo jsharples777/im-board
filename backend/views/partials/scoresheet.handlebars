@@ -17,7 +17,12 @@
                         <h1 style="font-size:40pt" id="selectedBoardGame" class="col-sm-12 col-md-10">Board Game</h1>
                         </div>
                         <div class="d-flex w-100 justify-content-between">
+                            {{#if user}}
                               <input class="col-sm-7" style="width: 70%" type="text" placeholder="Add user" id="ssFastSearchUserNames" data-source="fastSearchUserNames">
+                            {{else}}
+                                <input class="col-sm-7" style="width: 70%" type="text" placeholder="Add user" id="ssFastSearchUserNames" data-source="fastSearchUserNames" disabled>
+
+                            {{/if}}
                               <button type="submit" class="col-sm-3 ml-2 btn btn-warning btn-circle btn-md" id="leaveScoreSheet"><i class="fas fa-sign-out-alt"></i></button>
                         </div>
                     </div>

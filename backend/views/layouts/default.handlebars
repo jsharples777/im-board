@@ -7,6 +7,12 @@
     <div class="alert alert-danger">{{error}}</div>
 {{/if}}
 {{#if user}}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>Board Games</strong> Start by going to Board Game Search and finding some games to add to your collection.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
 {{else}}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>Welcome</strong> If you register with us the benefits are below.  But feel free to search for games and create score sheets with your friends.
@@ -21,7 +27,7 @@
     </button>
 </div>
 <div class="alert alert-info alert-dismissible fade show" role="alert">
-    <strong>Chat</strong> Find other users and has chats about your games.  You an invite other users by dragging them over to your chat window from User Search.
+    <strong>Chat</strong> Find other users and have chats about your games.  You an invite other users by dragging them over to your chat window from User Search.
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>

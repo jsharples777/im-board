@@ -15,6 +15,7 @@ export class ScoreSheetView implements StateChangeListener {
     // @ts-ignore
     protected ssFastSearchUserNames: HTMLElement;
     private applicationView: any | null = null;
+    private stateManager:StateManager;
 
     private thisEl: HTMLDivElement | null = null;
     private boardGameTitleEl: HTMLHeadingElement | null = null;
@@ -28,6 +29,7 @@ export class ScoreSheetView implements StateChangeListener {
 
     private constructor() {
         this.controller = ScoreSheetController.getInstance();
+        this.stateManager = controller.getStateManager();
         this.eventUserSelected = this.eventUserSelected.bind(this);
     }
 
@@ -38,9 +40,9 @@ export class ScoreSheetView implements StateChangeListener {
         return ScoreSheetView._instance;
     }
 
-    public setApplication(applicationView: any, stateManager: StateManager) {
+    public setApplication(applicationView: any) {
         this.config = applicationView.state;
-        stateManager.addChangeListenerForName(this.config.stateNames.users, this);
+        this.stateManager.addChangeListenerForName(this.config.stateNames.users, this);
     }
 
     public onDocumentLoaded(applicationView: any) {
@@ -263,6 +265,7 @@ export class ScoreSheetView implements StateChangeListener {
     }
 
     stateChangedItemAdded(managerName: string, name: string, itemAdded: any): void {
+        this.stateChanged(managerName, name, this.stateManager.getStateByName(name));
     }
 
     stateChangedItemRemoved(managerName: string, name: string, itemRemoved: any): void {
