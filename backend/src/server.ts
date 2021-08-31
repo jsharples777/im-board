@@ -1,6 +1,6 @@
 // Configuration and Logging handlers
 /* eslint-disable import/first */
-
+import fs from "fs";
 import DataSource from "./graphql/DataSource";
 
 require('dotenv').config();
@@ -9,6 +9,7 @@ import debug from 'debug';
 
 // HTTP handlers
 import http from 'http';
+import https from 'https';
 import path from 'path';
 
 // Express framework and additional middleware
@@ -29,6 +30,14 @@ import passport from 'passport';
 import setupPassport from './passport/passport';
 import sequelize from './db/connection';
 import {Account} from './models';
+
+// WebRTC
+import { ExpressPeerServer } from 'peer';
+
+// HTTPS config
+const key = fs.readFileSync('./config/key.pem');
+const cert = fs.readFileSync('./config/cert.pem');
+
 
 // routes
 import routes from './routes';
@@ -86,6 +95,8 @@ if (isDevelopment  && (process.env.ENABLE_HMR === "true")) {
   app.use(devMiddleware(compiler));
   app.use(hotMiddleware(compiler));
 }
+
+
 
 // Express middlewares
 app.use('/', express.static('./public')); // root directory of static content
@@ -197,12 +208,17 @@ if (isDevelopment) {
 
 // construct the web server
 serverDebug('Create HTTP Server');
-const httpServer = new http.Server(app);
+const httpServer = new https.Server({key: key, cert: cert },app);//new http.Server(app);
 
 
 // setup the sockets manager with the server
 serverDebug('Setting up Socket manager');
 socketManager.connectToServer(httpServer);
+
+// setup the WebRTC peer server
+// @ts-ignore
+const peerServer = ExpressPeerServer(httpServer, {debug: true,});
+app.use('/peerjs', peerServer);
 
 
 

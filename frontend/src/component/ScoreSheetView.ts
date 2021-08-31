@@ -15,7 +15,7 @@ export class ScoreSheetView implements StateChangeListener {
     // @ts-ignore
     protected ssFastSearchUserNames: HTMLElement;
     private applicationView: any | null = null;
-    private stateManager:StateManager;
+    private stateManager: StateManager;
 
     private thisEl: HTMLDivElement | null = null;
     private boardGameTitleEl: HTMLHeadingElement | null = null;
@@ -23,14 +23,23 @@ export class ScoreSheetView implements StateChangeListener {
     private timerEl: HTMLDivElement | null = null;
     private endOrLeaveEl: HTMLButtonElement | null = null;
     private scoreSheetEl: HTMLDivElement | null = null;
+    private webrtcDiv: HTMLElement | null = null;
+    private myVideoStream: MediaStream|null = null;
+
+
+
     private table: Handsontable | null = null;
     private controller: ScoreSheetController;
     private config: any;
+    private peer: any;
 
     private constructor() {
         this.controller = ScoreSheetController.getInstance();
         this.stateManager = controller.getStateManager();
         this.eventUserSelected = this.eventUserSelected.bind(this);
+
+        // @ts-ignore  - is for the WebRTC peer via Nodejs
+        this.peer = new Peer(undefined, {path: '/peerjs', host: '/', port: '3030'});
     }
 
     public static getInstance(): ScoreSheetView {
@@ -72,6 +81,8 @@ export class ScoreSheetView implements StateChangeListener {
         this.endOrLeaveEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.end);
         // @ts-ignore
         this.scoreSheetEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.scoreSheet);
+        // @ts-ignore
+        this.webrtcDiv = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.webrtc);
 
         // bind event handlers
         this.handleStartStopTimer = this.handleStartStopTimer.bind(this);
@@ -87,6 +98,7 @@ export class ScoreSheetView implements StateChangeListener {
             });
             this.thisEl.addEventListener('drop', this.handleUserDrop);
         }
+
     }
 
     eventUserSelected(event: Event, ui: any) {
@@ -319,4 +331,46 @@ export class ScoreSheetView implements StateChangeListener {
         }
         return result;
     }
+
+    private addVideoStream(video: HTMLVideoElement, stream: MediaStream) {
+        video.srcObject = stream;
+        video.addEventListener("loadedmetadata", () => {
+            video.play();
+            if (this.webrtcDiv) this.webrtcDiv.append(video);
+        });
+    };
+
+    public callUser(userId:string) {
+        if (this.myVideoStream) {
+            const call = this.peer.call(userId, this.myVideoStream);
+            const video = document.createElement('video');
+            call.on('stream', (userVideoStream:MediaStream) => {
+                this.addVideoStream(video, userVideoStream);
+            });
+        }
+    };
+
+    public startScoreSheet() {
+        if (controller.isLoggedIn()) {
+            const myVideo: HTMLVideoElement = document.createElement("video");
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: true,
+                }).then((stream) => {
+                    this.myVideoStream = stream;
+                    this.addVideoStream(myVideo, this.myVideoStream);
+                    // setup webrtc response
+                    this.peer.on('call', (call: any) => {
+                        call.answer(stream);
+                        const video = document.createElement('video');
+                        call.on('stream', (userVideoStream: any) => {
+                            this.addVideoStream(video, userVideoStream);
+                        });
+                    });
+                });
+            }
+        }
+    }
+
 }

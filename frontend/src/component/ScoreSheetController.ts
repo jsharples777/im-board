@@ -30,6 +30,8 @@ export class ScoreSheetController implements ChatReceiver {
     private currentUsersInScoreSheet: string[] = [];
     private intervalTimer: number = -1;
 
+
+
     private constructor() {
         this.stateManager = new BrowserStorageStateManager(true);
         socketManager.addChatReceiver(this);
@@ -93,6 +95,7 @@ export class ScoreSheetController implements ChatReceiver {
 
     public initialise(applicationView: any) {
         this.applicationView = applicationView;
+
     }
 
     receiveInvitation(invite: Invitation): void {
@@ -269,6 +272,8 @@ export class ScoreSheetController implements ChatReceiver {
                 isFinished: false
             }
             sscLogger(this.currentScoreSheet);
+
+            ScoreSheetView.getInstance().startScoreSheet();
 
             // store the score sheet locally
             this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, true);
@@ -501,7 +506,9 @@ export class ScoreSheetController implements ChatReceiver {
     }
 
     protected addUserToScoreSheet(username: string): void {
-        // TO DO
+        if (controller.isLoggedIn() && this.isSheetOwner()) {
+            ScoreSheetView.getInstance().callUser(username);
+        }
     }
 
     protected removeUserFromScoreSheet(username: string): void {
@@ -548,5 +555,9 @@ export class ScoreSheetController implements ChatReceiver {
             if (this.currentScoreSheet) ScoreSheetView.getInstance().updateTimer(this.currentScoreSheet.timer, true);
         }
         this.intervalTimer = -1;
+    }
+
+    public addUserToRTC(username:string) {
+
     }
 }

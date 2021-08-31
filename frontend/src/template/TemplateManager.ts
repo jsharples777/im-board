@@ -275,6 +275,17 @@ export class TemplateManager {
         // @ts-ignore
         const scores: any[] = scoreSheet.data[scoreSheet.data.length - 1]
 
+        // ensure the scores are numbers
+        scores.forEach((score,index) => {
+            const parsed = parseInt(score);
+            if (isNaN(parsed)) {
+                scores[index] = 0;
+            }
+            else {
+                scores[index] = parsed;
+            }
+        })
+
         // @ts-ignore
         saveData.players = playerNames;
         // @ts-ignore

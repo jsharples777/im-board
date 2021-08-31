@@ -1,2 +1,2 @@
 backend/.env filter=git-crypt diff=git-crypt
-backend/config/config.json filter=git-crypt diff=git-crypt
+backend/config/key.pem filter=git-crypt diff=git-crypt

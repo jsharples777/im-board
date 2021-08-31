@@ -306,7 +306,8 @@ class Root extends React.Component implements UnreadMessageCountListener {
                         iconInProgress: "<i class='fas fa-hourglass-half'></i>",
                         iconEnd: "<i class='fas fa-hourglass-end'></i>",
                         iconLeave: "<i class='fas fa-sign-out-alt'></i>",
-                        ssFastSearchUserNames: 'ssFastSearchUserNames'
+                        ssFastSearchUserNames: 'ssFastSearchUserNames',
+                        webrtc: 'webrtc'
 
                     }
                 }
@@ -526,7 +527,7 @@ class Root extends React.Component implements UnreadMessageCountListener {
 
 
         this.scoreSheetView = ScoreSheetView.getInstance();
-        this.scoreSheetView.setApplication(this, controller.getStateManager());
+        this.scoreSheetView.setApplication(this);
         this.scoreSheetView.onDocumentLoaded(this);
 
         // navigation item handlers
