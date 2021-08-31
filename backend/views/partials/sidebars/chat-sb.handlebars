@@ -18,22 +18,18 @@
             <div class="col-12 mt-2">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
-                        <div class="align-self-center">
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="name" id="chatFastSearchUserNames" data-source="fastSearchUserNames">
-                            </div>
-                        </div>
-                        <div><button type="submit" class="btn btn-warning btn-circle btn-md" id="leaveChat"><i class="fas fa-sign-out-alt"></i></button></div>
+                        <input type="text" style="width:80%" placeholder="Add user" id="chatFastSearchUserNames" data-source="fastSearchUserNames">
+                        <button type="submit" class="btn btn-warning btn-circle btn-md" id="leaveChat"><i class="fas fa-sign-out-alt"></i></button>
                     </div>
                     <div class="card-body room" id="chatLogRoom">
                         <div id="chatLog" class="messages">
                         </div>
                     </div>
                     <div class="card-footer">
-                        <form class="form-inline d-flex justify-content-between" id="newMessage">
-                            <div><input type="text" class="form-control form-control-sm align-self-center enter-message" id="message"
-                                   placeholder="Enter message" ></div>&nbsp;&nbsp;
-                            <div><button type="submit" class="btn btn-primary btn-circle btn-md" id="submitMessage"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></div>
+                        <form class="d-flex justify-content-between" id="newMessage">
+                            <input type="text" style="width:80%" class="align-self-center enter-message" id="message"
+                                   placeholder="Enter message" >
+                            <button type="submit" class="btn btn-primary btn-circle btn-md" id="submitMessage"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                         </form>
                     </div>
                 </div>

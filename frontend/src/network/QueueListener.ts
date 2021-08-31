@@ -1,4 +1,5 @@
 export default interface QueueListener {
-    handleEventAddToQueue():void;
-    handleEventRemoveFromQueue():void;
+    handleEventAddToQueue(): void;
+
+    handleEventRemoveFromQueue(): void;
 }

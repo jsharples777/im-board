@@ -4,20 +4,11 @@ import notifier from "../notification/NotificationManager";
 import debug from 'debug';
 import {ChatLog, Invitation, InviteType, Message} from "./Types";
 import {ChatUserEventListener} from "./ChatUserEventListener";
-import controller from "../Controller";
 
 const notLogger = debug('notification-controller');
 
 export class NotificationController implements ChatEventListener, ChatUserEventListener {
     private static _instance: NotificationController;
-
-    public static getInstance(): NotificationController {
-        if (!(NotificationController._instance)) {
-            NotificationController._instance = new NotificationController();
-        }
-        return NotificationController._instance;
-    }
-
     private doNotDisturb: boolean = false;
     private chatManager: ChatManager;
     private chatListeners: ChatEventListener[];
@@ -40,11 +31,18 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         this.chatManager.addChatUserEventHandler(this);
     }
 
+    public static getInstance(): NotificationController {
+        if (!(NotificationController._instance)) {
+            NotificationController._instance = new NotificationController();
+        }
+        return NotificationController._instance;
+    }
+
     handleInvitationDeclined(room: string, username: string): void {
         if ((this.doNotDisturb)) return;
 
         // notify the user of the new chat
-        notifier.show('Room',`User ${username} has declined the invitation to join you.`,'info',7000);
+        notifier.show('Room', `User ${username} has declined the invitation to join you.`, 'info', 7000);
     }
 
 
@@ -60,19 +58,19 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
             // notify the user of the invitation
             //result = controller.askUserAboutInvitation(invite); ///////TO FIX
 
-        }
-        else {
+        } else {
             // notify the user of the new chat
-            notifier.show('Chat Room',`User ${invite.from} has invited you.`,'info',7000);
+            notifier.show('Chat Room', `User ${invite.from} has invited you.`, 'info', 7000);
         }
 
         return result;
     }
 
-    public addListener(listener:ChatEventListener) {
+    public addListener(listener: ChatEventListener) {
         this.chatListeners.push(listener);
     }
-    public addUserListener(listener:ChatUserEventListener) {
+
+    public addUserListener(listener: ChatUserEventListener) {
         this.chatUserListeners.push(listener);
     }
 
@@ -80,29 +78,27 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         this.doNotDisturb = dontDisturbMe;
     }
 
-    public blackListUser(username:string, isBlackedListed:boolean = true) {
+    public blackListUser(username: string, isBlackedListed: boolean = true) {
         if (isBlackedListed) {
             this.chatManager.addUserToBlockedList(username);
-        }
-        else {
+        } else {
             this.chatManager.removeUserFromBlockedList(username);
         }
     }
 
-    public favouriteUser(username:string, isFavourited:boolean = true) {
+    public favouriteUser(username: string, isFavourited: boolean = true) {
         if (isFavourited) {
             this.chatManager.addUserToFavouriteList(username);
-        }
-        else {
+        } else {
             this.chatManager.removeUserFromFavouriteList(username);
         }
     }
 
-    public isFavouriteUser(username:string):boolean {
+    public isFavouriteUser(username: string): boolean {
         return this.chatManager.isUserInFavouriteList(username);
     }
 
-    public isBlockedUser(username:string):boolean {
+    public isBlockedUser(username: string): boolean {
         return this.chatManager.isUserInBlockedList(username);
     }
 
@@ -110,7 +106,7 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         this.chatListeners.forEach((listener) => listener.handleChatLogsUpdated());
     }
 
-    handleChatLogUpdated(log: ChatLog,wasOffline = false): void {
+    handleChatLogUpdated(log: ChatLog, wasOffline = false): void {
         notLogger(`Handle chat log updated`);
         notLogger(log);
         // pass on the changes
@@ -123,7 +119,7 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
             // get the last message added, it won't be from ourselves (the chat manager takes care of that)
             if (log.messages.length > 0) {
                 const displayMessage = log.messages[log.messages.length - 1];
-                notifier.show(displayMessage.from,displayMessage.message,'message',3000);
+                notifier.show(displayMessage.from, displayMessage.message, 'message', 3000);
             }
         }
     }
@@ -143,7 +139,7 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
 
         // provide visual notifications if do not disturb is not on
         if (this.doNotDisturb) return;
-        notifier.show(username,`User ${username} has logged in.`,'warning',5000);
+        notifier.show(username, `User ${username} has logged in.`, 'warning', 5000);
     }
 
     handleFavouriteUserLoggedOut(username: string): void {
@@ -153,7 +149,7 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
 
         // provide visual notifications if do not disturb is not on
         if (this.doNotDisturb) return;
-        notifier.show(username,`User ${username} has logged out.`,'priority',4000);
+        notifier.show(username, `User ${username} has logged out.`, 'priority', 4000);
 
     }
 
@@ -167,7 +163,7 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         this.chatUserListeners.forEach((listener) => listener.handleFavouriteUsersChanged(usernames));
     }
 
-    public startChatWithUser(username:string):string|null {
+    public startChatWithUser(username: string): string | null {
         return ChatManager.getInstance().startChatWithUser(username);
 
     }
@@ -181,7 +177,7 @@ export class NotificationController implements ChatEventListener, ChatUserEventL
         if (this.doNotDisturb) return;
         if (messages.length === 0) return;
 
-        notifier.show("Offline messages received",`You have received ${messages.length} messages since you last logged out.`);
+        notifier.show("Offline messages received", `You have received ${messages.length} messages since you last logged out.`);
     }
 
 

@@ -5,13 +5,31 @@ import browserUtil from "../util/BrowserUtil";
 import debug from 'debug';
 import {ScoreSheet} from "../AppTypes";
 import {TemplateManager} from "../template/TemplateManager";
-import notifier from "../notification/NotificationManager";
 import {StateManager} from "../state/StateManager";
+import controller from "../Controller";
 
 const ssvLogger = debug('score-sheet-view');
 
-export class ScoreSheetView implements StateChangeListener{
+export class ScoreSheetView implements StateChangeListener {
     private static _instance: ScoreSheetView;
+    // @ts-ignore
+    protected ssFastSearchUserNames: HTMLElement;
+    private applicationView: any | null = null;
+
+    private thisEl: HTMLDivElement | null = null;
+    private boardGameTitleEl: HTMLHeadingElement | null = null;
+    private startStopTimer: HTMLButtonElement | null = null;
+    private timerEl: HTMLDivElement | null = null;
+    private endOrLeaveEl: HTMLButtonElement | null = null;
+    private scoreSheetEl: HTMLDivElement | null = null;
+    private table: Handsontable | null = null;
+    private controller: ScoreSheetController;
+    private config: any;
+
+    private constructor() {
+        this.controller = ScoreSheetController.getInstance();
+        this.eventUserSelected = this.eventUserSelected.bind(this);
+    }
 
     public static getInstance(): ScoreSheetView {
         if (!(ScoreSheetView._instance)) {
@@ -20,36 +38,12 @@ export class ScoreSheetView implements StateChangeListener{
         return ScoreSheetView._instance;
     }
 
-    private applicationView:any|null = null;
-
-    private thisEl:HTMLDivElement|null = null;
-    private boardGameTitleEl:HTMLHeadingElement|null = null;
-    private startStopTimer:HTMLButtonElement|null = null;
-    private timerEl:HTMLDivElement|null = null;
-    private endOrLeaveEl:HTMLButtonElement|null = null;
-    private scoreSheetEl:HTMLDivElement|null = null;
-
-    // @ts-ignore
-    protected ssFastSearchUserNames: HTMLElement;
-
-
-    private table:Handsontable|null = null;
-
-    private controller:ScoreSheetController;
-
-    private config:any;
-
-    private constructor() {
-        this.controller = ScoreSheetController.getInstance();
-        this.eventUserSelected = this.eventUserSelected.bind(this);
-    }
-
-    public setApplication(applicationView:any, stateManager:StateManager) {
+    public setApplication(applicationView: any, stateManager: StateManager) {
         this.config = applicationView.state;
-        stateManager.addChangeListenerForName(this.config.stateNames.users,this);
+        stateManager.addChangeListenerForName(this.config.stateNames.users, this);
     }
 
-    public onDocumentLoaded(applicationView:any) {
+    public onDocumentLoaded(applicationView: any) {
         this.applicationView = applicationView;
         this.resetDisplay();
 
@@ -61,7 +55,7 @@ export class ScoreSheetView implements StateChangeListener{
         fastSearchEl.on('autocompleteselect', this.eventUserSelected);
 
 
-        ScoreSheetController.getInstance().getStateManager().addChangeListenerForName(this.applicationView.state.stateNames.scoreSheet,this);
+        ScoreSheetController.getInstance().getStateManager().addChangeListenerForName(this.applicationView.state.stateNames.scoreSheet, this);
 
         // load references to the key elements on the page
         // @ts-ignore
@@ -83,11 +77,13 @@ export class ScoreSheetView implements StateChangeListener{
         this.handleUserDrop = this.handleUserDrop.bind(this);
 
         // setup event handlers
-        if (this.startStopTimer) this.startStopTimer.addEventListener('click',this.handleStartStopTimer);
-        if (this.endOrLeaveEl) this.endOrLeaveEl.addEventListener('click',this.handleEndOrLeave);
+        if (this.startStopTimer) this.startStopTimer.addEventListener('click', this.handleStartStopTimer);
+        if (this.endOrLeaveEl) this.endOrLeaveEl.addEventListener('click', this.handleEndOrLeave);
         if (this.thisEl) {
-            this.thisEl.addEventListener('dragover',(event) => {event.preventDefault()});
-            this.thisEl.addEventListener('drop',this.handleUserDrop);
+            this.thisEl.addEventListener('dragover', (event) => {
+                event.preventDefault()
+            });
+            this.thisEl.addEventListener('drop', this.handleUserDrop);
         }
     }
 
@@ -105,7 +101,7 @@ export class ScoreSheetView implements StateChangeListener{
     }
 
 
-    handleEndOrLeave(event:MouseEvent) {
+    handleEndOrLeave(event: MouseEvent) {
         ssvLogger('leave or end');
         // are we leaving or ending?
         if (this.controller.hasActiveScoreSheet() && this.controller.isSheetOwner()) {
@@ -118,8 +114,7 @@ export class ScoreSheetView implements StateChangeListener{
 
             // reset the display
             this.resetDisplay();
-        }
-        else {
+        } else {
             // leaving the score sheet
             // double check this is want we want
             if (!confirm("Are you sure you want to leave the score sheet")) return;
@@ -133,17 +128,16 @@ export class ScoreSheetView implements StateChangeListener{
         }
     }
 
-    handleStartStopTimer(event:MouseEvent) {
+    handleStartStopTimer(event: MouseEvent) {
         ssvLogger('start/pause timer');
         if (this.controller.isTimerGoing()) {
             this.controller.pauseTimer();
-        }
-        else {
+        } else {
             this.controller.startTimer();
         }
     }
 
-    handleUserDrop(event:Event) {
+    handleUserDrop(event: Event) {
         ssvLogger('drop event on current score sheet');
         if (this.controller.hasActiveScoreSheet() && this.controller.isSheetOwner()) {
             // @ts-ignore
@@ -167,82 +161,26 @@ export class ScoreSheetView implements StateChangeListener{
         if (this.startStopTimer) {
             this.startStopTimer.innerHTML = 'Start ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
             this.startStopTimer.setAttribute("disabled", "true");
-            browserUtil.addRemoveClasses(this.startStopTimer,'btn-warning',false);
-            browserUtil.addRemoveClasses(this.startStopTimer,'btn-success',true);
+            browserUtil.addRemoveClasses(this.startStopTimer, 'btn-warning', false);
+            browserUtil.addRemoveClasses(this.startStopTimer, 'btn-success', true);
         }
         if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(0);
         if (this.endOrLeaveEl) this.endOrLeaveEl.innerHTML = this.applicationView.state.ui.scoreSheet.dom.iconLeave;
         if (this.scoreSheetEl) browserUtil.removeAllChildren(this.scoreSheetEl);
     }
 
-    private createTimerDisplay(timer:number):string {
-        let result = '';
-        if (timer === 0) {
-            result = '00:00';
-        }
-        else {
-            if (timer >= 60) {
-                let hours = Math.floor(timer/3600);
-                let minutes = Math.floor(timer/60);
-                let seconds = timer - (hours*3600) - (minutes*60);
-                if (hours > 0) {
-                    result += `${hours}:`;
-                }
-                if (minutes > 0) {
-                    if (minutes < 10) {
-                        result += `0${minutes}:`
-                    }
-                    else {
-                        result += `${minutes}:`
-                    }
-                }
-                else {
-                    result += '00:';
-                }
-                if (seconds > 0) {
-                    if (seconds < 10) {
-                        result += `0${seconds}`;
-                    }
-                    else {
-                        result += `${seconds}`;
-                    }
-                }
-                else {
-                    result += '00';
-                }
-            }
-            else {
-                result = `00:`;
-                if (timer > 0) {
-                    if (timer < 10) {
-                        result += `0${timer}`;
-                    }
-                    else {
-                        result += `${timer}`;
-                    }
-                }
-                else {
-                    result += '00';
-                }
-            }
-        }
-        return result;
-    }
-
-
-    public updateTimer(time:number, isPaused:boolean = false) {
+    public updateTimer(time: number, isPaused: boolean = false) {
         // update the view
         ssvLogger(`Updating timer ${time} ${isPaused}`);
         if (this.startStopTimer) {
             if (isPaused) {
                 this.startStopTimer.innerHTML = 'Start   ' + this.applicationView.state.ui.scoreSheet.dom.iconStart;
-                browserUtil.addRemoveClasses(this.startStopTimer,'btn-warning',false);
-                browserUtil.addRemoveClasses(this.startStopTimer,'btn-success',true);
-            }
-            else {
+                browserUtil.addRemoveClasses(this.startStopTimer, 'btn-warning', false);
+                browserUtil.addRemoveClasses(this.startStopTimer, 'btn-success', true);
+            } else {
                 this.startStopTimer.innerHTML = 'Pause   ' + this.applicationView.state.ui.scoreSheet.dom.iconInProgress;
-                browserUtil.addRemoveClasses(this.startStopTimer,'btn-warning',true);
-                browserUtil.addRemoveClasses(this.startStopTimer,'btn-success',false);
+                browserUtil.addRemoveClasses(this.startStopTimer, 'btn-warning', true);
+                browserUtil.addRemoveClasses(this.startStopTimer, 'btn-success', false);
             }
             this.startStopTimer.removeAttribute("disabled");
         }
@@ -253,6 +191,8 @@ export class ScoreSheetView implements StateChangeListener{
         if (name === this.config.stateNames.users) {
             // @ts-ignore
             const fastSearchEl = $(`#${this.config.ui.scoreSheet.dom.ssFastSearchUserNames}`);
+            // what is my username?
+            let myUsername = controller.getLoggedInUsername();
             // for each name, construct the patient details to display and the id referenced
             const fastSearchValues: any = [];
             newValue.forEach((item: any) => {
@@ -261,14 +201,12 @@ export class ScoreSheetView implements StateChangeListener{
                     value: item.id,
                 };
                 // @ts-ignore
-                let index = this.selectedChatLog.users.findIndex((user) => user === item.username);
-                if (index < 0) fastSearchValues.push(searchValue); // don't search for ourselves
+                if (myUsername !== item.username) fastSearchValues.push(searchValue); // don't search for ourselves
             });
             fastSearchEl.autocomplete({source: fastSearchValues});
             fastSearchEl.autocomplete('option', {disabled: false, minLength: 1});
 
-        }
-        else {
+        } else {
             let scoreSheet: ScoreSheet = newValue;
             ssvLogger(`Processing new state`);
             ssvLogger(scoreSheet);
@@ -316,16 +254,66 @@ export class ScoreSheetView implements StateChangeListener{
 
     }
 
-    public getTableData():any[] {
+    public getTableData(): any[] {
         if (this.table) {
             return this.table.getData();
-        }
-        else {
+        } else {
             return [];
         }
     }
 
-    stateChangedItemAdded(managerName: string, name: string, itemAdded: any): void {}
-    stateChangedItemRemoved(managerName: string, name: string, itemRemoved: any): void {}
-    stateChangedItemUpdated(managerName: string, name: string, itemUpdated: any, itemNewValue: any): void {}
+    stateChangedItemAdded(managerName: string, name: string, itemAdded: any): void {
+    }
+
+    stateChangedItemRemoved(managerName: string, name: string, itemRemoved: any): void {
+    }
+
+    stateChangedItemUpdated(managerName: string, name: string, itemUpdated: any, itemNewValue: any): void {
+    }
+
+    private createTimerDisplay(timer: number): string {
+        let result = '';
+        if (timer === 0) {
+            result = '00:00';
+        } else {
+            if (timer >= 60) {
+                let hours = Math.floor(timer / 3600);
+                let minutes = Math.floor(timer / 60);
+                let seconds = timer - (hours * 3600) - (minutes * 60);
+                if (hours > 0) {
+                    result += `${hours}:`;
+                }
+                if (minutes > 0) {
+                    if (minutes < 10) {
+                        result += `0${minutes}:`
+                    } else {
+                        result += `${minutes}:`
+                    }
+                } else {
+                    result += '00:';
+                }
+                if (seconds > 0) {
+                    if (seconds < 10) {
+                        result += `0${seconds}`;
+                    } else {
+                        result += `${seconds}`;
+                    }
+                } else {
+                    result += '00';
+                }
+            } else {
+                result = `00:`;
+                if (timer > 0) {
+                    if (timer < 10) {
+                        result += `0${timer}`;
+                    } else {
+                        result += `${timer}`;
+                    }
+                } else {
+                    result += '00';
+                }
+            }
+        }
+        return result;
+    }
 }

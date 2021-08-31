@@ -30,26 +30,60 @@ export default abstract class AbstractView implements StateChangeListener {
         this.eventStartDrag = this.eventStartDrag.bind(this);
         this.eventClickItem = this.eventClickItem.bind(this);
         this.eventDeleteClickItem = this.eventDeleteClickItem.bind(this);
+        this.eventAction2Clicked = this.eventAction2Clicked.bind(this);
+        this.eventAction1Clicked = this.eventAction1Clicked.bind(this);
     }
 
     public abstract onDocumentLoaded(): void;
 
+    public stateChanged(managerName: string, name: string, newValue: any): void {
+        this.updateView(name, newValue);
+    }
+
+    stateChangedItemAdded(managerName: string, name: string, itemAdded: any): void {
+        this.updateView(name, this.stateManager.getStateByName(name));
+    }
+
+    stateChangedItemRemoved(managerName: string, name: string, itemRemoved: any): void {
+        this.updateView(name, this.stateManager.getStateByName(name));
+    }
+
+    stateChangedItemUpdated(managerName: string, name: string, itemUpdated: any, itemNewValue: any): void {
+        this.updateView(name, this.stateManager.getStateByName(name));
+    }
 
     /* abstract */
     protected abstract eventClickItem(event: MouseEvent): void;
+
     protected abstract eventDeleteClickItem(event: MouseEvent): void;
 
+    protected eventAction1Clicked(event: MouseEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    protected eventAction2Clicked(event: MouseEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
     protected abstract getDragData(event: DragEvent): any;
+
     protected abstract getIdForStateItem(name: string, item: any): string;
+
     protected abstract getLegacyIdForStateItem(name: string, item: any): string;
+
     protected abstract getDisplayValueForStateItem(name: string, item: any): string;
+
     protected abstract getModifierForStateItem(name: string, item: any): string;
+
     protected abstract getSecondaryModifierForStateItem(name: string, item: any): string;
-    protected abstract getBadgeValue(name:string, item:any): number;
-    protected abstract getBackgroundImage(name:string,item:any) :string;
+
+    protected abstract getBadgeValue(name: string, item: any): number;
+
+    protected abstract getBackgroundImage(name: string, item: any): string;
 
     protected abstract updateView(name: string, newState: any): void;
-
 
     protected eventStartDrag(event: DragEvent) {
         avLogger('Abstract View : drag start', 10);
@@ -59,7 +93,7 @@ export default abstract class AbstractView implements StateChangeListener {
         event.dataTransfer.setData(this.applicationView.state.ui.draggable.draggableDataKeyId, data);
     }
 
-    protected createResultForItem(name: string, item: any, dataSource:any = null): HTMLElement {
+    protected createResultForItem(name: string, item: any, dataSource: any = null): HTMLElement {
         avLogger('Abstract View : creating Result');
         avLogger(item);
         const domConfig = this.uiConfig.dom;
@@ -71,13 +105,13 @@ export default abstract class AbstractView implements StateChangeListener {
         }
 
 
-        let childEl:HTMLElement = this.document.createElement(domConfig.resultsElementType);
+        let childEl: HTMLElement = this.document.createElement(domConfig.resultsElementType);
         browserUtil.addRemoveClasses(childEl, domConfig.resultsClasses);
         browserUtil.addAttributes(childEl, domConfig.resultsElementAttributes);
         // the content may be structured
         let textEl = childEl;
         if (domConfig.resultContentDivClasses) {
-            let contentEl:HTMLElement = this.document.createElement('div');
+            let contentEl: HTMLElement = this.document.createElement('div');
             browserUtil.addRemoveClasses(contentEl, domConfig.resultContentDivClasses);
             contentEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
             contentEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
@@ -94,29 +128,86 @@ export default abstract class AbstractView implements StateChangeListener {
 
             if (domConfig.hasBackgroundImage) {
                 let imgEl = this.document.createElement(domConfig.imgElementType);
-                browserUtil.addRemoveClasses(imgEl,domConfig.imgClasses);
-                imgEl.setAttribute('src',this.getBackgroundImage(name,item));
+                browserUtil.addRemoveClasses(imgEl, domConfig.imgClasses);
+                imgEl.setAttribute('src', this.getBackgroundImage(name, item));
                 childEl.appendChild(imgEl);
             }
 
+            let buttonBadgeEl = this.document.createElement('div');
+            contentEl.appendChild(buttonBadgeEl);
+
             if (domConfig.hasBadge) {
-                const badgeValue = this.getBadgeValue(name,item);
+                const badgeValue = this.getBadgeValue(name, item);
                 if (badgeValue > 0) {
                     let badgeEl: HTMLElement = this.document.createElement(domConfig.badgeElementType);
                     browserUtil.addRemoveClasses(badgeEl, domConfig.badgeClasses);
                     badgeEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
                     badgeEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
                     badgeEl.setAttribute(domConfig.resultDataSourceId, dataSource);
-                    contentEl.appendChild(badgeEl);
+                    buttonBadgeEl.appendChild(badgeEl);
                     badgeEl.innerHTML = `&nbsp;&nbsp;&nbsp;${badgeValue}&nbsp;&nbsp;&nbsp;`;
                     browserUtil.addAttributes(badgeEl, domConfig.badgeElementAttributes);
                 }
             }
 
+            if (domConfig.extraAction1Classes) {
+                let action: HTMLElement = this.document.createElement('button');
+                action.setAttribute('type', 'button');
+                browserUtil.addRemoveClasses(action, domConfig.extraAction1Classes);
+                if (domConfig.extraAction1Text) {
+                    if (domConfig.extraAction1Text.trim().length > 0) {
+                        action.innerHTML = domConfig.extraAction1Text;
+                    }
+                }
+                if (domConfig.extraAction1IconClasses) {
+                    let iconEl = document.createElement('i');
+                    browserUtil.addRemoveClasses(iconEl, domConfig.extraAction1IconClasses);
+                    iconEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+                    iconEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+                    iconEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+                    action.appendChild(iconEl);
+                }
+                action.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+                action.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+                action.setAttribute(domConfig.resultDataSourceId, dataSource);
+                action.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.eventAction1Clicked(event);
+                });
+                buttonBadgeEl.appendChild(action);
+            }
+            if (domConfig.extraAction2Classes) {
+                let action: HTMLElement = this.document.createElement('button');
+                action.setAttribute('type', 'button');
+                browserUtil.addRemoveClasses(action, domConfig.extraAction2Classes);
+                if (domConfig.extraAction2Text) {
+                    if (domConfig.extraAction2Text.trim().length > 0) {
+                        action.innerHTML = domConfig.extraAction1Text;
+                    }
+                }
+                if (domConfig.extraAction2IconClasses) {
+                    let iconEl = document.createElement('i');
+                    browserUtil.addRemoveClasses(iconEl, domConfig.extraAction2IconClasses);
+                    iconEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+                    iconEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+                    iconEl.setAttribute(domConfig.resultDataSourceId, dataSource);
+                    action.appendChild(iconEl);
+                }
+                action.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
+                action.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
+                action.setAttribute(domConfig.resultDataSourceId, dataSource);
+                action.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.eventAction2Clicked(event);
+                });
+                buttonBadgeEl.appendChild(action);
+            }
             if (domConfig.isDeleteable) {
-                let deleteButtonEl:HTMLElement = this.document.createElement('button');
-                deleteButtonEl.setAttribute('type','button');
-                browserUtil.addRemoveClasses(deleteButtonEl,domConfig.deleteButtonClasses);
+                let deleteButtonEl: HTMLElement = this.document.createElement('button');
+                deleteButtonEl.setAttribute('type', 'button');
+                browserUtil.addRemoveClasses(deleteButtonEl, domConfig.deleteButtonClasses);
                 if (domConfig.deleteButtonText) {
                     if (domConfig.deleteButtonText.trim().length > 0) {
                         deleteButtonEl.innerHTML = domConfig.deleteButtonText;
@@ -124,7 +215,7 @@ export default abstract class AbstractView implements StateChangeListener {
                 }
                 if (domConfig.deleteButtonIconClasses) {
                     let iconEl = document.createElement('i');
-                    browserUtil.addRemoveClasses(iconEl,domConfig.deleteButtonIconClasses);
+                    browserUtil.addRemoveClasses(iconEl, domConfig.deleteButtonIconClasses);
                     iconEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
                     iconEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
                     iconEl.setAttribute(domConfig.resultDataSourceId, dataSource);
@@ -133,12 +224,12 @@ export default abstract class AbstractView implements StateChangeListener {
                 deleteButtonEl.setAttribute(domConfig.resultDataKeyId, resultDataKeyId);
                 deleteButtonEl.setAttribute(domConfig.resultLegacyDataKeyId, legacyDataKeyId);
                 deleteButtonEl.setAttribute(domConfig.resultDataSourceId, dataSource);
-                deleteButtonEl.addEventListener('click',(event) => {
+                deleteButtonEl.addEventListener('click', (event) => {
                     event.preventDefault();
                     event.stopPropagation();
                     this.eventDeleteClickItem(event);
                 });
-                contentEl.appendChild(deleteButtonEl);
+                buttonBadgeEl.appendChild(deleteButtonEl);
             }
             childEl.appendChild(contentEl);
         }
@@ -240,7 +331,6 @@ export default abstract class AbstractView implements StateChangeListener {
         return childEl;
     }
 
-
     protected createResultsForState(name: string, newState: any): void {
         avLogger('Abstract View : creating Results', 10);
         avLogger(newState);
@@ -251,7 +341,7 @@ export default abstract class AbstractView implements StateChangeListener {
 
         // add the new children
         newState.map((item: any, index: number) => {
-            const childEl = this.createResultForItem(name,item);
+            const childEl = this.createResultForItem(name, item);
             // add draggable actions
             if (domConfig.isDraggable) {
                 childEl.setAttribute('draggable', 'true');
@@ -264,22 +354,6 @@ export default abstract class AbstractView implements StateChangeListener {
             avLogger(`Abstract View: Adding child ${item.id}`);
             if (viewEl) viewEl.appendChild(childEl);
         });
-    }
-
-    public stateChanged(managerName: string, name: string, newValue: any): void {
-        this.updateView(name, newValue);
-    }
-
-    stateChangedItemAdded(managerName: string, name: string, itemAdded: any): void {
-        this.updateView(name, this.stateManager.getStateByName(name));
-    }
-
-    stateChangedItemRemoved(managerName: string, name: string, itemRemoved: any): void {
-        this.updateView(name, this.stateManager.getStateByName(name));
-    }
-
-    stateChangedItemUpdated(managerName: string, name: string, itemUpdated: any, itemNewValue: any): void {
-        this.updateView(name, this.stateManager.getStateByName(name));
     }
 
 }

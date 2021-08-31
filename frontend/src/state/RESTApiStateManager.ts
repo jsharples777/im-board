@@ -20,17 +20,9 @@ type ApiConfig = {
 
 export class RESTApiStateManager implements AsynchronousStateManager {
     private static _instance: RESTApiStateManager;
-
-    public static getInstance() {
-        if (!(RESTApiStateManager._instance)) {
-            RESTApiStateManager._instance = new RESTApiStateManager();
-        }
-        return RESTApiStateManager._instance;
-    }
-
     protected configuration: ApiConfig[] = [];
     protected bHasCompletedRun: boolean[];
-    protected delegate:StateChangeInformer;
+    protected delegate: StateChangeInformer;
 
     protected constructor() {
         this.delegate = new StateChangedDelegate('restapi');
@@ -42,6 +34,13 @@ export class RESTApiStateManager implements AsynchronousStateManager {
         this.callbackForRemoveItem = this.callbackForRemoveItem.bind(this);
         this.callbackForUpdateItem = this.callbackForUpdateItem.bind(this);
         this.callbackForGetItems = this.callbackForGetItems.bind(this);
+    }
+
+    public static getInstance() {
+        if (!(RESTApiStateManager._instance)) {
+            RESTApiStateManager._instance = new RESTApiStateManager();
+        }
+        return RESTApiStateManager._instance;
     }
 
     getConfiguredStateNames(): string[] {
@@ -61,7 +60,7 @@ export class RESTApiStateManager implements AsynchronousStateManager {
         return result;
     }
 
-    setCompletedRun(stateName:string):void {
+    setCompletedRun(stateName: string): void {
         let foundIndex = this.configuration.findIndex((config) => config.stateName === stateName);
         if (foundIndex >= 0) {
             this.bHasCompletedRun[foundIndex] = true;
@@ -82,51 +81,6 @@ export class RESTApiStateManager implements AsynchronousStateManager {
             runsComplete.push(false);
         });
         this.bHasCompletedRun = runsComplete;
-    }
-
-    protected getConfigurationForStateName(name: string) {
-        let config: ApiConfig = {
-            stateName: name,
-            serverURL: '',
-            api: '',
-            isActive: false
-        }
-        let foundIndex = this.configuration.findIndex((config) => config.stateName === name);
-        if (foundIndex >= 0) {
-            config = this.configuration[foundIndex];
-        }
-        return config;
-    }
-
-    private callbackForRemoveItem(data: any, status: number, associatedStateName: string) {
-        apiSMLogger(`callback for remove item for state ${associatedStateName} with status ${status} - not forwarded`);
-        if (status >= 200 && status <= 299) { // do we have any data?
-            apiSMLogger(data);
-        }
-    }
-
-    private callbackForUpdateItem(data: any, status: number, associatedStateName: string) {
-        apiSMLogger(`callback for update item for state ${associatedStateName} with status ${status} - not forwarded`);
-        if (status >= 200 && status <= 299) { // do we have any data?
-            apiSMLogger(data);
-        }
-    }
-
-    private callbackForGetItems(data: any, status: number, associatedStateName: string) {
-        apiSMLogger(`callback for get items for state ${associatedStateName} with status ${status} - FORWARDING`);
-        if (status >= 200 && status <= 299) { // do we have any data?
-            apiSMLogger(data);
-            this.setCompletedRun(associatedStateName);
-            this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.StateChanged,null);
-        }
-    }
-
-    private callbackForAddItem(data: any, status: number, associatedStateName: string) {
-        apiSMLogger(`callback for add item for state ${associatedStateName} with status ${status} - FORWARDING`);
-        if (status >= 200 && status <= 299) { // do we have any data?
-            apiSMLogger(data);
-            this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.ItemAdded,null);
-        }
     }
 
     _addNewNamedStateToStorage(state: stateValue): void { /* assume model on the other end exists */
@@ -185,7 +139,6 @@ export class RESTApiStateManager implements AsynchronousStateManager {
         }
     }
 
-
     _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
         if (isPersisted) return; // dont remove complete objects to the state - they are already processed
         apiSMLogger(`Removing item to ${name}`);
@@ -229,11 +182,11 @@ export class RESTApiStateManager implements AsynchronousStateManager {
     }
 
     addChangeListenerForName(name: string, listener: StateChangeListener): void {
-        this.delegate.addChangeListenerForName(name,listener);
+        this.delegate.addChangeListenerForName(name, listener);
     }
 
     addNewItemToState(name: string, item: any, isPersisted: boolean): void {
-        this._addItemToState(name,item,isPersisted);
+        this._addItemToState(name, item, isPersisted);
     }
 
     emitEvents(): void {
@@ -249,7 +202,7 @@ export class RESTApiStateManager implements AsynchronousStateManager {
     }
 
     informChangeListenersForStateWithName(name: string, stateObjValue: any, eventType: stateEventType, previousObjValue: any): void {
-        this.delegate.informChangeListenersForStateWithName(name,stateObjValue,eventType,previousObjValue);
+        this.delegate.informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue);
     }
 
     isItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
@@ -257,18 +210,64 @@ export class RESTApiStateManager implements AsynchronousStateManager {
     }
 
     removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
-        this._removeItemFromState(name,item,testForEqualityFunction,isPersisted);
+        this._removeItemFromState(name, item, testForEqualityFunction, isPersisted);
         return true;
     }
 
-    setStateByName(name: string, stateObjectForName: any, informListeners: boolean): void {}
+    setStateByName(name: string, stateObjectForName: any, informListeners: boolean): void {
+    }
 
     suppressEvents(): void {
         this.delegate.suppressEvents();
     }
 
     updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
-        this._updateItemInState(name,item,testForEqualityFunction,isPersisted);
+        this._updateItemInState(name, item, testForEqualityFunction, isPersisted);
         return true;
+    }
+
+    protected getConfigurationForStateName(name: string) {
+        let config: ApiConfig = {
+            stateName: name,
+            serverURL: '',
+            api: '',
+            isActive: false
+        }
+        let foundIndex = this.configuration.findIndex((config) => config.stateName === name);
+        if (foundIndex >= 0) {
+            config = this.configuration[foundIndex];
+        }
+        return config;
+    }
+
+    private callbackForRemoveItem(data: any, status: number, associatedStateName: string) {
+        apiSMLogger(`callback for remove item for state ${associatedStateName} with status ${status} - not forwarded`);
+        if (status >= 200 && status <= 299) { // do we have any data?
+            apiSMLogger(data);
+        }
+    }
+
+    private callbackForUpdateItem(data: any, status: number, associatedStateName: string) {
+        apiSMLogger(`callback for update item for state ${associatedStateName} with status ${status} - not forwarded`);
+        if (status >= 200 && status <= 299) { // do we have any data?
+            apiSMLogger(data);
+        }
+    }
+
+    private callbackForGetItems(data: any, status: number, associatedStateName: string) {
+        apiSMLogger(`callback for get items for state ${associatedStateName} with status ${status} - FORWARDING`);
+        if (status >= 200 && status <= 299) { // do we have any data?
+            apiSMLogger(data);
+            this.setCompletedRun(associatedStateName);
+            this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.StateChanged, null);
+        }
+    }
+
+    private callbackForAddItem(data: any, status: number, associatedStateName: string) {
+        apiSMLogger(`callback for add item for state ${associatedStateName} with status ${status} - FORWARDING`);
+        if (status >= 200 && status <= 299) { // do we have any data?
+            apiSMLogger(data);
+            this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.ItemAdded, null);
+        }
     }
 }

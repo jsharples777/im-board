@@ -1,4 +1,4 @@
-export enum Decorator  {
+export enum Decorator {
     Incomplete,
     Complete,
     Persisted,
@@ -8,9 +8,9 @@ export enum Decorator  {
 export type ScoreSheet = {
     room: string,
     boardGameName: string,
-    sheetLayoutOptions: any|null;
+    sheetLayoutOptions: any | null;
     timer: number,
-    data: any[]|null,
+    data: any[] | null,
     isFinished: boolean,
     timerGoing: boolean
 }

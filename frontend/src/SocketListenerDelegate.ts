@@ -8,13 +8,13 @@ import {isSame} from "./util/EqualityFunctions";
 const slLogger = debug('socket-listener');
 
 export default class SocketListenerDelegate implements SocketListener {
-    private config:any;
+    private config: any;
 
-    public constructor(config:any) {
+    public constructor(config: any) {
         this.config = config;
     }
 
-    public handleDataChangedByAnotherUser(message:any) {
+    public handleDataChangedByAnotherUser(message: any) {
         slLogger(`Handling data change ${message.type} on object type ${message.stateName} made by user ${message.user}`);
         const changeUser = controller.getStateManager().findItemInState(this.config.stateNames.users, {id: message.user}, isSame);
         let username = "unknown";
@@ -31,7 +31,7 @@ export default class SocketListenerDelegate implements SocketListener {
                 case "create": {
                     switch (message.stateName) {
                         case this.config.stateNames.comments: {
-                            controller.getStateManager().addNewItemToState(this.config.stateNames.comments,stateObj,true);
+                            controller.getStateManager().addNewItemToState(this.config.stateNames.comments, stateObj, true);
                             // find the entry in question
                             const changedEntry = controller.getStateManager().findItemInState(this.config.stateNames.entries, {id: stateObj.commentOn}, isSame);
                             if (changedEntry) {
@@ -40,12 +40,12 @@ export default class SocketListenerDelegate implements SocketListener {
                             break;
                         }
                         case this.config.stateNames.entries: {
-                            controller.getStateManager().addNewItemToState(this.config.stateNames.entries, stateObj,true);
+                            controller.getStateManager().addNewItemToState(this.config.stateNames.entries, stateObj, true);
                             notifier.show(stateObj.title, `${username} added new entry`);
                             break;
                         }
                         case this.config.stateNames.users: {
-                            controller.getStateManager().addNewItemToState(this.config.stateNames.users, stateObj,true);
+                            controller.getStateManager().addNewItemToState(this.config.stateNames.users, stateObj, true);
                             notifier.show(stateObj.username, `${stateObj.username} has just registered.`, 'message');
                             break;
                         }
@@ -65,12 +65,12 @@ export default class SocketListenerDelegate implements SocketListener {
                 case "delete": {
                     switch (message.stateName) {
                         case this.config.stateNames.comments: {
-                            controller.getStateManager().removeItemFromState(this.config.stateNames.comments,stateObj,isSame, true);
+                            controller.getStateManager().removeItemFromState(this.config.stateNames.comments, stateObj, isSame, true);
                             break;
                         }
                         case this.config.stateNames.entries: {
                             let deletedEntry = controller.getStateManager().findItemInState(this.config.stateNames.entries, stateObj, isSame);
-                            controller.getStateManager().removeItemFromState(this.config.stateNames.entries, stateObj, isSame,true);
+                            controller.getStateManager().removeItemFromState(this.config.stateNames.entries, stateObj, isSame, true);
                             notifier.show(deletedEntry.title, `${username} has deleted this entry.`, 'priority');
                             break;
                         }

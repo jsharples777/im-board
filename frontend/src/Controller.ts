@@ -29,7 +29,6 @@ class Controller implements StateChangeListener {
     protected displayedBoardGamesStateManager: StateManager;
 
 
-
     constructor() {
     }
 
@@ -145,7 +144,7 @@ class Controller implements StateChangeListener {
             // load the users
             this.getStateManager().getStateByName(this.config.stateNames.users);
         }
-        let currentGameList:any[] = this.displayedBoardGamesStateManager.getStateByName(this.config.stateNames.boardGames);
+        let currentGameList: any[] = this.displayedBoardGamesStateManager.getStateByName(this.config.stateNames.boardGames);
         currentGameList = this.cleanupBoardGameState(currentGameList);
 
 
@@ -156,62 +155,8 @@ class Controller implements StateChangeListener {
         this.downloadAndSyncSavedBoardGameCollection();
     }
 
-    private cleanupBoardGameState(boardGames:any[]):any[]{ // lets tidy up any duplicates, keeping Persisted ones by preference
-        let cleanedUpList:any[] = [];
-        boardGames.forEach((boardGame) => {
-            // is already in the list?
-            let index = cleanedUpList.findIndex((game) => game.gameId === boardGame.gameId);
-            if (index >= 0) { // found in the list
-                // is this a persisted board game?
-                let existingListGame = cleanedUpList[index]
-                if (existingListGame.decorator && existingListGame.decorator === Decorator.Persisted) {
-                    // leave the persisted version in the cleaned up list
-                }
-                else {
-                    // do we have persisted game to replace the one in the list
-                    if (boardGame.decorator && boardGame.decorator === Decorator.Persisted) {
-                        // replace the existing one with this one
-                        cleanedUpList.splice(index,1,boardGame);
-                    }
-                    else {
-                        // just leave the one there, neither are persisted to a database
-                    }
-                }
-            }
-            else {
-                // not found yet, add to list
-                cleanedUpList.push(boardGame);
-            }
-
-        });
-        return cleanedUpList;
-
-    }
-
-    private downloadAndSyncSavedBoardGameCollection() {
-        if (this.isLoggedIn()) {
-            // start the call to retrieve the saved collection of board games
-            downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.getMyBoardGameCollection.queryString, {userId:this.getLoggedInUserId()}, this.callbackGetCollection, this.config.stateNames.boardGames, false);
-        }
-    }
-
     public getStateManager(): StateManager {
         return this.stateManager;
-    }
-
-    /*
-    *
-    * Simple Application state (URL, logged in user)
-    *
-     */
-    private getServerAPIURL(): string {
-        let result = "";
-        // @ts-ignore
-        if ((window.ENV) && (window.ENV.serverURL)) {
-            // @ts-ignore
-            result = window.ENV.serverURL;
-        }
-        return result;
     }
 
     public isLoggedIn(): boolean {
@@ -254,13 +199,6 @@ class Controller implements StateChangeListener {
         return result;
     }
 
-
-    /*
-    *  sockets -
-    *  Handling data changes by other users
-    *
-     */
-
     public handleMessage(message: string): void {
         cLogger(message);
     }
@@ -286,6 +224,13 @@ class Controller implements StateChangeListener {
             }
         }
     }
+
+
+    /*
+    *  sockets -
+    *  Handling data changes by other users
+    *
+     */
 
     stateChangedItemRemoved(managerName: string, name: string, itemRemoved: any): void {
         cLogger(`State changed ${name} from ${managerName}  - item Removed`);
@@ -366,11 +311,11 @@ class Controller implements StateChangeListener {
         cLogger(`Adding received board game to application`);
         cLogger(boardGame);
 
-        this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentListOfGames,false);
+        this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
         this.applicationView.setState({boardGames: currentListOfGames});
 
         // now we need an API call to fill in the details
-        downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.bggSearchCallById.queryString, {gameId:boardGame.gameId}, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
+        downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.bggSearchCallById.queryString, {gameId: boardGame.gameId}, this.callbackBoardGameDetails, this.config.stateNames.boardGames, false);
     }
 
     public callbackBoardGameDetails(data: any, status: number, associatedStateName: string): void {
@@ -399,7 +344,7 @@ class Controller implements StateChangeListener {
                 currentListOfGames.splice(index, 1, boardGameDetails);
                 cLogger(currentListOfGames);
                 boardGameDetails.decorator = Decorator.PersistedLocally;
-                this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentListOfGames,false);
+                this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
                 this.applicationView.setState({boardGames: currentListOfGames});
             } else {
                 cLogger(`Board game ${boardGameDetails.id} not found in current state`);
@@ -408,42 +353,6 @@ class Controller implements StateChangeListener {
         }
 
     }
-
-    private removeBoardGameFromState(boardGame:any) {
-        const currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
-        let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === boardGame.gameId);
-        if (index >= 0) {
-            currentBoardGamesOnDisplay.splice(index,1);
-            this.applicationView.setState({boardGames:currentBoardGamesOnDisplay});
-        }
-        // save locally
-        this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentBoardGamesOnDisplay,false);
-    }
-
-    private findBoardGameInStateFromEvent(event: Event) {
-        let boardGame: any | null = null;
-        cLoggerDetail(`Finding board game id in event`);
-        // @ts-ignore
-        let id = event.target.getAttribute(this.config.controller.events.boardGames.eventDataKeyId);
-        cLoggerDetail(id);
-        if (id) {
-            // find the entry from the state manager
-            id = parseInt(id);
-            // @ts-ignore
-            const currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
-            let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
-            cLoggerDetail(index);
-            if (index >= 0) {
-                boardGame = currentBoardGamesOnDisplay[index];
-            }
-        }
-        cLoggerDetail(boardGame);
-        return boardGame;
-    }
-
-
-
-
 
     public callbackAddToCollection(data: any, status: number, associatedStateName: string): void {
         cLogger(`callback for add single board game ${associatedStateName} to my collection with status ${status}`);
@@ -454,7 +363,7 @@ class Controller implements StateChangeListener {
 
             // Find and update the board game in the state
             let currentGameList = this.applicationView.state.boardGames;
-            let index = currentGameList.findIndex((game:any) => game.gameId === id.gameId);
+            let index = currentGameList.findIndex((game: any) => game.gameId === id.gameId);
             if (index >= 0) {
                 let updatingBoardGame = currentGameList[index];
                 cLogger(`Updating board game ${updatingBoardGame.gameId} with database id ${id.id} and new Persisted state`);
@@ -462,13 +371,14 @@ class Controller implements StateChangeListener {
                 updatingBoardGame.id = id.id;
 
                 if (updatingBoardGame.scoresheets) {
-                    const cb = (data: any, status: number, associatedStateName: string) => {};
+                    const cb = (data: any, status: number, associatedStateName: string) => {
+                    };
 
                     // add the scoresheets to database
-                    updatingBoardGame.scoresheets.forEach((scoreSheet:any) => {
+                    updatingBoardGame.scoresheets.forEach((scoreSheet: any) => {
                         this.convertScoreSheetToApiCallFormat(scoreSheet);
                         downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString,
-                            {userId: this.getCurrentUser(), boardGameId: updatingBoardGame.id,sheet:scoreSheet},
+                            {userId: this.getCurrentUser(), boardGameId: updatingBoardGame.id, sheet: scoreSheet},
                             cb,
                             this.config.stateNames.scoreSheet,
                             false);
@@ -479,8 +389,8 @@ class Controller implements StateChangeListener {
 
                 }
 
-                this.applicationView.setState({boardGames:currentGameList});
-                this.displayedBoardGamesStateManager.updateItemInState(this.config.stateNames.boardGames,updatingBoardGame,isSameGame,false);
+                this.applicationView.setState({boardGames: currentGameList});
+                this.displayedBoardGamesStateManager.updateItemInState(this.config.stateNames.boardGames, updatingBoardGame, isSameGame, false);
             }
         }
     }
@@ -494,53 +404,6 @@ class Controller implements StateChangeListener {
         }
     }
 
-    private decorateScoreSheets(boardGame:any) {
-        if (boardGame) {
-            if (boardGame.scoresheets) {
-                boardGame.scoresheets.forEach((sheet:any) => {
-                    sheet.decorator = Decorator.Persisted;
-                })
-            }
-            else {
-                boardGame.scoresheets = [];
-            }
-        }
-    }
-
-    private copyLocallySavedScoreSheetsToBoardGame(target:any, source:any) {
-        if (source.scoresheets) {
-            let toSave:any[] = [];
-            source.scoresheets.forEach((sheet:any) => {
-                // is the scoresheet already in the target?
-                let index = target.scoresheets.findIndex((item:any) => item.id === sheet.id);
-                if (index < 0) {
-                    sheet.decorator = Decorator.PersistedLocally;
-                    target.scoresheets.push(sheet);
-                    toSave.push(sheet);
-                }
-            });
-
-            // do we have any sheets to save?
-            if (toSave.length > 0) {
-                const cb = (data: any, status: number, associatedStateName: string) => {};
-
-                toSave.forEach((sheetToSave:any) => {
-                    this.convertScoreSheetToApiCallFormat(sheetToSave);
-
-
-                    downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString,
-                        {userId: this.getCurrentUser(), boardGameId: target.id,sheet:sheetToSave},
-                        cb,
-                        this.config.stateNames.scoreSheet,
-                        false);
-
-                    this.convertScoreSheetToDatabaseFormat(sheetToSave);
-                    sheetToSave.decorator = Decorator.Persisted;
-                });
-            }
-        }
-    }
-
     public callbackGetCollection(data: any, status: number, associatedStateName: string): void {
         cLogger(`callback for getting my collection of board games ${associatedStateName} to my collection with status ${status}`);
         if (status >= 200 && status <= 299) { // do we have any data?
@@ -550,102 +413,49 @@ class Controller implements StateChangeListener {
             // loop through the collection data and see if it already exists in the state
             let currentGameList = this.applicationView.state.boardGames;
             cLoggerDetail(`Starting with local state of ${currentGameList.length}`);
-            collectionData.forEach((boardGame:any) => {
+            collectionData.forEach((boardGame: any) => {
                 boardGame.decorator = Decorator.Persisted;
                 cLoggerDetail(`Loading board game from collection `);
                 cLoggerDetail(boardGame);
 
                 this.decorateScoreSheets(boardGame);
 
-                let index = currentGameList.findIndex((game:any) => game.gameId === boardGame.gameId);
-                cLoggerDetail(`have found the board game locally? ${index >=0}`);
+                let index = currentGameList.findIndex((game: any) => game.gameId === boardGame.gameId);
+                cLoggerDetail(`have found the board game locally? ${index >= 0}`);
                 if (index >= 0) {
                     const locallySaveBoardGame = currentGameList[index];
 
                     cLoggerDetail(`in current state, replacing`);
                     // copy any locally saved score sheets to the database object
-                    this.copyLocallySavedScoreSheetsToBoardGame(boardGame,locallySaveBoardGame);
+                    this.copyLocallySavedScoreSheetsToBoardGame(boardGame, locallySaveBoardGame);
 
                     // replace the current entry
-                    currentGameList.splice(index,1,boardGame);
-                }
-                else {
+                    currentGameList.splice(index, 1, boardGame);
+                } else {
                     cLoggerDetail(`not in current state, adding`);
                     currentGameList.push(boardGame);
                 }
             });
             currentGameList = this.cleanupBoardGameState(currentGameList);
             cLoggerDetail(`Ending with local state of ${currentGameList.length}`);
-            this.applicationView.setState({boardGames:currentGameList});
-            this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentGameList,false);
+            this.applicationView.setState({boardGames: currentGameList});
+            this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentGameList, false);
         }
     }
 
-    private convertScoreSheetToDatabaseFormat(scoreSheet:any) {
-        if (scoreSheet.players) {
-            if (scoreSheet.players.length >= 1) {
-                scoreSheet.player1 = scoreSheet.players[0];
-                scoreSheet.score1 = scoreSheet.scores[0];
-            }
-            if (scoreSheet.players.length >= 2) {
-                scoreSheet.player2 = scoreSheet.players[1];
-                scoreSheet.score2 = scoreSheet.scores[1];
-            }
-            if (scoreSheet.players.length >= 3) {
-                scoreSheet.player3 = scoreSheet.players[2];
-                scoreSheet.score3 = scoreSheet.scores[2];
-            }
-            if (scoreSheet.players.length >= 4) {
-                scoreSheet.player4 = scoreSheet.players[3];
-                scoreSheet.score4 = scoreSheet.scores[3];
-            }
-            if (scoreSheet.players.length >= 5) {
-                scoreSheet.player5 = scoreSheet.players[4];
-                scoreSheet.score5 = scoreSheet.scores[4];
-            }
-            if (scoreSheet.players.length >= 6) {
-                scoreSheet.player6 = scoreSheet.players[5];
-                scoreSheet.score6 = scoreSheet.scores[5];
-            }
-            if (scoreSheet.players.length >= 7) {
-                scoreSheet.player7 = scoreSheet.players[6];
-                scoreSheet.score7 = scoreSheet.scores[6];
-            }
-
-        }
-    }
-
-    private convertScoreSheetToApiCallFormat(scoreSheet:any) {
-        delete scoreSheet.decorator;
-        delete scoreSheet.player1;
-        delete scoreSheet.score1;
-        delete scoreSheet.player2;
-        delete scoreSheet.score2;
-        delete scoreSheet.player3;
-        delete scoreSheet.score3;
-        delete scoreSheet.player4;
-        delete scoreSheet.score4;
-        delete scoreSheet.player5;
-        delete scoreSheet.score5;
-        delete scoreSheet.player6;
-        delete scoreSheet.score6;
-        delete scoreSheet.player7;
-        delete scoreSheet.score7;
-    }
-
-    scoreSheetAddedToBoardGame(boardGame:any,scoreSheet:any) {
-        const cb = (data: any, status: number, associatedStateName: string) => {};
+    scoreSheetAddedToBoardGame(boardGame: any, scoreSheet: any) {
+        const cb = (data: any, status: number, associatedStateName: string) => {
+        };
 
         if (this.isLoggedIn() && (boardGame.decorator && (boardGame.decorator === Decorator.Persisted))) {
             //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
-                downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString,
-                    {userId: this.getCurrentUser(), boardGameId: boardGame.id,sheet:scoreSheet},
-                    cb,
-                    this.config.stateNames.scoreSheet,
-                    false);
-                scoreSheet.decorator = Decorator.Persisted;
-        }
-        else {
+            downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString,
+                {userId: this.getCurrentUser(), boardGameId: boardGame.id, sheet: scoreSheet},
+                cb,
+                this.config.stateNames.scoreSheet,
+                false);
+            scoreSheet.decorator = Decorator.Persisted;
+        } else {
             scoreSheet.decorator = Decorator.PersistedLocally;
         }
         // convert the scoresheet into the usual received format from the database
@@ -660,7 +470,7 @@ class Controller implements StateChangeListener {
             cLogger(`Updating application state`);
             currentListOfGames.splice(index, 1, boardGame);
             cLogger(currentListOfGames);
-            this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentListOfGames,false);
+            this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
             this.applicationView.setState({boardGames: currentListOfGames});
         } else {
             cLogger(`Board game ${boardGame.id} not found in current state`);
@@ -668,13 +478,14 @@ class Controller implements StateChangeListener {
 
     }
 
-    scoreSheetRemovedFromBoardGame(boardGame:any,scoreSheetId:string) {
-        const cb = (data: any, status: number, associatedStateName: string) => {};
+    scoreSheetRemovedFromBoardGame(boardGame: any, scoreSheetId: string) {
+        const cb = (data: any, status: number, associatedStateName: string) => {
+        };
 
         if (this.isLoggedIn() && (boardGame.decorator && (boardGame.decorator === Decorator.Persisted))) {
             //mutation addScore($userId: Int!, $boardGameId: Int!, $sheet: ScoreSheetInput) {addScoreSheetToBoardGame(userId: $userId, boardGameId: $boardGameId, sheet: $sheet){id}
             downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.removeScoreSheet.queryString,
-                {sheetId:scoreSheetId},
+                {sheetId: scoreSheetId},
                 cb,
                 this.config.stateNames.scoreSheet,
                 false);
@@ -689,7 +500,7 @@ class Controller implements StateChangeListener {
             cLogger(`Updating application state`);
             currentListOfGames.splice(index, 1, boardGame);
             cLogger(currentListOfGames);
-            this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames,currentListOfGames,false);
+            this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentListOfGames, false);
             this.applicationView.setState({boardGames: currentListOfGames});
         } else {
             cLogger(`Board game ${boardGame.id} not found in current state`);
@@ -714,7 +525,7 @@ class Controller implements StateChangeListener {
                     case (Decorator.PersistedLocally):
                     case (Decorator.Complete): {
                         // loaded and ready to save
-                        this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames,boardGame,true);
+                        this.displayedBoardGamesStateManager.addNewItemToState(this.config.stateNames.boardGames, boardGame, true);
                         // add the board game to my collection
                         // now we need an API call to fill in the details
                         delete boardGame.decorator;
@@ -732,8 +543,7 @@ class Controller implements StateChangeListener {
                             boardGame.scoresheets = scoreSheets;
 
 
-                        }
-                        else {
+                        } else {
                             boardGame.decorator = Decorator.PersistedLocally;
                         }
                         break;
@@ -793,6 +603,188 @@ class Controller implements StateChangeListener {
                 }
             }
         }
+    }
+
+    private cleanupBoardGameState(boardGames: any[]): any[] { // lets tidy up any duplicates, keeping Persisted ones by preference
+        let cleanedUpList: any[] = [];
+        boardGames.forEach((boardGame) => {
+            // is already in the list?
+            let index = cleanedUpList.findIndex((game) => game.gameId === boardGame.gameId);
+            if (index >= 0) { // found in the list
+                // is this a persisted board game?
+                let existingListGame = cleanedUpList[index]
+                if (existingListGame.decorator && existingListGame.decorator === Decorator.Persisted) {
+                    // leave the persisted version in the cleaned up list
+                } else {
+                    // do we have persisted game to replace the one in the list
+                    if (boardGame.decorator && boardGame.decorator === Decorator.Persisted) {
+                        // replace the existing one with this one
+                        cleanedUpList.splice(index, 1, boardGame);
+                    } else {
+                        // just leave the one there, neither are persisted to a database
+                    }
+                }
+            } else {
+                // not found yet, add to list
+                cleanedUpList.push(boardGame);
+            }
+
+        });
+        return cleanedUpList;
+
+    }
+
+    private downloadAndSyncSavedBoardGameCollection() {
+        if (this.isLoggedIn()) {
+            // start the call to retrieve the saved collection of board games
+            downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.getMyBoardGameCollection.queryString, {userId: this.getLoggedInUserId()}, this.callbackGetCollection, this.config.stateNames.boardGames, false);
+        }
+    }
+
+    /*
+    *
+    * Simple Application state (URL, logged in user)
+    *
+     */
+    private getServerAPIURL(): string {
+        let result = "";
+        // @ts-ignore
+        if ((window.ENV) && (window.ENV.serverURL)) {
+            // @ts-ignore
+            result = window.ENV.serverURL;
+        }
+        return result;
+    }
+
+    private removeBoardGameFromState(boardGame: any) {
+        const currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
+        let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === boardGame.gameId);
+        if (index >= 0) {
+            currentBoardGamesOnDisplay.splice(index, 1);
+            this.applicationView.setState({boardGames: currentBoardGamesOnDisplay});
+        }
+        // save locally
+        this.displayedBoardGamesStateManager.setStateByName(this.config.stateNames.boardGames, currentBoardGamesOnDisplay, false);
+    }
+
+    private findBoardGameInStateFromEvent(event: Event) {
+        let boardGame: any | null = null;
+        cLoggerDetail(`Finding board game id in event`);
+        // @ts-ignore
+        let id = event.target.getAttribute(this.config.controller.events.boardGames.eventDataKeyId);
+        cLoggerDetail(id);
+        if (id) {
+            // find the entry from the state manager
+            id = parseInt(id);
+            // @ts-ignore
+            const currentBoardGamesOnDisplay = this.applicationView.state.boardGames;
+            let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
+            cLoggerDetail(index);
+            if (index >= 0) {
+                boardGame = currentBoardGamesOnDisplay[index];
+            }
+        }
+        cLoggerDetail(boardGame);
+        return boardGame;
+    }
+
+    private decorateScoreSheets(boardGame: any) {
+        if (boardGame) {
+            if (boardGame.scoresheets) {
+                boardGame.scoresheets.forEach((sheet: any) => {
+                    sheet.decorator = Decorator.Persisted;
+                })
+            } else {
+                boardGame.scoresheets = [];
+            }
+        }
+    }
+
+    private copyLocallySavedScoreSheetsToBoardGame(target: any, source: any) {
+        if (source.scoresheets) {
+            let toSave: any[] = [];
+            source.scoresheets.forEach((sheet: any) => {
+                // is the scoresheet already in the target?
+                let index = target.scoresheets.findIndex((item: any) => item.id === sheet.id);
+                if (index < 0) {
+                    sheet.decorator = Decorator.PersistedLocally;
+                    target.scoresheets.push(sheet);
+                    toSave.push(sheet);
+                }
+            });
+
+            // do we have any sheets to save?
+            if (toSave.length > 0) {
+                const cb = (data: any, status: number, associatedStateName: string) => {
+                };
+
+                toSave.forEach((sheetToSave: any) => {
+                    this.convertScoreSheetToApiCallFormat(sheetToSave);
+
+
+                    downloader.addQLApiRequest(this.config.apis.graphQL, this.config.apis.addScoreSheetToBoardGame.queryString,
+                        {userId: this.getCurrentUser(), boardGameId: target.id, sheet: sheetToSave},
+                        cb,
+                        this.config.stateNames.scoreSheet,
+                        false);
+
+                    this.convertScoreSheetToDatabaseFormat(sheetToSave);
+                    sheetToSave.decorator = Decorator.Persisted;
+                });
+            }
+        }
+    }
+
+    private convertScoreSheetToDatabaseFormat(scoreSheet: any) {
+        if (scoreSheet.players) {
+            if (scoreSheet.players.length >= 1) {
+                scoreSheet.player1 = scoreSheet.players[0];
+                scoreSheet.score1 = scoreSheet.scores[0];
+            }
+            if (scoreSheet.players.length >= 2) {
+                scoreSheet.player2 = scoreSheet.players[1];
+                scoreSheet.score2 = scoreSheet.scores[1];
+            }
+            if (scoreSheet.players.length >= 3) {
+                scoreSheet.player3 = scoreSheet.players[2];
+                scoreSheet.score3 = scoreSheet.scores[2];
+            }
+            if (scoreSheet.players.length >= 4) {
+                scoreSheet.player4 = scoreSheet.players[3];
+                scoreSheet.score4 = scoreSheet.scores[3];
+            }
+            if (scoreSheet.players.length >= 5) {
+                scoreSheet.player5 = scoreSheet.players[4];
+                scoreSheet.score5 = scoreSheet.scores[4];
+            }
+            if (scoreSheet.players.length >= 6) {
+                scoreSheet.player6 = scoreSheet.players[5];
+                scoreSheet.score6 = scoreSheet.scores[5];
+            }
+            if (scoreSheet.players.length >= 7) {
+                scoreSheet.player7 = scoreSheet.players[6];
+                scoreSheet.score7 = scoreSheet.scores[6];
+            }
+
+        }
+    }
+
+    private convertScoreSheetToApiCallFormat(scoreSheet: any) {
+        delete scoreSheet.decorator;
+        delete scoreSheet.player1;
+        delete scoreSheet.score1;
+        delete scoreSheet.player2;
+        delete scoreSheet.score2;
+        delete scoreSheet.player3;
+        delete scoreSheet.score3;
+        delete scoreSheet.player4;
+        delete scoreSheet.score4;
+        delete scoreSheet.player5;
+        delete scoreSheet.score5;
+        delete scoreSheet.player6;
+        delete scoreSheet.score6;
+        delete scoreSheet.player7;
+        delete scoreSheet.score7;
     }
 
 

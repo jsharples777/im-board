@@ -16,13 +16,13 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
     protected loggedInUsers: string[];
     protected localisedSM: StateManager;
     // @ts-ignore
-    protected favUsersDiv:HTMLElement;
+    protected favUsersDiv: HTMLElement;
     // @ts-ignore
-    protected favUsersDropZone:HTMLElement;
+    protected favUsersDropZone: HTMLElement;
     // @ts-ignore
-    protected blockedUsersDiv:HTMLElement;
+    protected blockedUsersDiv: HTMLElement;
     // @ts-ignore
-    protected blockedUsersDropZone:HTMLElement;
+    protected blockedUsersDropZone: HTMLElement;
 
     constructor(applicationView: any, htmlDocument: HTMLDocument, stateManager: StateManager) {
         super(applicationView, htmlDocument, applicationView.state.ui.userSearchSideBar, applicationView.state.uiPrefs.userSearchSideBar, stateManager);
@@ -54,7 +54,7 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
 
     }
 
-    handleFavouriteUserDrop(event:Event) {
+    handleFavouriteUserDrop(event: Event) {
         vLogger('drop event on favourites');
         // @ts-ignore
         const draggedObjectJSON = event.dataTransfer.getData(this.config.ui.draggable.draggableDataKeyId);
@@ -62,7 +62,7 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         vLogger(draggedObject);
 
         if (draggedObject[this.config.ui.draggable.draggedType] === this.config.ui.draggable.draggedTypeUser) {
-             switch (draggedObject[this.config.ui.draggable.draggedFrom]) {
+            switch (draggedObject[this.config.ui.draggable.draggedFrom]) {
                 case this.config.ui.draggable.draggedFromUserSearch: {
                     // we know we have dragged a user from the user search to our favorites and dropped it
                     // is this user already in the favourites?
@@ -79,7 +79,7 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         }
     }
 
-    handleBlockedUserDrop(event:Event) {
+    handleBlockedUserDrop(event: Event) {
         vLogger('drop event on blocked users');
         // @ts-ignore
         const draggedObjectJSON = event.dataTransfer.getData(this.config.ui.draggable.draggableDataKeyId);
@@ -132,42 +132,6 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         this.reRenderView();
     }
 
-    private renderFavouriteUsers() {
-        const usernames: string[] = ChatManager.getInstance().getFavouriteUserList();
-        if (this.favUsersDiv) browserUtil.removeAllChildren(this.favUsersDiv);
-
-        usernames.forEach((username) => {
-            // find the user in the state manager
-            let user:any = this.stateManager.findItemInState(this.config.stateNames.users, {username}, isSameUsername);
-            if (user) {
-                let childElement = this.createResultForItem(this.config.stateNames.users,user,this.uiConfig.dom.resultDataSourceFavUsers);
-                childElement.addEventListener('click', this.eventClickItem);
-                childElement.setAttribute('draggable', 'true');
-                childElement.addEventListener('dragstart', this.eventStartDrag);
-
-
-                this.favUsersDiv.appendChild(childElement);
-            }
-        });
-    }
-
-    private renderBlockedUsers() {
-        const usernames: string[] = ChatManager.getInstance().getBlockedUserList();
-        if (this.blockedUsersDiv) browserUtil.removeAllChildren(this.blockedUsersDiv);
-
-        usernames.forEach((username) => {
-            // find the user in the state manager
-            let user:any = this.stateManager.findItemInState(this.config.stateNames.users, {username}, isSameUsername);
-            if (user) {
-                let childElement = this.createResultForItem(this.config.stateNames.users,user,this.uiConfig.dom.resultDataSourceBlockedUsers);
-                childElement.setAttribute('draggable', 'false');
-                childElement.addEventListener('dragstart', (event) => {event.preventDefault();});
-                this.blockedUsersDiv.appendChild(childElement);
-            }
-        });
-    }
-
-
     onDocumentLoaded() {
         super.onDocumentLoaded();
         // @ts-ignore
@@ -177,7 +141,10 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         // ok lets add the favourite users area and event handling for that now
         // @ts-ignore
         this.favUsersDropZone = document.getElementById(this.uiConfig.dom.favouriteUsersDropZone);
-        this.favUsersDropZone.addEventListener('dragover', (event) => {vLogger('Dragged over'); event.preventDefault();});
+        this.favUsersDropZone.addEventListener('dragover', (event) => {
+            vLogger('Dragged over');
+            event.preventDefault();
+        });
         this.favUsersDropZone.addEventListener('drop', this.handleFavouriteUserDrop);
 
         // @ts-ignore
@@ -186,7 +153,10 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         // ok lets add the favourite users area and event handling for that now
         // @ts-ignore
         this.blockedUsersDropZone = document.getElementById(this.uiConfig.dom.blockedUsersDropZone);
-        this.blockedUsersDropZone.addEventListener('dragover', (event) => {vLogger('Dragged over'); event.preventDefault();});
+        this.blockedUsersDropZone.addEventListener('dragover', (event) => {
+            vLogger('Dragged over');
+            event.preventDefault();
+        });
         this.blockedUsersDropZone.addEventListener('drop', this.handleBlockedUserDrop);
 
         // @ts-ignore
@@ -255,9 +225,8 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: parseInt(userId)}, isSame);
         vLogger(user);
         const roomName = NotificationController.getInstance().startChatWithUser(user.username);
-        this.applicationView.handleShowChat(event,roomName);
+        this.applicationView.handleShowChat(event, roomName);
     }
-
 
     eventUserSelected(event: Event, ui: any) {
         event.preventDefault();
@@ -330,6 +299,24 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         return user;
     }
 
+    deleteFavouriteUser(user: any) {
+        // @ts-ignore
+        vLogger(`Favourite user ${user.username} with id ${user.id} deleted - removing`);
+        ChatManager.getInstance().removeUserFromFavouriteList(user.username);
+    }
+
+    deleteBlockedUser(user: any) {
+        // @ts-ignore
+        vLogger(`Blocked user ${user.username} with id ${user.id} deleted - removing`);
+        ChatManager.getInstance().removeUserFromBlockedList(user.username);
+    }
+
+    deleteRecentSearchUser(user: any) {
+        // @ts-ignore
+        vLogger(`Recent search user ${user.username} with id ${user.id} deleted - removing`);
+        this.localisedSM.removeItemFromState(this.config.stateNames.recentUserSearches, user, isSame, true);
+    }
+
     protected eventDeleteClickItem(event: MouseEvent): void {
         event.preventDefault();
         event.stopPropagation();
@@ -362,30 +349,83 @@ class UserSearchSidebarView extends SidebarView implements ChatUserEventListener
         }
     }
 
-    deleteFavouriteUser(user:any) {
-        // @ts-ignore
-        vLogger(`Favourite user ${user.username} with id ${user.id} deleted - removing`);
-        ChatManager.getInstance().removeUserFromFavouriteList(user.username);
-    }
-
-    deleteBlockedUser(user:any) {
-        // @ts-ignore
-        vLogger(`Blocked user ${user.username} with id ${user.id} deleted - removing`);
-        ChatManager.getInstance().removeUserFromBlockedList(user.username);
-    }
-
-    deleteRecentSearchUser(user:any) {
-        // @ts-ignore
-        vLogger(`Recent search user ${user.username} with id ${user.id} deleted - removing`);
-        this.localisedSM.removeItemFromState(this.config.stateNames.recentUserSearches,user,isSame,true);
-    }
-
     protected getBadgeValue(name: string, item: any): number {
         return 0;
     }
 
     protected getBackgroundImage(name: string, item: any): string {
         return "";
+    }
+
+    protected eventAction1Clicked(event: MouseEvent) {
+        super.eventAction1Clicked(event);
+        // add this user to the favourites
+        // @ts-ignore
+        const userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
+        let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: parseInt(userId)}, isSame);
+        if (user) {
+            if (ChatManager.getInstance().isUserInFavouriteList(user.username)) {
+                vLogger(`${user.username} already in favourite list, ignoring`);
+                return;
+            }
+            // ok, so we have a new user to add to the favourite list
+            // add the user to the Chat Manager and we should get an event about it
+            ChatManager.getInstance().addUserToFavouriteList(user.username);
+        }
+    }
+
+    protected eventAction2Clicked(event: MouseEvent) {
+        super.eventAction2Clicked(event);
+        // add this user to the blocked list
+        // @ts-ignore
+        const userId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
+        let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {id: parseInt(userId)}, isSame);
+        if (user) {
+            if (ChatManager.getInstance().isUserInBlockedList(user.username)) {
+                vLogger(`${user.username} already in blocked list, ignoring`);
+                return;
+            }
+            // ok, so we have a new user to add to the blocked list
+            // add the user to the Chat Manager and we should get an event about it
+            ChatManager.getInstance().addUserToBlockedList(user.username);
+        }
+    }
+
+    private renderFavouriteUsers() {
+        const usernames: string[] = ChatManager.getInstance().getFavouriteUserList();
+        if (this.favUsersDiv) browserUtil.removeAllChildren(this.favUsersDiv);
+
+        usernames.forEach((username) => {
+            // find the user in the state manager
+            let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {username}, isSameUsername);
+            if (user) {
+                let childElement = this.createResultForItem(this.config.stateNames.users, user, this.uiConfig.dom.resultDataSourceFavUsers);
+                childElement.addEventListener('click', this.eventClickItem);
+                childElement.setAttribute('draggable', 'true');
+                childElement.addEventListener('dragstart', this.eventStartDrag);
+
+
+                this.favUsersDiv.appendChild(childElement);
+            }
+        });
+    }
+
+    private renderBlockedUsers() {
+        const usernames: string[] = ChatManager.getInstance().getBlockedUserList();
+        if (this.blockedUsersDiv) browserUtil.removeAllChildren(this.blockedUsersDiv);
+
+        usernames.forEach((username) => {
+            // find the user in the state manager
+            let user: any = this.stateManager.findItemInState(this.config.stateNames.users, {username}, isSameUsername);
+            if (user) {
+                let childElement = this.createResultForItem(this.config.stateNames.users, user, this.uiConfig.dom.resultDataSourceBlockedUsers);
+                childElement.setAttribute('draggable', 'false');
+                childElement.addEventListener('dragstart', (event) => {
+                    event.preventDefault();
+                });
+                this.blockedUsersDiv.appendChild(childElement);
+            }
+        });
     }
 
 

@@ -3,12 +3,6 @@ import SidebarView from './SidebarView';
 import {StateManager} from '../state/StateManager';
 import moment from "moment";
 import controller from "../Controller";
-import {ChatManager} from "../socket/ChatManager";
-import notifier from "../notification/NotificationManager";
-import {ScoreSheetController} from "./ScoreSheetController";
-
-
-
 
 
 const csLogger = debug('score-sheet-sidebar');
@@ -34,13 +28,12 @@ class ScoreSheetSidebarView extends SidebarView {
     }
 
 
-
-    public setSelectedBoardGame(boardGame:any) {
+    public setSelectedBoardGame(boardGame: any) {
         csLogger(`setting selected board game to`);
         csLoggerDetail(boardGame);
         if (boardGame) {
             this.selectedBoardGame = boardGame;
-            this.updateView('',boardGame);
+            this.updateView('', boardGame);
         }
     }
 
@@ -69,7 +62,7 @@ class ScoreSheetSidebarView extends SidebarView {
         }
         */
         buffer += `<h5 class="card-title">${this.selectedBoardGame.name} (${this.selectedBoardGame.year})</h5>`;
-        buffer += `<p class="card-text">Played On: ${moment(item.createdOn,'YYYYMMDDHHmmss').format('ddd, DD/MM/YYYY HH:mm')}</p>`;
+        buffer += `<p class="card-text">Played On: ${moment(item.createdOn, 'YYYYMMDDHHmmss').format('ddd, DD/MM/YYYY HH:mm')}</p>`;
         buffer += `<p class="card-text">Scores: `;
         if (item.player1) {
             if (item.score1 > 0) {
@@ -107,7 +100,7 @@ class ScoreSheetSidebarView extends SidebarView {
             }
         }
         if (item.players) {
-            for (let index = 0;index < item.players.length;index++) {
+            for (let index = 0; index < item.players.length; index++) {
 
             }
 
@@ -124,41 +117,7 @@ class ScoreSheetSidebarView extends SidebarView {
         return this.getModifierForStateItem(name, item);
     }
 
-    protected getBadgeValue(name: string, item: any): number {
-        return 0;
-    }
-
-    protected getBackgroundImage(name: string, item: any): string {
-        return './img/scorecard-vertical.jpg';
-    }
-
-
-    eventClickItem(event: MouseEvent) {}
-
-    protected eventDeleteClickItem(event: MouseEvent): void {
-        // @ts-ignore
-        const sheetId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
-        // @ts-ignore
-        const dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId)
-        // @ts-ignore
-        csLogger(`Score Sheet ${event.target} with id ${sheetId} delete clicked from ${dataSource}`);
-
-
-
-
-        if (this.selectedBoardGame && confirm("Are you sure you want to delete this Score Sheet?")) {
-            // remove the sheet from the selected board game
-            if (this.selectedBoardGame.scoresheets) {
-                let index = this.selectedBoardGame.scoresheets.findIndex((sheet:any) => sheet.id === sheetId);
-                if (index >= 0) {
-                    this.selectedBoardGame.scoresheets.splice(index,1);
-                    // let the controller know to remove from the database if the user is logged in
-                    controller.scoreSheetRemovedFromBoardGame(this.selectedBoardGame,sheetId);
-                }
-            }
-            this.updateView('',this.selectedBoardGame);
-        }
-
+    eventClickItem(event: MouseEvent) {
     }
 
     updateView(name: string, newState: any) {
@@ -171,8 +130,40 @@ class ScoreSheetSidebarView extends SidebarView {
 
     }
 
-    getDragData(event: DragEvent) {}
+    getDragData(event: DragEvent) {
+    }
 
+    protected getBadgeValue(name: string, item: any): number {
+        return 0;
+    }
+
+    protected getBackgroundImage(name: string, item: any): string {
+        return './img/scorecard-vertical.jpg';
+    }
+
+    protected eventDeleteClickItem(event: MouseEvent): void {
+        // @ts-ignore
+        const sheetId = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
+        // @ts-ignore
+        const dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId)
+        // @ts-ignore
+        csLogger(`Score Sheet ${event.target} with id ${sheetId} delete clicked from ${dataSource}`);
+
+
+        if (this.selectedBoardGame && confirm("Are you sure you want to delete this Score Sheet?")) {
+            // remove the sheet from the selected board game
+            if (this.selectedBoardGame.scoresheets) {
+                let index = this.selectedBoardGame.scoresheets.findIndex((sheet: any) => sheet.id === sheetId);
+                if (index >= 0) {
+                    this.selectedBoardGame.scoresheets.splice(index, 1);
+                    // let the controller know to remove from the database if the user is logged in
+                    controller.scoreSheetRemovedFromBoardGame(this.selectedBoardGame, sheetId);
+                }
+            }
+            this.updateView('', this.selectedBoardGame);
+        }
+
+    }
 
 
 }

@@ -1,28 +1,20 @@
 import debug from 'debug';
 
-import {stateValue} from "./StateManager";
+import {StateManager, stateValue} from "./StateManager";
 import {equalityFunction} from "../util/EqualityFunctions";
-import {StateManager} from "./StateManager";
 import {AbstractStateManager} from "./AbstractStateManager";
 
 
 const aggLogger = debug('state-manager-aggregate');
 
 type managerWithFilters = {
-    manager:StateManager,
-    filters:string[]
+    manager: StateManager,
+    filters: string[]
 }
 
 export class AggregateStateManager extends AbstractStateManager {
-    private stateManagers: managerWithFilters[];
     private static _instance: AggregateStateManager;
-
-    public static getInstance() {
-        if (!(AggregateStateManager._instance)) {
-            AggregateStateManager._instance = new AggregateStateManager();
-        }
-        return AggregateStateManager._instance;
-    }
+    private stateManagers: managerWithFilters[];
 
     private constructor() {
         super('aggregate');
@@ -31,7 +23,14 @@ export class AggregateStateManager extends AbstractStateManager {
 
     }
 
-    public addStateManager(stateManager: AbstractStateManager, filters: string[] = [], emitEvents:boolean) {
+    public static getInstance() {
+        if (!(AggregateStateManager._instance)) {
+            AggregateStateManager._instance = new AggregateStateManager();
+        }
+        return AggregateStateManager._instance;
+    }
+
+    public addStateManager(stateManager: AbstractStateManager, filters: string[] = [], emitEvents: boolean) {
         let mWF: managerWithFilters = {
             manager: stateManager,
             filters: filters
@@ -39,11 +38,6 @@ export class AggregateStateManager extends AbstractStateManager {
         this.stateManagers.push(mWF);
         if (!emitEvents) stateManager.suppressEvents();
         aggLogger('adding state manager with/without filters');
-    }
-
-    private stateNameInFilters(name: string, filters: string[]): boolean {
-        let foundIndex = filters.findIndex((filter) => filter === name);
-        return (foundIndex >= 0);
     }
 
     public _addNewNamedStateToStorage(state: stateValue): void {
@@ -101,13 +95,13 @@ export class AggregateStateManager extends AbstractStateManager {
         });
     }
 
-    _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {
+    _addItemToState(name: string, stateObj: any, isPersisted: boolean = false): void {
         this.stateManagers.forEach((managerWithFilters) => {
             if (!this.stateNameInFilters(name, managerWithFilters.filters)) {
                 aggLogger(`adding item to state in  state manager for state ${name}, is persisted = ${isPersisted}`);
                 aggLogger(managerWithFilters.manager);
                 aggLogger(stateObj);
-                managerWithFilters.manager._addItemToState(name, stateObj,isPersisted);
+                managerWithFilters.manager._addItemToState(name, stateObj, isPersisted);
             }
         });
     }
@@ -132,5 +126,10 @@ export class AggregateStateManager extends AbstractStateManager {
                 managerWithFilters.manager._updateItemInState(name, stateObj, testForEqualityFunction, isPersisted);
             }
         });
+    }
+
+    private stateNameInFilters(name: string, filters: string[]): boolean {
+        let foundIndex = filters.findIndex((filter) => filter === name);
+        return (foundIndex >= 0);
     }
 }

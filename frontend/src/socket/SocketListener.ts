@@ -1,8 +1,8 @@
 export default interface SocketListener {
-    handleDataChangedByAnotherUser(message:any):void;
+    handleDataChangedByAnotherUser(message: any): void;
 
-    handleMessage(message:string):void;
+    handleMessage(message: string): void;
 
-    getCurrentUser():number;
+    getCurrentUser(): number;
 }
 

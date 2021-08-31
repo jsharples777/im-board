@@ -1,9 +1,9 @@
 export enum RequestType {
     POST,
-    GET ,
+    GET,
     PUT,
     DELETE
-};
+}
 
 export enum queueType {
     PRIORITY,
@@ -12,11 +12,11 @@ export enum queueType {
 
 
 export type jsonRequest = {
-    url:string,
+    url: string,
     type: RequestType,
-    params:any,
+    params: any,
     callback: RequestCallBackFunction,
-    associatedStateName:string,
+    associatedStateName: string,
 };
 
 export type managerRequest = {
@@ -27,5 +27,5 @@ export type managerRequest = {
 }
 
 
-export type ManagerCallbackFunction = (data:any,status:number,queueId:number,requestId:string) => void;
-export type RequestCallBackFunction = (data:any,status:number,associatedStateName:string) => void;
+export type ManagerCallbackFunction = (data: any, status: number, queueId: number, requestId: string) => void;
+export type RequestCallBackFunction = (data: any, status: number, associatedStateName: string) => void;

@@ -1,7 +1,7 @@
 import debug from 'debug';
 import SidebarView from './SidebarView';
 import {StateManager} from '../state/StateManager';
-import {isSame, isSameGame} from '../util/EqualityFunctions';
+import {isSameGame} from '../util/EqualityFunctions';
 import browserUtil from "../util/BrowserUtil";
 import downloader from "../network/DownloadManager";
 import MemoryBufferStateManager from "../state/MemoryBufferStateManager";
@@ -11,6 +11,12 @@ const vLoggerDetail = debug('board-game-search-sidebar:detail');
 
 class BoardGameSearchSidebarView extends SidebarView {
     protected localisedSM: StateManager;
+    // @ts-ignore
+    private formEl: HTMLElement;
+    // @ts-ignore
+    private queryEl: HTMLInputElement;
+    // @ts-ignore
+    private buttonEl: HTMLButtonElement;
 
     constructor(applicationView: any, htmlDocument: HTMLDocument, stateManager: StateManager) {
         super(applicationView, htmlDocument, applicationView.state.ui.boardGameSearchSideBar, applicationView.state.uiPrefs.boardGameSearchSideBar, stateManager);
@@ -30,54 +36,15 @@ class BoardGameSearchSidebarView extends SidebarView {
         vLogger(this.localisedSM.getStateByName(this.config.stateNames.bggSearchResults));
     }
 
-    // @ts-ignore
-    private formEl:HTMLElement;
-    // @ts-ignore
-    private queryEl:HTMLInputElement;
-    // @ts-ignore
-    private buttonEl:HTMLButtonElement;
-
-
-    private changeSearchButton(enable:boolean = false) {
-        browserUtil.removeAllChildren(this.buttonEl);
-        if (enable) {
-            if (this.buttonEl) this.buttonEl.removeAttribute("disabled");
-            if (this.buttonEl) this.buttonEl.innerHTML = 'Search';
-        }
-        else {
-            if (this.buttonEl) this.buttonEl.setAttribute("disabled","true");
-            if (this.buttonEl) this.buttonEl.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  Loading...';
-        }
-    }
-
-    private handleSearch(event:Event) {
-        vLogger(`Handling search`);
-        event.preventDefault();
-        event.stopPropagation();
-        // do we have anything to search for?
-        let queryText = this.queryEl.value.trim();
-        if (queryText.length == 0) return;
-
-        // ok, have a search term, lets start a search
-        this.changeSearchButton(false);
-
-        // get the query string from state obj
-        let query = this.config.apis.bggSearchCall;
-
-
-        downloader.addQLApiRequest(this.config.apis.graphQL, query, {queryString:queryText}, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
-    }
-
-    public handleSearchResultsCB(data:any,status:number,associatedStateName:string):void {
+    public handleSearchResultsCB(data: any, status: number, associatedStateName: string): void {
         this.changeSearchButton(true);
         vLogger(`callback for bgg search ${associatedStateName} with status ${status} - `);
         if (status >= 200 && status <= 299) { // do we have any data?
             vLoggerDetail(data);
             vLoggerDetail(data.data.findBoardGames);
-            this.localisedSM.setStateByName(this.config.stateNames.bggSearchResults,data.data.findBoardGames,true);
+            this.localisedSM.setStateByName(this.config.stateNames.bggSearchResults, data.data.findBoardGames, true);
         }
     }
-
 
     onDocumentLoaded() {
         super.onDocumentLoaded();
@@ -89,7 +56,7 @@ class BoardGameSearchSidebarView extends SidebarView {
         // @ts-ignore
         this.queryEl = this.document.getElementById(this.uiConfig.dom.queryId);
 
-        this.formEl.addEventListener('submit',this.handleSearch);
+        this.formEl.addEventListener('submit', this.handleSearch);
     }
 
     getIdForStateItem(name: string, item: any) {
@@ -109,7 +76,7 @@ class BoardGameSearchSidebarView extends SidebarView {
     }
 
     getSecondaryModifierForStateItem(name: string, item: any) {
-    return 'normal';
+        return 'normal';
     }
 
     eventClickItem(event: MouseEvent) {
@@ -124,16 +91,13 @@ class BoardGameSearchSidebarView extends SidebarView {
         // @ts-ignore
         vLoggerDetail(`Board Game ${event.target} with id ${boardGameId} clicked from ${dataSource}`);
 
-        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults,{gameId:parseInt(boardGameId)},isSameGame);
+        let boardGame = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {gameId: parseInt(boardGameId)}, isSameGame);
         if (boardGame) {
             this.applicationView.addBoardGameToDisplay(boardGame);
         }
         this.eventHide(null);
 
     }
-
-
-
 
     updateView(name: string, newState: any) {
         if (name === this.config.stateNames.bggSearchResults) {
@@ -165,10 +129,10 @@ class BoardGameSearchSidebarView extends SidebarView {
         // @ts-ignore
         vLoggerDetail(`Board Game ${event.target} with id ${boardGameId} delete clicked from ${dataSource}`);
 
-        let boardGame:any = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {id: parseInt(boardGameId)}, isSameGame);
+        let boardGame: any = this.localisedSM.findItemInState(this.config.stateNames.bggSearchResults, {id: parseInt(boardGameId)}, isSameGame);
         vLogger(boardGameId);
         if (boardGame) {
-            this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, isSameGame,true);
+            this.localisedSM.removeItemFromState(this.config.stateNames.bggSearchResults, boardGame, isSameGame, true);
         }
     }
 
@@ -178,6 +142,35 @@ class BoardGameSearchSidebarView extends SidebarView {
 
     protected getBackgroundImage(name: string, item: any): string {
         return "";
+    }
+
+    private changeSearchButton(enable: boolean = false) {
+        browserUtil.removeAllChildren(this.buttonEl);
+        if (enable) {
+            if (this.buttonEl) this.buttonEl.removeAttribute("disabled");
+            if (this.buttonEl) this.buttonEl.innerHTML = 'Search';
+        } else {
+            if (this.buttonEl) this.buttonEl.setAttribute("disabled", "true");
+            if (this.buttonEl) this.buttonEl.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  Loading...';
+        }
+    }
+
+    private handleSearch(event: Event) {
+        vLogger(`Handling search`);
+        event.preventDefault();
+        event.stopPropagation();
+        // do we have anything to search for?
+        let queryText = this.queryEl.value.trim();
+        if (queryText.length == 0) return;
+
+        // ok, have a search term, lets start a search
+        this.changeSearchButton(false);
+
+        // get the query string from state obj
+        let query = this.config.apis.bggSearchCall;
+
+
+        downloader.addQLApiRequest(this.config.apis.graphQL, query, {queryString: queryText}, this.handleSearchResultsCB, this.config.stateNames.bggSearchResults);
     }
 
 

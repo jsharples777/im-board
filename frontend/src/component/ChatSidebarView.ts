@@ -7,7 +7,6 @@ import {ChatManager} from "../socket/ChatManager";
 import browserUtil from "../util/BrowserUtil";
 import moment from "moment";
 import {ChatLog, Invitation, Message, Priority} from "../socket/Types";
-import {isSame} from "../util/EqualityFunctions";
 import controller from "../Controller";
 import notifier from "../notification/NotificationManager";
 
@@ -29,7 +28,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
     // @ts-ignore
     protected leaveChatButton: HTMLElement;
     // @ts-ignore
-    protected fastUserSearch:HTMLElement;
+    protected fastUserSearch: HTMLElement;
 
     protected selectedChatLog: ChatLog | null = null;
 
@@ -48,28 +47,17 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         this.handleUserDrop = this.handleUserDrop.bind(this);
         this.leaveChat = this.leaveChat.bind(this);
         this.eventUserSelected = this.eventUserSelected.bind(this);
+        this.eventHide = this.eventHide.bind(this);
 
         NotificationController.getInstance().addListener(this);
-        stateManager.addChangeListenerForName(this.config.stateNames.users,this);
+        stateManager.addChangeListenerForName(this.config.stateNames.users, this);
     }
 
     handleNewInviteReceived(invite: Invitation): boolean {
         throw new Error('Method not implemented.');
     }
 
-    private leaveChat(event:Event) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (this.selectedChatLog) {
-            ChatManager.getInstance().leaveChat(this.selectedChatLog.roomName);
-            this.selectedChatLog = null;
-            this.clearChatLog();
-            this.checkCanComment();
-        }
-        this.updateView('',{});
-    }
-
-    handleUserDrop(event:Event) {
+    handleUserDrop(event: Event) {
         csLogger('drop event on current chat room');
         if (this.selectedChatLog) {
             // @ts-ignore
@@ -79,19 +67,18 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
 
             if (draggedObject[this.config.ui.draggable.draggedType] === this.config.ui.draggable.draggedTypeUser) {
                 //add the user to the current chat if not already there
-                ChatManager.getInstance().sendInvite(draggedObject.username,this.selectedChatLog.roomName);
-                notifier.show('Chat',`Invited ${draggedObject.username} to the chat.`);
+                ChatManager.getInstance().sendInvite(draggedObject.username, this.selectedChatLog.roomName);
+                notifier.show('Chat', `Invited ${draggedObject.username} to the chat.`);
             }
         }
 
     }
 
-
     handleChatLogUpdated(log: ChatLog): void {
         csLogger(`Handling chat log updates`);
         this.checkCanComment();
         this.renderChatLog(log);
-        this.updateView('',{})
+        this.updateView('', {})
     }
 
     handleAddMessage(event: Event): void {
@@ -106,7 +93,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
             // @ts-ignore
             this.commentEl.value = '';
 
-            let sentMessage:Message|null = ChatManager.getInstance().sendMessage(this.selectedChatLog.roomName, messageContent,Priority.Normal, {});
+            let sentMessage: Message | null = ChatManager.getInstance().sendMessage(this.selectedChatLog.roomName, messageContent, Priority.Normal, {});
             if (sentMessage) {
                 // add the message to our display
                 let messageEl = this.addChatMessage(sentMessage);
@@ -115,22 +102,6 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
             }
         }
     }
-
-    private checkCanComment() {
-        if (this.selectedChatLog) {
-            if (this.commentEl) this.commentEl.removeAttribute("readonly");
-            if (this.sendMessageButton) this.sendMessageButton.removeAttribute("disabled");
-            if (this.leaveChatButton) this.leaveChatButton.removeAttribute("disabled");
-            if (this.fastUserSearch) this.fastUserSearch.removeAttribute("disabled");
-        } else {
-            if (this.commentEl) this.commentEl.setAttribute("readonly", "true");
-            if (this.sendMessageButton) this.sendMessageButton.setAttribute("disabled", "true");
-            if (this.leaveChatButton) this.leaveChatButton.setAttribute("disabled", "true");
-            if (this.fastUserSearch) this.fastUserSearch.setAttribute("disabled","true");
-        }
-
-    }
-
 
     onDocumentLoaded() {
         super.onDocumentLoaded();
@@ -149,12 +120,15 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         // @ts-ignore
         this.fastUserSearch = document.getElementById(this.uiConfig.dom.chatFastSearchUserNames);
 
-        this.chatRoomDiv.addEventListener('dragover', (event) => {csLoggerDetail('Dragged over'); if (this.selectedChatLog) event.preventDefault();});
+        this.chatRoomDiv.addEventListener('dragover', (event) => {
+            csLoggerDetail('Dragged over');
+            if (this.selectedChatLog) event.preventDefault();
+        });
         this.chatRoomDiv.addEventListener('drop', this.handleUserDrop);
 
 
         this.chatForm.addEventListener('submit', this.handleAddMessage);
-        this.leaveChatButton.addEventListener('click',this.leaveChat);
+        this.leaveChatButton.addEventListener('click', this.leaveChat);
 
         this.checkCanComment();
 
@@ -175,10 +149,9 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         event.target.innerText = '';
 
         // add to the chat, if one selected
-        if (this.selectedChatLog) ChatManager.getInstance().sendInvite(ui.item.label,this.selectedChatLog.roomName);
-        notifier.show('Chat',`Invited ${ui.item.label} to the chat.`);
+        if (this.selectedChatLog) ChatManager.getInstance().sendInvite(ui.item.label, this.selectedChatLog.roomName);
+        notifier.show('Chat', `Invited ${ui.item.label} to the chat.`);
     }
-
 
     getIdForStateItem(name: string, item: any) {
         return item.roomName;
@@ -207,10 +180,6 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         return this.getModifierForStateItem(name, item);
     }
 
-    protected getBadgeValue(name: string, item: any): number {
-        return item.numOfNewMessages;
-    }
-
     addChatMessage(message: Message): HTMLElement {
         let chatMessageEl = document.createElement('div');
         browserUtil.addRemoveClasses(chatMessageEl, "message");
@@ -220,8 +189,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
             browserUtil.addRemoveClasses(messageSenderEl, 'message-sender');
             messageSenderEl.innerText = message.message;
             chatMessageEl.appendChild(messageSenderEl);
-        }
-        else {
+        } else {
 
             if (message.from === ChatManager.getInstance().getCurrentUser()) {
                 browserUtil.addRemoveClasses(chatMessageEl, "my-message");
@@ -246,20 +214,15 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         return chatMessageEl;
     }
 
-    private clearChatLog() {
-        browserUtil.removeAllChildren(this.chatLogDiv);
-    }
-
     reRenderChatMessages(chatLog: ChatLog) {
         browserUtil.removeAllChildren(this.chatLogDiv);
-        let messageEl:HTMLElement|null = null;
+        let messageEl: HTMLElement | null = null;
         chatLog.messages.forEach((message: Message) => {
             messageEl = this.addChatMessage(message);
         });
         // scroll to the last message (if any)
         if (messageEl) browserUtil.scrollTo(messageEl);
     }
-
 
     renderChatLog(chatLog: ChatLog) {
         csLoggerDetail(`Chat Log ${chatLog.roomName} rendering`);
@@ -292,7 +255,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         }
     }
 
-    public selectChatRoom(room:string) {
+    public selectChatRoom(room: string) {
         csLoggerDetail(`Chat Log with id ${room} selected`);
         this.selectedChatLog = ChatManager.getInstance().getChatLog(room);
         if (this.selectedChatLog) {
@@ -302,31 +265,32 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
 
     }
 
-
     updateView(name: string, newState: any) {
         if (name === this.config.stateNames.users) {
-            if (this.selectedChatLog) {
-                // load the search names into the search field
-                // except for the users already in the chat
-                // @ts-ignore
-                const fastSearchEl = $(`#${this.uiConfig.dom.chatFastSearchUserNames}`);
-                // for each name, construct the patient details to display and the id referenced
-                const fastSearchValues: any = [];
+            // load the search names into the search field
+            // except for the users already in the chat
+            csLoggerDetail(`Updating the fast user search`)
+            csLoggerDetail(newState);
+            // what is my username?
+            let myUsername = controller.getLoggedInUsername();
+            // @ts-ignore
+            const fastSearchEl = $(`#${this.uiConfig.dom.chatFastSearchUserNames}`);
+            // for each name, construct the patient details to display and the id referenced
+            const fastSearchValues: any = [];
+            if (newState) {
                 newState.forEach((item: any) => {
                     const searchValue = {
                         label: item.username,
                         value: item.id,
                     };
                     // @ts-ignore
-                    let index = this.selectedChatLog.users.findIndex((user) => user === item.username);
-                    if (index < 0) fastSearchValues.push(searchValue); // don't search for ourselves
+                    if (myUsername !== item.username) fastSearchValues.push(searchValue); // don't search for ourselves
                 });
                 fastSearchEl.autocomplete({source: fastSearchValues});
                 fastSearchEl.autocomplete('option', {disabled: false, minLength: 1});
-
             }
-        }
-        else {
+
+        } else {
             csLoggerDetail(`Updating state with chat manager`);
             newState = ChatManager.getInstance().getChatLogs();
             csLoggerDetail(newState);
@@ -336,32 +300,7 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
         }
     }
 
-    getDragData(event: DragEvent) {}
-    protected eventDeleteClickItem(event: MouseEvent): void {
-        event.preventDefault();
-        event.stopPropagation();
-        console.log(event.target);
-        // @ts-ignore
-        const room = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
-        // @ts-ignore
-        const dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId);
-
-        // @ts-ignore
-        csLoggerDetail(`Chat Log ${event.target} with id ${room} deleted from ${dataSource}`);
-
-        if (room) {
-            let log: ChatLog|null = ChatManager.getInstance().getChatLog(room);
-            if (log) {
-                ChatManager.getInstance().leaveChat(room);
-                if (this.selectedChatLog && (this.selectedChatLog.roomName === room)) {
-                    this.selectedChatLog = null;
-                    this.clearChatLog();
-                    this.checkCanComment();
-                }
-                this.updateView('', {});
-            }
-        }
-
+    getDragData(event: DragEvent) {
 
     }
 
@@ -378,17 +317,93 @@ class ChatSidebarView extends SidebarView implements ChatEventListener {
     handleChatStarted(log: ChatLog): void {
         this.selectedChatLog = log;
         this.renderChatLog(log);
-        this.updateView('',{});
+        this.updateView('', {});
+    }
+
+    eventHide(event: Event | null) {
+        super.eventHide(event);
+        // deselect the selected chat
+        if (this.selectedChatLog) {
+            this.selectedChatLog = null;
+            this.checkCanComment();
+            this.clearChatLog();
+        }
+
     }
 
     handleOfflineMessagesReceived(messages: Message[]): void {
+    }
+
+    handleInvitationDeclined(room: string, username: string): void {
+    }
+
+    protected getBadgeValue(name: string, item: any): number {
+        return item.numOfNewMessages;
+    }
+
+    protected eventDeleteClickItem(event: MouseEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log(event.target);
+        // @ts-ignore
+        const room = event.target.getAttribute(this.uiConfig.dom.resultDataKeyId);
+        // @ts-ignore
+        const dataSource = event.target.getAttribute(this.uiConfig.dom.resultDataSourceId);
+
+        // @ts-ignore
+        csLoggerDetail(`Chat Log ${event.target} with id ${room} deleted from ${dataSource}`);
+
+        if (room) {
+            let log: ChatLog | null = ChatManager.getInstance().getChatLog(room);
+            if (log) {
+                ChatManager.getInstance().leaveChat(room);
+                if (this.selectedChatLog && (this.selectedChatLog.roomName === room)) {
+                    this.selectedChatLog = null;
+                    this.clearChatLog();
+                    this.checkCanComment();
+                }
+                this.updateView('', {});
+            }
+        }
+
+
     }
 
     protected getBackgroundImage(name: string, item: any): string {
         return "";
     }
 
-    handleInvitationDeclined(room: string, username: string): void {
+    private leaveChat(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.selectedChatLog) {
+            ChatManager.getInstance().leaveChat(this.selectedChatLog.roomName);
+            this.selectedChatLog = null;
+            this.clearChatLog();
+            this.checkCanComment();
+        }
+        this.updateView('', {});
+    }
+
+    private checkCanComment() {
+        if (this.selectedChatLog) {
+            if (this.commentEl) this.commentEl.removeAttribute("readonly");
+            if (this.commentEl) this.commentEl.removeAttribute("disabled");
+            if (this.sendMessageButton) this.sendMessageButton.removeAttribute("disabled");
+            if (this.leaveChatButton) this.leaveChatButton.removeAttribute("disabled");
+            if (this.fastUserSearch) this.fastUserSearch.removeAttribute("disabled");
+        } else {
+            if (this.commentEl) this.commentEl.setAttribute("readonly", "true");
+            if (this.commentEl) this.commentEl.setAttribute("disabled", "true");
+            if (this.sendMessageButton) this.sendMessageButton.setAttribute("disabled", "true");
+            if (this.leaveChatButton) this.leaveChatButton.setAttribute("disabled", "true");
+            if (this.fastUserSearch) this.fastUserSearch.setAttribute("disabled", "true");
+        }
+
+    }
+
+    private clearChatLog() {
+        browserUtil.removeAllChildren(this.chatLogDiv);
     }
 
 

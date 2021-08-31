@@ -8,14 +8,13 @@ import StateChangedDelegate from "./StateChangedDelegate";
 const smLogger = debug('state-manager-ts');
 
 
-
 export abstract class AbstractStateManager implements StateManager {
 
-    protected forceSaves:boolean = true;
-    protected managerName:string = '';
-    protected delegate:StateChangeInformer;
+    protected forceSaves: boolean = true;
+    protected managerName: string = '';
+    protected delegate: StateChangeInformer;
 
-    protected constructor(managerName:string) {
+    protected constructor(managerName: string) {
         this.delegate = new StateChangedDelegate(managerName);
         this.managerName = managerName;
         this.emitEvents();
@@ -25,10 +24,10 @@ export abstract class AbstractStateManager implements StateManager {
     suppressEvents(): void {
         this.delegate.suppressEvents();
     }
+
     emitEvents(): void {
         this.delegate.emitEvents();
     }
-
 
 
     public dontForceSavesOnAddRemoveUpdate() {
@@ -40,33 +39,40 @@ export abstract class AbstractStateManager implements StateManager {
     }
 
     informChangeListenersForStateWithName(name: string, stateObjValue: any, eventType: stateEventType = stateEventType.StateChanged, previousObjValue: any | null = null) {
-        this.delegate.informChangeListenersForStateWithName(name,stateObjValue,eventType,previousObjValue);
+        this.delegate.informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue);
     }
 
 
     addChangeListenerForName(name: string, listener: StateChangeListener): void {
-        this.delegate.addChangeListenerForName(name,listener);
+        this.delegate.addChangeListenerForName(name, listener);
     }
 
-    public abstract _ensureStatePresent(name:string):void;
-    public abstract _addNewNamedStateToStorage(state:stateValue):void;
-    public abstract _replaceNamedStateInStorage(state:stateValue):void;
-    public abstract _getState(name:string):stateValue;
-    public abstract _saveState(name:string,stateObj:any):void;
-    public abstract _addItemToState(name:string,stateObj:any,isPersisted:boolean):void;
-    public abstract _removeItemFromState(name:string,stateObj:any,testForEqualityFunction:equalityFunction, isPersisted: boolean):void;
-    public abstract _updateItemInState(name:string,stateObj:any,testForEqualityFunction:equalityFunction, isPersisted: boolean):void;
+    public abstract _ensureStatePresent(name: string): void;
 
-    public addStateByName(name:string, stateObjForName:any):any {
+    public abstract _addNewNamedStateToStorage(state: stateValue): void;
+
+    public abstract _replaceNamedStateInStorage(state: stateValue): void;
+
+    public abstract _getState(name: string): stateValue;
+
+    public abstract _saveState(name: string, stateObj: any): void;
+
+    public abstract _addItemToState(name: string, stateObj: any, isPersisted: boolean): void;
+
+    public abstract _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void;
+
+    public abstract _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void;
+
+    public addStateByName(name: string, stateObjForName: any): any {
         this._ensureStatePresent(name);
         /* create a new state attribute for the application state */
-        const state:stateValue = {
+        const state: stateValue = {
             name,
             value: stateObjForName,
         };
         /* get the current state value and replace it */
         this._replaceNamedStateInStorage(state);
-        this.informChangeListenersForStateWithName(name,stateObjForName,stateEventType.StateChanged);
+        this.informChangeListenersForStateWithName(name, stateObjForName, stateEventType.StateChanged);
         return stateObjForName;
     }
 
@@ -131,7 +137,7 @@ export abstract class AbstractStateManager implements StateManager {
     removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
         this._ensureStatePresent(name);
         let result = true;
-        let oldItem = this.findItemInState(name,item,testForEqualityFunction);
+        let oldItem = this.findItemInState(name, item, testForEqualityFunction);
         // remove the item from the state
         smLogger('State Manager: Found item - removing ');
         this._removeItemFromState(name, item, testForEqualityFunction, isPersisted);
@@ -143,9 +149,9 @@ export abstract class AbstractStateManager implements StateManager {
     updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
         this._ensureStatePresent(name);
         let result = true;
-        let oldItem:any = this.findItemInState(name,item,testForEqualityFunction);
+        let oldItem: any = this.findItemInState(name, item, testForEqualityFunction);
         smLogger('State Manager: Found item - replacing ');
-        this._updateItemInState(name, item, testForEqualityFunction,isPersisted);
+        this._updateItemInState(name, item, testForEqualityFunction, isPersisted);
         //this.setStateByName(name, this.getStateByName(name), false);
         this.informChangeListenersForStateWithName(name, item, stateEventType.ItemUpdated, oldItem);
         return result;

@@ -1,3 +1,3 @@
 export interface UnreadMessageCountListener {
-    countChanged(newCount:number):void;
+    countChanged(newCount: number): void;
 }

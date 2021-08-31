@@ -1,13 +1,13 @@
 export type Invitation = {
-    from:string,
-    room:string,
-    message:string,
-    created:number,
-    userList:string[],
+    from: string,
+    room: string,
+    message: string,
+    created: number,
+    userList: string[],
     type: InviteType,
     requiresAcceptDecline: boolean,
-    subject:string,
-    attachment:any
+    subject: string,
+    attachment: any
 }
 
 export type Message = {
@@ -16,7 +16,7 @@ export type Message = {
     message: string,
     created: number,
     priority: number,
-    type:InviteType,
+    type: InviteType,
     attachment?: any
 }
 

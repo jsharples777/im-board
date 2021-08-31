@@ -5,7 +5,7 @@ class NotificationFactory {
     constructor() {
     }
 
-    createNotification(manager:NotificationManager) {
+    createNotification(manager: NotificationManager) {
         return new BootstrapNotification(manager);
     }
 }

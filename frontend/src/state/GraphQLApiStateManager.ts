@@ -41,7 +41,7 @@ export type QLConfig = {
 export class GraphQLApiStateManager implements AsynchronousStateManager {
     protected configuration: QLConfig[] = [];
     protected bHasCompletedRun: boolean[];
-    protected delegate:StateChangeInformer;
+    protected delegate: StateChangeInformer;
 
     public constructor() {
         this.delegate = new StateChangedDelegate('graphql');
@@ -72,7 +72,7 @@ export class GraphQLApiStateManager implements AsynchronousStateManager {
         return result;
     }
 
-    setCompletedRun(stateName:string):void {
+    setCompletedRun(stateName: string): void {
         let foundIndex = this.configuration.findIndex((config) => config.stateName === stateName);
         if (foundIndex >= 0) {
             this.bHasCompletedRun[foundIndex] = true;
@@ -93,6 +93,158 @@ export class GraphQLApiStateManager implements AsynchronousStateManager {
             runsComplete.push(false);
         });
         this.bHasCompletedRun = runsComplete;
+    }
+
+    _addNewNamedStateToStorage(state: stateValue): void { /* assume model on the other end exists */
+    }
+
+    _getState(name: string): stateValue {
+        graphSMLogger(`Getting All ${name}`);
+        if (this.hasCompletedRun(name)) {
+            graphSMLogger(`Getting All ${name} - not done - previously retrieved`);
+        } else {
+            let config: QLConfig = this.getConfigurationForStateName(name);
+            if (config.isActive) {
+                let query = config.apis.findAll;
+                const jsonRequest: jsonRequest = {
+                    url: config.apiURL,
+                    type: RequestType.POST,
+                    params: {query},
+                    callback: this.callbackForGetItems,
+                    associatedStateName: name
+                };
+                graphSMLogger(`Getting All ${name} with query "${query}"`);
+                downloader.addApiRequest(jsonRequest, true);
+
+            } else {
+                graphSMLogger(`No configuration for state ${name}`);
+            }
+        }
+        let state: stateValue = {name: name, value: []};
+        return state;
+    }
+
+    _ensureStatePresent(name: string): void { /* assume state exists */
+    }
+
+    _replaceNamedStateInStorage(state: stateValue): void { /* not going to replace all state */
+    }
+
+    _saveState(name: string, stateObj: any): void { /* not going to replace all state */
+    }
+
+    _addItemToState(name: string, stateObj: any, isPersisted: boolean = false): void {
+        if (isPersisted) return; // dont add complete objects to the state - they are already processed
+        graphSMLogger(`Adding item to ${name}`);
+        graphSMLogger(stateObj);
+        let config: QLConfig = this.getConfigurationForStateName(name);
+        if (config.isActive) {
+            let mutation: any = {};
+            mutation[config.apis.create] = {}
+
+            const jsonRequest: jsonRequest = {
+                url: config.apiURL,
+                type: RequestType.POST,
+                params: {mutation},
+                callback: this.callbackForAddItem,
+                associatedStateName: name
+            };
+            downloader.addApiRequest(jsonRequest, true);
+
+        } else {
+            graphSMLogger(`No configuration for state ${name}`);
+        }
+    }
+
+    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
+        if (isPersisted) return; // dont remove complete objects to the state - they are already processed
+        graphSMLogger(`Removing item to ${name}`);
+        graphSMLogger(stateObj);
+        let config: QLConfig = this.getConfigurationForStateName(name);
+        if (config.isActive) {
+            let mutation: any = {};
+            mutation[config.apis.destroy] = {}
+
+            const jsonRequest: jsonRequest = {
+                url: config.apiURL,
+                type: RequestType.POST,
+                params: {mutation},
+                callback: this.callbackForRemoveItem,
+                associatedStateName: name
+            };
+            downloader.addApiRequest(jsonRequest, true);
+
+        } else {
+            graphSMLogger(`No configuration for state ${name}`);
+        }
+    }
+
+    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
+        if (isPersisted) return; // dont update complete objects to the state - they are already processed
+        graphSMLogger(`Updating item in ${name}`);
+        graphSMLogger(stateObj);
+        let config: QLConfig = this.getConfigurationForStateName(name);
+        if (config.isActive) {
+            let mutation: any = {};
+            mutation[config.apis.destroy] = {}
+
+            const jsonRequest: jsonRequest = {
+                url: config.apiURL,
+                type: RequestType.POST,
+                params: {mutation},
+                callback: this.callbackForUpdateItem,
+                associatedStateName: name
+            };
+            downloader.addApiRequest(jsonRequest, true);
+
+        } else {
+            graphSMLogger(`No configuration for state ${name}`);
+        }
+    }
+
+    addChangeListenerForName(name: string, listener: StateChangeListener): void {
+        this.delegate.addChangeListenerForName(name, listener);
+    }
+
+    addNewItemToState(name: string, item: any, isPersisted: boolean): void {
+        this._addItemToState(name, item, isPersisted);
+    }
+
+    emitEvents(): void {
+        this.delegate.emitEvents();
+    }
+
+    findItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): any {
+        throw Error("not implemented");
+    }
+
+    getStateByName(name: string): any {
+        this._getState(name);
+    }
+
+    informChangeListenersForStateWithName(name: string, stateObjValue: any, eventType: stateEventType, previousObjValue: any): void {
+        this.delegate.informChangeListenersForStateWithName(name, stateObjValue, eventType, previousObjValue);
+    }
+
+    isItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
+        return true;
+    }
+
+    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
+        this._removeItemFromState(name, item, testForEqualityFunction, isPersisted);
+        return true;
+    }
+
+    setStateByName(name: string, stateObjectForName: any, informListeners: boolean): void {
+    }
+
+    suppressEvents(): void {
+        this.delegate.suppressEvents();
+    }
+
+    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
+        this._updateItemInState(name, item, testForEqualityFunction, isPersisted);
+        return true;
     }
 
     protected getConfigurationForStateName(name: string) {
@@ -140,10 +292,10 @@ export class GraphQLApiStateManager implements AsynchronousStateManager {
         graphSMLogger(`callback for get items for state ${associatedStateName} with status ${status} - FORWARDING`);
         if (status >= 200 && status <= 299) { // do we have any data?
             graphSMLogger(data);
-            let config:QLConfig = this.getConfigurationForStateName(associatedStateName);
+            let config: QLConfig = this.getConfigurationForStateName(associatedStateName);
             let dataAttribute = config.data.findAll;
             this.setCompletedRun(associatedStateName);
-            this.delegate.informChangeListenersForStateWithName(associatedStateName, data.data[dataAttribute], stateEventType.StateChanged,null);
+            this.delegate.informChangeListenersForStateWithName(associatedStateName, data.data[dataAttribute], stateEventType.StateChanged, null);
         }
     }
 
@@ -151,159 +303,7 @@ export class GraphQLApiStateManager implements AsynchronousStateManager {
         graphSMLogger(`callback for add item for state ${associatedStateName} with status ${status} - FORWARDING`);
         if (status >= 200 && status <= 299) { // do we have any data?
             graphSMLogger(data);
-            this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.ItemAdded,null);
+            this.delegate.informChangeListenersForStateWithName(associatedStateName, data, stateEventType.ItemAdded, null);
         }
-    }
-
-    _addNewNamedStateToStorage(state: stateValue): void { /* assume model on the other end exists */
-    }
-
-    _getState(name: string): stateValue {
-        graphSMLogger(`Getting All ${name}`);
-        if (this.hasCompletedRun(name)) {
-            graphSMLogger(`Getting All ${name} - not done - previously retrieved`);
-        } else {
-            let config: QLConfig = this.getConfigurationForStateName(name);
-            if (config.isActive) {
-                let query = config.apis.findAll;
-                const jsonRequest: jsonRequest = {
-                    url: config.apiURL,
-                    type: RequestType.POST,
-                    params: {query},
-                    callback: this.callbackForGetItems,
-                    associatedStateName: name
-                };
-                graphSMLogger(`Getting All ${name} with query "${query}"`);
-                downloader.addApiRequest(jsonRequest, true);
-
-            } else {
-                graphSMLogger(`No configuration for state ${name}`);
-            }
-        }
-        let state: stateValue = {name: name, value: []};
-        return state;
-    }
-
-    _ensureStatePresent(name: string): void { /* assume state exists */
-    }
-
-    _replaceNamedStateInStorage(state: stateValue): void { /* not going to replace all state */
-    }
-
-    _saveState(name: string, stateObj: any): void { /* not going to replace all state */
-    }
-
-    _addItemToState(name: string, stateObj: any, isPersisted: boolean = false): void {
-        if (isPersisted) return; // dont add complete objects to the state - they are already processed
-        graphSMLogger(`Adding item to ${name}`);
-        graphSMLogger(stateObj);
-        let config: QLConfig = this.getConfigurationForStateName(name);
-        if (config.isActive) {
-            let mutation:any = {};
-            mutation[config.apis.create] = {}
-
-            const jsonRequest: jsonRequest = {
-                url: config.apiURL,
-                type: RequestType.POST,
-                params: {mutation},
-                callback: this.callbackForAddItem,
-                associatedStateName: name
-            };
-            downloader.addApiRequest(jsonRequest, true);
-
-        } else {
-            graphSMLogger(`No configuration for state ${name}`);
-        }
-    }
-
-
-    _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
-        if (isPersisted) return; // dont remove complete objects to the state - they are already processed
-        graphSMLogger(`Removing item to ${name}`);
-        graphSMLogger(stateObj);
-        let config: QLConfig = this.getConfigurationForStateName(name);
-        if (config.isActive) {
-            let mutation:any = {};
-            mutation[config.apis.destroy] = {}
-
-            const jsonRequest: jsonRequest = {
-                url: config.apiURL,
-                type: RequestType.POST,
-                params: {mutation},
-                callback: this.callbackForRemoveItem,
-                associatedStateName: name
-            };
-            downloader.addApiRequest(jsonRequest, true);
-
-        } else {
-            graphSMLogger(`No configuration for state ${name}`);
-        }
-    }
-
-    _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
-        if (isPersisted) return; // dont update complete objects to the state - they are already processed
-        graphSMLogger(`Updating item in ${name}`);
-        graphSMLogger(stateObj);
-        let config: QLConfig = this.getConfigurationForStateName(name);
-        if (config.isActive) {
-            let mutation:any = {};
-            mutation[config.apis.destroy] = {}
-
-            const jsonRequest: jsonRequest = {
-                url: config.apiURL,
-                type: RequestType.POST,
-                params: {mutation},
-                callback: this.callbackForUpdateItem,
-                associatedStateName: name
-            };
-            downloader.addApiRequest(jsonRequest, true);
-
-        } else {
-            graphSMLogger(`No configuration for state ${name}`);
-        }
-    }
-
-    addChangeListenerForName(name: string, listener: StateChangeListener): void {
-        this.delegate.addChangeListenerForName(name,listener);
-    }
-
-    addNewItemToState(name: string, item: any, isPersisted: boolean): void {
-        this._addItemToState(name,item,isPersisted);
-    }
-
-    emitEvents(): void {
-        this.delegate.emitEvents();
-    }
-
-    findItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): any {
-        throw Error("not implemented");
-    }
-
-    getStateByName(name: string): any {
-        this._getState(name);
-    }
-
-    informChangeListenersForStateWithName(name: string, stateObjValue: any, eventType: stateEventType, previousObjValue: any): void {
-        this.delegate.informChangeListenersForStateWithName(name,stateObjValue,eventType,previousObjValue);
-    }
-
-    isItemInState(name: string, item: any, testForEqualityFunction: equalityFunction): boolean {
-        return true;
-    }
-
-    removeItemFromState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
-        this._removeItemFromState(name,item,testForEqualityFunction,isPersisted);
-        return true;
-    }
-
-    setStateByName(name: string, stateObjectForName: any, informListeners: boolean): void {}
-
-    suppressEvents(): void {
-        this.delegate.suppressEvents();
-    }
-
-    updateItemInState(name: string, item: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): boolean {
-        this._updateItemInState(name,item,testForEqualityFunction,isPersisted);
-        return true;
     }
 }

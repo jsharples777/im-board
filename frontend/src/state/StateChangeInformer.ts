@@ -6,6 +6,7 @@ export interface StateChangeInformer {
 
     addChangeListenerForName(name: string, listener: StateChangeListener): void;
 
-    suppressEvents():void;
-    emitEvents():void;
+    suppressEvents(): void;
+
+    emitEvents(): void;
 }

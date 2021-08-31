@@ -7,12 +7,18 @@ import {stateValue} from "./StateManager";
 const idLogger = debug('indexeddb-ts');
 
 export type collection = {
-    name:string,
-    keyField:string
+    name: string,
+    keyField: string
 };
 
 class IndexedDBStateManager extends AbstractStateManager {
     private static instance: IndexedDBStateManager;
+
+    protected constructor() {
+        super('indexeddb');
+        idLogger(`Constructor`);
+        this.forceSaves = false;
+    }
 
     public static getInstance(): IndexedDBStateManager {
         if (!IndexedDBStateManager.instance) {
@@ -21,12 +27,12 @@ class IndexedDBStateManager extends AbstractStateManager {
         return IndexedDBStateManager.instance;
     }
 
-    public async initialise(collections:collection[]) {
-        await openDB('imboard-db', 1,{
+    public async initialise(collections: collection[]) {
+        await openDB('imboard-db', 1, {
             upgrade(db, oldVersion, newVersion, transaction) {
-               collections.forEach((collection) => {
-                   db.createObjectStore(collection.name, {keyPath: collection.keyField, autoIncrement: false});
-               });
+                collections.forEach((collection) => {
+                    db.createObjectStore(collection.name, {keyPath: collection.keyField, autoIncrement: false});
+                });
             },
             blocked() {
                 // …
@@ -40,47 +46,27 @@ class IndexedDBStateManager extends AbstractStateManager {
         });
     }
 
-    protected constructor() {
-        super('indexeddb');
-        idLogger(`Constructor`);
-        this.forceSaves = false;
-    }
+    public _ensureStatePresent(name: string): void {
+    } // should be present with initialise
 
-    public _ensureStatePresent(name:string):void {} // should be present with initialise
-
-
-    private async checkForObjectStore(db: IDBPDatabase, key: string, keyField: string) {
-        if (!db.objectStoreNames.contains(key)) {
-            // @ts-ignore
-            await db.createObjectStore(key, {keyPath: keyField, autoIncrement: false});
-        }
-    }
-
-    private async saveItemsToCollection(objectStore: IDBPObjectStore, saveData: any[], keyField: string = 'id') {
-        saveData.forEach((data) => {
-            // @ts-ignore
-            objectStore.add(data);
-        });
-    }
-
-
-    public _addNewNamedStateToStorage(state:stateValue):void {
-        let fn = async() => {
-            await this.saveWithCollectionKey(state.name,state.value);
+    public _addNewNamedStateToStorage(state: stateValue): void {
+        let fn = async () => {
+            await this.saveWithCollectionKey(state.name, state.value);
         };
         fn();
     }
-    public _replaceNamedStateInStorage(state:stateValue):void {
-        let fn = async() => {
+
+    public _replaceNamedStateInStorage(state: stateValue): void {
+        let fn = async () => {
             await this.removeAllItemsFromCollectionKey(state.name);
-            await this.saveWithCollectionKey(state.name,state.value);
+            await this.saveWithCollectionKey(state.name, state.value);
         }
         fn();
     }
 
-    _addItemToState(name: string, stateObj: any,isPersisted:boolean = false): void {
+    _addItemToState(name: string, stateObj: any, isPersisted: boolean = false): void {
         if (!isPersisted) return; // dont add incomplete objects to the state
-        this.addNewItemToCollection(name,stateObj);
+        this.addNewItemToCollection(name, stateObj);
     }
 
     _removeItemFromState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
@@ -88,40 +74,27 @@ class IndexedDBStateManager extends AbstractStateManager {
     }
 
     _updateItemInState(name: string, stateObj: any, testForEqualityFunction: equalityFunction, isPersisted: boolean): void {
-        this.updateItemInCollection(name,stateObj);
+        this.updateItemInCollection(name, stateObj);
     }
 
-    public _getState(name:string):stateValue {
-        let state:stateValue = {
+    public _getState(name: string): stateValue {
+        let state: stateValue = {
             name: name,
             value: []
         }
-        let fn = async() => {
+        let fn = async () => {
             state.value = await this.getWithCollectionKey(state.name);
         }
         return state;
     }
 
-    public _saveState(name:string,stateObj:any):void {
-        let fn = async() => {
+    public _saveState(name: string, stateObj: any): void {
+        let fn = async () => {
             await this.removeAllItemsFromCollectionKey(name);
-            await this.saveWithCollectionKey(name,stateObj);
+            await this.saveWithCollectionKey(name, stateObj);
         }
         fn();
     }
-
-    private async removeAllItemsFromCollectionKey(key:string,keyField:string = 'id') {
-        idLogger(`Clearing collection ${key}`);
-        let db: IDBPDatabase = await openDB('imboard-db', 1,);
-        await this.checkForObjectStore(db, key, keyField);
-        // @ts-ignore
-        let transaction: IDBPTransaction = db.transaction(key, "readwrite");
-        // @ts-ignore
-        let objectStore: IDBPObjectStore = transaction.store;
-        // @ts-ignore
-        await objectStore.clear();
-    }
-
 
     public async saveWithCollectionKey(key: string, saveData: any[], keyField: string = 'id') {
         idLogger(`Saving with key ${key}`);
@@ -140,7 +113,8 @@ class IndexedDBStateManager extends AbstractStateManager {
         let savedResults: any[] = [];
         idLogger(`Loading with key ${key}`);
         let db: IDBPDatabase = await openDB('imboard-db', 1);
-        await this.checkForObjectStore(db, key, keyField);;
+        await this.checkForObjectStore(db, key, keyField);
+
         // @ts-ignore
         let transaction: IDBPTransaction = db.transaction(key);
         // @ts-ignore
@@ -166,7 +140,8 @@ class IndexedDBStateManager extends AbstractStateManager {
             idLogger(item);
         }
         let db: IDBPDatabase = await openDB('imboard-db', 1);
-        await this.checkForObjectStore(db, key, keyField);;
+        await this.checkForObjectStore(db, key, keyField);
+
         // @ts-ignore
         let transaction: IDBPTransaction = db.transaction(key, "readwrite");
         // @ts-ignore
@@ -179,7 +154,8 @@ class IndexedDBStateManager extends AbstractStateManager {
             idLogger(`Removing with key ${key}`);
             idLogger(item);
             let db: IDBPDatabase = await openDB('imboard-db', 1);
-            await this.checkForObjectStore(db, key, keyField);;
+            await this.checkForObjectStore(db, key, keyField);
+
             // @ts-ignore
             let transaction: IDBPTransaction = db.transaction(key, "readwrite");
             // @ts-ignore
@@ -196,7 +172,8 @@ class IndexedDBStateManager extends AbstractStateManager {
             idLogger(`Updating item in storage ${key}`);
             idLogger(item);
             let db: IDBPDatabase = await openDB('imboard-db', 1);
-            await this.checkForObjectStore(db, key, keyField);;
+            await this.checkForObjectStore(db, key, keyField);
+
             // @ts-ignore
             let transaction: IDBPTransaction = db.transaction(key, "readwrite");
             // @ts-ignore
@@ -211,6 +188,32 @@ class IndexedDBStateManager extends AbstractStateManager {
             }
             await transaction.done;
         }
+    }
+
+    private async checkForObjectStore(db: IDBPDatabase, key: string, keyField: string) {
+        if (!db.objectStoreNames.contains(key)) {
+            // @ts-ignore
+            await db.createObjectStore(key, {keyPath: keyField, autoIncrement: false});
+        }
+    }
+
+    private async saveItemsToCollection(objectStore: IDBPObjectStore, saveData: any[], keyField: string = 'id') {
+        saveData.forEach((data) => {
+            // @ts-ignore
+            objectStore.add(data);
+        });
+    }
+
+    private async removeAllItemsFromCollectionKey(key: string, keyField: string = 'id') {
+        idLogger(`Clearing collection ${key}`);
+        let db: IDBPDatabase = await openDB('imboard-db', 1,);
+        await this.checkForObjectStore(db, key, keyField);
+        // @ts-ignore
+        let transaction: IDBPTransaction = db.transaction(key, "readwrite");
+        // @ts-ignore
+        let objectStore: IDBPObjectStore = transaction.store;
+        // @ts-ignore
+        await objectStore.clear();
     }
 
 

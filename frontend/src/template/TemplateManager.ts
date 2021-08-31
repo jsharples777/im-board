@@ -7,6 +7,9 @@ const templateLogger = debug('template-manager');
 export class TemplateManager {
     private static _instance: TemplateManager;
 
+    private constructor() {
+    }
+
     public static getInstance(): TemplateManager {
         if (!(TemplateManager._instance)) {
             TemplateManager._instance = new TemplateManager();
@@ -14,9 +17,50 @@ export class TemplateManager {
         return TemplateManager._instance;
     }
 
-    private constructor() {}
+    public getScoreSheetTemplate(boardGame: any): any | null {
+        if (boardGame.gameId === 270314) {
+            return this.getOhanamiTemplate();
+        }
+        if (boardGame.gameId === 333201) {
+            return this.getSkullKingTemplate();
+        }
+        return this.getDefaultScoreSheetTemplate(boardGame);
+    }
 
-    private getOhanamiTemplate():any {
+    public getScoreSheetStartingData(boardGame: any): any[] | null {
+        if (boardGame.gameId === 270314) {
+            return this.getOhanamiStartingData();
+        }
+        if (boardGame.gameId === 333201) {
+            return this.getSkullKingStartingData();
+        }
+        return this.getDefaultScoreSheetStartingData(boardGame);
+    }
+
+    public getSaveData(boardGame: any, scoreSheet: ScoreSheet): any {
+        if (boardGame.gameId === 270314) {
+            return this.getOhanamiSaveData(scoreSheet);
+        }
+        if (boardGame.gameId === 333201) {
+            return this.getSkullKingSaveData(scoreSheet);
+        }
+        return this.getDefaultSaveData(scoreSheet);
+    }
+
+    public transformDataAfterUserChange(boardGame: any, scoreSheet: ScoreSheet): boolean {
+        let result = false;
+        if (boardGame.gameId === 270314) {
+            result = true;
+            this.transformOhanamiData(scoreSheet);
+        }
+        if (boardGame.gameId === 333201) {
+            result = true;
+            this.transformSkullKingData(scoreSheet);
+        }
+        return result; // do nothing unless for a specific game
+    }
+
+    private getOhanamiTemplate(): any {
         let template = {
             colHeaders: false,
             rowHeaders: false,
@@ -24,10 +68,10 @@ export class TemplateManager {
             manualColumnResize: false,
             manualRowResize: false,
             selectionMode: 'single',
-            cells(row:number,column:number) {
+            cells(row: number, column: number) {
                 if ((column === 0) || (column === 1) || (row === 8)) {
                     return {
-                        readOnly:true,
+                        readOnly: true,
                         className: 'bg-readonly-heading'
                     }
                 }
@@ -38,7 +82,7 @@ export class TemplateManager {
                             forceNumeric: true,
                         }
                     }
-                    if ((row === 3) || (row === 5) ) {
+                    if ((row === 3) || (row === 5)) {
                         return {
                             className: 'bg-ohanami-green',
                             forceNumeric: true,
@@ -63,7 +107,8 @@ export class TemplateManager {
         templateLogger(template);
         return template;
     }
-    private getSkullKingTemplate():any {
+
+    private getSkullKingTemplate(): any {
         let template = {
             colHeaders: false,
             rowHeaders: false,
@@ -71,15 +116,15 @@ export class TemplateManager {
             manualColumnResize: false,
             manualRowResize: false,
             selectionMode: 'single',
-            cells(row:number,column:number) {
+            cells(row: number, column: number) {
                 if ((column === 0) || (column === 1) || (row === 21)) {
                     return {
-                        readOnly:true,
+                        readOnly: true,
                         className: 'bg-readonly-heading'
                     }
                 }
-                if (column%2 === 0) {
-                    if (row%2 === 0){
+                if (column % 2 === 0) {
+                    if (row % 2 === 0) {
                         return {
                             className: 'bg-readonly',
                         }
@@ -92,153 +137,130 @@ export class TemplateManager {
         return template;
     }
 
-    private getSkullKingStartingData():any[] {
+    private getSkullKingStartingData(): any[] {
         return [
-            ['Round','','P 1','','P 2','','P 3','','P 4',''],
-            ['1','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['2','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['3','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['4','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['5','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['6','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['7','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['8','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['9','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['10','bid','','','','','','','',''],
-            ['','bonus','','','','','','','',''],
-            ['Total','','','','','','','','','']
+            ['Round', '', 'P 1', '', 'P 2', '', 'P 3', '', 'P 4', ''],
+            ['1', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['2', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['3', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['4', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['5', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['6', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['7', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['8', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['9', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['10', 'bid', '', '', '', '', '', '', '', ''],
+            ['', 'bonus', '', '', '', '', '', '', '', ''],
+            ['Total', '', '', '', '', '', '', '', '', '']
         ];
     }
 
-    private getOhanamiStartingData():any[] {
+    private getOhanamiStartingData(): any[] {
         return [
-            ['Round','Mult.','P 1','P 2','P 3','P 4'],
-            ['1','x3','0','0','0','0'],
-            ['2','x3','0','0','0','0'],
-            ['','x4','0','0','0','0'],
-            ['3','x3','0','0','0','0'],
-            ['','x4','0','0','0','0'],
-            ['','x7','0','0','0','0'],
-            ['','var','0','0','0','0'],
-            ['Total','','0','0','0','0']
+            ['Round', 'Mult.', 'P 1', 'P 2', 'P 3', 'P 4'],
+            ['1', 'x3', '0', '0', '0', '0'],
+            ['2', 'x3', '0', '0', '0', '0'],
+            ['', 'x4', '0', '0', '0', '0'],
+            ['3', 'x3', '0', '0', '0', '0'],
+            ['', 'x4', '0', '0', '0', '0'],
+            ['', 'x7', '0', '0', '0', '0'],
+            ['', 'var', '0', '0', '0', '0'],
+            ['Total', '', '0', '0', '0', '0']
         ];
     }
 
-
-
-    private getDefaultScoreSheetTemplate(boardGame:any):any {
+    private getDefaultScoreSheetTemplate(boardGame: any): any {
         return {
             //width:'90%',
             //height:'90%',
-            colHeaders:false,
-            rowHeaders:false,
+            colHeaders: false,
+            rowHeaders: false,
             licenseKey: 'non-commercial-and-evaluation',
-            manualColumnResize:false,
-            manualRowResize:false,
-            selectionMode:'single',
+            manualColumnResize: false,
+            manualRowResize: false,
+            selectionMode: 'single',
             columnSummary: [
                 {
                     destinationRow: 0,
-                    destinationColumn:0,
+                    destinationColumn: 0,
                     reversedRowCoords: true,
                     type: 'sum',
-                    forceNumeric:true
+                    forceNumeric: true
                 },
                 {
                     destinationRow: 0,
-                    destinationColumn:1,
+                    destinationColumn: 1,
                     reversedRowCoords: true,
                     type: 'sum',
-                    forceNumeric:true
+                    forceNumeric: true
                 },
                 {
                     destinationRow: 0,
-                    destinationColumn:2,
+                    destinationColumn: 2,
                     reversedRowCoords: true,
                     type: 'sum',
-                    forceNumeric:true
+                    forceNumeric: true
                 },
                 {
                     destinationRow: 0,
-                    destinationColumn:3,
+                    destinationColumn: 3,
                     reversedRowCoords: true,
                     type: 'sum',
-                    forceNumeric:true
+                    forceNumeric: true
                 },
                 {
                     destinationRow: 0,
-                    destinationColumn:4,
+                    destinationColumn: 4,
                     reversedRowCoords: true,
                     type: 'sum',
-                    forceNumeric:true
+                    forceNumeric: true
                 },
                 {
                     destinationRow: 0,
-                    destinationColumn:5,
+                    destinationColumn: 5,
                     reversedRowCoords: true,
                     type: 'sum',
-                    forceNumeric:true
+                    forceNumeric: true
                 },
                 {
                     destinationRow: 0,
-                    destinationColumn:6,
+                    destinationColumn: 6,
                     reversedRowCoords: true,
                     type: 'sum',
-                    forceNumeric:true
+                    forceNumeric: true
                 },
             ]
 
         }
     }
 
-    private getDefaultScoreSheetStartingData(boardGame:any):any[] {
+    private getDefaultScoreSheetStartingData(boardGame: any): any[] {
         return [
-            ['P 1','P 2','P 3','P 4','P 5','P 6','P 7'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
-            ['0','0','0','0','0','0','0'],
+            ['P 1', 'P 2', 'P 3', 'P 4', 'P 5', 'P 6', 'P 7'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0'],
         ];
     }
 
-
-    public getScoreSheetTemplate(boardGame:any):any|null {
-        if (boardGame.gameId === 270314) {
-            return this.getOhanamiTemplate();
-        }
-        if (boardGame.gameId === 333201) {
-            return this.getSkullKingTemplate();
-        }
-        return this.getDefaultScoreSheetTemplate(boardGame);
-    }
-
-    public getScoreSheetStartingData(boardGame:any):any[]|null {
-        if (boardGame.gameId === 270314) {
-            return this.getOhanamiStartingData();
-        }
-        if (boardGame.gameId === 333201) {
-            return this.getSkullKingStartingData();
-        }
-        return this.getDefaultScoreSheetStartingData(boardGame);
-    }
-
-    private getDefaultSaveData(scoreSheet:ScoreSheet):any {
+    private getDefaultSaveData(scoreSheet: ScoreSheet): any {
         let saveData = {
             id: scoreSheet.room,
             jsonData: JSON.stringify(scoreSheet),
@@ -260,7 +282,7 @@ export class TemplateManager {
         return saveData;
     }
 
-    private getOhanamiSaveData(scoreSheet:ScoreSheet):any {
+    private getOhanamiSaveData(scoreSheet: ScoreSheet): any {
         let saveData = {
             id: scoreSheet.room,
             jsonData: JSON.stringify(scoreSheet),
@@ -275,7 +297,7 @@ export class TemplateManager {
         // @ts-ignore
         const scores: any[] = scoreSheet.data[scoreSheet.data.length - 1]
 
-        for (let index = 2;index < playerNames.length;index++) {
+        for (let index = 2; index < playerNames.length; index++) {
             // @ts-ignore
             saveData.players.push(playerNames[index]);
             // @ts-ignore
@@ -286,7 +308,8 @@ export class TemplateManager {
         templateLogger(saveData);
         return saveData;
     }
-    private getSkullKingSaveData(scoreSheet:ScoreSheet):any {
+
+    private getSkullKingSaveData(scoreSheet: ScoreSheet): any {
         let saveData = {
             id: scoreSheet.room,
             jsonData: JSON.stringify(scoreSheet),
@@ -302,7 +325,7 @@ export class TemplateManager {
         // @ts-ignore
         const scores: any[] = scoreSheet.data[scoreSheet.data.length - 1]
 
-        for (let index = 3;index < playerNames.length;index+=2) {
+        for (let index = 3; index < playerNames.length; index += 2) {
             // @ts-ignore
             saveData.players.push(playerNames[index]);
             // @ts-ignore
@@ -314,32 +337,21 @@ export class TemplateManager {
         return saveData;
     }
 
-
-    public getSaveData(boardGame:any,scoreSheet:ScoreSheet):any {
-        if (boardGame.gameId === 270314) {
-            return this.getOhanamiSaveData(scoreSheet);
-        }
-        if (boardGame.gameId === 333201) {
-            return this.getSkullKingSaveData(scoreSheet);
-        }
-        return this.getDefaultSaveData(scoreSheet);
-    }
-
-    private calculateOhanamiPinkScore(numOfCards:number):number {
+    private calculateOhanamiPinkScore(numOfCards: number): number {
         let score = 0;
         if (numOfCards > 0) {
             if (numOfCards > 15) numOfCards = 15;
             while (numOfCards > 0) {
                 score += numOfCards;
-                numOfCards --;
+                numOfCards--;
             }
         }
         return score;
     }
 
-    private transformOhanamiData(scoreSheet:ScoreSheet) {
+    private transformOhanamiData(scoreSheet: ScoreSheet) {
         // need to calculate the player scores
-        for (let index = 0;index < 4;index++) {
+        for (let index = 0; index < 4; index++) {
             /*
              *  for each player the score is the sum of
              *  3 x row 1, 2, and 4
@@ -347,7 +359,7 @@ export class TemplateManager {
              *  7 x row 6
              *  row 7 is complicated
              */
-            let score:number = 0;
+            let score: number = 0;
             // @ts-ignore
             let parsed = parseInt(scoreSheet.data[1][index + 2]);
             if (!isNaN(parsed)) score += (3 * parsed);
@@ -378,9 +390,9 @@ export class TemplateManager {
         }
     }
 
-    private transformSkullKingData(scoreSheet:ScoreSheet) {
+    private transformSkullKingData(scoreSheet: ScoreSheet) {
         // need to calculate the player scores
-        for (let index = 2;index < 10;index+=2) {
+        for (let index = 2; index < 10; index += 2) {
             /*
              *  for each player the score is the sum of
              *  each bid score plus a bonus
@@ -388,21 +400,21 @@ export class TemplateManager {
              *  if bid is x, and actual is x, score is 20 x bid
              *  if bid ix x, and actual is y (x != y), score is 10 x abs(x-y)
              */
-            let score:number = 0;
+            let score: number = 0;
 
 
-            for (let round = 1; round <= 10;round++) {
-                let row = 2*round - 1;
+            for (let round = 1; round <= 10; round++) {
+                let row = 2 * round - 1;
                 // @ts-ignore
                 let parsedBid = parseInt(scoreSheet.data[row][index]);
                 // @ts-ignore
-                let parsedActual = parseInt(scoreSheet.data[row][index+1])
+                let parsedActual = parseInt(scoreSheet.data[row][index + 1])
                 // @ts-ignore
-                let parsedBonus = parseInt(scoreSheet.data[row + 1][index+1]);
+                let parsedBonus = parseInt(scoreSheet.data[row + 1][index + 1]);
                 // @ts-ignore
                 if (!isNaN(parsedBid) && !isNaN(parsedActual)) {
                     if ((parsedBid === 0) && (parsedActual === 0)) {
-                        score += round*10;
+                        score += round * 10;
                     }
                     if (parsedBid === parsedActual) {
                         score += 20 * parsedBid;
@@ -418,18 +430,5 @@ export class TemplateManager {
             scoreSheet.data[21][index + 1] = score;
         }
 
-    }
-
-    public transformDataAfterUserChange(boardGame:any,scoreSheet:ScoreSheet):boolean {
-        let result = false;
-        if (boardGame.gameId === 270314) {
-            result = true;
-            this.transformOhanamiData(scoreSheet);
-        }
-        if (boardGame.gameId === 333201) {
-            result = true;
-            this.transformSkullKingData(scoreSheet);
-        }
-        return result; // do nothing unless for a specific game
     }
 }

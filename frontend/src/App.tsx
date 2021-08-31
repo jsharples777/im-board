@@ -19,7 +19,7 @@ import {UnreadMessageCountListener} from "./socket/UnreadMessageCountListener";
 
 const logger = debug('app');
 
-class Root extends React.Component implements UnreadMessageCountListener{
+class Root extends React.Component implements UnreadMessageCountListener {
     private titleEl: any;
     private contentEl: any;
     private modalEl: any;
@@ -51,7 +51,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
     // @ts-ignore
     private scoreSheetEl: HTMLDivElement | null;
     // @ts-ignore
-    private chatNavigationItem: HTMLAnchorElement|null;
+    private chatNavigationItem: HTMLAnchorElement | null;
 
     constructor() {
         // @ts-ignore
@@ -82,7 +82,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
                 bggSearchCall: 'query search($queryString: String!) {findBoardGames(query: $queryString) {gameId, name, year}}',
                 bggSearchCallById: {
                     queryString: 'query getDetails($gameId:Int!) {getBoardGameDetails(gameId:$gameId) {gameId,thumb,image,name,description,year, minPlayers, maxPlayers, minPlayTime, maxPlayTime, minAge, designers, artists, publisher, numOfRaters, averageScore, rank, categories}}',
-                    resultName:'getBoardGameDetails',
+                    resultName: 'getBoardGameDetails',
                 },
                 findUsers: {
                     queryString: 'query {findUsers {id, username}}',
@@ -108,7 +108,6 @@ class Root extends React.Component implements UnreadMessageCountListener{
                     queryString: 'mutation removeSheet($sheetId: String!) {removeScoreSheet(sheetId: $sheetId) {result}}',
                     resultName: 'removeFromMyCollection'
                 },
-
 
 
             },
@@ -165,7 +164,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         isDeleteable: true,
                         deleteButtonClasses: 'btn btn-circle bg-warning btn-sm',
                         deleteButtonText: '',
-                        deleteButtonIconClasses:'text-black fas fa-sign-out-alt',
+                        deleteButtonIconClasses: 'text-black fas fa-sign-out-alt',
                         hasBadge: true,
                         resultContentDivClasses: 'd-flex w-100 justify-content-between',
                         resultContentTextElementType: 'span',
@@ -174,7 +173,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         badgeElementAttributes: [
                             ['style', 'font-size:12pt'],
                         ],
-                        badgeClasses: 'badge badge-pill badge-primary',
+                        badgeClasses: 'badge badge-pill badge-primary mr-1',
                         newFormId: "newMessage",
                         commentId: "message",
                         submitCommentId: "submitMessage",
@@ -217,12 +216,18 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         isDraggable: true,
                         isClickable: true,
                         isDeleteable: true,
-                        deleteButtonClasses: 'btn btn-circle btn-xsm',
+                        deleteButtonClasses: 'btn bg-danger text-white btn-circle btn-sm',
                         deleteButtonText: '',
-                        deleteButtonIconClasses:'fas fa-trash-alt',
+                        deleteButtonIconClasses: 'fas fa-trash-alt',
                         extra: {
                             fastSearchInputId: 'fastSearchUserNames',
                         },
+                        extraAction1Classes: 'btn bg-info text-white btn-circle btn-sm mr-1',
+                        extraAction1Text: '',
+                        extraAction1IconClasses: 'fas fa-user-plus',
+                        extraAction2Classes: 'btn bg-warning text-white btn-circle btn-sm mr-1',
+                        extraAction2Text: '',
+                        extraAction2IconClasses: 'fas fa-user-slash'
                     },
                 },
                 boardGameSearchSideBar: {
@@ -251,10 +256,6 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         resultContentTextClasses: 'mb-1',
                         isDraggable: true,
                         isClickable: true,
-                        isDeleteable: true,
-                        deleteButtonClasses: 'btn btn-circle btn-xsm',
-                        deleteButtonText: '',
-                        deleteButtonIconClasses:'fas fa-trash-alt',
                         formId: 'bggSearch',
                         queryId: 'queryText',
                         buttonId: 'bggSearchButton'
@@ -265,8 +266,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         sideBarId: 'scoreSheetSidebar',
                         resultsId: 'scoreSheets',
                         resultsElementType: 'div',
-                        resultsElementAttributes: [
-                        ],
+                        resultsElementAttributes: [],
                         resultsClasses: 'text-white bg-info col-sm-6 col-md-3 col-lg-2 score-card',
                         resultDataKeyId: 'bgg-id',
                         resultLegacyDataKeyId: 'bgg-id',
@@ -285,7 +285,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
                         isDeleteable: true,
                         deleteButtonClasses: 'btn btn-rounded btn-warning ml-6 mt-4',
                         deleteButtonText: 'Delete&nbsp;',
-                        deleteButtonIconClasses:'fas fa-trash-alt',
+                        deleteButtonIconClasses: 'fas fa-trash-alt',
                         resultContentDivClasses: 'card-img-overlay',
                         resultContentTextElementType: 'div',
                         resultContentTextClasses: 'ml-2',
@@ -370,24 +370,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
         controller.connectToApplication(this, window.localStorage);
     }
 
-    private handleDragOver(event:DragEvent) {
-        event.preventDefault();
-    }
-
-    private handleDrop(event:Event) {
-        // @ts-ignore
-        const draggedObjectJSON = event.dataTransfer.getData(this.state.ui.draggable.draggableDataKeyId);
-        logger(draggedObjectJSON);
-        const draggedObject = JSON.parse(draggedObjectJSON);
-        logger(draggedObject);
-        // @ts-ignore
-        if (draggedObject[this.state.ui.draggable.draggedType] === this.state.ui.draggable.draggedTypeBoardGame) {
-            this.addBoardGameToDisplay(draggedObject);
-        }
-
-    }
-
-    public addBoardGameToDisplay(draggedObject:any) {
+    public addBoardGameToDisplay(draggedObject: any) {
         // ok, we are just the dumb view, pass this onto the controller to work out the logic for us
         controller.addBoardGameToDisplay(draggedObject);
     }
@@ -396,7 +379,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
         return controller.getLoggedInUserId();
     }
 
-    alert(title:string,content:string) {
+    alert(title: string, content: string) {
         this.titleEl.textContent = title;
         this.contentEl.textContent = content;
         // @ts-ignore
@@ -405,14 +388,13 @@ class Root extends React.Component implements UnreadMessageCountListener{
         this.modalEl.classList.add(this.state.ui.alert.showClass);
     }
 
-
     render() {
         logger("Rendering App");
         // @ts-ignore
-        let boardGames:any[] = this.state.boardGames;
+        let boardGames: any[] = this.state.boardGames;
         logger(boardGames);
 
-        const games = boardGames.map((entry, index:number) =>
+        const games = boardGames.map((entry, index: number) =>
             <BoardGameView
                 key={index}
                 boardGame={entry}
@@ -432,7 +414,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
         );
     }
 
-    cancelDelete(event:MouseEvent) {
+    cancelDelete(event: MouseEvent) {
         // @ts-ignore
         this.modalEl.classList.remove(this.state.ui.alert.showClass);
         // @ts-ignore
@@ -440,7 +422,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
         event.preventDefault();
     }
 
-    confirmDelete(event:MouseEvent) {
+    confirmDelete(event: MouseEvent) {
         // @ts-ignore
         this.modalEl.classList.remove(this.state.ui.alert.showClass);
         // @ts-ignore
@@ -452,21 +434,20 @@ class Root extends React.Component implements UnreadMessageCountListener{
         logger(`Handling Delete with id ${id}`);
         // @ts-ignore
         const currentBoardGamesOnDisplay = this.state.boardGames;
-        let index = currentBoardGamesOnDisplay.findIndex((game:any) => game.gameId === id);
+        let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
         if (index >= 0) {
             const boardGame = currentBoardGamesOnDisplay[index];
             controller.removeBoardGameFromCollection(boardGame);
         }
     }
 
-    handleStartScoreSheet(event:MouseEvent) {
+    handleStartScoreSheet(event: MouseEvent) {
         event.preventDefault();
         // do we already have an active score sheet?
         if (ScoreSheetController.getInstance().hasActiveScoreSheet()) {
             if (confirm("You already have an active score sheet, do you want to finish that one and start a new one?")) {
                 ScoreSheetController.getInstance().endScoreSheet();
-            }
-            else {
+            } else {
                 // user cancelled, finish
                 return;
             }
@@ -491,8 +472,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
         }
     }
 
-
-    handleDeleteBoardGame(event:MouseEvent) {
+    handleDeleteBoardGame(event: MouseEvent) {
         event.preventDefault();
         //this.hideAllSideBars();
         // @ts-ignore
@@ -503,24 +483,22 @@ class Root extends React.Component implements UnreadMessageCountListener{
             id = parseInt(id);
             // @ts-ignore
             const currentBoardGamesOnDisplay = this.state.boardGames;
-            let index = currentBoardGamesOnDisplay.findIndex((game:any) => game.gameId === id);
+            let index = currentBoardGamesOnDisplay.findIndex((game: any) => game.gameId === id);
             if (index >= 0) {
                 const boardGame = currentBoardGamesOnDisplay[index];
                 if (boardGame.decorator && (boardGame.decorator === Decorator.Persisted)) {
                     logger(`Handling Delete Board Game ${id} - persisted, confirming with user, but only if logged in`);
                     if (controller.isLoggedIn()) {
                         // @ts-ignore
-                        this.modalEl.setAttribute(this.state.controller.events.boardGames.eventDataKeyId,id);
+                        this.modalEl.setAttribute(this.state.controller.events.boardGames.eventDataKeyId, id);
                         this.alert(`${boardGame.name} (${boardGame.year})`, "Are you sure you want to delete this board game from your collection?");
-                    }
-                    else {
+                    } else {
                         logger(`Handling Delete Board Game ${id} - IS persisted but not logged in, just deleting from local storage  asking controller to remove`);
                         // not persisted yet, let the controller manage this one
                         controller.removeBoardGameFromDisplay(boardGame);
 
                     }
-                }
-                else {
+                } else {
                     logger(`Handling Delete Board Game ${id} - NOT persisted, asking controller to remove`);
                     // not persisted yet, let the controller manage this one
                     controller.removeBoardGameFromDisplay(boardGame);
@@ -529,27 +507,26 @@ class Root extends React.Component implements UnreadMessageCountListener{
         }
     }
 
-
     async componentDidMount() {
         logger('component Did Mount');
 
 
-        this.chatView = new ChatSidebarView(this,document,controller.getStateManager());
+        this.chatView = new ChatSidebarView(this, document, controller.getStateManager());
         this.chatView.onDocumentLoaded();
 
-        this.userSearchView = new UserSearchSidebarView(this,document,controller.getStateManager());
+        this.userSearchView = new UserSearchSidebarView(this, document, controller.getStateManager());
         this.userSearchView.onDocumentLoaded();
 
 
-        this.bggSearchView = new BoardGameSearchSidebarView(this,document,controller.getStateManager());
+        this.bggSearchView = new BoardGameSearchSidebarView(this, document, controller.getStateManager());
         this.bggSearchView.onDocumentLoaded();
 
-        this.scoresView = new ScoreSheetSidebarView(this,document,controller.getStateManager());
+        this.scoresView = new ScoreSheetSidebarView(this, document, controller.getStateManager());
         this.scoresView.onDocumentLoaded();
 
 
         this.scoreSheetView = ScoreSheetView.getInstance();
-        this.scoreSheetView.setApplication(this,controller.getStateManager());
+        this.scoreSheetView.setApplication(this, controller.getStateManager());
         this.scoreSheetView.onDocumentLoaded(this);
 
         // navigation item handlers
@@ -584,9 +561,9 @@ class Root extends React.Component implements UnreadMessageCountListener{
         this.closeBtnEl = document.getElementById(this.state.ui.alert.closeButtonId);
 
         // event listeners for the confirm delete of entry
-        if (this.cancelBtnEl) this.cancelBtnEl.addEventListener('click',this.cancelDelete);
-        if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click',this.confirmDelete);
-        if (this.closeBtnEl) this.closeBtnEl.addEventListener('click',this.cancelDelete);
+        if (this.cancelBtnEl) this.cancelBtnEl.addEventListener('click', this.cancelDelete);
+        if (this.confirmBtnEl) this.confirmBtnEl.addEventListener('click', this.confirmDelete);
+        if (this.closeBtnEl) this.closeBtnEl.addEventListener('click', this.cancelDelete);
 
         // a reference to the div containing ourselves
         // @ts-ignore
@@ -609,32 +586,15 @@ class Root extends React.Component implements UnreadMessageCountListener{
         this.bggSearchView.eventHide(null);
     }
 
-    private switchBetweenCollectionAndScoreSheet(showCollection:boolean) {
-        if (showCollection) {
-            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-none',false);
-            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl,'d-block', true);
-            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-none', true);
-            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl,'d-block', false);
-        }
-        else {
-            if (ScoreSheetController.getInstance().hasActiveScoreSheet()) {
-                if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl, 'd-none', true);
-                if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl, 'd-block', false);
-                if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl, 'd-none', false);
-                if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl, 'd-block', true);
-            }
-        }
-    }
-
-    handleShowCollection(event:MouseEvent) {
+    handleShowCollection(event: MouseEvent) {
         this.switchBetweenCollectionAndScoreSheet(true);
     }
 
-    handleShowScoreSheet(event:MouseEvent) {
+    handleShowScoreSheet(event: MouseEvent) {
         this.switchBetweenCollectionAndScoreSheet(false);
     }
 
-    handleShowUserSearch(event:Event) {
+    handleShowUserSearch(event: Event) {
         logger('Handling Show User Search');
         event.preventDefault();
         //this.hideAllSideBars();
@@ -647,7 +607,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
         this.userSearchView.eventShow(event);
     }
 
-    handleShowScores(event:Event) {
+    handleShowScores(event: Event) {
         logger(`Handling show board game scores`);
         event.preventDefault();
         // @ts-ignore
@@ -667,7 +627,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
         }
     }
 
-    handleShowChat(event:Event,roomName:string|null) {
+    handleShowChat(event: Event, roomName: string | null) {
         logger('Handling Show Chat');
         event.preventDefault();
         //this.hideAllSideBars();
@@ -683,7 +643,7 @@ class Root extends React.Component implements UnreadMessageCountListener{
         }
     }
 
-    handleShowBGGSearch(event:Event) {
+    handleShowBGGSearch(event: Event) {
         logger('Handling Show BGG Search View');
         event.preventDefault();
         // prevent anything from happening if we are not logged in
@@ -703,12 +663,46 @@ class Root extends React.Component implements UnreadMessageCountListener{
         if (this.chatNavigationItem) this.chatNavigationItem.innerHTML = `${buffer}`;
     }
 
+    private handleDragOver(event: DragEvent) {
+        event.preventDefault();
+    }
+
+    private handleDrop(event: Event) {
+        // @ts-ignore
+        const draggedObjectJSON = event.dataTransfer.getData(this.state.ui.draggable.draggableDataKeyId);
+        logger(draggedObjectJSON);
+        const draggedObject = JSON.parse(draggedObjectJSON);
+        logger(draggedObject);
+        // @ts-ignore
+        if (draggedObject[this.state.ui.draggable.draggedType] === this.state.ui.draggable.draggedTypeBoardGame) {
+            this.addBoardGameToDisplay(draggedObject);
+        }
+
+    }
+
+    private switchBetweenCollectionAndScoreSheet(showCollection: boolean) {
+        if (showCollection) {
+            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl, 'd-none', false);
+            if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl, 'd-block', true);
+            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl, 'd-none', true);
+            if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl, 'd-block', false);
+        } else {
+            if (ScoreSheetController.getInstance().hasActiveScoreSheet()) {
+                if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl, 'd-none', true);
+                if (this.thisEl) browserUtil.addRemoveClasses(this.thisEl, 'd-block', false);
+                if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl, 'd-none', false);
+                if (this.scoreSheetEl) browserUtil.addRemoveClasses(this.scoreSheetEl, 'd-block', true);
+            }
+        }
+    }
+
 }
 
 //localStorage.debug = 'app view-ts controller-ts socket-ts api-ts local-storage-ts state-manager-ts view-ts:blogentry view-ts:comments view-ts:details';
 //localStorage.debug = 'app controller-ts socket-ts api-ts local-storage-ts state-manager-ts indexeddb-ts user-search-sidebar user-search-sidebar:detail state-manager-ms state-manager-api state-manager-aggregate state-manager-async';
 //localStorage.debug = 'app controller-ts  chat-sidebar chat-sidebar:detail board-game-search-sidebar board-game-search-sidebar:detail ';
-localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view score-sheet-sidebar score-sheet-sidebar:detail view-ts template-manager' ;
+//localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts chat-sidebar chat-sidebar:detail socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view score-sheet-sidebar score-sheet-sidebar:detail view-ts template-manager' ;
+localStorage.debug = 'chat-sidebar chat-sidebar:detail chat-manager score-sheet-controller score-sheet-view';
 debug.log = console.info.bind(console);
 
 // @ts-ignore

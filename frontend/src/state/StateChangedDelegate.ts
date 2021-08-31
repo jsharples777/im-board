@@ -7,10 +7,10 @@ const smLogger = debug('state-manager-delegate');
 
 class StateChangedDelegate implements StateChangeInformer {
     protected stateChangeListeners: stateListeners[];
-    protected suppressEventEmits:boolean = false;
-    protected managerName:string;
+    protected suppressEventEmits: boolean = false;
+    protected managerName: string;
 
-    public constructor(managerName:string) {
+    public constructor(managerName: string) {
         this.managerName = managerName;
         this.stateChangeListeners = [];
     }
@@ -60,18 +60,6 @@ class StateChangedDelegate implements StateChangeInformer {
         }
     }
 
-
-    private ensureListenerSetupForName(name:string) {
-        const foundIndex = this.stateChangeListeners.findIndex(element => element.name === name);
-        if (foundIndex < 0) {
-            const listenersNameArrayPair = {
-                name,
-                listeners: [],
-            };
-            this.stateChangeListeners.push(listenersNameArrayPair);
-        }
-    }
-
     /*
           Add a state listener for a given state name
           the listener should be a function with two parameters
@@ -85,6 +73,17 @@ class StateChangedDelegate implements StateChangeInformer {
         if (foundIndex >= 0) {
             let changeListenersForName = this.stateChangeListeners[foundIndex];
             changeListenersForName.listeners.push(listener);
+        }
+    }
+
+    private ensureListenerSetupForName(name: string) {
+        const foundIndex = this.stateChangeListeners.findIndex(element => element.name === name);
+        if (foundIndex < 0) {
+            const listenersNameArrayPair = {
+                name,
+                listeners: [],
+            };
+            this.stateChangeListeners.push(listenersNameArrayPair);
         }
     }
 
