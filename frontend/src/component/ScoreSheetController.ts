@@ -49,6 +49,14 @@ export class ScoreSheetController implements ChatReceiver {
         this.userChangedValue = this.userChangedValue.bind(this);
         this.endScoreSheet = this.endScoreSheet.bind(this);
         this.pauseTimer = this.pauseTimer.bind(this);
+        this.isSheetOwner = this.isSheetOwner.bind(this);
+        this.inviteUser = this.inviteUser.bind(this);
+        this.getCurrentRoom = this.getCurrentRoom.bind(this);
+        this.getSelectedBoardGame = this.getSelectedBoardGame.bind(this);
+        this.startTimer = this.startTimer.bind(this);
+        this.stopTimerStoppedByAnotherUser = this.stopTimerStoppedByAnotherUser.bind(this);
+        this.isTimerGoing = this.isTimerGoing.bind(this);
+        this.reset = this.reset.bind(this);
 
 
         // reset state
@@ -295,7 +303,7 @@ export class ScoreSheetController implements ChatReceiver {
 
     public hasActiveScoreSheet(): boolean {
         let result = false;
-        if (this.currentScoreRoom) {
+        if (this.currentScoreRoom && (this.currentScoreRoom !== null)) {
             sscLogger(this.currentScoreRoom);
             result = true;
         }

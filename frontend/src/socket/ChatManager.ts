@@ -385,7 +385,9 @@ export class ChatManager implements ChatReceiver, ChatEmitter {
         socketManager.getUserList();
         // connect to the chat rooms already in logs
         this.chatLogs.forEach((log) => {
-            socketManager.joinChat(this.currentUsername, log.roomName, InviteType.ChatRoom);
+            if (log.type === InviteType.ChatRoom) {
+                socketManager.joinChat(this.currentUsername, log.roomName, InviteType.ChatRoom);
+            }
         });
     }
 
