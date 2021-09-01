@@ -56,6 +56,11 @@ export class CallManager {
     }
     
     public reset() {
+        if (this.currentUserList && this.currentUserList.length > 0) {
+            this.currentUserList.forEach((user) => {
+                this.removeUser(user);
+            })
+        }
         if (this.webrtcDiv) browserUtil.removeAllChildren(this.webrtcDiv);
         this.currentUserList = [];
         if (this.peer) {
@@ -181,8 +186,14 @@ export class CallManager {
         }
         const userVideoCard = document.getElementById(userId);
         if (userVideoCard) {
+            const videoEl:HTMLVideoElement|null = userVideoCard.querySelector(".video");
+            if (videoEl) {
+                videoEl.srcObject = null;
+            }
+
             browserUtil.removeAllChildren(userVideoCard);
-            // remove from parent
+            const parentNode = userVideoCard.parentNode;
+            if (parentNode) parentNode.removeChild(userVideoCard);
         }
     }
 
