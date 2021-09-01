@@ -1,10 +1,11 @@
 "use strict";
-// Configuration and Logging handlers
-/* eslint-disable import/first */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// Configuration and Logging handlers
+/* eslint-disable import/first */
+const fs_1 = __importDefault(require("fs"));
 const DataSource_1 = __importDefault(require("./graphql/DataSource"));
 require('dotenv').config();
 const morgan_1 = __importDefault(require("morgan"));
@@ -27,6 +28,11 @@ const passport_1 = __importDefault(require("passport"));
 const passport_2 = __importDefault(require("./passport/passport"));
 const connection_1 = __importDefault(require("./db/connection"));
 const models_1 = require("./models");
+// WebRTC
+const peer_1 = require("peer");
+// HTTPS config
+const key = fs_1.default.readFileSync('./config/key.pem');
+const cert = fs_1.default.readFileSync('./config/cert.pem');
 // routes
 const routes_1 = __importDefault(require("./routes"));
 //import apiRoutes from './routes/api';
@@ -132,6 +138,17 @@ app.get('/js/env.js', (req, res) => {
     }
     res.send(`window.ENV = ${JSON.stringify(env)}`);
 });
+// construct the web server
+serverDebug('Create HTTP Server');
+//const httpServer = new https.Server({key: key, cert: cert },app);
+const httpServer = new http_1.default.Server(app);
+// setup the sockets manager with the server
+serverDebug('Setting up Socket manager');
+SocketManager_1.default.connectToServer(httpServer);
+// setup the WebRTC peer server
+// @ts-ignore
+const peerServer = peer_1.ExpressPeerServer(httpServer, { debug: 3 });
+app.use('/peerjs', peerServer);
 // catch 404 and forward to error handler
 serverDebug('Setting up 404 handler');
 app.use((req, res, next) => {
@@ -166,12 +183,6 @@ else {
         });
     });
 }
-// construct the web server
-serverDebug('Create HTTP Server');
-const httpServer = new http_1.default.Server(app);
-// setup the sockets manager with the server
-serverDebug('Setting up Socket manager');
-SocketManager_1.default.connectToServer(httpServer);
 httpServer.listen(port, () => {
     serverDebug(`Server started on port ${port}`);
     // start listening for socket events
