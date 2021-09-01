@@ -162,17 +162,27 @@ export class CallManager {
     };
 
     public callUser(userId: string) {
+        let numberOfAttempts:number = 0;
+
         let index = this.currentUserList.findIndex((user) => user === userId); // don't call the same users
         if (index >= 0) return;
         // wait a small time for the sockets and peer to sync
-        const interval = setTimeout(() => {
+        const interval = setInterval(() => {
             callLogger(`Calling user ${userId}`);
             if (this.myVideoStream) {
                 const call = this.peer.call(userId, this.myVideoStream);
-                call.on('stream', (userVideoStream: any) => {
-                    callLogger(`User ${userId} answered, showing stream`);
-                    this.addVideoStream(userId, userVideoStream, false);
-                });
+                if (call) {
+                    call.on('stream', (userVideoStream: any) => {
+                        callLogger(`User ${userId} answered, showing stream`);
+                        this.addVideoStream(userId, userVideoStream, false);
+                    });
+                    clearInterval(interval);
+                }
+                else {
+                    // try again shortly
+                    numberOfAttempts ++;
+                    if (numberOfAttempts > 3) clearInterval(interval);
+                }
             }
         },5000);
 

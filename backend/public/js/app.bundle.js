@@ -3496,23 +3496,31 @@ var CallManager = /*#__PURE__*/function () {
   _proto.callUser = function callUser(userId) {
     var _this4 = this;
 
+    var numberOfAttempts = 0;
     var index = this.currentUserList.findIndex(function (user) {
       return user === userId;
     }); // don't call the same users
 
     if (index >= 0) return; // wait a small time for the sockets and peer to sync
 
-    var interval = setTimeout(function () {
+    var interval = setInterval(function () {
       callLogger("Calling user " + userId);
 
       if (_this4.myVideoStream) {
         var call = _this4.peer.call(userId, _this4.myVideoStream);
 
-        call.on('stream', function (userVideoStream) {
-          callLogger("User " + userId + " answered, showing stream");
+        if (call) {
+          call.on('stream', function (userVideoStream) {
+            callLogger("User " + userId + " answered, showing stream");
 
-          _this4.addVideoStream(userId, userVideoStream, false);
-        });
+            _this4.addVideoStream(userId, userVideoStream, false);
+          });
+          clearInterval(interval);
+        } else {
+          // try again shortly
+          numberOfAttempts++;
+          if (numberOfAttempts > 3) clearInterval(interval);
+        }
       }
     }, 5000);
   };
