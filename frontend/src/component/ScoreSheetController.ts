@@ -9,11 +9,11 @@ import uuid from "../util/UUID";
 import socketManager from "../socket/SocketManager";
 import {ChatManager} from "../socket/ChatManager";
 import {StateManager} from "../state/StateManager";
-import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
 import moment from "moment";
 import controller from "../Controller";
 import {TemplateManager} from "../template/TemplateManager";
 import {CallManager} from "./CallManager";
+import MemoryBufferStateManager from "../state/MemoryBufferStateManager";
 
 const sscLogger = debug('score-sheet-controller');
 
@@ -34,7 +34,7 @@ export class ScoreSheetController implements ChatReceiver {
 
 
     private constructor() {
-        this.stateManager = new BrowserStorageStateManager(true);
+        this.stateManager = new MemoryBufferStateManager();
         socketManager.addChatReceiver(this);
 
         // bind events
@@ -523,7 +523,7 @@ export class ScoreSheetController implements ChatReceiver {
     }
 
     protected addUserToScoreSheet(username: string): void {
-        if (controller.isLoggedIn() && this.isSheetOwner()) {
+        if (controller.isLoggedIn()) {
             sscLogger(`Calling user ${username}`);
             CallManager.getInstance().callUser(username);
         }
@@ -540,6 +540,7 @@ export class ScoreSheetController implements ChatReceiver {
         this.isRoomCreator = false;
         this.currentUsersInScoreSheet = [];
         this.stopTimerStoppedByAnotherUser();
+        CallManager.getInstance().reset();
     }
 
     private isLoggedIn(): boolean {

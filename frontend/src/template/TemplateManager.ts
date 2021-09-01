@@ -311,8 +311,12 @@ export class TemplateManager {
         for (let index = 2; index < playerNames.length; index++) {
             // @ts-ignore
             saveData.players.push(playerNames[index]);
+            let parsed = parseInt(scores[index]);
+            if (isNaN(parsed)) {
+                parsed = 0;
+            }
             // @ts-ignore
-            saveData.scores.push(scores[index]);
+            saveData.scores.push(parsed);
 
         }
         templateLogger(`Save data for ohanami is`);
@@ -339,8 +343,12 @@ export class TemplateManager {
         for (let index = 3; index < playerNames.length; index += 2) {
             // @ts-ignore
             saveData.players.push(playerNames[index]);
+            let parsed = parseInt(scores[index]);
+            if (isNaN(parsed)) {
+                parsed = 0;
+            }
             // @ts-ignore
-            saveData.scores.push(scores[index]);
+            saveData.scores.push(parsed);
 
         }
         templateLogger(`Save data for skull king is`);

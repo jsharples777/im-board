@@ -331,6 +331,7 @@ i:hover {
     height: 100vh;
     background-image: url('../img/scoresheet2.jpg');
     background-size: cover;
+    background-repeat: repeat-y;
     padding-top: 110px;
 }
 

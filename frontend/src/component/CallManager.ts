@@ -18,6 +18,7 @@ export class CallManager {
     private peer: any | null = null;
     private webrtcDiv: HTMLElement | null = null;
     private myVideoStream: MediaStream | null = null;
+    private myVideo: HTMLVideoElement | null = null;
     private currentUserList:string[];
     
     private constructor() {
@@ -35,6 +36,7 @@ export class CallManager {
         }
         // @ts-ignore
         this.webrtcDiv = document.getElementById(applicationView.state.ui.scoreSheet.dom.webrtc);
+        this.reset();
     }
 
     public startScoreSheet() {
@@ -56,6 +58,15 @@ export class CallManager {
     public reset() {
         if (this.webrtcDiv) browserUtil.removeAllChildren(this.webrtcDiv);
         this.currentUserList = [];
+        if (this.peer) {
+            this.peer.disconnect();
+            if (this.myVideoStream) {
+                this.myVideoStream.getTracks().forEach((track) => track.stop());
+            }
+            if (this.myVideo) this.myVideo.srcObject = null;
+            this.myVideoStream = null;
+
+        }
     }
 
     private addVideoStream(username: string, stream: MediaStream, isCurrentUser = false) {
@@ -67,16 +78,16 @@ export class CallManager {
 
         const videoCardHolder = document.createElement('div');
         videoCardHolder.setAttribute("id", username);
-        browserUtil.addRemoveClasses(videoCardHolder, 'col-sm-12 col-md-4 col-lg-3');
+        browserUtil.addRemoveClasses(videoCardHolder, 'col-sm-12 col-md-4 col-lg-2');
         const videoCard = document.createElement('div');
         browserUtil.addRemoveClasses(videoCard,'card');
         const videoCardTitle = document.createElement('div');
         browserUtil.addRemoveClasses(videoCardTitle, 'card-header');
         videoCardTitle.innerHTML = `<h5 class="card-title">${username}</h5>`;
         const videoCardBody = document.createElement('div');
-        browserUtil.addRemoveClasses(videoCardBody, 'card-body p-0');
+        browserUtil.addRemoveClasses(videoCardBody, 'card-body p-0 text-center');
         const video = document.createElement('video');
-        browserUtil.addRemoveClasses(video, 'video');
+        browserUtil.addRemoveClasses(video, 'video ');
 
         videoCard.appendChild(videoCardTitle);
         videoCard.appendChild(videoCardBody);
@@ -133,6 +144,8 @@ export class CallManager {
                 }
 
             });
+
+            this.myVideo = video;
         }
 
         videoCardHolder.appendChild(videoCard);
@@ -144,6 +157,8 @@ export class CallManager {
     };
 
     public callUser(userId: string) {
+        let index = this.currentUserList.findIndex((user) => user === userId); // don't call the same users
+        if (index >= 0) return;
         // wait a small time for the sockets and peer to sync
         const interval = setTimeout(() => {
             callLogger(`Calling user ${userId}`);

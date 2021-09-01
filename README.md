@@ -26,7 +26,8 @@ A logged in user also has access to:
 4.  A user can note some users as favourites, and will be notified if a user in their favourite list logs in/out
 5.  A user can note some users as blocked, preventing those users from invite them to chat rooms and sending them messages
 
-Finally a user can start a score sheet, and if logged in, and make it collaborative, inviting other logged in users and allow all invited users to enter data and share that data during the game.
+Finally a user can start a score sheet, and if logged in, and make it collaborative, inviting other logged in users and allow all invited users to enter data and share that data during the game, and if they
+have the capability and a secure connection, join a video/audio chat session together.
 
 As a technical note, the chat sessions are persisted and offline messages are received on login.
 
@@ -134,6 +135,9 @@ Please access the [Questions](#questions) section to send me an email, or access
 24. [Digital 7 Font](http://www.styleseven.com/)
 25. [Bootstrap 4 Round Buttons](https://www.geeksforgeeks.org/how-to-get-circular-buttons-in-bootstrap-4/)
 26. [Handsontable](https://handsontable.com/)
+27. [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API)
+28. [Peerjs](https://peerjs.com/)
+29. [Building a Video Chat App with Node.js + Socket.io + WebRTC](https://levelup.gitconnected.com/building-a-video-chat-app-with-node-js-socket-io-webrtc-26f46b213017)    
 
 
 
