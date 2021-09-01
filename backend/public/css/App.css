@@ -300,7 +300,7 @@ i:hover {
     background-image: url('../img/splash.jpg');
     background-size: cover;
     background-repeat: repeat-y;
-    padding-top: 110px;
+    padding-top: 10px;
 }
 
 .root-login {
