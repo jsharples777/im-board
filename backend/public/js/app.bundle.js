@@ -1478,7 +1478,7 @@ var Root = /*#__PURE__*/function (_React$Component) {
 //localStorage.debug = 'app controller-ts controller-ts-detail api-ts socket-ts chat-sidebar chat-sidebar:detail socket-listener notification-controller chat-manager board-game-search-sidebar board-game-search-sidebar:detail score-sheet-controller score-sheet-view score-sheet-sidebar score-sheet-sidebar:detail view-ts template-manager' ;
 
 
-localStorage.debug = 'chat-sidebar chat-sidebar:detail chat-manager score-sheet-controller score-sheet-view';
+localStorage.debug = 'score-sheet-controller score-sheet-view call-manager';
 debug__WEBPACK_IMPORTED_MODULE_2___default.a.log = console.info.bind(console); // @ts-ignore
 
 var element = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Root, {
@@ -3310,6 +3310,174 @@ function BoardGameView(_ref) {
 
 /***/ }),
 
+/***/ "./src/component/CallManager.ts":
+/*!**************************************!*\
+  !*** ./src/component/CallManager.ts ***!
+  \**************************************/
+/*! exports provided: CallManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CallManager", function() { return CallManager; });
+/* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/BrowserUtil */ "./src/util/BrowserUtil.ts");
+
+
+
+var callLogger = debug__WEBPACK_IMPORTED_MODULE_1___default()('call-manager');
+var CallManager = /*#__PURE__*/function () {
+  CallManager.getInstance = function getInstance() {
+    if (!CallManager._instance) {
+      CallManager._instance = new CallManager();
+    }
+
+    return CallManager._instance;
+  };
+
+  function CallManager() {
+    this.peer = null;
+    this.webrtcDiv = null;
+    this.myVideoStream = null;
+  }
+
+  var _proto = CallManager.prototype;
+
+  _proto.initialise = function initialise(applicationView) {
+    if (_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].isLoggedIn()) {
+      // @ts-ignore  - is for the WebRTC peer via Nodejs
+      this.peer = new Peer(_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].getLoggedInUsername(), {
+        path: '/peerjs',
+        host: '/',
+        port: '3000'
+      });
+      this.peer.on('open', function (id) {
+        callLogger('My peer ID is: ' + id);
+      });
+    } // @ts-ignore
+
+
+    this.webrtcDiv = document.getElementById(applicationView.state.ui.scoreSheet.dom.webrtc);
+  };
+
+  _proto.startScoreSheet = function startScoreSheet() {
+    var _this = this;
+
+    if (_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].isLoggedIn()) {
+      if (navigator.mediaDevices.getUserMedia) {
+        callLogger('Starting scoresheet');
+        navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true
+        }).then(function (stream) {
+          _this.myVideoStream = stream;
+
+          _this.addVideoStream(_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].getLoggedInUsername(), _this.myVideoStream, true);
+        });
+      }
+    }
+  };
+
+  _proto.reset = function reset() {
+    if (this.webrtcDiv) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeAllChildren(this.webrtcDiv);
+  };
+
+  _proto.addVideoStream = function addVideoStream(username, stream, isCurrentUser) {
+    var _this2 = this;
+
+    if (isCurrentUser === void 0) {
+      isCurrentUser = false;
+    }
+
+    var videoCard = document.createElement('div');
+    videoCard.setAttribute("id", username);
+    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(videoCard, 'card col-sm-12 col-md-4 col-lg-3');
+    var videoCardTitle = document.createElement('div');
+    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(videoCardTitle, 'card-header');
+    videoCardTitle.innerHTML = "<h5 class=\"card-title\">" + username + "</h5>";
+    var videoCardBody = document.createElement('div');
+    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(videoCardBody, 'card-body');
+    var video = document.createElement('video');
+    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(video, 'video');
+    videoCard.appendChild(videoCardTitle);
+    videoCard.appendChild(videoCardBody);
+    videoCardBody.appendChild(video);
+
+    if (isCurrentUser) {
+      var videoCardFooter = document.createElement('div');
+      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(videoCardFooter, 'card-footer');
+      videoCardFooter.innerHTML = "<div class=\"d-flex w-100 justify-content-between mt-2\"><button type=\"\"button id=\"stopVideo\" class=\"btn btn-circle btn-primary\"><i class=\"fas fa-video-slash\"></i></button><button type=\"button\" id=\"muteButton\" class=\"btn btn-circle btn-primary\"><i class=\"fa fa-microphone\"></i></button></div>";
+      videoCard.appendChild(videoCardFooter);
+    }
+
+    video.srcObject = stream;
+    video.addEventListener("loadedmetadata", function () {
+      video.play();
+      if (_this2.webrtcDiv) _this2.webrtcDiv.append(videoCard);
+    });
+  };
+
+  _proto.callUser = function callUser(userId) {
+    var _this3 = this;
+
+    callLogger("Calling user " + userId);
+
+    if (this.myVideoStream) {
+      var call = this.peer.call(userId, this.myVideoStream);
+      call.on('stream', function (userVideoStream) {
+        callLogger("User " + userId + " answered, showing stream");
+
+        _this3.addVideoStream(userId, userVideoStream, false);
+      });
+    }
+  };
+
+  _proto.removeUser = function removeUser(userId) {
+    var userVideoCard = document.getElementById(userId);
+
+    if (userVideoCard) {
+      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeAllChildren(userVideoCard); // remove from parent
+    }
+  };
+
+  _proto.prepareToAnswerCallFrom = function prepareToAnswerCallFrom(userId) {
+    var _this4 = this;
+
+    if (_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].isLoggedIn()) {
+      callLogger("Preparing to answer call from " + userId);
+
+      if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true
+        }).then(function (stream) {
+          _this4.myVideoStream = stream;
+
+          _this4.addVideoStream(_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].getLoggedInUsername(), _this4.myVideoStream, true);
+
+          callLogger("Awaiting call from " + userId);
+
+          _this4.peer.on('call', function (call) {
+            callLogger("Answering call from " + userId);
+            call.answer(_this4.myVideoStream);
+            call.on('stream', function (userVideoStream) {
+              callLogger("Have answered, showing stream");
+
+              _this4.addVideoStream(userId, userVideoStream, false);
+            });
+          });
+        });
+      }
+    }
+  };
+
+  return CallManager;
+}();
+
+/***/ }),
+
 /***/ "./src/component/ChatSidebarView.ts":
 /*!******************************************!*\
   !*** ./src/component/ChatSidebarView.ts ***!
@@ -3788,6 +3956,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_8__);
 /* harmony import */ var _Controller__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../Controller */ "./src/Controller.ts");
 /* harmony import */ var _template_TemplateManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../template/TemplateManager */ "./src/template/TemplateManager.ts");
+/* harmony import */ var _CallManager__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./CallManager */ "./src/component/CallManager.ts");
+
 
 
 
@@ -3871,6 +4041,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
   _proto.initialise = function initialise(applicationView) {
     this.applicationView = applicationView;
+    _CallManager__WEBPACK_IMPORTED_MODULE_11__["CallManager"].getInstance().initialise(applicationView);
   };
 
   _proto.receiveInvitation = function receiveInvitation(invite) {
@@ -3906,7 +4077,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
     } // prepare to receive a call
 
 
-    _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().prepareToAnswerCallFrom(invite.from); // notify the user of the new chat
+    _CallManager__WEBPACK_IMPORTED_MODULE_11__["CallManager"].getInstance().prepareToAnswerCallFrom(invite.from); // notify the user of the new chat
 
     _notification_NotificationManager__WEBPACK_IMPORTED_MODULE_2__["default"].show('Score Sheet', "Joining score sheet", 'info', 7000);
     _socket_SocketManager__WEBPACK_IMPORTED_MODULE_5__["default"].joinChat(this.getCurrentUser(), invite.room, _socket_Types__WEBPACK_IMPORTED_MODULE_1__["InviteType"].ScoreSheet);
@@ -4071,7 +4242,7 @@ var ScoreSheetController = /*#__PURE__*/function () {
         isFinished: false
       };
       sscLogger(this.currentScoreSheet);
-      _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().startScoreSheet(); // store the score sheet locally
+      _CallManager__WEBPACK_IMPORTED_MODULE_11__["CallManager"].getInstance().startScoreSheet(); // store the score sheet locally
 
       this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, true); // start a new chat room, will automatically manage if logged in or not
 
@@ -4311,11 +4482,12 @@ var ScoreSheetController = /*#__PURE__*/function () {
   _proto.addUserToScoreSheet = function addUserToScoreSheet(username) {
     if (_Controller__WEBPACK_IMPORTED_MODULE_9__["default"].isLoggedIn() && this.isSheetOwner()) {
       sscLogger("Calling user " + username);
-      _ScoreSheetView__WEBPACK_IMPORTED_MODULE_3__["ScoreSheetView"].getInstance().callUser(username);
+      _CallManager__WEBPACK_IMPORTED_MODULE_11__["CallManager"].getInstance().callUser(username);
     }
   };
 
-  _proto.removeUserFromScoreSheet = function removeUserFromScoreSheet(username) {// TO DO
+  _proto.removeUserFromScoreSheet = function removeUserFromScoreSheet(username) {
+    _CallManager__WEBPACK_IMPORTED_MODULE_11__["CallManager"].getInstance().removeUser(username);
   };
 
   _proto.reset = function reset() {
@@ -4366,8 +4538,6 @@ var ScoreSheetController = /*#__PURE__*/function () {
 
     this.intervalTimer = -1;
   };
-
-  _proto.addUserToRTC = function addUserToRTC(username) {};
 
   return ScoreSheetController;
 }();
@@ -4631,10 +4801,7 @@ var ScoreSheetView = /*#__PURE__*/function () {
     this.timerEl = null;
     this.endOrLeaveEl = null;
     this.scoreSheetEl = null;
-    this.webrtcDiv = null;
-    this.myVideoStream = null;
     this.table = null;
-    this.peer = null;
     this.controller = _ScoreSheetController__WEBPACK_IMPORTED_MODULE_0__["ScoreSheetController"].getInstance();
     this.stateManager = _Controller__WEBPACK_IMPORTED_MODULE_5__["default"].getStateManager();
     this.eventUserSelected = this.eventUserSelected.bind(this);
@@ -4677,9 +4844,7 @@ var ScoreSheetView = /*#__PURE__*/function () {
 
     this.endOrLeaveEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.end); // @ts-ignore
 
-    this.scoreSheetEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.scoreSheet); // @ts-ignore
-
-    this.webrtcDiv = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.webrtc); // bind event handlers
+    this.scoreSheetEl = document.getElementById(this.applicationView.state.ui.scoreSheet.dom.scoreSheet); // bind event handlers
 
     this.handleStartStopTimer = this.handleStartStopTimer.bind(this);
     this.handleEndOrLeave = this.handleEndOrLeave.bind(this);
@@ -4693,18 +4858,6 @@ var ScoreSheetView = /*#__PURE__*/function () {
         event.preventDefault();
       });
       this.thisEl.addEventListener('drop', this.handleUserDrop);
-    }
-
-    if (_Controller__WEBPACK_IMPORTED_MODULE_5__["default"].isLoggedIn()) {
-      // @ts-ignore  - is for the WebRTC peer via Nodejs
-      this.peer = new Peer(_Controller__WEBPACK_IMPORTED_MODULE_5__["default"].getLoggedInUsername(), {
-        path: '/peerjs',
-        host: '/',
-        port: '3000'
-      });
-      this.peer.on('open', function (id) {
-        ssvLogger('My peer ID is: ' + id);
-      });
     }
   };
 
@@ -4783,7 +4936,6 @@ var ScoreSheetView = /*#__PURE__*/function () {
     if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(0);
     if (this.endOrLeaveEl) this.endOrLeaveEl.innerHTML = this.applicationView.state.ui.scoreSheet.dom.iconLeave;
     if (this.scoreSheetEl) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeAllChildren(this.scoreSheetEl);
-    if (this.webrtcDiv) _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].removeAllChildren(this.webrtcDiv);
   };
 
   _proto.updateTimer = function updateTimer(time, isPaused) {
@@ -4942,104 +5094,6 @@ var ScoreSheetView = /*#__PURE__*/function () {
     }
 
     return result;
-  };
-
-  _proto.addVideoStream = function addVideoStream(username, stream, isCurrentUser) {
-    var _this = this;
-
-    if (isCurrentUser === void 0) {
-      isCurrentUser = false;
-    }
-
-    var videoCard = document.createElement('div');
-    videoCard.setAttribute("id", username);
-    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(videoCard, 'card col-sm-12 col-md-4 col-lg-3');
-    var videoCardTitle = document.createElement('div');
-    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(videoCardTitle, 'card-header');
-    videoCardTitle.innerHTML = "<h5 class=\"card-title\">" + username + "</h5>";
-    var videoCardBody = document.createElement('div');
-    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(videoCardBody, 'card-body');
-    var video = document.createElement('video');
-    _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(video, 'video');
-    videoCard.appendChild(videoCardTitle);
-    videoCard.appendChild(videoCardBody);
-    videoCardBody.appendChild(video);
-
-    if (isCurrentUser) {
-      var videoCardFooter = document.createElement('div');
-      _util_BrowserUtil__WEBPACK_IMPORTED_MODULE_2__["default"].addRemoveClasses(videoCardFooter, 'card-footer');
-      videoCardFooter.innerHTML = "<div class=\"d-flex w-100 justify-content-between mt-2\"><button type=\"\"button id=\"stopVideo\" class=\"btn btn-circle btn-primary\"><i class=\"fas fa-video-slash\"></i></button><button type=\"button\" id=\"muteButton\" class=\"btn btn-circle btn-primary\"><i class=\"fa fa-microphone\"></i></button></div>";
-      videoCard.appendChild(videoCardFooter);
-    }
-
-    video.srcObject = stream;
-    video.addEventListener("loadedmetadata", function () {
-      video.play();
-      if (_this.webrtcDiv) _this.webrtcDiv.append(videoCard);
-    });
-  };
-
-  _proto.callUser = function callUser(userId) {
-    var _this2 = this;
-
-    ssvLogger("Calling user " + userId);
-
-    if (this.myVideoStream) {
-      var call = this.peer.call(userId, this.myVideoStream);
-      call.on('stream', function (userVideoStream) {
-        ssvLogger("User " + userId + " answered, showing stream");
-
-        _this2.addVideoStream(userId, userVideoStream, false);
-      });
-    }
-  };
-
-  _proto.prepareToAnswerCallFrom = function prepareToAnswerCallFrom(userId) {
-    var _this3 = this;
-
-    if (_Controller__WEBPACK_IMPORTED_MODULE_5__["default"].isLoggedIn()) {
-      ssvLogger("Preparing to answer call from " + userId);
-
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true
-        }).then(function (stream) {
-          _this3.myVideoStream = stream;
-
-          _this3.addVideoStream(_Controller__WEBPACK_IMPORTED_MODULE_5__["default"].getLoggedInUsername(), _this3.myVideoStream, true);
-
-          ssvLogger("Awaiting call from " + userId);
-
-          _this3.peer.on('call', function (call) {
-            ssvLogger("Answering call from " + userId);
-            call.answer(_this3.myVideoStream);
-            call.on('stream', function (userVideoStream) {
-              ssvLogger("Have answered, showing stream");
-
-              _this3.addVideoStream(userId, userVideoStream, false);
-            });
-          });
-        });
-      }
-    }
-  };
-
-  _proto.startScoreSheet = function startScoreSheet() {
-    var _this4 = this;
-
-    if (_Controller__WEBPACK_IMPORTED_MODULE_5__["default"].isLoggedIn()) {
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true
-        }).then(function (stream) {
-          _this4.myVideoStream = stream;
-
-          _this4.addVideoStream(_Controller__WEBPACK_IMPORTED_MODULE_5__["default"].getLoggedInUsername(), _this4.myVideoStream, true);
-        });
-      }
-    }
   };
 
   return ScoreSheetView;

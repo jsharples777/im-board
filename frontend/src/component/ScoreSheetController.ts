@@ -13,6 +13,7 @@ import BrowserStorageStateManager from "../state/BrowserStorageStateManager";
 import moment from "moment";
 import controller from "../Controller";
 import {TemplateManager} from "../template/TemplateManager";
+import {CallManager} from "./CallManager";
 
 const sscLogger = debug('score-sheet-controller');
 
@@ -95,7 +96,7 @@ export class ScoreSheetController implements ChatReceiver {
 
     public initialise(applicationView: any) {
         this.applicationView = applicationView;
-
+        CallManager.getInstance().initialise(applicationView);
     }
 
     receiveInvitation(invite: Invitation): void {
@@ -129,7 +130,7 @@ export class ScoreSheetController implements ChatReceiver {
         }
 
         // prepare to receive a call
-        ScoreSheetView.getInstance().prepareToAnswerCallFrom(invite.from);
+        CallManager.getInstance().prepareToAnswerCallFrom(invite.from);
 
 
         // notify the user of the new chat
@@ -281,7 +282,7 @@ export class ScoreSheetController implements ChatReceiver {
             }
             sscLogger(this.currentScoreSheet);
 
-            ScoreSheetView.getInstance().startScoreSheet();
+            CallManager.getInstance().startScoreSheet();
 
             // store the score sheet locally
             this.stateManager.setStateByName(this.applicationView.state.stateNames.scoreSheet, this.currentScoreSheet, true);
@@ -516,12 +517,12 @@ export class ScoreSheetController implements ChatReceiver {
     protected addUserToScoreSheet(username: string): void {
         if (controller.isLoggedIn() && this.isSheetOwner()) {
             sscLogger(`Calling user ${username}`);
-            ScoreSheetView.getInstance().callUser(username);
+            CallManager.getInstance().callUser(username);
         }
     }
 
     protected removeUserFromScoreSheet(username: string): void {
-        // TO DO
+        CallManager.getInstance().removeUser(username);
     }
 
     private reset(): void {
@@ -566,7 +567,4 @@ export class ScoreSheetController implements ChatReceiver {
         this.intervalTimer = -1;
     }
 
-    public addUserToRTC(username:string) {
-
-    }
 }
