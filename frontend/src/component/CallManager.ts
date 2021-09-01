@@ -17,14 +17,18 @@ export class CallManager {
 
     private peer: any | null = null;
     private webrtcDiv: HTMLElement | null = null;
-    private myVideoStream: MediaStream | null = null;    
+    private myVideoStream: MediaStream | null = null;
+    private currentUserList:string[];
     
-    private constructor() {}
+    private constructor() {
+        this.callUser = this.callUser.bind(this);
+        this.currentUserList = [];
+    }
     
     public initialise(applicationView:any) {
         if (controller.isLoggedIn()) {
             // @ts-ignore  - is for the WebRTC peer via Nodejs
-            this.peer = new Peer(controller.getLoggedInUsername(), {path: '/peerjs', host: '/', port: '3000'});
+            this.peer = new Peer(controller.getLoggedInUsername(), {path: '/peerjs', host: '/', });//port: '3000'});
             this.peer.on('open', (id:any) => {
                 callLogger('My peer ID is: ' + id);
             });
@@ -44,15 +48,23 @@ export class CallManager {
                     this.myVideoStream = stream;
                     this.addVideoStream(controller.getLoggedInUsername(), this.myVideoStream, true);
                 });
+
             }
         }
     }
     
     public reset() {
         if (this.webrtcDiv) browserUtil.removeAllChildren(this.webrtcDiv);
+        this.currentUserList = [];
     }
 
     private addVideoStream(username: string, stream: MediaStream, isCurrentUser = false) {
+        // check to see if they are already there
+        let index = this.currentUserList.findIndex((user) => user === username);
+        if (index >= 0) return;
+
+        this.currentUserList.push(username);
+
         const videoCard = document.createElement('div');
         videoCard.setAttribute("id", username);
         browserUtil.addRemoveClasses(videoCard, 'card col-sm-12 col-md-4 col-lg-3');
@@ -84,17 +96,26 @@ export class CallManager {
     };
 
     public callUser(userId: string) {
-        callLogger(`Calling user ${userId}`);
-        if (this.myVideoStream) {
-            const call = this.peer.call(userId, this.myVideoStream);
-            call.on('stream', (userVideoStream: any) => {
-                callLogger(`User ${userId} answered, showing stream`);
-                this.addVideoStream(userId, userVideoStream, false);
-            });
-        }
+        // wait a small time for the sockets and peer to sync
+        const interval = setTimeout(() => {
+            callLogger(`Calling user ${userId}`);
+            if (this.myVideoStream) {
+                const call = this.peer.call(userId, this.myVideoStream);
+                call.on('stream', (userVideoStream: any) => {
+                    callLogger(`User ${userId} answered, showing stream`);
+                    this.addVideoStream(userId, userVideoStream, false);
+                });
+            }
+        },5000);
+
+
     };
 
     public removeUser(userId:string) {
+        let index = this.currentUserList.findIndex((user) => user === userId);
+        if (index >= 0) {
+            this.currentUserList.splice(index,1);
+        }
         const userVideoCard = document.getElementById(userId);
         if (userVideoCard) {
             browserUtil.removeAllChildren(userVideoCard);

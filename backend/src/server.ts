@@ -171,7 +171,8 @@ app.get('/js/env.js', (req, res) => {
 
 // construct the web server
 serverDebug('Create HTTP Server');
-const httpServer = new https.Server({key: key, cert: cert },app);//new http.Server(app);
+//const httpServer = new https.Server({key: key, cert: cert },app);
+const httpServer = new http.Server(app);
 
 
 // setup the sockets manager with the server
@@ -180,7 +181,7 @@ socketManager.connectToServer(httpServer);
 
 // setup the WebRTC peer server
 // @ts-ignore
-const peerServer = ExpressPeerServer(httpServer, {debug: true,});
+const peerServer = ExpressPeerServer(httpServer, {debug: 3});
 app.use('/peerjs', peerServer);
 
 
