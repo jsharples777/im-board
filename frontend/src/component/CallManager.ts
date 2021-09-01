@@ -65,14 +65,16 @@ export class CallManager {
 
         this.currentUserList.push(username);
 
+        const videoCardHolder = document.createElement('div');
+        videoCardHolder.setAttribute("id", username);
+        browserUtil.addRemoveClasses(videoCardHolder, 'col-sm-12 col-md-4 col-lg-3');
         const videoCard = document.createElement('div');
-        videoCard.setAttribute("id", username);
-        browserUtil.addRemoveClasses(videoCard, 'card col-sm-12 col-md-4 col-lg-3');
+        browserUtil.addRemoveClasses(videoCard,'card');
         const videoCardTitle = document.createElement('div');
         browserUtil.addRemoveClasses(videoCardTitle, 'card-header');
         videoCardTitle.innerHTML = `<h5 class="card-title">${username}</h5>`;
         const videoCardBody = document.createElement('div');
-        browserUtil.addRemoveClasses(videoCardBody, 'card-body');
+        browserUtil.addRemoveClasses(videoCardBody, 'card-body p-0');
         const video = document.createElement('video');
         browserUtil.addRemoveClasses(video, 'video');
 
@@ -83,15 +85,61 @@ export class CallManager {
         if (isCurrentUser) {
             const videoCardFooter = document.createElement('div');
             browserUtil.addRemoveClasses(videoCardFooter, 'card-footer');
-            videoCardFooter.innerHTML = `<div class="d-flex w-100 justify-content-between mt-2"><button type=""button id="stopVideo" class="btn btn-circle btn-primary"><i class="fas fa-video-slash"></i></button><button type="button" id="muteButton" class="btn btn-circle btn-primary"><i class="fa fa-microphone"></i></button></div>`;
+            const footerContent = document.createElement('div');
+            browserUtil.addRemoveClasses(footerContent,'d-flex w-100 justify-content-between mt-2');
+            const stopVideoButton = document.createElement('button');
+            stopVideoButton.setAttribute('type','button');
+            browserUtil.addRemoveClasses(stopVideoButton,'btn btn-circle btn-warning');
+            stopVideoButton.innerHTML = '<i class="fas fa-video-slash"></i>';
+            const muteMicButton = document.createElement('button');
+            muteMicButton.setAttribute('type','button');
+            browserUtil.addRemoveClasses(muteMicButton,'btn btn-circle btn-warning');
+            muteMicButton.innerHTML = '<i class="fa fa-microphone"></i>';
+
+            footerContent.appendChild(stopVideoButton);
+            footerContent.appendChild(muteMicButton);
+
+            videoCardFooter.appendChild(footerContent);
+
             videoCard.appendChild(videoCardFooter);
+
+            stopVideoButton.addEventListener('click',() => {
+                const isPaused = video.paused;
+                if (isPaused) {
+                    video.play();
+                    browserUtil.addRemoveClasses(stopVideoButton,'btn-success',false);
+                    browserUtil.addRemoveClasses(stopVideoButton,'btn-warning',true);
+
+                }
+                else {
+                    video.pause();
+                    browserUtil.addRemoveClasses(stopVideoButton,'btn-success',true);
+                    browserUtil.addRemoveClasses(stopVideoButton,'btn-warning',false);
+                }
+
+            });
+            muteMicButton.addEventListener('click',() => {
+                const isMuted = video.muted;
+                if (isMuted) {
+                    video.muted = false;
+                    browserUtil.addRemoveClasses(muteMicButton,'btn-success',false);
+                    browserUtil.addRemoveClasses(muteMicButton,'btn-warning',true);
+
+                }
+                else {
+                    video.muted = true;
+                    browserUtil.addRemoveClasses(muteMicButton,'btn-success',true);
+                    browserUtil.addRemoveClasses(muteMicButton,'btn-warning',false);
+                }
+
+            });
         }
 
-
+        videoCardHolder.appendChild(videoCard);
         video.srcObject = stream;
         video.addEventListener("loadedmetadata", () => {
             video.play();
-            if (this.webrtcDiv) this.webrtcDiv.append(videoCard);
+            if (this.webrtcDiv) this.webrtcDiv.append(videoCardHolder);
         });
     };
 
