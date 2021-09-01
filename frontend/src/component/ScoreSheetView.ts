@@ -24,22 +24,18 @@ export class ScoreSheetView implements StateChangeListener {
     private endOrLeaveEl: HTMLButtonElement | null = null;
     private scoreSheetEl: HTMLDivElement | null = null;
     private webrtcDiv: HTMLElement | null = null;
-    private myVideoStream: MediaStream|null = null;
-
+    private myVideoStream: MediaStream | null = null;
 
 
     private table: Handsontable | null = null;
     private controller: ScoreSheetController;
     private config: any;
-    private peer: any;
+    private peer: any | null = null;
 
     private constructor() {
         this.controller = ScoreSheetController.getInstance();
         this.stateManager = controller.getStateManager();
         this.eventUserSelected = this.eventUserSelected.bind(this);
-
-        // @ts-ignore  - is for the WebRTC peer via Nodejs
-        this.peer = new Peer(undefined, {path: '/peerjs', host: '/', port: '3030'});
     }
 
     public static getInstance(): ScoreSheetView {
@@ -97,6 +93,13 @@ export class ScoreSheetView implements StateChangeListener {
                 event.preventDefault()
             });
             this.thisEl.addEventListener('drop', this.handleUserDrop);
+        }
+        if (controller.isLoggedIn()) {
+            // @ts-ignore  - is for the WebRTC peer via Nodejs
+            this.peer = new Peer(controller.getLoggedInUsername(), {path: '/peerjs', host: '/', port: '3000'});
+            this.peer.on('open', (id:any) => {
+                ssvLogger('My peer ID is: ' + id);
+            });
         }
 
     }
@@ -181,6 +184,8 @@ export class ScoreSheetView implements StateChangeListener {
         if (this.timerEl) this.timerEl.innerText = this.createTimerDisplay(0);
         if (this.endOrLeaveEl) this.endOrLeaveEl.innerHTML = this.applicationView.state.ui.scoreSheet.dom.iconLeave;
         if (this.scoreSheetEl) browserUtil.removeAllChildren(this.scoreSheetEl);
+
+        if (this.webrtcDiv) browserUtil.removeAllChildren(this.webrtcDiv);
     }
 
     public updateTimer(time: number, isPaused: boolean = false) {
@@ -332,42 +337,82 @@ export class ScoreSheetView implements StateChangeListener {
         return result;
     }
 
-    private addVideoStream(video: HTMLVideoElement, stream: MediaStream) {
+    private addVideoStream(username: string, stream: MediaStream, isCurrentUser = false) {
+        const videoCard = document.createElement('div');
+        videoCard.setAttribute("id", username);
+        browserUtil.addRemoveClasses(videoCard, 'card col-sm-12 col-md-4 col-lg-3');
+        const videoCardTitle = document.createElement('div');
+        browserUtil.addRemoveClasses(videoCardTitle, 'card-header');
+        videoCardTitle.innerHTML = `<h5 class="card-title">${username}</h5>`;
+        const videoCardBody = document.createElement('div');
+        browserUtil.addRemoveClasses(videoCardBody, 'card-body');
+        const video = document.createElement('video');
+        browserUtil.addRemoveClasses(video, 'video');
+
+        videoCard.appendChild(videoCardTitle);
+        videoCard.appendChild(videoCardBody);
+        videoCardBody.appendChild(video);
+
+        if (isCurrentUser) {
+            const videoCardFooter = document.createElement('div');
+            browserUtil.addRemoveClasses(videoCardFooter, 'card-footer');
+            videoCardFooter.innerHTML = `<div class="d-flex w-100 justify-content-between mt-2"><button type=""button id="stopVideo" class="btn btn-circle btn-primary"><i class="fas fa-video-slash"></i></button><button type="button" id="muteButton" class="btn btn-circle btn-primary"><i class="fa fa-microphone"></i></button></div>`;
+            videoCard.appendChild(videoCardFooter);
+        }
+
+
         video.srcObject = stream;
         video.addEventListener("loadedmetadata", () => {
             video.play();
-            if (this.webrtcDiv) this.webrtcDiv.append(video);
+            if (this.webrtcDiv) this.webrtcDiv.append(videoCard);
         });
     };
 
-    public callUser(userId:string) {
+    public callUser(userId: string) {
+        ssvLogger(`Calling user ${userId}`);
         if (this.myVideoStream) {
             const call = this.peer.call(userId, this.myVideoStream);
-            const video = document.createElement('video');
-            call.on('stream', (userVideoStream:MediaStream) => {
-                this.addVideoStream(video, userVideoStream);
+            call.on('stream', (userVideoStream: any) => {
+                ssvLogger(`User ${userId} answered, showing stream`);
+                this.addVideoStream(userId, userVideoStream, false);
             });
         }
     };
 
-    public startScoreSheet() {
+    prepareToAnswerCallFrom(userId: string) {
         if (controller.isLoggedIn()) {
-            const myVideo: HTMLVideoElement = document.createElement("video");
+            ssvLogger(`Preparing to answer call from ${userId}`);
             if (navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({
                     audio: true,
                     video: true,
                 }).then((stream) => {
                     this.myVideoStream = stream;
-                    this.addVideoStream(myVideo, this.myVideoStream);
-                    // setup webrtc response
+                    this.addVideoStream(controller.getLoggedInUsername(), this.myVideoStream, true);
+                    ssvLogger(`Awaiting call from ${userId}`);
                     this.peer.on('call', (call: any) => {
-                        call.answer(stream);
-                        const video = document.createElement('video');
+                        ssvLogger(`Answering call from ${userId}`);
+                        call.answer(this.myVideoStream);
                         call.on('stream', (userVideoStream: any) => {
-                            this.addVideoStream(video, userVideoStream);
+                            ssvLogger(`Have answered, showing stream`);
+                            this.addVideoStream(userId, userVideoStream, false);
                         });
                     });
+                });
+            }
+        }
+
+    }
+
+    public startScoreSheet() {
+        if (controller.isLoggedIn()) {
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: true,
+                }).then((stream) => {
+                    this.myVideoStream = stream;
+                    this.addVideoStream(controller.getLoggedInUsername(), this.myVideoStream, true);
                 });
             }
         }

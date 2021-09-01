@@ -169,6 +169,21 @@ app.get('/js/env.js', (req, res) => {
     res.send(`window.ENV = ${JSON.stringify(env)}`);
 });
 
+// construct the web server
+serverDebug('Create HTTP Server');
+const httpServer = new https.Server({key: key, cert: cert },app);//new http.Server(app);
+
+
+// setup the sockets manager with the server
+serverDebug('Setting up Socket manager');
+socketManager.connectToServer(httpServer);
+
+// setup the WebRTC peer server
+// @ts-ignore
+const peerServer = ExpressPeerServer(httpServer, {debug: true,});
+app.use('/peerjs', peerServer);
+
+
 
 // catch 404 and forward to error handler
 serverDebug('Setting up 404 handler');
@@ -206,19 +221,6 @@ if (isDevelopment) {
 }
 
 
-// construct the web server
-serverDebug('Create HTTP Server');
-const httpServer = new https.Server({key: key, cert: cert },app);//new http.Server(app);
-
-
-// setup the sockets manager with the server
-serverDebug('Setting up Socket manager');
-socketManager.connectToServer(httpServer);
-
-// setup the WebRTC peer server
-// @ts-ignore
-const peerServer = ExpressPeerServer(httpServer, {debug: true,});
-app.use('/peerjs', peerServer);
 
 
 

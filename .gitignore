@@ -9,3 +9,4 @@
 /backend/dist/js/*.map
 /backend/dist/js/*.ts
 /backend/db/queue.json
+/backend/keytmp.pem

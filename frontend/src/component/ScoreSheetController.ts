@@ -127,6 +127,11 @@ export class ScoreSheetController implements ChatReceiver {
             }
 
         }
+
+        // prepare to receive a call
+        ScoreSheetView.getInstance().prepareToAnswerCallFrom(invite.from);
+
+
         // notify the user of the new chat
         notifier.show('Score Sheet', `Joining score sheet`, 'info', 7000);
         socketManager.joinChat(this.getCurrentUser(), invite.room, InviteType.ScoreSheet);
@@ -143,6 +148,8 @@ export class ScoreSheetController implements ChatReceiver {
         }
         // ask the view to initialise with these values
         ScoreSheetView.getInstance().stateChanged("", "", this.currentScoreSheet);
+
+
 
         // change to the score sheet
         this.applicationView.handleShowScoreSheet(null);
@@ -199,12 +206,13 @@ export class ScoreSheetController implements ChatReceiver {
         if (index < 0) {
             this.currentUsersInScoreSheet.push(users.username);
             // update the sheet data
-            this.addUserToScoreSheet(users.username);
+
             // the owner of the sheet should send a sync message of the data
             if (this.currentScoreSheet) this.saveCurrentScoreSheet(this.currentScoreSheet);
         }
         if (this.isRoomCreator && this.currentScoreSheet) {
             sscLogger(`Handling user joined ${users.username} - sending`)
+            this.addUserToScoreSheet(users.username);
             this.sendScoreSheetState(this.currentScoreSheet, false);
         }
         notifier.show(this.currentlySelectedBoardGame.name, `User ${users.username} joined the scoresheet.`, 'message', 120000);
@@ -507,6 +515,7 @@ export class ScoreSheetController implements ChatReceiver {
 
     protected addUserToScoreSheet(username: string): void {
         if (controller.isLoggedIn() && this.isSheetOwner()) {
+            sscLogger(`Calling user ${username}`);
             ScoreSheetView.getInstance().callUser(username);
         }
     }

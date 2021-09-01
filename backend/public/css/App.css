@@ -353,6 +353,12 @@ i:hover {
     margin-right: 20px;
 }
 
+/* video */
+.video {
+    width:200px;
+    height:200px;
+}
+
 /* keep the messages where they are (left or right) */
 @media(max-width : 30em){
     .room.messages{
