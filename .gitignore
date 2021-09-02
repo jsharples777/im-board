@@ -10,5 +10,3 @@
 /backend/dist/js/*.ts
 /backend/db/queue.json
 /backend/keytmp.pem
-/backend/public/js/app.bundle.js.map
-/backend/public/js/vendor.bundle.js.map
