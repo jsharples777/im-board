@@ -29,8 +29,8 @@ export class CallManager {
     private startPeerConnection() {
         if (controller.isLoggedIn()) {
             // @ts-ignore  - is for the WebRTC peer via Nodejs
-            this.peer = new Peer(controller.getLoggedInUsername(), {path: '/peerjs', host: '/', debug: 3, secure:true});
-            //this.peer = new Peer(controller.getLoggedInUsername(), {path: '/peerjs', host: '/', port: '3000', debug:3});
+            this.peer = new Peer(controller.getLoggedInUsername(), {path: '/peerjs', host: '/', debug: 2, secure:true});
+            //this.peer = new Peer(controller.getLoggedInUsername(), {path: '/peerjs', host: '/', port: '3000', debug:1, secure:false});
             this.peer.on('open', (id:any) => {
                 callLogger('My peer ID is: ' + id);
             });
