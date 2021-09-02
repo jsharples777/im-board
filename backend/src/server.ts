@@ -143,23 +143,23 @@ if (isDevelopment) {
 
 serverDebug('Installing routes');
 
-if (!isDevelopment) {
-  serverDebug(`Setting up re-routing for HTTP connections to HTTPS in production`);
-  app.use((req,resp,next) => {
-      if (!req.secure && !isDevelopment) {
-          const host:string|undefined = req.get('Host');
-          if (host) {
-              resp.set('location',['https://',host,req.url].join(''));
-              resp.status(301).send();
-
-          }
-          return;
-      }
-      else {
-          next();
-      }
-  });
-}
+// if (!isDevelopment) {
+//   serverDebug(`Setting up re-routing for HTTP connections to HTTPS in production`);
+//   app.use((req,resp,next) => {
+//       if (!req.secure && !isDevelopment) {
+//           const host:string|undefined = req.get('Host');
+//           if (host) {
+//               resp.set('location',['https://',host,req.url].join(''));
+//               resp.status(301).send();
+//
+//           }
+//           return;
+//       }
+//       else {
+//           next();
+//       }
+//   });
+// }
 
 app.use('/', routes);// add the middleware path routing
 

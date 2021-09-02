@@ -116,22 +116,23 @@ else {
 }
 // ensure the user is logged in with a path
 serverDebug('Installing routes');
-if (!isDevelopment) {
-    serverDebug(`Setting up re-routing for HTTP connections to HTTPS in production`);
-    app.use((req, resp, next) => {
-        if (!req.secure && !isDevelopment) {
-            const host = req.get('Host');
-            if (host) {
-                resp.set('location', ['https://', host, req.url].join(''));
-                resp.status(301).send();
-            }
-            return;
-        }
-        else {
-            next();
-        }
-    });
-}
+// if (!isDevelopment) {
+//   serverDebug(`Setting up re-routing for HTTP connections to HTTPS in production`);
+//   app.use((req,resp,next) => {
+//       if (!req.secure && !isDevelopment) {
+//           const host:string|undefined = req.get('Host');
+//           if (host) {
+//               resp.set('location',['https://',host,req.url].join(''));
+//               resp.status(301).send();
+//
+//           }
+//           return;
+//       }
+//       else {
+//           next();
+//       }
+//   });
+// }
 app.use('/', routes_1.default); // add the middleware path routing
 // setup the QL server for the Board Game Geek Data retrieval (just for fun, don't need Graph QL, but good practise)
 serverDebug('Setting up Board Game Geek API interface via Graph QL');
