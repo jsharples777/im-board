@@ -106,6 +106,9 @@ export class ScoreSheetView implements StateChangeListener {
         if (ScoreSheetController.getInstance().isSheetOwner()) {
             ScoreSheetController.getInstance().inviteUser(ui.item.label);
         }
+        else {
+            alert ("Only the score sheet creator can invite users.");
+        }
     }
 
 
