@@ -124,12 +124,10 @@ if (!isDevelopment) {
             if (host) {
                 resp.set('location', ['https://', host, req.url].join(''));
                 resp.status(301).send();
-                return;
             }
+            return;
         }
-        else {
-            next();
-        }
+        next();
     });
 }
 app.use('/', routes_1.default); // add the middleware path routing

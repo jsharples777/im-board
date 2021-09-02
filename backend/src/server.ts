@@ -151,12 +151,11 @@ if (!isDevelopment) {
           if (host) {
               resp.set('location',['https://',host,req.url].join(''));
               resp.status(301).send();
-              return;
+
           }
+          return;
       }
-      else {
-          next();
-      }
+      next();
   });
 }
 

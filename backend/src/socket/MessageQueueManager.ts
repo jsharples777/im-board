@@ -223,6 +223,12 @@ export default class MessageQueueManager {
             mqLogger(dataObj);
             this.messageQueue = dataObj.queues;
 
+            // set all queued users to offline
+            mqLogger(`All users are off-line, by definition.`);
+            this.messageQueue.forEach((queue) => {
+                queue.status = Status.LoggedOut;
+            })
+
             // go through the rooms and remove empty ones
             if (dataObj.rooms) {
                 let counter = dataObj.rooms.length;
