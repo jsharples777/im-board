@@ -45,19 +45,25 @@ export class CallManager {
     }
 
     public startScoreSheet() {
-        if (controller.isLoggedIn()) {
-            if (navigator.mediaDevices.getUserMedia) {
-                callLogger('Starting scoresheet stream');
-                navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                    video: true,
-                }).then((stream) => {
-                    callLogger('Scoresheet stream started - adding video element');
-                    this.myVideoStream = stream;
-                    this.addVideoStream(controller.getLoggedInUsername(), this.myVideoStream, true);
-                });
+        try {
+            if (controller.isLoggedIn()) {
+                if (navigator.mediaDevices.getUserMedia) {
+                    callLogger('Starting scoresheet stream');
+                    navigator.mediaDevices.getUserMedia({
+                        audio: true,
+                        video: true,
+                    }).then((stream) => {
+                        callLogger('Scoresheet stream started - adding video element');
+                        this.myVideoStream = stream;
+                        this.addVideoStream(controller.getLoggedInUsername(), this.myVideoStream, true);
+                    });
 
+                }
             }
+        }
+        catch (err) {
+            callLogger(err);
+            callLogger(`Non-secure context or no camera capability`);
         }
     }
     
@@ -219,27 +225,33 @@ export class CallManager {
     }
 
     prepareToAnswerCallFrom(userId: string) {
-        if (controller.isLoggedIn()) {
-            callLogger(`Preparing to answer call from ${userId}`);
-            if (navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                    video: true,
-                }).then((stream) => {
-                    this.myVideoStream = stream;
-                    this.addVideoStream(controller.getLoggedInUsername(), this.myVideoStream, true);
-                    callLogger(`Awaiting call from ${userId}`);
-                    this.peer.on('call', (call: any) => {
-                        callLogger(`Answering call from ${userId}`);
-                        call.answer(this.myVideoStream);
-                        call.on('stream', (userVideoStream: any) => {
-                            alert("Answered");
-                            callLogger(`Have answered, showing stream`);
-                            this.addVideoStream(userId, userVideoStream, false);
+        try {
+            if (controller.isLoggedIn()) {
+                callLogger(`Preparing to answer call from ${userId}`);
+                if (navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({
+                        audio: true,
+                        video: true,
+                    }).then((stream) => {
+                        this.myVideoStream = stream;
+                        this.addVideoStream(controller.getLoggedInUsername(), this.myVideoStream, true);
+                        callLogger(`Awaiting call from ${userId}`);
+                        this.peer.on('call', (call: any) => {
+                            callLogger(`Answering call from ${userId}`);
+                            call.answer(this.myVideoStream);
+                            call.on('stream', (userVideoStream: any) => {
+                                alert("Answered");
+                                callLogger(`Have answered, showing stream`);
+                                this.addVideoStream(userId, userVideoStream, false);
+                            });
                         });
                     });
-                });
+                }
             }
+        }
+        catch (err) {
+            callLogger(err);
+            callLogger(`Insecure context or no video capability`);
         }
 
     }

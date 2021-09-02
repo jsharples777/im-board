@@ -3373,19 +3373,24 @@ var CallManager = /*#__PURE__*/function () {
   _proto.startScoreSheet = function startScoreSheet() {
     var _this = this;
 
-    if (_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].isLoggedIn()) {
-      if (navigator.mediaDevices.getUserMedia) {
-        callLogger('Starting scoresheet stream');
-        navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true
-        }).then(function (stream) {
-          callLogger('Scoresheet stream started - adding video element');
-          _this.myVideoStream = stream;
+    try {
+      if (_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].isLoggedIn()) {
+        if (navigator.mediaDevices.getUserMedia) {
+          callLogger('Starting scoresheet stream');
+          navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+          }).then(function (stream) {
+            callLogger('Scoresheet stream started - adding video element');
+            _this.myVideoStream = stream;
 
-          _this.addVideoStream(_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].getLoggedInUsername(), _this.myVideoStream, true);
-        });
+            _this.addVideoStream(_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].getLoggedInUsername(), _this.myVideoStream, true);
+          });
+        }
       }
+    } catch (err) {
+      callLogger(err);
+      callLogger("Non-secure context or no camera capability");
     }
   };
 
@@ -3567,32 +3572,37 @@ var CallManager = /*#__PURE__*/function () {
   _proto.prepareToAnswerCallFrom = function prepareToAnswerCallFrom(userId) {
     var _this5 = this;
 
-    if (_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].isLoggedIn()) {
-      callLogger("Preparing to answer call from " + userId);
+    try {
+      if (_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].isLoggedIn()) {
+        callLogger("Preparing to answer call from " + userId);
 
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true
-        }).then(function (stream) {
-          _this5.myVideoStream = stream;
+        if (navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+          }).then(function (stream) {
+            _this5.myVideoStream = stream;
 
-          _this5.addVideoStream(_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].getLoggedInUsername(), _this5.myVideoStream, true);
+            _this5.addVideoStream(_Controller__WEBPACK_IMPORTED_MODULE_0__["default"].getLoggedInUsername(), _this5.myVideoStream, true);
 
-          callLogger("Awaiting call from " + userId);
+            callLogger("Awaiting call from " + userId);
 
-          _this5.peer.on('call', function (call) {
-            callLogger("Answering call from " + userId);
-            call.answer(_this5.myVideoStream);
-            call.on('stream', function (userVideoStream) {
-              alert("Answered");
-              callLogger("Have answered, showing stream");
+            _this5.peer.on('call', function (call) {
+              callLogger("Answering call from " + userId);
+              call.answer(_this5.myVideoStream);
+              call.on('stream', function (userVideoStream) {
+                alert("Answered");
+                callLogger("Have answered, showing stream");
 
-              _this5.addVideoStream(userId, userVideoStream, false);
+                _this5.addVideoStream(userId, userVideoStream, false);
+              });
             });
           });
-        });
+        }
       }
+    } catch (err) {
+      callLogger(err);
+      callLogger("Insecure context or no video capability");
     }
   };
 
