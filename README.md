@@ -14,7 +14,7 @@
 
 
 # Project Description
-This [web application](https://im-board.herokuapp.com/) allows the user to find board games from Board Game Geek and add them to a local collection.  From there they can manage that
+This [web application](https://im-board-beta.herokuapp.com/) allows the user to find board games from Board Game Geek and add them to a local collection.  From there they can manage that
 collection adding and removing as they choose.  They can also start a score sheet for a board game, which is maintained in the browser and has some simple display and math functionality built-in.  
 The user can run a timer on the scoresheet to track the game length and then save the score sheet for that board game and review them at a later date.
 
