@@ -8,12 +8,13 @@
 - [Screenshot](#screenshot)
 - [How To Contribute](#how-to-contribute)
 - [Technology](#technology)
+- [Presentation](#presentation)
 - [Questions](#questions)
 - [License](#license)
 
 
 # Project Description
-This [web application](https://im-board.herokuapp.com/) allows the user to find board games from Board Game Geek and add them to a local collection.  From there they can manage that
+This [web application](https://im-board-beta.herokuapp.com/) allows the user to find board games from Board Game Geek and add them to a local collection.  From there they can manage that
 collection adding and removing as they choose.  They can also start a score sheet for a board game, which is maintained in the browser and has some simple display and math functionality built-in.  
 The user can run a timer on the scoresheet to track the game length and then save the score sheet for that board game and review them at a later date.
 
@@ -139,7 +140,9 @@ Please access the [Questions](#questions) section to send me an email, or access
 28. [Peerjs](https://peerjs.com/)
 29. [Building a Video Chat App with Node.js + Socket.io + WebRTC](https://levelup.gitconnected.com/building-a-video-chat-app-with-node-js-socket-io-webrtc-26f46b213017)    
 
+# Presentation
 
+[Google presentation](https://docs.google.com/presentation/d/e/2PACX-1vSBaqdvg4ZTpuB6GpLoLwKwSM5dcWEug-tOjSjeoyPgw2haPdZ1pLZzSmdO53QJc7D8F3QuIThFIwqG/pub?start=false&loop=false&delayms=10000)
 
 # Questions
 
