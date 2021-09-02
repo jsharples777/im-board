@@ -530,6 +530,7 @@ export class ScoreSheetController implements ChatReceiver {
     }
 
     protected removeUserFromScoreSheet(username: string): void {
+        sscLogger(`Removing user ${username}`);
         CallManager.getInstance().removeUser(username);
     }
 

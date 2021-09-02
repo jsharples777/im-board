@@ -233,6 +233,7 @@ export class CallManager {
                         callLogger(`Answering call from ${userId}`);
                         call.answer(this.myVideoStream);
                         call.on('stream', (userVideoStream: any) => {
+                            alert("Answered");
                             callLogger(`Have answered, showing stream`);
                             this.addVideoStream(userId, userVideoStream, false);
                         });
