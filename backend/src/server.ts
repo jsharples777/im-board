@@ -181,7 +181,7 @@ socketManager.connectToServer(httpServer);
 
 // setup the WebRTC peer server
 // @ts-ignore
-const peerServer = ExpressPeerServer(httpServer, {debug: 3});
+const peerServer = ExpressPeerServer(httpServer, {debug: 2, allow_discovery: true});
 app.use('/peerjs', peerServer);
 
 

@@ -147,7 +147,7 @@ serverDebug('Setting up Socket manager');
 SocketManager_1.default.connectToServer(httpServer);
 // setup the WebRTC peer server
 // @ts-ignore
-const peerServer = peer_1.ExpressPeerServer(httpServer, { debug: 3 });
+const peerServer = peer_1.ExpressPeerServer(httpServer, { debug: 2, allow_discovery: true });
 app.use('/peerjs', peerServer);
 // catch 404 and forward to error handler
 serverDebug('Setting up 404 handler');
