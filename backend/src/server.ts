@@ -146,7 +146,7 @@ serverDebug('Installing routes');
 if (!isDevelopment) {
   serverDebug(`Setting up re-routing for HTTP connections to HTTPS in production`);
   app.use((req,resp,next) => {
-      if (!req.secure) {
+      if (!req.secure && !isDevelopment) {
           const host:string|undefined = req.get('Host');
           if (host) {
               resp.set('location',['https://',host,req.url].join(''));
@@ -155,22 +155,22 @@ if (!isDevelopment) {
           }
           return;
       }
-      next();
+      else {
+          next();
+      }
   });
 }
 
 app.use('/', routes);// add the middleware path routing
-//app.use('/api',apiRoutes);// add the api path routing
+
 // setup the QL server for the Board Game Geek Data retrieval (just for fun, don't need Graph QL, but good practise)
 serverDebug('Setting up Board Game Geek API interface via Graph QL');
+new DataSource(app);
 
 // Setup authentication
 serverDebug('Setting up User model and authentication with Passport');
 // @ts-ignore
 setupPassport(passport, Account);
-
-// setup the Graph SQL
-new DataSource(app);
 
 // route for the env.js file being served to the client
 serverDebug('Setting the environment variables for the browser to access');
@@ -181,9 +181,9 @@ let env:any = {serverURL: API_SERVER_URL};
 app.get('/js/env.js', (req, res) => {
     let session = req.session;
     if (session.id) {
-        env.id = session.id;
+        env.sessionId = session.id;
     }
-    res.send(`window.ENV = ${JSON.stringify(env)}`);
+    res.send(`let window.ENV = ${JSON.stringify(env)}`);
 });
 
 // construct the web server
