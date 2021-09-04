@@ -98,7 +98,7 @@ export class CallManager {
 
         const videoCardHolder = document.createElement('div');
         videoCardHolder.setAttribute("id", username);
-        browserUtil.addRemoveClasses(videoCardHolder, 'col-sm-12 col-md-4 col-lg-2');
+        browserUtil.addRemoveClasses(videoCardHolder, 'col-sm-12 col-md-4 col-lg-3');
         const videoCard = document.createElement('div');
         browserUtil.addRemoveClasses(videoCard,'card');
         const videoCardTitle = document.createElement('div');
