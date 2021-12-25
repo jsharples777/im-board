@@ -21,7 +21,7 @@ export class TemplateManager {
         if (boardGame.gameId === 270314) {
             return this.getOhanamiTemplate();
         }
-        if (boardGame.gameId === 333201) {
+        if (boardGame.gameId === 150145) {
             return this.getSkullKingTemplate();
         }
         return this.getDefaultScoreSheetTemplate(boardGame);
@@ -31,7 +31,7 @@ export class TemplateManager {
         if (boardGame.gameId === 270314) {
             return this.getOhanamiStartingData();
         }
-        if (boardGame.gameId === 333201) {
+        if (boardGame.gameId === 150145) {
             return this.getSkullKingStartingData();
         }
         return this.getDefaultScoreSheetStartingData(boardGame);
@@ -41,7 +41,7 @@ export class TemplateManager {
         if (boardGame.gameId === 270314) {
             return this.getOhanamiSaveData(scoreSheet);
         }
-        if (boardGame.gameId === 333201) {
+        if (boardGame.gameId === 150145) {
             return this.getSkullKingSaveData(scoreSheet);
         }
         return this.getDefaultSaveData(scoreSheet);
@@ -53,7 +53,7 @@ export class TemplateManager {
             result = true;
             this.transformOhanamiData(scoreSheet);
         }
-        if (boardGame.gameId === 333201) {
+        if (boardGame.gameId === 150145) {
             result = true;
             this.transformSkullKingData(scoreSheet);
         }
